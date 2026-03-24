@@ -5,9 +5,15 @@ import con  from './config/connect.js';
 import cookieParser from 'cookie-parser';
 import { 
     authRoutes,
-    userRoutes
+    userRoutes,
+    workspacesRoutes
 } from './routes/index.js';
 import { protectedRoute } from './middlewares/authMiddlewares.js';
+
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
+
+
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -17,6 +23,40 @@ const HOST = process.env.HOST || '0.0.0.0';
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+
+//swagger
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.0', 
+        info: {
+            title: 'FLOWISE API',
+            version: '1.0.0',
+            description: 'Tài liệu API cho hệ thống quản lý công việc Flowise',
+        },
+        servers: [
+            {
+                url: `http://localhost:${PORT}`, 
+                description: 'Development Server'
+            },
+        ],
+
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                }
+            }
+        },
+        security: [{
+            bearerAuth: [] 
+        }]
+    },
+    apis: ['./src/routes/*.js'], 
+};
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 //public route
 app.get('/db-health', async (req, res) => {
     try {
@@ -42,6 +82,7 @@ app.use('/api/auth', authRoutes);
 //private route'
 app.use(protectedRoute);
 app.use('/api/user', userRoutes);
+app.use('/api/workspaces', workspacesRoutes);
 
 
 

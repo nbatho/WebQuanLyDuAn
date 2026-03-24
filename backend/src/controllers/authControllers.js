@@ -3,7 +3,6 @@ import { createUser, findUserByEmail, findUserByUsername } from '../models/User.
 import { createSession, deleteSessionByRefreshToken } from '../models/Session.js';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import con from '../config/connect.js';
 const ACCESS_TOKEN_TTL = '15m';
 const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000; // 14 ngày
 

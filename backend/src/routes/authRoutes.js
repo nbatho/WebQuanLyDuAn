@@ -1,9 +1,92 @@
-import express from 'express';
-import { signUp, signIn, signOut } from '../controllers/authControllers.js';
+import express from "express";
+import { signUp, signIn, signOut } from "../controllers/authControllers.js";
 const router = express.Router();
 
-router.post('/signup', signUp);
-router.post('/signin', signIn);
-router.post('/signout', signOut);
+/**
+ * @swagger
+ * tags:
+ *   - name: Authentication
+ *     description: Các API liên quan đến xác thực người dùng
+ */
+
+/**
+ * @swagger
+ * /api/auth/signup:
+ *   post:
+ *     summary: Đăng ký tài khoản mới
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *     responses:
+ *       201:
+ *         description: Đăng ký thành công
+ *       400:
+ *         description: Dữ liệu đầu vào không hợp lệ
+ *       409:
+ *         description: Tài khoản đã tồn tại
+ */
+router.post("/signup", signUp);
+
+/**
+ * @swagger
+ * /api/auth/signin:
+ *  post:
+ *    summary: Đăng nhập vào hệ thống
+ *    tags: [Authentication]
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            required:
+ *              - username
+ *              - password
+ *            properties:
+ *              username:
+ *                type: string
+ *                example: john_doe
+ *              password:
+ *                type: string
+ *                example: password123
+ *    responses:
+ *      200:
+ *        description: Đăng nhập thành công
+ *      400:
+ *        description: Dữ liệu đầu vào không hợp lệ
+ *      401:
+ *        description: Thông tin đăng nhập không hợp lệ
+ */
+router.post("/signin", signIn);
+
+/**
+ * @swagger
+ * /api/auth/signout:
+ *  post:
+ *   summary: Đăng xuất khỏi hệ thống
+ *   tags: [Authentication]
+ *   responses:
+ *      200:
+ *        description: Đăng xuất thành công
+ *      400:
+ *        description: Dữ liệu đầu vào không hợp lệ
+ *      401:
+ *       description: Người dùng chưa đăng nhập
+ */
+router.post("/signout", signOut);
 
 export default router;
