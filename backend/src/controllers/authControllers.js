@@ -44,20 +44,27 @@ export const signUp = async (req, res) => {
 export const signIn = async (req, res) => {
     try {
         // lấy input 
-        const { username, password } = req.body;
-        if (!username || !password) {
-            return res.status(400).json({ message: 'Khong the thieu username hoac password' });
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Khong the thieu email hoac password' });
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ message: 'Email khong hop le' });
+        }
+        if (email.length > 255) {
+            return res.status(400).json({ message: 'Email khong duoc qua 255 ky tu' });
         }
         // lấy hash password từ database
-        const user = await findUserByUsername(username);
+        const user = await findUserByEmail(email);
         if (!user) {
-            return res.status(401).json({ message: 'Sai username hoac password' });
+            return res.status(401).json({ message: 'Sai email hoac password' });
         }
 
         // so sánh password với hash password
         const passwordCorrect = await bcrypt.compare(password, user.password_hash);
         if (!passwordCorrect) {
-            return res.status(401).json({ message: 'Sai username hoac password' });
+            return res.status(401).json({ message: 'Sai email hoac password' });
         }
 
         //nếu khớp, tạo token và trả về cho client

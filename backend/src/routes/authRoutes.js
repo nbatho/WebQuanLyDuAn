@@ -24,6 +24,8 @@ const router = express.Router();
  *             required:
  *               - email
  *               - password
+ *               - username
+ *               - name
  *             properties:
  *               email:
  *                 type: string
@@ -31,6 +33,12 @@ const router = express.Router();
  *               password:
  *                 type: string
  *                 example: password123
+ *               username:
+ *                 type: string
+ *                 example: john_doe
+ *               name:
+ *                 type: string
+ *                 example: John Doe
  *     responses:
  *       201:
  *         description: Đăng ký thành công
@@ -44,48 +52,48 @@ router.post("/signup", signUp);
 /**
  * @swagger
  * /api/auth/signin:
- *  post:
- *    summary: Đăng nhập vào hệ thống
- *    tags: [Authentication]
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            type: object
- *            required:
- *              - username
- *              - password
- *            properties:
- *              username:
- *                type: string
- *                example: john_doe
- *              password:
- *                type: string
- *                example: password123
- *    responses:
- *      200:
- *        description: Đăng nhập thành công
- *      400:
- *        description: Dữ liệu đầu vào không hợp lệ
- *      401:
- *        description: Thông tin đăng nhập không hợp lệ
+ *   post:
+ *     summary: Đăng nhập vào hệ thống
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         description: Đăng nhập thành công
+ *       400:
+ *         description: Dữ liệu đầu vào không hợp lệ
+ *       401:
+ *         description: Thông tin đăng nhập không hợp lệ
  */
 router.post("/signin", signIn);
 
 /**
  * @swagger
  * /api/auth/signout:
- *  post:
- *   summary: Đăng xuất khỏi hệ thống
- *   tags: [Authentication]
- *   responses:
- *      200:
- *        description: Đăng xuất thành công
- *      400:
- *        description: Dữ liệu đầu vào không hợp lệ
- *      401:
- *       description: Người dùng chưa đăng nhập
+ *   post:
+ *     summary: Đăng xuất khỏi hệ thống
+ *     tags: [Authentication]
+ *     responses:
+ *       200:
+ *         description: Đăng xuất thành công
+ *       400:
+ *         description: Dữ liệu đầu vào không hợp lệ
+ *       401:
+ *         description: Người dùng chưa đăng nhập
  */
 router.post("/signout", signOut);
 
