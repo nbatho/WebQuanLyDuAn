@@ -98,8 +98,12 @@ export default function AppLayout() {
                     </div>
                     {spaces.map((s) => (
                         <div key={s.name}>
-                            <div className="al-sb-item">
-                                {s.expanded ? <ChevronDown size={14} className="al-sb-chevron" /> : <ChevronRight size={14} className="al-sb-chevron" />}
+                            <div 
+                                className="al-sb-item" 
+                                onClick={() => navigate(`/space/${s.name.toLowerCase().replace(/\s+/g, '-')}`)}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                {s.expanded ? <ChevronDown size={14} className="al-sb-chevron" onClick={(e) => { e.stopPropagation(); /* toggle logic */ }} /> : <ChevronRight size={14} className="al-sb-chevron" onClick={(e) => { e.stopPropagation(); /* toggle logic */ }} />}
                                 <span className="al-sb-space-icon" style={{ color: s.color }}>{s.icon}</span>
                                 <span>{s.name}</span>
                             </div>

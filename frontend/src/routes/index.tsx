@@ -7,6 +7,7 @@ import InviteTeamPage from "../pages/InviteTeamPage";
 import DashboardPage from "../pages/DashboardPage";
 import InboxPage from "../pages/InboxPage";
 import MyTasksPage from "../pages/MyTasksPage";
+import SpaceViewPage from '../pages/SpaceViewPage';
 import AppLayout from "../layouts/AppLayout";
 import type { RouteConfig } from "../types/app";
 export const routes: RouteConfig[] = [
@@ -52,8 +53,11 @@ export const routes: RouteConfig[] = [
             {
                 path: '/my-tasks',
                 element: <MyTasksPage />
+            },
+            {
+                path: 'space/:spaceId',
+                element: <SpaceViewPage />
             }
         ]
     }
 ];
-
