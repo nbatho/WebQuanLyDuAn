@@ -1,0 +1,222 @@
+/* ═══════════════════════════════════════════════════════
+   Unified AppLayout CSS
+   ═══════════════════════════════════════════════════════ */
+
+.al-container {
+    height: 100vh;
+    display: flex;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    overflow: hidden;
+    background: #f5f7ff;
+}
+
+/* ═══════ Sidebar ═══════ */
+.al-sidebar {
+    width: 220px;
+    background: #fff;
+    border-right: 1px solid #eef0f5;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 12px;
+    flex-shrink: 0;
+    overflow-y: auto;
+}
+
+/* Logo */
+.al-sb-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 8px 16px;
+    border-bottom: 1px solid #eef0f5;
+    margin-bottom: 12px;
+}
+.al-sb-logo-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #0058be;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.al-sb-logo-name {
+    font-size: 14px;
+    font-weight: 900;
+    color: #141b2b;
+    letter-spacing: -0.01em;
+}
+.al-sb-logo-sub {
+    font-size: 9px;
+    font-weight: 800;
+    color: #0058be;
+    letter-spacing: 0.08em;
+    line-height: 1.1;
+}
+
+/* Nav Groups */
+.al-sb-nav, .al-sb-extra {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 16px;
+}
+
+/* Items */
+.al-sb-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #5f6368;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+}
+.al-sb-item:hover {
+    background: #f0f4ff;
+    color: #141b2b;
+}
+.al-sb-item--active {
+    background: #0058be;
+    color: #fff;
+}
+.al-sb-item--active:hover {
+    background: #0058be;
+    color: #fff;
+}
+
+/* Badges */
+.al-sb-badge {
+    margin-left: auto;
+    background: #e74c3c;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 10px;
+    line-height: 1;
+}
+
+/* Spaces Section */
+.al-sb-section {
+    margin-bottom: 16px;
+}
+.al-sb-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #9aa0a6;
+    letter-spacing: 0.08em;
+}
+.al-sb-section-add {
+    color: #c2c9e0;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+.al-sb-section-add:hover {
+    color: #0058be;
+}
+
+.al-sb-chevron {
+    color: #9aa0a6;
+    margin-left: -2px;
+    margin-right: -2px;
+}
+.al-sb-space-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    background: #f0f4ff;
+    color: #0058be;
+}
+.al-sb-subitem {
+    padding: 6px 10px 6px 42px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #9aa0a6;
+    cursor: pointer;
+    border-radius: 6px;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+}
+.al-sb-subitem:hover {
+    background: #f0f4ff;
+    color: #5f6368;
+}
+
+/* AI Item */
+.al-sb-item--ai {
+    background: linear-gradient(90deg, #f0f4ff 0%, #fff 100%);
+    color: #0058be;
+    border: 1px solid #e8edff;
+}
+.al-sb-item--ai:hover {
+    background: #eef2ff;
+}
+.al-sb-ai-sparkle {
+    margin-left: auto;
+    font-size: 12px;
+}
+
+/* Bottom */
+.al-sb-bottom {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-top: 1px solid #eef0f5;
+    padding-top: 12px;
+}
+.al-sb-invite-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px;
+    background: #f0f4ff;
+    color: #0058be;
+    border: 1px dashed #0058be;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 4px;
+}
+.al-sb-invite-btn:hover {
+    background: #0058be;
+    color: #fff;
+}
+.al-sb-item--logout {
+    color: #e74c3c;
+}
+.al-sb-item--logout:hover {
+    background: #fff1f0;
+    color: #e74c3c;
+}
+
+/* ═══════ Main Outlet ═══════ */
+.al-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow-y: auto;
+    background: #f5f7ff;
+}
+
+@media (max-width: 900px) {
+    .al-sidebar {
+        display: none;
+    }
+}

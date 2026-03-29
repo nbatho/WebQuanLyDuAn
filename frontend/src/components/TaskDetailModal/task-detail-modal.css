@@ -1,0 +1,225 @@
+.tdm-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(20, 27, 43, 0.5);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.15s ease;
+}
+
+.tdm-modal {
+    background: #fff;
+    width: 960px;
+    height: 85vh;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tdm-modal--maximized {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+}
+
+/* ═══════ Header ═══════ */
+.tdm-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid #eef0f5;
+    background: #fff;
+    flex-shrink: 0;
+}
+
+.tdm-header-left {
+    display: flex; align-items: center; gap: 16px;
+}
+
+.tdm-breadcrumbs {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; color: #9aa0a6;
+    text-transform: uppercase; letter-spacing: 0.05em;
+}
+
+.tdm-status-badge {
+    color: #fff; font-size: 10px; font-weight: 800;
+    padding: 4px 10px; border-radius: 4px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.tdm-header-right {
+    display: flex; align-items: center; gap: 8px;
+}
+
+.tdm-icon-btn {
+    width: 30px; height: 30px; border-radius: 6px;
+    background: none; border: 1px solid transparent;
+    display: flex; align-items: center; justify-content: center;
+    color: #5f6368; cursor: pointer; transition: all 0.15s;
+}
+.tdm-icon-btn:hover { background: #f0f4ff; border-color: #dcdfe4; color: #141b2b; }
+.tdm-close-btn:hover { background: #fee2e2; border-color: #fecaca; color: #dc2626; }
+
+/* ═══════ Body ═══════ */
+.tdm-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* ═══════ Left Column ═══════ */
+.tdm-main-col {
+    flex: 2.5;
+    display: flex; flex-direction: column;
+    padding: 24px 32px;
+    overflow-y: auto;
+    border-right: 1px solid #eef0f5;
+    background: #fff;
+}
+
+.tdm-task-title {
+    width: 100%; border: none; outline: none;
+    font-size: 28px; font-weight: 800; color: #141b2b;
+    margin-bottom: 24px; letter-spacing: -0.02em;
+    font-family: inherit;
+}
+.tdm-task-title::placeholder { color: #dcdfe4; }
+
+.tdm-section {
+    margin-bottom: 32px;
+}
+.tdm-section-title {
+    font-size: 14px; font-weight: 800; color: #5f6368;
+    margin: 0 0 12px; letter-spacing: -0.01em;
+}
+
+.tdm-desc-editor {
+    width: 100%; min-height: 120px;
+    border: 1px solid transparent; border-radius: 8px;
+    padding: 12px; font-size: 14px; color: #141b2b;
+    resize: vertical; font-family: inherit;
+    transition: all 0.2s; line-height: 1.6;
+}
+.tdm-desc-editor:hover { border-color: #eef0f5; }
+.tdm-desc-editor:focus {
+    outline: none; border-color: #0058be;
+    box-shadow: 0 0 0 3px rgba(0,88,190,0.1); background: #fff;
+}
+
+.tdm-attachment-dropzone {
+    border: 2px dashed #dcdfe4;
+    border-radius: 8px; padding: 24px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #9aa0a6; font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s; background: #fafbfc;
+}
+.tdm-attachment-dropzone:hover { border-color: #0058be; color: #0058be; background: #f0f4ff; }
+.tdm-drop-icon { margin-bottom: 8px; }
+
+/* Activity / Comments */
+.tdm-activity-section {
+    margin-top: auto; border-top: 1px solid #eef0f5;
+    padding-top: 24px;
+}
+.tdm-activity-tabs {
+    display: flex; gap: 16px; margin-bottom: 16px;
+    border-bottom: 1px solid #eef0f5;
+}
+.tdm-tab {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 12px; background: none; border: none;
+    font-size: 13px; font-weight: 700; color: #9aa0a6;
+    cursor: pointer; border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+}
+.tdm-tab:hover { color: #5f6368; }
+.tdm-tab--active { color: #0058be; border-bottom-color: #0058be; }
+
+.tdm-activity-content {
+    min-height: 150px; margin-bottom: 16px;
+}
+.tdm-comment {
+    display: flex; gap: 12px; margin-bottom: 16px;
+}
+.tdm-comment-body {
+    background: #f8fafc; padding: 12px 16px; border-radius: 8px;
+    border-top-left-radius: 0; flex: 1;
+}
+.tdm-comment-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 4px; font-size: 12px;
+}
+.tdm-comment-header strong { color: #141b2b; }
+.tdm-comment-header span { color: #9aa0a6; font-weight: 500; }
+.tdm-comment-body p { margin: 0; font-size: 13px; color: #5f6368; line-height: 1.5; }
+
+.tdm-activity-item {
+    display: flex; gap: 12px; padding: 8px 0; border-bottom: 1px solid #f0f2f5;
+}
+.tdm-activity-item p { margin: 0; font-size: 12px; color: #5f6368; }
+.tdm-activity-item span { font-size: 10px; color: #9aa0a6; }
+
+.tdm-comment-input-area {
+    display: flex; gap: 12px; align-items: flex-start;
+}
+.tdm-comment-box {
+    flex: 1; border: 1px solid #dcdfe4; border-radius: 8px;
+    overflow: hidden; transition: all 0.2s;
+}
+.tdm-comment-box:focus-within { border-color: #0058be; box-shadow: 0 0 0 3px rgba(0,88,190,0.1); }
+.tdm-comment-box textarea { border: none !important; box-shadow: none !important; resize: none; }
+.tdm-comment-actions {
+    display: flex; justify-content: flex-end; padding: 8px;
+    background: #f8fafc; border-top: 1px solid #eef0f5;
+}
+
+
+/* ═══════ Right Column (Metadata) ═══════ */
+.tdm-meta-col {
+    flex: 1; min-width: 250px; background: #fafbfc;
+    padding: 24px; overflow-y: auto;
+}
+
+.tdm-meta-group {
+    display: flex; flex-direction: column; gap: 12px;
+    margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eef0f5;
+}
+
+.tdm-meta-item {
+    display: flex; align-items: center; justify-content: space-between;
+}
+
+.tdm-meta-label {
+    font-size: 12px; font-weight: 600; color: #9aa0a6;
+}
+
+.tdm-meta-value {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 700; color: #5f6368;
+    padding: 6px 10px; border-radius: 6px; cursor: pointer;
+    transition: background 0.15s; border: 1px dashed transparent;
+}
+.tdm-meta-value:hover { background: #eef0f5; border-color: #dcdfe4; }
+
+.tdm-meta-icon { color: #9aa0a6; }
+
+.tdm-meta-value--timer { gap: 12px; }
+.tdm-timer-btn { font-size: 11px; height: 24px; font-weight: 700; }
+
+.tdm-meta-section { margin-bottom: 24px; }
+.tdm-meta-section h4 {
+    font-size: 11px; font-weight: 800; color: #9aa0a6; letter-spacing: 0.05em;
+    text-transform: uppercase; margin: 0 0 12px;
+}
+.tdm-empty-text { font-size: 12px; color: #9aa0a6; font-style: italic; margin: 0; }

@@ -1,0 +1,496 @@
+/* ═══════════════════════════════════════════════════════
+   Workspace Branding — Color + Logo Setup
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Page ── */
+.wb-page {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #fff;
+    overflow: hidden;
+}
+
+/* ── Top Nav ── */
+.wb-topnav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 52px;
+    border-bottom: 1px solid #eef0f5;
+    flex-shrink: 0;
+}
+
+.wb-topnav-brand {
+    font-size: 20px;
+    font-weight: 900;
+    color: #141b2b;
+    letter-spacing: -0.04em;
+}
+
+.wb-topnav-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wb-topnav-icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: #e8edf5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #5f6368;
+    transition: background 0.15s;
+}
+
+.wb-topnav-icon-btn:hover {
+    background: #d4dbe8;
+}
+
+.wb-topnav-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.wb-topnav-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ── Body ── */
+.wb-body {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+}
+
+/* ── Left: Form ── */
+.wb-form-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 48px;
+    overflow-y: auto;
+}
+
+.wb-form-inner {
+    width: 100%;
+    max-width: 420px;
+}
+
+.wb-heading {
+    font-size: 32px;
+    font-weight: 900;
+    color: #141b2b;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+    margin: 0 0 8px;
+}
+
+.wb-subheading {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0 0 24px;
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+/* ── Field ── */
+.wb-field {
+    margin-bottom: 20px;
+}
+
+.wb-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    color: #141b2b;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+/* ── Color Picker ── */
+.wb-color-picker {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.wb-color-swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    outline: none;
+    position: relative;
+}
+
+.wb-color-swatch:hover {
+    transform: scale(1.1);
+}
+
+.wb-color-swatch--active {
+    border-color: #141b2b;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px currentColor;
+    transform: scale(1.08);
+}
+
+/* ── Drop Zone ── */
+.wb-drop-zone {
+    border: 2px dashed #c2c9e0;
+    border-radius: 14px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+    transition: all 0.2s;
+    position: relative;
+    background: #fafbff;
+}
+
+.wb-drop-zone--dragging {
+    border-color: #0058be;
+    background: #eef2ff;
+}
+
+.wb-drop-icon-wrap {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #e8edff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.wb-drop-icon {
+    color: #0058be;
+}
+
+.wb-drop-text {
+    font-size: 14px;
+    font-weight: 700;
+    color: #141b2b;
+    margin: 0 0 4px;
+}
+
+.wb-drop-hint {
+    font-size: 12px;
+    color: #9aa0a6;
+    margin: 0 0 12px;
+    font-weight: 500;
+}
+
+.wb-drop-preview {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.wb-file-input {
+    display: none;
+}
+
+.wb-select-file-btn {
+    padding: 6px 20px;
+    border: 2px solid #d2d6e8;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    color: #141b2b;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+}
+
+.wb-select-file-btn:hover {
+    border-color: #0058be;
+    color: #0058be;
+}
+
+/* ── Actions ── */
+.wb-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.wb-back-btn {
+    padding: 10px 24px;
+    border: 2px solid #e2e6f0;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    color: #5f6368;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+}
+
+.wb-back-btn:hover {
+    border-color: #141b2b;
+    color: #141b2b;
+}
+
+.wb-next-btn {
+    height: 44px !important;
+    min-width: 120px !important;
+    border-radius: 10px !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    border: none !important;
+    transition: filter 0.2s !important;
+}
+
+.wb-next-btn:hover {
+    filter: brightness(1.1) !important;
+}
+
+/* ═══════ RIGHT: Preview ═══════ */
+.wb-preview-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 40px;
+    background: #f0f4ff;
+    gap: 16px;
+    overflow: hidden;
+}
+
+.wb-preview-wrap {
+    display: flex;
+    border-radius: 14px;
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.04),
+        0 8px 28px rgba(0, 88, 190, 0.07);
+    overflow: hidden;
+    background: #fff;
+}
+
+/* ── Sidebar ── */
+.wb-sidebar {
+    width: 200px;
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-right: 1px solid #f0f2f5;
+    min-height: 340px;
+}
+
+.wb-sb-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f2f5;
+}
+
+.wb-sb-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0;
+    transition: background-color 0.3s;
+    overflow: hidden;
+}
+
+.wb-sb-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.wb-sb-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.wb-sb-name {
+    font-size: 13px;
+    font-weight: 800;
+    color: #141b2b;
+}
+
+.wb-sb-plan {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+}
+
+/* ── Nav ── */
+.wb-sb-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+    padding-top: 6px;
+}
+
+.wb-sb-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #5f6368;
+    transition: all 0.2s;
+}
+
+.wb-sb-item--active {
+    color: #fff;
+}
+
+.wb-sb-item-icon {
+    color: #fff;
+}
+
+.wb-sb-item-icon--muted {
+    color: #9aa0a6;
+}
+
+/* ── User ── */
+.wb-sb-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f2f5;
+    margin-top: auto;
+}
+
+.wb-sb-user-img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.wb-sb-user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.wb-sb-user-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #141b2b;
+}
+
+.wb-sb-user-role {
+    font-size: 10px;
+    color: #9aa0a6;
+    font-weight: 600;
+}
+
+/* ── Content Mock ── */
+.wb-content-mock {
+    width: 180px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #f9faff;
+}
+
+.wb-mock-bar {
+    height: 10px;
+    border-radius: 5px;
+    background: #e2e6f0;
+}
+
+.wb-mock-bar--top {
+    width: 60%;
+}
+
+.wb-mock-cards-row {
+    display: flex;
+    gap: 8px;
+}
+
+.wb-mock-card {
+    background: #e8edf5;
+    border-radius: 8px;
+}
+
+.wb-mock-card--tall {
+    flex: 1;
+    height: 100px;
+}
+
+.wb-mock-card--sm {
+    flex: 1;
+    height: 70px;
+}
+
+/* ── Caption ── */
+.wb-caption-box {
+    padding: 12px 20px;
+    border: 1px solid;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 380px;
+    transition: all 0.3s;
+}
+
+.wb-caption-box p {
+    font-size: 13px;
+    font-weight: 600;
+    color: #5f6368;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+    .wb-body {
+        flex-direction: column;
+    }
+    .wb-preview-section {
+        display: none;
+    }
+    .wb-form-section {
+        padding: 24px 20px;
+    }
+}
