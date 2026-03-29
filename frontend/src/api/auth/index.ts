@@ -1,0 +1,44 @@
+import { beApi } from "../callApi";
+
+export const signIn = async (email: string, password: string) => {
+    return beApi.post("/auth/signin", { email, password });
+}
+
+export const signUp = async (email: string, password: string, username : string, name : string) => {
+    return beApi.post("/auth/signup", { email, password, username, name });
+}
+
+export const signOut = async () => {
+    return beApi.post("/auth/signout");
+}
+
+export const getToken = (): string | null => {
+    return localStorage.getItem('access_token');
+};
+
+export const isTokenExpired = (): boolean => {
+    const token = getToken();
+    if (!token) return true;
+
+    try {
+        const base64Url = token.split('.')[1];
+        if (!base64Url) return true;
+
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            window.atob(base64)
+                .split('')
+                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+        );
+
+        const payload = JSON.parse(jsonPayload);
+        
+        const bufferSeconds = 10;
+        return (payload.exp - bufferSeconds) * 1000 < Date.now();
+        
+    } catch (error) {
+        console.error('Error decoding token:', error);
+        return true;
+    }
+};
