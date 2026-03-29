@@ -6,9 +6,9 @@ import {
   updateWorkspaces,
   deleteWorkspaces,
   getWorkspaceMembers,
-  // getWorkspaceInvitations,
-  // acceptWorkspaceInvitation,
-  // rejectWorkspaceInvitation
+  getWorkspaceInvitations,
+  acceptWorkspaceInvitation,
+  rejectWorkspaceInvitation
 } from "../controllers/workspacesControllers.js";
 
 const router = express.Router();
@@ -90,17 +90,17 @@ router.post("/", createWorkspaces);
  *       404:
  *         description: Không tìm thấy workspace
  */
-router.get("/:id", getWorkspaceById);
+router.get("/:workspaceId", getWorkspaceById);
 
 /**
  * @swagger
- * /api/workspaces/{id}:
+ * /api/workspaces/{workspaceId}:
  *   put:
  *     summary: Cập nhật thông tin Workspace
  *     tags: [Workspaces]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: workspaceId
  *         schema:
  *           type: integer
  *         required: true
@@ -126,17 +126,17 @@ router.get("/:id", getWorkspaceById);
  *       404:
  *         description: Không tìm thấy workspace
  */
-router.put("/:id", updateWorkspaces);
+router.put("/:workspaceId", updateWorkspaces);
 
 /**
  * @swagger
- * /api/workspaces/{id}:
+ * /api/workspaces/{workspaceId}:
  *   delete:
  *     summary: Xóa một Workspace
  *     tags: [Workspaces]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: workspaceId
  *         schema:
  *           type: integer
  *         required: true
@@ -149,17 +149,17 @@ router.put("/:id", updateWorkspaces);
  *       404:
  *         description: Không tìm thấy workspace
  */
-router.delete("/:id", deleteWorkspaces);
+router.delete("/:workspaceId", deleteWorkspaces);
 
 /**
  * @swagger
- * /api/workspaces/{id}/members:
+ * /api/workspaces/{workspaceId}/members:
  *   get:
  *     summary: Lấy danh sách thành viên trong Workspace
  *     tags: [Workspaces]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: workspaceId
  *         schema:
  *           type: integer
  *         required: true
@@ -170,10 +170,10 @@ router.delete("/:id", deleteWorkspaces);
  *       404:
  *         description: Không tìm thấy workspace
  */
-router.get("/:id/members", getWorkspaceMembers);
+router.get("/:workspaceId/members", getWorkspaceMembers);
 
-// router.post('/:id/invitations', getWorkspaceInvitations);
-// router.post('/:id/invitations/accept', acceptWorkspaceInvitation);
-// router.post('/:id/invitations/reject', rejectWorkspaceInvitation);
+router.post('/:workspaceId/invitations', getWorkspaceInvitations);
+router.post('/:workspaceId/invitations/accept', acceptWorkspaceInvitation);
+router.post('/:workspaceId/invitations/reject', rejectWorkspaceInvitation);
 
 export default router;

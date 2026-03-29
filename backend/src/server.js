@@ -6,7 +6,12 @@ import cookieParser from 'cookie-parser';
 import { 
     authRoutes,
     userRoutes,
-    workspacesRoutes
+    workspacesRoutes,
+    spaceRoutes,
+    taskRoutes,
+    milestoneRoutes,
+    sprintRoutes,
+    notificationRoutes
 } from './routes/index.js';
 import { protectedRoute } from './middlewares/authMiddlewares.js';
 
@@ -83,7 +88,11 @@ app.use('/api/auth', authRoutes);
 app.use(protectedRoute);
 app.use('/api/user', userRoutes);
 app.use('/api/workspaces', workspacesRoutes);
-
+app.use('/api/spaces', spaceRoutes);
+app.use('/api/tasks', taskRoutes);
+app.use('/api/milestones', milestoneRoutes);
+app.use('/api/sprints', sprintRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 
 //error handling middleware
