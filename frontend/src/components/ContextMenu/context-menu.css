@@ -1,0 +1,37 @@
+/* ═══════════════════════════════════════════
+   CONTEXT MENU
+═══════════════════════════════════════════ */
+.ctx-menu {
+    position: fixed; z-index: 3000;
+    min-width: 200px; background: #fff;
+    border: 1px solid #eef0f5; border-radius: 10px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.15);
+    padding: 4px; animation: ctx-in 0.12s ease;
+}
+@keyframes ctx-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.ctx-menu-title {
+    padding: 6px 12px 4px; font-size: 11px; font-weight: 700;
+    color: #9aa0a6; text-transform: uppercase; letter-spacing: 0.04em;
+    border-bottom: 1px solid #f0f2f5; margin-bottom: 2px;
+}
+
+.ctx-menu-item {
+    display: flex; align-items: center; gap: 8px; width: 100%;
+    background: none; border: none; border-radius: 6px;
+    padding: 7px 12px; font-size: 13px; font-weight: 500;
+    color: #141b2b; cursor: pointer; text-align: left;
+    transition: background 0.1s;
+}
+.ctx-menu-item:hover { background: #f0f4ff; color: #0058be; }
+.ctx-menu-item--danger { color: #e74c3c; }
+.ctx-menu-item--danger:hover { background: #fff5f5; color: #c0392b; }
+
+.ctx-submenu-arrow { margin-left: auto; color: #c2c9e0; }
+
+.ctx-menu-divider {
+    height: 1px; background: #f0f2f5; margin: 3px 8px;
+}

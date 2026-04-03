@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { 
-    X, CheckCircle2, User, Calendar, Flag, Clock, 
+import { useState, useRef, useEffect } from 'react';
+import {
+    X, CheckCircle2, User, Calendar, Flag, Clock,
     MoreHorizontal, Paperclip, Minimize2, Maximize2,
-    MessageSquare, Activity, ChevronRight, Tag
+    MessageSquare, Activity, ChevronRight, ChevronDown, Tag
 } from 'lucide-react';
 import { Button, Input, Avatar, Tooltip } from 'antd';
 import './task-detail-modal.css';
@@ -10,31 +10,106 @@ import './task-detail-modal.css';
 interface TaskDetailModalProps {
     isOpen: boolean;
     onClose: () => void;
-    task: any; // Using generic any for mockup purposes
+    task: any;
 }
+
+const STATUS_OPTIONS = [
+    { value: 'TO DO', color: '#5f6368' },
+    { value: 'IN PROGRESS', color: '#0058be' },
+    { value: 'COMPLETE', color: '#27ae60' },
+];
+
+const PRIORITY_OPTIONS = [
+    { value: 'Urgent', color: '#e74c3c' },
+    { value: 'High', color: '#f0a220' },
+    { value: 'Normal', color: '#00b894' },
+    { value: 'Low', color: '#9aa0a6' },
+];
+
+const MEMBER_OPTIONS = [
+    { id: 'AR', name: 'Alex Rivera', color: '#4285F4' },
+    { id: 'MC', name: 'Marcus Chen', color: '#7c5cfc' },
+    { id: 'SJ', name: 'Sarah Jenkins', color: '#0058be' },
+    { id: 'ER', name: 'Elena Rodriguez', color: '#e84393' },
+];
 
 export default function TaskDetailModal({ isOpen, onClose, task }: TaskDetailModalProps) {
     const [isMaximized, setIsMaximized] = useState(false);
     const [activeTab, setActiveTab] = useState<'comments' | 'activity'>('comments');
+    const [taskTitle, setTaskTitle] = useState('');
+    const [taskDesc, setTaskDesc] = useState('');
+    const [taskStatus, setTaskStatus] = useState('TO DO');
+    const [taskPriority, setTaskPriority] = useState('Normal');
+
+    // Dropdown states
+    const [showStatus, setShowStatus] = useState(false);
+    const [showPriority, setShowPriority] = useState(false);
+    const [showAssignee, setShowAssignee] = useState(false);
+
+    const statusRef = useRef<HTMLDivElement>(null);
+    const priorityRef = useRef<HTMLDivElement>(null);
+    const assigneeRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (task) {
+            setTaskTitle(task.title || '');
+            setTaskDesc(task.description || '');
+            setTaskStatus(task.status || 'TO DO');
+            setTaskPriority(task.priority || 'Normal');
+        }
+    }, [task]);
+
+    // Close dropdowns on outside click
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (statusRef.current && !statusRef.current.contains(e.target as Node)) setShowStatus(false);
+            if (priorityRef.current && !priorityRef.current.contains(e.target as Node)) setShowPriority(false);
+            if (assigneeRef.current && !assigneeRef.current.contains(e.target as Node)) setShowAssignee(false);
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
 
     if (!isOpen || !task) return null;
 
+    const statusObj = STATUS_OPTIONS.find(s => s.value === taskStatus) || STATUS_OPTIONS[0];
+    const priorityObj = PRIORITY_OPTIONS.find(p => p.value === taskPriority) || PRIORITY_OPTIONS[2];
+
     return (
         <div className="tdm-overlay" onClick={onClose}>
-            <div 
-                className={`tdm-modal ${isMaximized ? 'tdm-modal--maximized' : ''}`} 
+            <div
+                className={`tdm-modal ${isMaximized ? 'tdm-modal--maximized' : ''}`}
                 onClick={e => e.stopPropagation()}
             >
                 {/* ═══════ HEADER ═══════ */}
                 <div className="tdm-header">
                     <div className="tdm-header-left">
                         <div className="tdm-breadcrumbs">
-                            <span>Marketing Space</span>
+                            <span>Main Space</span>
                             <ChevronRight size={12} />
-                            <span>Q1 Campaign</span>
+                            <span>Task Management</span>
                         </div>
-                        <div className="tdm-status-badge" style={{ backgroundColor: task.statusColor || '#0984e3' }}>
-                            {task.status || 'TO DO'}
+                        {/* Status dropdown */}
+                        <div className="tdm-status-wrap" ref={statusRef}>
+                            <button
+                                className="tdm-status-badge"
+                                style={{ backgroundColor: statusObj.color }}
+                                onClick={() => setShowStatus(!showStatus)}
+                            >
+                                {taskStatus} <ChevronDown size={11} />
+                            </button>
+                            {showStatus && (
+                                <div className="tdm-mini-dropdown">
+                                    {STATUS_OPTIONS.map(s => (
+                                        <button key={s.value}
+                                            className={`tdm-dd-item ${taskStatus === s.value ? 'tdm-dd-item--active' : ''}`}
+                                            onClick={() => { setTaskStatus(s.value); setShowStatus(false); }}>
+                                            <span className="tdm-dd-dot" style={{ backgroundColor: s.color }} />
+                                            {s.value}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className="tdm-header-right">
@@ -52,21 +127,23 @@ export default function TaskDetailModal({ isOpen, onClose, task }: TaskDetailMod
 
                 {/* ═══════ BODY ═══════ */}
                 <div className="tdm-body">
-                    
-                    {/* LEFT COLUMN: Main Content */}
+
+                    {/* LEFT COLUMN */}
                     <div className="tdm-main-col">
-                        <input 
-                            className="tdm-task-title" 
-                            defaultValue={task.title}
+                        <input
+                            className="tdm-task-title"
+                            value={taskTitle}
+                            onChange={e => setTaskTitle(e.target.value)}
                             placeholder="Task name"
                         />
-                        
+
                         <div className="tdm-section">
                             <h3 className="tdm-section-title">Description</h3>
-                            <textarea 
+                            <textarea
                                 className="tdm-desc-editor"
                                 placeholder="Add a more detailed description..."
-                                defaultValue={task.description || ''}
+                                value={taskDesc}
+                                onChange={e => setTaskDesc(e.target.value)}
                             />
                         </div>
 
@@ -78,18 +155,16 @@ export default function TaskDetailModal({ isOpen, onClose, task }: TaskDetailMod
                             </div>
                         </div>
 
-                        {/* Activity / Comments 
-                            In ClickUp, there's a seamless activity thread at the bottom.
-                        */}
+                        {/* Activity / Comments */}
                         <div className="tdm-activity-section">
                             <div className="tdm-activity-tabs">
-                                <button 
+                                <button
                                     className={`tdm-tab ${activeTab === 'comments' ? 'tdm-tab--active' : ''}`}
                                     onClick={() => setActiveTab('comments')}
                                 >
                                     <MessageSquare size={14} /> Comments
                                 </button>
-                                <button 
+                                <button
                                     className={`tdm-tab ${activeTab === 'activity' ? 'tdm-tab--active' : ''}`}
                                     onClick={() => setActiveTab('activity')}
                                 >
@@ -100,7 +175,6 @@ export default function TaskDetailModal({ isOpen, onClose, task }: TaskDetailMod
                             <div className="tdm-activity-content">
                                 {activeTab === 'comments' ? (
                                     <div className="tdm-comments-list">
-                                        {/* Mock Comment */}
                                         <div className="tdm-comment">
                                             <Avatar src="https://i.pravatar.cc/150?u=a042581f4e29026024d" />
                                             <div className="tdm-comment-body">
@@ -115,7 +189,7 @@ export default function TaskDetailModal({ isOpen, onClose, task }: TaskDetailMod
                                     <div className="tdm-activity-list">
                                         <div className="tdm-activity-item">
                                             <Avatar size={24} src="https://i.pravatar.cc/150?u=a04258a2462d826712d" />
-                                            <p><strong>Sarah Chen</strong> changed status from <em>To Do</em> to <em>In Progress</em> <br/><span>4 hours ago</span></p>
+                                            <p><strong>Sarah Chen</strong> changed status from <em>To Do</em> to <em>In Progress</em> <br /><span>4 hours ago</span></p>
                                         </div>
                                     </div>
                                 )}
@@ -136,37 +210,83 @@ export default function TaskDetailModal({ isOpen, onClose, task }: TaskDetailMod
                     {/* RIGHT COLUMN: Metadata */}
                     <div className="tdm-meta-col">
                         <div className="tdm-meta-group">
-                            <div className="tdm-meta-item">
+                            {/* Assignee */}
+                            <div className="tdm-meta-item" ref={assigneeRef}>
                                 <span className="tdm-meta-label">Assignee</span>
-                                <div className="tdm-meta-value">
-                                    <User size={14} className="tdm-meta-icon" /> Assign
+                                <div className="tdm-meta-value tdm-meta-clickable" onClick={() => setShowAssignee(!showAssignee)}>
+                                    {task.assignees && task.assignees.length > 0 ? (
+                                        <div className="tdm-assignee-avatars">
+                                            {task.assignees.map((a: string) => {
+                                                const member = MEMBER_OPTIONS.find(m => m.id === a);
+                                                return (
+                                                    <Avatar key={a} size={24} style={{
+                                                        backgroundColor: member?.color || '#9aa0a6',
+                                                        fontSize: '10px', fontWeight: 'bold'
+                                                    }}>{a}</Avatar>
+                                                );
+                                            })}
+                                        </div>
+                                    ) : (
+                                        <><User size={14} className="tdm-meta-icon" /> Assign</>
+                                    )}
                                 </div>
+                                {showAssignee && (
+                                    <div className="tdm-mini-dropdown tdm-dd-right">
+                                        {MEMBER_OPTIONS.map(m => (
+                                            <button key={m.id} className="tdm-dd-item">
+                                                <span className="tdm-dd-avatar" style={{ backgroundColor: m.color }}>{m.id}</span>
+                                                {m.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
 
+                            {/* Due Date */}
                             <div className="tdm-meta-item">
                                 <span className="tdm-meta-label">Due Date</span>
-                                <div className="tdm-meta-value">
-                                    <Calendar size={14} className="tdm-meta-icon" /> {task.dueDate || 'Set date'}
+                                <div className="tdm-meta-value tdm-meta-clickable tdm-date-wrap">
+                                    <Calendar size={14} className="tdm-meta-icon" />
+                                    <span>{task.dueDate || 'Set date'}</span>
+                                    <input type="date" className="tdm-hidden-date" />
                                 </div>
                             </div>
 
-                            <div className="tdm-meta-item">
+                            {/* Priority dropdown */}
+                            <div className="tdm-meta-item" ref={priorityRef}>
                                 <span className="tdm-meta-label">Priority</span>
-                                <div className="tdm-meta-value">
-                                    <Flag size={14} className="tdm-meta-icon" /> {task.priority || 'Clear'}
+                                <div className="tdm-meta-value tdm-meta-clickable" onClick={() => setShowPriority(!showPriority)}>
+                                    <Flag size={14} className="tdm-meta-icon"
+                                        fill={taskPriority !== 'Normal' ? priorityObj.color : 'none'}
+                                        color={priorityObj.color} />
+                                    <span style={{ color: priorityObj.color, fontWeight: 600 }}>{taskPriority}</span>
                                 </div>
+                                {showPriority && (
+                                    <div className="tdm-mini-dropdown tdm-dd-right">
+                                        {PRIORITY_OPTIONS.map(p => (
+                                            <button key={p.value}
+                                                className={`tdm-dd-item ${taskPriority === p.value ? 'tdm-dd-item--active' : ''}`}
+                                                onClick={() => { setTaskPriority(p.value); setShowPriority(false); }}>
+                                                <Flag size={13} fill={p.value !== 'Normal' ? p.color : 'none'} color={p.color} />
+                                                {p.value}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
 
+                            {/* Time Tracked */}
                             <div className="tdm-meta-item">
                                 <span className="tdm-meta-label">Time Tracked</span>
                                 <div className="tdm-meta-value tdm-meta-value--timer">
                                     <Clock size={14} className="tdm-meta-icon" /> 00:00:00 <Button size="small" type="primary" className="tdm-timer-btn">Play</Button>
                                 </div>
                             </div>
-                            
+
+                            {/* Tags */}
                             <div className="tdm-meta-item">
                                 <span className="tdm-meta-label">Tags</span>
-                                <div className="tdm-meta-value">
+                                <div className="tdm-meta-value tdm-meta-clickable">
                                     <Tag size={14} className="tdm-meta-icon" /> Add Tags
                                 </div>
                             </div>
@@ -174,9 +294,19 @@ export default function TaskDetailModal({ isOpen, onClose, task }: TaskDetailMod
 
                         <div className="tdm-meta-section">
                             <h4>Subtasks</h4>
-                            <Button block type="dashed" icon={<CheckCircle2 size={14}/>}>Add Subtask</Button>
+                            {task.subtasks && task.subtasks.length > 0 ? (
+                                <div className="tdm-subtask-list">
+                                    {task.subtasks.map((sub: any) => (
+                                        <div key={sub.id} className="tdm-subtask-item">
+                                            <CheckCircle2 size={14} style={{ color: sub.statusColor || '#dcdfe4' }} />
+                                            <span>{sub.title}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : null}
+                            <Button block type="dashed" icon={<CheckCircle2 size={14} />}>Add Subtask</Button>
                         </div>
-                        
+
                         <div className="tdm-meta-section">
                             <h4>Relationships</h4>
                             <p className="tdm-empty-text">No relationships added.</p>

@@ -1,13 +1,16 @@
 import Home from "../pages/HomePage";
-import LoginPage from "../pages/LoginPage";
-import GoogleLoginPage from "../pages/GoogleLoginPage";
-import WorkspaceSetupPage from "../pages/WorkspaceSetupPage";
-import WorkspaceBrandingPage from "../pages/WorkspaceBrandingPage";
-import InviteTeamPage from "../pages/InviteTeamPage";
-import DashboardPage from "../pages/DashboardPage";
-import InboxPage from "../pages/InboxPage";
-import MyTasksPage from "../pages/MyTasksPage";
-import SpaceViewPage from '../pages/SpaceViewPage';
+import LoginPage from "../pages/auth/LoginPage";
+import GoogleLoginPage from "../pages/auth/GoogleLoginPage";
+import WorkspaceSetupPage from "../pages/workspace/WorkspaceSetupPage";
+import WorkspaceBrandingPage from "../pages/workspace/WorkspaceBrandingPage";
+import InviteTeamPage from "../pages/workspace/InviteTeamPage";
+import DashboardPage from "../pages/app/DashboardPage";
+import InboxPage from "../pages/app/InboxPage";
+import MyTasksPage from "../pages/app/MyTasksPage";
+import SpaceViewPage from '../pages/app/SpaceViewPage';
+import TimeTrackingPage from '../pages/app/TimeTrackingPage';
+import DashboardsPage from '../pages/app/DashboardsPage';
+import SettingsPage from '../pages/app/SettingsPage';
 import AppLayout from "../layouts/AppLayout";
 import type { RouteConfig } from "../types/app";
 export const routes: RouteConfig[] = [
@@ -57,6 +60,18 @@ export const routes: RouteConfig[] = [
             {
                 path: 'space/:spaceId',
                 element: <SpaceViewPage />
+            },
+            {
+                path: '/time-tracking',
+                element: <TimeTrackingPage />
+            },
+            {
+                path: '/dashboards',
+                element: <DashboardsPage />
+            },
+            {
+                path: '/settings',
+                element: <SettingsPage />
             }
         ]
     }
