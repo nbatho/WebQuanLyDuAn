@@ -1,4 +1,46 @@
-import con from '../config/connect.js';
+import con from "../config/connect.js";
+export const getProfile = async (user_id) => {
+    try {
+        const query = 'SELECT user_id, username, name, email, avatar_url, sdt FROM users WHERE user_id = $1';
+        const values = [user_id];
+        const result = await con.query(query, values);
+        return result.rows[0];
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const updateProfile = async (user_id, updateData) => {
+    try {
+        const { name, avatar_url, sdt } = updateData; 
+        
+        let query = 'UPDATE users SET ';
+        const values = [user_id];
+        const updates = ['updated_at = CURRENT_TIMESTAMP'];
+        let count = 2; 
+
+        if (name !== undefined) {
+            updates.push(`name = $${count++}`);
+            values.push(name);
+        }
+        if (avatar_url !== undefined) {
+            updates.push(`avatar_url = $${count++}`);
+            values.push(avatar_url);
+        }
+        if (sdt !== undefined) {
+            updates.push(`sdt = $${count++}`);
+            values.push(sdt);
+        }
+
+        if (updates.length === 1) return; 
+
+        query += updates.join(', ') + ' WHERE user_id = $1';
+        await con.query(query, values);
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 export const findUserByUsername = async (username) => {
     const query = 'SELECT * FROM users WHERE username = $1';

@@ -127,3 +127,10 @@ export const getWorkspaceMembers = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 }
+
+export const getWorkspaceInvitations = async (req, res) => {
+}
+export const acceptWorkspaceInvitation = async (req, res) => {
+}
+export const rejectWorkspaceInvitation = async (req, res) => {
+}

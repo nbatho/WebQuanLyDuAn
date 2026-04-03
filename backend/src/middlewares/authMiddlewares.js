@@ -1,7 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { findUserById } from '../models/User.js';
-import con from '../config/connect.js';
-
+import { findUserById } from '../models/Users.js';
 // xác minh user
 export const protectedRoute = (req, res, next) => {
     try {
