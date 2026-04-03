@@ -6,7 +6,7 @@ import {
     SocialProof,
     CTABanner,
     Footer,
-} from './LandingPage';
+} from './component';
 
 export default function Home() {
     return (

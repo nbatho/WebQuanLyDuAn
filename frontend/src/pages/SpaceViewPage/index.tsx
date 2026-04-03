@@ -7,15 +7,15 @@ import {
     Sparkles, Grid, X, Maximize2, Users, Share2, Zap, Bot, Clock
 } from 'lucide-react';
 import { Avatar } from 'antd';
-import TaskDetailModal from '../../../components/TaskDetailModal';
-import CreateTaskModal, { type NewTaskData } from '../../../components/CreateTaskModal';
-import ContextMenu from '../../../components/ContextMenu';
+import TaskDetailModal from '../../components/TaskDetailModal';
+import CreateTaskModal, { type NewTaskData } from '../../components/CreateTaskModal';
+import ContextMenu from '../../components/ContextMenu';
 import {
     GroupByDropdown,
     SubtasksDropdown,
     FilterPanel,
     CustomizePanel,
-} from '../../../components/ToolbarDropdowns';
+} from '../../components/ToolbarDropdowns';
 import './space-view.css';
 
 /* ═══════════════════════════════════════════════

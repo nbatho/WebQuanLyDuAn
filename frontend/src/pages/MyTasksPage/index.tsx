@@ -5,7 +5,7 @@ import {
     MessageSquare, Clock
 } from 'lucide-react';
 import { Avatar } from 'antd';
-import TaskDetailModal from '../../../components/TaskDetailModal';
+import TaskDetailModal from '../../components/TaskDetailModal';
 import './my-tasks.css';
 
 /* ── Types ── */
