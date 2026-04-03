@@ -16,6 +16,12 @@ import {
 } from '../controllers/taskController.js';
 const router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   - name: Tasks
+ */
+
 router.get('/spaces/:spaceId/tasks', getTasksBySpaceId);
 router.post('/spaces/:spaceId/tasks', createTask);
 router.get('/tasks/:taskId', getTaskById);

@@ -6,12 +6,11 @@ const router = express.Router();
  * @swagger
  * tags:
  *   - name: Authentication
- *     description: Các API liên quan đến xác thực người dùng
  */
 
 /**
  * @swagger
- * /api/auth/signup:
+ * /api/v1/auth/signup:
  *   post:
  *     summary: Đăng ký tài khoản mới
  *     tags: [Authentication]
@@ -51,7 +50,7 @@ router.post("/signup", signUp);
 
 /**
  * @swagger
- * /api/auth/signin:
+ * /api/v1/auth/signin:
  *   post:
  *     summary: Đăng nhập vào hệ thống
  *     tags: [Authentication]
@@ -83,7 +82,7 @@ router.post("/signin", signIn);
 
 /**
  * @swagger
- * /api/auth/signout:
+ * /api/v1/auth/signout:
  *   post:
  *     summary: Đăng xuất khỏi hệ thống
  *     tags: [Authentication]

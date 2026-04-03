@@ -8,6 +8,12 @@ import {
 } from "../controllers/sprintController.js";
 const router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   - name: Sprints
+ */
+
 router.get("/spaces/:spaceId/sprints", getSprintsBySpaceId);
 router.post("/spaces/:spaceId/sprints", createSprint);
 router.get("/sprints/:sprintId", getSprintById);

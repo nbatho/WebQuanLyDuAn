@@ -17,12 +17,11 @@ const router = express.Router();
  * @swagger
  * tags:
  *   - name: Workspaces
- *     description: Các API quản lý không gian làm việc
  */
 
 /**
  * @swagger
- * /api/workspaces:
+ * /api/v1/workspaces:
  *   get:
  *     summary: Lấy danh sách toàn bộ workspaces của người dùng
  *     tags: [Workspaces]
@@ -38,7 +37,7 @@ router.get("/", getWorkspaces);
 
 /**
  * @swagger
- * /api/workspaces:
+ * /api/v1/workspaces:
  *   post:
  *     summary: Tạo một Workspace mới
  *     tags: [Workspaces]
@@ -73,7 +72,7 @@ router.post("/", createWorkspaces);
 
 /**
  * @swagger
- * /api/workspaces/{id}:
+ * /api/v1/workspaces/{id}:
  *   get:
  *     summary: Lấy chi tiết một Workspace theo ID
  *     tags: [Workspaces]
@@ -94,7 +93,7 @@ router.get("/:workspaceId", getWorkspaceById);
 
 /**
  * @swagger
- * /api/workspaces/{workspaceId}:
+ * /api/v1/workspaces/{workspaceId}:
  *   put:
  *     summary: Cập nhật thông tin Workspace
  *     tags: [Workspaces]
@@ -130,7 +129,7 @@ router.put("/:workspaceId", updateWorkspaces);
 
 /**
  * @swagger
- * /api/workspaces/{workspaceId}:
+ * /api/v1/workspaces/{workspaceId}:
  *   delete:
  *     summary: Xóa một Workspace
  *     tags: [Workspaces]
@@ -153,7 +152,7 @@ router.delete("/:workspaceId", deleteWorkspaces);
 
 /**
  * @swagger
- * /api/workspaces/{workspaceId}/members:
+ * /api/v1/workspaces/{workspaceId}/members:
  *   get:
  *     summary: Lấy danh sách thành viên trong Workspace
  *     tags: [Workspaces]

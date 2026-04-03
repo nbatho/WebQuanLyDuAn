@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { createUser, findUserByEmail, findUserByUsername } from '../models/User.js';
+import { createUser, findUserByEmail, findUserByUsername } from '../models/Users.js';
 import { createSession, deleteSessionByRefreshToken } from '../models/Session.js';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';

@@ -61,7 +61,7 @@ const swaggerOptions = {
     apis: ['./src/routes/*.js'], 
 };
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 //public route
 app.get('/db-health', async (req, res) => {
     try {
@@ -80,19 +80,19 @@ app.get('/db-health', async (req, res) => {
         })
     }
 });
-app.use('/api/auth', authRoutes);
+app.use('api/v1/auth', authRoutes);
 
 
 
 //private route'
 app.use(protectedRoute);
-app.use('/api/user', userRoutes);
-app.use('/api/workspaces', workspacesRoutes);
-app.use('/api/spaces', spaceRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/milestones', milestoneRoutes);
-app.use('/api/sprints', sprintRoutes);
-app.use('/api/notifications', notificationRoutes);
+app.use('api/v1/user', userRoutes);
+app.use('api/v1/workspaces', workspacesRoutes);
+app.use('api/v1/spaces', spaceRoutes);
+app.use('api/v1/tasks', taskRoutes);
+app.use('api/v1/milestones', milestoneRoutes);
+app.use('api/v1/sprints', sprintRoutes);
+app.use('api/v1/notifications', notificationRoutes);
 
 
 //error handling middleware

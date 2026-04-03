@@ -8,6 +8,12 @@ import {
 } from "../controllers/milestonesController.js";
 const router = exppress.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   - name: Milestones
+ */
+
 router.get("/spaces/:spaceId/milestones", getMilestonesBySpaceId);
 router.post("/spaces/:spaceId/milestones", createMilestone);
 router.get("/milestones/:milestoneId", getMilestoneById);
