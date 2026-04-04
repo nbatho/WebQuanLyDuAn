@@ -1,10 +1,10 @@
-import Home from "../pages/HomePage";
-import LoginPage from "../pages/auth/LoginPage";
-import GoogleLoginPage from "../pages/auth/GoogleLoginPage";
+import LandingPage from "../pages/LandingPage";
+import LoginPage from "../pages/AuthPage/LoginPage";
+import GoogleLoginPage from "../pages/AuthPage/GoogleLoginPage";
 import WorkspaceSetupPage from "../pages/workspace/WorkspaceSetupPage";
 import WorkspaceBrandingPage from "../pages/workspace/WorkspaceBrandingPage";
 import InviteTeamPage from "../pages/workspace/InviteTeamPage";
-import DashboardPage from "../pages/DashboardPage";
+import HomePage from "../pages/HomePage";
 import InboxPage from "../pages/InboxPage";
 import MyTasksPage from "../pages/MyTasksPage";
 import SpaceViewPage from '../pages/SpaceViewPage';
@@ -16,7 +16,7 @@ import type { RouteConfig } from "../types/app";
 export const routes: RouteConfig[] = [
     {
         path: '/',
-        element: <Home />
+        element: <LandingPage />
     },
     {
         path: '/login',
@@ -47,7 +47,7 @@ export const routes: RouteConfig[] = [
         children: [
             {
                 path: '/home',
-                element: <DashboardPage />
+                element: <HomePage />
             },
             {
                 path: '/inbox',

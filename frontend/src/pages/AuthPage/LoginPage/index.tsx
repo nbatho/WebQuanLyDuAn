@@ -32,11 +32,11 @@ export default function AuthPage() {
     return (
         <div className="h-screen flex flex-col md:flex-row overflow-hidden">
             {/* ═══════ LEFT PANEL: Brand Visual (55%) ═══════ */}
-            <section className="relative w-full md:w-[55%] min-h-[400px] md:h-screen bg-[#0058be] flex flex-col justify-between p-10 md:p-14 overflow-hidden">
+            <section className="relative flex min-h-100 w-full flex-col justify-between overflow-hidden bg-[#0058be] p-10 md:h-screen md:w-[55%] md:p-14">
                 {/* Decorative Geometric Shapes */}
-                <div className="absolute -top-20 -left-20 w-[400px] h-[400px] rounded-full bg-white opacity-5 pointer-events-none" />
-                <div className="absolute top-1/2 -right-20 w-[250px] h-[250px] bg-white opacity-[0.08] rotate-[15deg] pointer-events-none" />
-                <div className="absolute bottom-20 left-1/4 w-[120px] h-[120px] rounded-full bg-white opacity-10 pointer-events-none" />
+                <div className="pointer-events-none absolute -left-20 -top-20 h-100 w-100 rounded-full bg-white opacity-5" />
+                <div className="pointer-events-none absolute -right-20 top-1/2 h-62.5 w-62.5 rotate-15 bg-white opacity-[0.08]" />
+                <div className="pointer-events-none absolute bottom-20 left-1/4 h-30 w-30 rounded-full bg-white opacity-10" />
 
                 {/* Logo */}
                 <div className="relative z-10">
@@ -52,7 +52,9 @@ export default function AuthPage() {
                 <div className="relative z-10 flex-1 flex items-center">
                     <div className="slide-panel-wrapper">
                         {/* ── LOGIN panel content ── */}
-                        <div className={`slide-panel-content ${!isRegister ? 'slide-active' : 'slide-exit-up'}`}>
+                        <div
+                            className={`slide-panel-content ${!isRegister ? 'slide-active' : 'slide-exit-up'}`}
+                        >
                             <div className="max-w-md">
                                 <h1 className="text-4xl md:text-5xl font-bold text-white leading-[1.1] tracking-tight mb-4">
                                     Where work feels less like work.
@@ -84,7 +86,9 @@ export default function AuthPage() {
                         </div>
 
                         {/* ── REGISTER panel content ── */}
-                        <div className={`slide-panel-content ${isRegister ? 'slide-active' : 'slide-exit-down'}`}>
+                        <div
+                            className={`slide-panel-content ${isRegister ? 'slide-active' : 'slide-exit-down'}`}
+                        >
                             <div className="max-w-md">
                                 <h1 className="text-4xl md:text-5xl font-bold text-white leading-[1.1] tracking-tight mb-5">
                                     Start Automating Today
@@ -157,10 +161,12 @@ export default function AuthPage() {
                 </div>
 
                 {/* Form Container */}
-                <div className="w-full max-w-md mx-auto flex flex-col justify-center flex-grow">
+                <div className="mx-auto flex w-full max-w-md grow flex-col justify-center">
                     <div className="slide-form-wrapper">
                         {/* ── LOGIN FORM ── */}
-                        <div className={`slide-form-content ${!isRegister ? 'slide-active' : 'slide-exit-left'}`}>
+                        <div
+                            className={`slide-form-content ${!isRegister ? 'slide-active' : 'slide-exit-left'}`}
+                        >
                             <header className="mb-6">
                                 <h2 className="text-3xl font-extrabold text-[#141b2b] tracking-tighter mb-1">
                                     Sign in
@@ -182,7 +188,7 @@ export default function AuthPage() {
                                         type="email"
                                         value={loginEmail}
                                         onChange={(e) => setLoginEmail(e.target.value)}
-                                        className="!h-11 !bg-[#f1f3ff] !rounded-lg !border-0 !text-[#141b2b] !font-medium"
+                                        className="h-11! bg-[#f1f3ff]! rounded-lg! border-0! text-[#141b2b]! font-medium!"
                                     />
                                 </div>
 
@@ -201,7 +207,7 @@ export default function AuthPage() {
                                         placeholder="••••••••"
                                         value={loginPass}
                                         onChange={(e) => setLoginPass(e.target.value)}
-                                        className="!h-11 !bg-[#f1f3ff] !rounded-lg !border-0 !text-[#141b2b] !font-medium"
+                                        className="h-11! bg-[#f1f3ff]! rounded-lg! border-0! text-[#141b2b]! font-medium!"
                                     />
                                 </div>
 
@@ -209,7 +215,7 @@ export default function AuthPage() {
                                     <Checkbox
                                         checked={remember}
                                         onChange={(e) => setRemember(e.target.checked)}
-                                        className="!text-sm !font-semibold !text-[#424754]"
+                                        className="text-sm! font-semibold! text-[#424754]!"
                                     >
                                         Remember this device
                                     </Checkbox>
@@ -220,23 +226,23 @@ export default function AuthPage() {
                                     htmlType="submit"
                                     size="large"
                                     block
-                                    className="!h-12 !rounded-lg !font-bold !text-base !border-0 !flex !items-center !justify-center !gap-2 group"
+                                    className="group h-12! rounded-lg! font-bold! text-base! border-0! flex! items-center! justify-center! gap-2!"
                                 >
                                     <span>Sign into Dashboard</span>
                                     <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
                                 </Button>
 
                                 <div className="relative py-2 flex items-center">
-                                    <div className="flex-grow border-t border-[#c2c6d6]" />
-                                    <span className="flex-shrink mx-4 text-[#424754]/40 text-xs font-black uppercase tracking-widest">or</span>
-                                    <div className="flex-grow border-t border-[#c2c6d6]" />
+                                    <div className="grow border-t border-[#c2c6d6]" />
+                                    <span className="mx-4 shrink text-xs font-black uppercase tracking-widest text-[#424754]/40">or</span>
+                                    <div className="grow border-t border-[#c2c6d6]" />
                                 </div>
 
                                 <Button
                                     size="large"
                                     block
                                     onClick={() => navigate('/google-login')}
-                                    className="!h-12 !bg-[#f1f3ff] !text-[#141b2b] !rounded-lg !font-bold !text-base !border-0 !flex !items-center !justify-center !gap-3 hover:!bg-[#e1e8fd]"
+                                    className="h-12! bg-[#f1f3ff]! text-[#141b2b]! rounded-lg! font-bold! text-base! border-0! flex! items-center! justify-center! gap-3! hover:bg-[#e1e8fd]!"
                                 >
                                     <svg className="w-6 h-6" viewBox="0 0 24 24">
                                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -250,7 +256,9 @@ export default function AuthPage() {
                         </div>
 
                         {/* ── REGISTER FORM ── */}
-                        <div className={`slide-form-content ${isRegister ? 'slide-active' : 'slide-exit-right'}`}>
+                        <div
+                            className={`slide-form-content ${isRegister ? 'slide-active' : 'slide-exit-right'}`}
+                        >
                             <header className="mb-3">
                                 <h2 className="text-2xl font-extrabold text-[#141b2b] tracking-tight mb-1">
                                     Create your account
@@ -271,7 +279,7 @@ export default function AuthPage() {
                                         placeholder="John Doe"
                                         value={regName}
                                         onChange={(e) => setRegName(e.target.value)}
-                                        className="!h-10 !bg-white !rounded-lg !border-2 !border-[#c2c6d6] focus-within:!border-[#0058be] !transition-colors"
+                                        className="h-10! bg-white! rounded-lg! border-2! border-[#c2c6d6]! focus-within:border-[#0058be]! transition-colors!"
                                     />
                                 </div>
 
@@ -286,7 +294,7 @@ export default function AuthPage() {
                                         type="email"
                                         value={regEmail}
                                         onChange={(e) => setRegEmail(e.target.value)}
-                                        className="!h-12 !bg-white !rounded-lg !border-2 !border-[#c2c6d6] focus-within:!border-[#0058be] !transition-colors"
+                                        className="h-12! bg-white! rounded-lg! border-2! border-[#c2c6d6]! focus-within:border-[#0058be]! transition-colors!"
                                     />
                                 </div>
 
@@ -300,7 +308,7 @@ export default function AuthPage() {
                                         placeholder="••••••••"
                                         value={regPass}
                                         onChange={(e) => setRegPass(e.target.value)}
-                                        className="!h-12 !bg-white !rounded-lg !border-2 !border-[#c2c6d6] focus-within:!border-[#0058be] !transition-colors"
+                                        className="h-12! bg-white! rounded-lg! border-2! border-[#c2c6d6]! focus-within:border-[#0058be]! transition-colors!"
                                     />
                                     <p className="text-xs text-[#424754]">Must be at least 8 characters with a symbol.</p>
                                 </div>
@@ -309,7 +317,7 @@ export default function AuthPage() {
                                     <Checkbox
                                         checked={agreed}
                                         onChange={(e) => setAgreed(e.target.checked)}
-                                        className="!text-sm !text-[#424754]"
+                                        className="text-sm! text-[#424754]!"
                                     >
                                         I agree to the <a href="#" className="text-[#0058be] hover:underline">Terms of Service</a> and <a href="#" className="text-[#0058be] hover:underline">Privacy Policy</a>.
                                     </Checkbox>
@@ -320,7 +328,7 @@ export default function AuthPage() {
                                     htmlType="submit"
                                     size="large"
                                     block
-                                    className="!h-11 !rounded-lg !font-bold !text-sm !border-0"
+                                    className="h-11! rounded-lg! font-bold! text-sm! border-0!"
                                 >
                                     Create Account
                                 </Button>
@@ -333,7 +341,7 @@ export default function AuthPage() {
                                     size="middle"
                                     block
                                     onClick={() => navigate('/google-login')}
-                                    className="!h-10 !bg-[#f1f3ff] !rounded-lg !font-bold !border-0 !flex !items-center !justify-center !gap-2 hover:!bg-[#e1e8fd]"
+                                    className="h-10! bg-[#f1f3ff]! rounded-lg! font-bold! border-0! flex! items-center! justify-center! gap-2! hover:bg-[#e1e8fd]!"
                                 >
                                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />

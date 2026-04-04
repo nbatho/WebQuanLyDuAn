@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-    Play, Pause, Clock, Calendar, ChevronDown, Plus,
+    Play, Pause, Clock, Calendar,
     BarChart2, Timer, Trash2, Edit3
 } from 'lucide-react';
 import { Avatar } from 'antd';
@@ -32,7 +32,7 @@ function formatTimer(seconds: number): string {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
-    return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 
 export default function TimeTrackingPage() {
@@ -68,20 +68,22 @@ export default function TimeTrackingPage() {
     const totalTodayHrs = (totalToday / 3600000).toFixed(1);
     const totalWeekHrs = (totalWeek / 3600000).toFixed(1);
 
+    const pulseClass = isRunning ? 'animate-[tt-pulse_1s_infinite]' : '';
+
     return (
-        <div className="tt-page">
+        <div className="flex h-full flex-col overflow-hidden bg-white font-['Plus_Jakarta_Sans','Inter',sans-serif]">
             {/* Header */}
-            <header className="tt-header">
-                <div className="tt-header-left">
-                    <Clock size={20} className="tt-header-icon" />
-                    <h1 className="tt-title">Time Tracking</h1>
+            <header className="flex shrink-0 items-center justify-between border-b border-[#eef0f5] px-6 py-3.5">
+                <div className="flex items-center gap-2.5">
+                    <Clock size={20} className="text-[#0058be]" />
+                    <h1 className="m-0 text-lg font-extrabold text-[#141b2b]">Time Tracking</h1>
                 </div>
-                <div className="tt-header-right">
-                    <button className={`tt-tab ${activeTab === 'entries' ? 'tt-tab--active' : ''}`}
+                <div className="flex gap-1">
+                    <button className={`flex items-center gap-1.25 border-x-0 border-b-2 border-t-0 border-solid bg-transparent px-3 py-1.5 text-[13px] font-semibold transition-all ${activeTab === 'entries' ? 'border-b-[#0058be] text-[#0058be]' : 'border-b-transparent text-[#5f6368] hover:text-[#141b2b]'}`}
                         onClick={() => setActiveTab('entries')}>
                         <Timer size={14} /> Entries
                     </button>
-                    <button className={`tt-tab ${activeTab === 'reports' ? 'tt-tab--active' : ''}`}
+                    <button className={`flex items-center gap-1.25 border-x-0 border-b-2 border-t-0 border-solid bg-transparent px-3 py-1.5 text-[13px] font-semibold transition-all ${activeTab === 'reports' ? 'border-b-[#0058be] text-[#0058be]' : 'border-b-transparent text-[#5f6368] hover:text-[#141b2b]'}`}
                         onClick={() => setActiveTab('reports')}>
                         <BarChart2 size={14} /> Reports
                     </button>
@@ -89,21 +91,21 @@ export default function TimeTrackingPage() {
             </header>
 
             {/* Timer Bar */}
-            <div className="tt-timer-bar">
-                <div className="tt-timer-input-wrap">
+            <div className="flex shrink-0 items-center gap-4 border-b border-[#eef0f5] bg-[linear-gradient(135deg,#f8fafe_0%,#fff_100%)] px-6 py-3">
+                <div className="flex-1">
                     <input
-                        className="tt-timer-input"
+                        className="box-border w-full rounded-lg border border-[#eef0f5] bg-white px-3.5 py-2.5 text-sm text-[#141b2b] outline-none focus:border-[#0058be] focus:shadow-[0_0_0_3px_rgba(0,88,190,0.08)]"
                         placeholder="What are you working on?"
                         value={timerTask}
                         onChange={e => setTimerTask(e.target.value)}
                     />
                 </div>
-                <div className="tt-timer-display">
-                    <span className={`tt-timer-clock ${isRunning ? 'tt-timer-clock--active' : ''}`}>
+                <div className="flex items-center gap-2.5">
+                    <span className={`min-w-25 text-center text-[22px] font-extrabold tabular-nums text-[#5f6368] ${pulseClass} ${isRunning ? 'text-[#0058be]' : ''}`}>
                         {formatTimer(timerSeconds)}
                     </span>
                     <button
-                        className={`tt-timer-btn ${isRunning ? 'tt-timer-btn--stop' : ''}`}
+                        className={`flex h-10 w-10 items-center justify-center rounded-full border-none text-white transition-all hover:scale-105 ${isRunning ? 'bg-[#e74c3c] shadow-[0_2px_8px_rgba(231,76,60,0.3)] hover:bg-[#c0392b]' : 'bg-[#0058be] shadow-[0_2px_8px_rgba(0,88,190,0.3)] hover:bg-[#004aab]'}`}
                         onClick={handleToggleTimer}
                     >
                         {isRunning ? <Pause size={16} /> : <Play size={16} />}
@@ -112,55 +114,55 @@ export default function TimeTrackingPage() {
             </div>
 
             {/* Summary Cards */}
-            <div className="tt-summary-row">
-                <div className="tt-summary-card">
-                    <span className="tt-sum-label">Today</span>
-                    <span className="tt-sum-value">{totalTodayHrs}h</span>
-                    <div className="tt-sum-bar"><div className="tt-sum-bar-fill" style={{ width: `${Math.min(100, (parseFloat(totalTodayHrs) / 8) * 100)}%` }} /></div>
-                    <span className="tt-sum-target">/ 8h target</span>
+            <div className="flex shrink-0 gap-4 px-6 py-4">
+                <div className="flex-1 rounded-[10px] border border-[#eef0f5] bg-[#f8fafb] px-4 py-3.5">
+                    <span className="block text-[11px] font-extrabold uppercase tracking-[0.06em] text-[#9aa0a6]">Today</span>
+                    <span className="my-1 block text-[28px] font-black text-[#141b2b]">{totalTodayHrs}h</span>
+                    <div className="mt-1.5 h-1.5 overflow-hidden rounded bg-[#eef0f5]"><div className="h-full rounded bg-[#0058be] transition-[width] duration-400" style={{ width: `${Math.min(100, (parseFloat(totalTodayHrs) / 8) * 100)}%` }} /></div>
+                    <span className="text-[11px] font-semibold text-[#9aa0a6]">/ 8h target</span>
                 </div>
-                <div className="tt-summary-card">
-                    <span className="tt-sum-label">This Week</span>
-                    <span className="tt-sum-value">{totalWeekHrs}h</span>
-                    <div className="tt-sum-bar"><div className="tt-sum-bar-fill tt-sum-bar-fill--week" style={{ width: `${Math.min(100, (parseFloat(totalWeekHrs) / 40) * 100)}%` }} /></div>
-                    <span className="tt-sum-target">/ 40h target</span>
+                <div className="flex-1 rounded-[10px] border border-[#eef0f5] bg-[#f8fafb] px-4 py-3.5">
+                    <span className="block text-[11px] font-extrabold uppercase tracking-[0.06em] text-[#9aa0a6]">This Week</span>
+                    <span className="my-1 block text-[28px] font-black text-[#141b2b]">{totalWeekHrs}h</span>
+                    <div className="mt-1.5 h-1.5 overflow-hidden rounded bg-[#eef0f5]"><div className="h-full rounded bg-[#7c5cfc] transition-[width] duration-400" style={{ width: `${Math.min(100, (parseFloat(totalWeekHrs) / 40) * 100)}%` }} /></div>
+                    <span className="text-[11px] font-semibold text-[#9aa0a6]">/ 40h target</span>
                 </div>
-                <div className="tt-summary-card">
-                    <span className="tt-sum-label">Entries</span>
-                    <span className="tt-sum-value">{entries.length}</span>
-                    <span className="tt-sum-sub">time entries tracked</span>
+                <div className="flex-1 rounded-[10px] border border-[#eef0f5] bg-[#f8fafb] px-4 py-3.5">
+                    <span className="block text-[11px] font-extrabold uppercase tracking-[0.06em] text-[#9aa0a6]">Entries</span>
+                    <span className="my-1 block text-[28px] font-black text-[#141b2b]">{entries.length}</span>
+                    <span className="text-xs font-medium text-[#9aa0a6]">time entries tracked</span>
                 </div>
             </div>
 
             {/* Entries List */}
-            <div className="tt-entries">
+            <div className="flex-1 overflow-y-auto px-6 pb-6">
                 {Object.entries(grouped).map(([date, dateEntries]) => {
                     const dayTotal = dateEntries.reduce((sum, e) => sum + e.durationMs, 0);
                     const dayHrs = (dayTotal / 3600000).toFixed(1);
                     return (
-                        <div key={date} className="tt-date-group">
-                            <div className="tt-date-header">
+                        <div key={date} className="mb-5">
+                            <div className="flex items-center gap-2 pb-1.5 pt-2 text-[#9aa0a6]">
                                 <Calendar size={13} />
-                                <span className="tt-date-label">{date}</span>
-                                <span className="tt-date-total">{dayHrs}h total</span>
-                                <div className="tt-date-line" />
+                                <span className="text-[13px] font-extrabold text-[#141b2b]">{date}</span>
+                                <span className="text-xs font-semibold text-[#0058be]">{dayHrs}h total</span>
+                                <div className="ml-2 h-px flex-1 bg-[#eef0f5]" />
                             </div>
-                            <div className="tt-entry-list">
+                            <div className="flex flex-col">
                                 {dateEntries.map(entry => (
-                                    <div key={entry.id} className="tt-entry-row">
-                                        <div className="tt-entry-task">
-                                            <span className="tt-entry-title">{entry.task}</span>
-                                            <span className="tt-entry-space" style={{ backgroundColor: entry.spaceColor + '18', color: entry.spaceColor }}>
+                                    <div key={entry.id} className="group flex items-center gap-3 rounded-md border-b border-[#f5f7fa] px-2 py-2.5 transition-colors duration-100 hover:bg-[#f8fafb]">
+                                        <div className="min-w-0 flex-1">
+                                            <span className="block text-[13px] font-semibold text-[#141b2b]">{entry.task}</span>
+                                            <span className="mt-0.75 inline-block rounded px-1.5 py-px text-[10px] font-bold" style={{ backgroundColor: entry.spaceColor + '18', color: entry.spaceColor }}>
                                                 {entry.space}
                                             </span>
                                         </div>
-                                        <div className="tt-entry-user">
+                                        <div className="shrink-0">
                                             <Avatar size={22} style={{ backgroundColor: entry.userColor, fontSize: '9px', fontWeight: 'bold' }}>{entry.user}</Avatar>
                                         </div>
-                                        <div className="tt-entry-duration">{entry.duration}</div>
-                                        <div className="tt-entry-actions">
-                                            <button className="tt-entry-btn"><Edit3 size={13} /></button>
-                                            <button className="tt-entry-btn tt-entry-btn--danger"><Trash2 size={13} /></button>
+                                        <div className="min-w-17.5 text-right text-sm font-extrabold text-[#141b2b]">{entry.duration}</div>
+                                        <div className="flex gap-1 opacity-0 transition-opacity duration-100 group-hover:opacity-100">
+                                            <button className="rounded bg-transparent p-1 text-[#9aa0a6] hover:bg-[#eef0f5] hover:text-[#141b2b]"><Edit3 size={13} /></button>
+                                            <button className="rounded bg-transparent p-1 text-[#9aa0a6] hover:bg-[#fff1f0] hover:text-[#e74c3c]"><Trash2 size={13} /></button>
                                         </div>
                                     </div>
                                 ))}
