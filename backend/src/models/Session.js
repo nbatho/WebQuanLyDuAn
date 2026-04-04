@@ -19,3 +19,14 @@ export const deleteSessionByRefreshToken = async (refresh_token) => {
         throw error;
     }
 }
+
+export const findSessionByRefreshToken = async (refresh_token) => {
+    const query = 'SELECT * FROM user_sessions WHERE refresh_token = $1';
+    const values = [refresh_token];
+    try {
+        const result = await con.query(query, values);
+        return result.rows[0];
+    } catch (error) {
+        throw error;
+    }
+}

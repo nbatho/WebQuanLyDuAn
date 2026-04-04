@@ -1,5 +1,5 @@
 import express from "express";
-import { signUp, signIn, signOut } from "../controllers/authControllers.js";
+import { signUp, signIn, signOut, refreshToken } from "../controllers/authControllers.js";
 const router = express.Router();
 
 /**
@@ -96,4 +96,23 @@ router.post("/signin", signIn);
  */
 router.post("/signout", signOut);
 
+/**
+ * @swagger
+ * /api/v1/auth/refresh:
+ *   post:
+ *     summary: Làm mới access token bằng refresh token
+ *     tags: [Authentication]
+ *     responses:
+ *       200:
+ *         description: Làm mới token thành công
+ *       400:
+ *         description: Dữ liệu đầu vào không hợp lệ
+ *       401:
+ *         description: Refresh token không hợp lệ hoặc đã hết hạn
+ *       403:
+ *         description: Người dùng không có quyền truy cập
+ *       500:
+ *         description: Lỗi server khi làm mới token
+*/
+router.post("/refresh", refreshToken);
 export default router;

@@ -40,7 +40,7 @@ export const fetchSignOut = createAsyncThunk<void, void, { rejectValue: string }
 const initialState : AuthState = {
     signIn : null,
     signUp : null,
-    accessToken : null,
+    access_token : null,
     isLoadingSignIn: false,
     isLoadingSignUp: false,
     isLoadingSignOut: false,
@@ -61,16 +61,16 @@ const authSlice = createSlice({
         builder.addCase(fetchSignIn.fulfilled, (state, action) => {
             state.isLoadingSignIn = false;
             state.signIn = action.payload;
-            const accessToken = action.payload?.user?.accessToken;
+            const access_token = action.payload?.user?.access_token;
 
-            if (!accessToken) {
+            if (!access_token) {
                 state.errorSignIn = "Invalid sign in response: missing access token";
-                state.accessToken = null;
+                state.access_token = null;
                 return;
             }
 
-            state.accessToken = accessToken;
-            localStorage.setItem('accessToken', accessToken);
+            state.access_token = access_token;
+            localStorage.setItem('access_token', access_token);
         });
         builder.addCase(fetchSignIn.rejected, (state, action) => {
             state.isLoadingSignIn = false;
@@ -96,8 +96,8 @@ const authSlice = createSlice({
             state.isLoadingSignOut = false;
             state.signIn = null;
             state.signUp = null;
-            state.accessToken = null;
-            localStorage.removeItem('accessToken');
+            state.access_token = null;
+            localStorage.removeItem('access_token');
         });
         builder.addCase(fetchSignOut.rejected, (state, action) => {
             state.isLoadingSignOut = false;

@@ -8,7 +8,7 @@ export interface SignInResponse {
     message: string;
     user : {
         user_id: number;
-        accessToken : string;
+        access_token : string;
     }
 }
 export interface SignUpResponse {
@@ -18,7 +18,7 @@ export interface SignUpResponse {
 export interface AuthState {
     signIn : SignInResponse | null;
     signUp : SignUpResponse | null;
-    accessToken : string | null;
+    access_token : string | null;
     isLoadingSignIn?: boolean;
     isLoadingSignUp?: boolean;
     isLoadingSignOut?: boolean;
