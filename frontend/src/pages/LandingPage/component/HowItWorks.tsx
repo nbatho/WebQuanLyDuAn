@@ -30,7 +30,7 @@ const steps = [
 export default function HowItWorks() {
     return (
         <section id="how-it-works" className="py-24 bg-[#f1f3ff]">
-            <div className="max-w-[1280px] mx-auto px-10">
+            <div className="max-w-7xl mx-auto px-10">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl md:text-4xl font-extrabold text-[#141b2b] mb-4">
                         Đơn giản để bắt đầu. Mạnh mẽ để mở rộng.

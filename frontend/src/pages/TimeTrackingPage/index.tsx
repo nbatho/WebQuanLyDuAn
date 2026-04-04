@@ -5,19 +5,7 @@ import {
 } from 'lucide-react';
 import { Avatar } from 'antd';
 import './time-tracking.css';
-
-interface TimeEntry {
-    id: string;
-    task: string;
-    space: string;
-    spaceColor: string;
-    duration: string;
-    durationMs: number;
-    date: string;
-    user: string;
-    userColor: string;
-    isRunning: boolean;
-}
+import type { TimeEntry } from '../../types/timetracking';
 
 const mockEntries: TimeEntry[] = [
     { id: 'te1', task: 'Finalize Q1 Marketing Roadmap', space: 'Marketing', spaceColor: '#e84393', duration: '2h 15m', durationMs: 8100000, date: 'Today', user: 'AR', userColor: '#4285F4', isRunning: false },

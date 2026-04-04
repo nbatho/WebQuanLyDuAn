@@ -9,7 +9,7 @@ const benefits = [
 
 export default function HeroSection() {
     return (
-        <section className="relative px-10 pt-24 pb-32 max-w-[1280px] mx-auto">
+        <section className="relative px-10 pt-24 pb-32 max-w-7xl mx-auto">
             {/* Center-aligned hero like ClickUp */}
             <div className="text-center max-w-3xl mx-auto mb-16">
                 {/* Trust badge */}

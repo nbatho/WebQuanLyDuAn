@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react';
 export default function CTABanner() {
     return (
         <section className="py-24 bg-[#f9f9ff] px-10">
-            <div className="max-w-[1280px] mx-auto bg-[#141b2b] rounded-3xl p-16 md:p-20 relative overflow-hidden text-center">
+            <div className="max-w-7xl mx-auto bg-[#141b2b] rounded-3xl p-16 md:p-20 relative overflow-hidden text-center">
                 <div className="relative z-10">
                     <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
                         Sẵn sàng tăng tốc dự án?

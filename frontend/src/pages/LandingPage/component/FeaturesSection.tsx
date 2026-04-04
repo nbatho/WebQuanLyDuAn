@@ -54,7 +54,7 @@ const features = [
 export default function FeaturesSection() {
     return (
         <section id="features" className="py-24 bg-[#f9f9ff]">
-            <div className="max-w-[1280px] mx-auto px-10">
+            <div className="max-w-7xl mx-auto px-10">
                 <div className="text-center mb-16">
                     <div className="inline-flex items-center gap-2 bg-[#6ffbbe] text-[#006c49] font-bold text-xs uppercase tracking-widest px-4 py-2 rounded-full mb-6">
                         Tính năng

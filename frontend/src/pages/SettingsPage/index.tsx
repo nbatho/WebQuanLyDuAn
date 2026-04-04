@@ -4,8 +4,8 @@ import {
     ChevronRight, Camera, Check, Moon, Sun, Monitor
 } from 'lucide-react';
 import { Avatar } from 'antd';
+import type { SettingsTab } from '../../types/app';
 
-type SettingsTab = 'profile' | 'notifications' | 'theme' | 'security' | 'workspace';
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState<SettingsTab>('profile');

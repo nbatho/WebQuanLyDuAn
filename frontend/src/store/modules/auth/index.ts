@@ -1,44 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { signIn, signUp,signOut } from "../../../api/auth";
-export interface UserData {
-    user_id: number;
-    username: string;
-    name : string;
-    email : string;
-}
-export interface SignInResponse {
-    message: string;
-    user : {
-        user_id: number;
-        accessToken : string;
-    }
-}
-export interface SignUpResponse {
-    message: string;
-    user: UserData;
-}
-export interface AuthState {
-    signIn : SignInResponse | null;
-    signUp : SignUpResponse | null;
-    accessToken : string | null;
-    isLoadingSignIn?: boolean;
-    isLoadingSignUp?: boolean;
-    isLoadingSignOut?: boolean;
-    errorSignIn?: string | null;
-    errorSignUp?: string | null;
-    errorSignOut?: string | null;
-
-}
-export interface SignInRequest {
-    email: string;
-    password: string;
-}
-export interface SignUpRequest {
-    email: string;
-    password: string;
-    username : string;
-    name : string;
-}
+import type { SignInRequest, SignInResponse, SignUpRequest,SignUpResponse, AuthState } from "../../../types/auth";
 export const fetchSignIn = createAsyncThunk<SignInResponse, SignInRequest, { rejectValue: string }>(
     "auth/fetchSignIn",
     async ({ email, password }, { rejectWithValue }) => {

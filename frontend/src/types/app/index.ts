@@ -8,3 +8,5 @@ export type RouteConfig = RouteObject & {
     subsidebar?: boolean;
     children?: RouteConfig[];
 };
+
+export type SettingsTab = 'profile' | 'notifications' | 'theme' | 'security' | 'workspace';

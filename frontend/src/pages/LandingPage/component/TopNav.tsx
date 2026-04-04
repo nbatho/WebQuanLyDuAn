@@ -13,7 +13,7 @@ export default function TopNav() {
 
     return (
         <header className="w-full sticky top-0 z-50 bg-[#f9f9ff]/90 backdrop-blur-md border-b border-[#e9edff]">
-            <nav className="flex justify-between items-center px-10 py-4 max-w-[1280px] mx-auto">
+            <nav className="flex justify-between items-center px-10 py-4 max-w-7xl mx-auto">
                 {/* Logo */}
                 <Link to="/" className="text-2xl font-extrabold text-[#141b2b] tracking-tight no-underline">
                     Flowise

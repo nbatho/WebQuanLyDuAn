@@ -3,7 +3,6 @@ import {
     Copy, Trash2, Move, Archive, Link2, Edit3,
     ArrowRight, CheckCircle2, Flag
 } from 'lucide-react';
-import './context-menu.css';
 
 interface ContextMenuProps {
     x: number;
@@ -57,23 +56,28 @@ export default function ContextMenu({ x, y, isOpen, onClose, onAction, taskTitle
     return (
         <div
             ref={menuRef}
-            className="ctx-menu"
+            className="fixed z-3000 min-w-50 rounded-[10px] border border-[#eef0f5] bg-white p-1 shadow-[0_8px_28px_rgba(0,0,0,0.15)]"
             style={{ top: y, left: x }}
         >
             {taskTitle && (
-                <div className="ctx-menu-title">{taskTitle.length > 30 ? taskTitle.slice(0, 30) + '...' : taskTitle}</div>
+                <div className="mb-0.5 border-b border-[#f0f2f5] px-3 py-1.5 pb-1 text-[11px] font-bold uppercase tracking-[0.04em] text-[#9aa0a6]">
+                    {taskTitle.length > 30 ? taskTitle.slice(0, 30) + '...' : taskTitle}
+                </div>
             )}
             {MENU_ITEMS.map(item => (
                 <div key={item.id}>
                     <button
-                        className={`ctx-menu-item ${item.danger ? 'ctx-menu-item--danger' : ''}`}
+                        className={`flex w-full cursor-pointer items-center gap-2 rounded-md border-none bg-transparent px-3 py-1.75 text-left text-[13px] font-medium transition-colors ${item.danger
+                                ? 'text-[#e74c3c] hover:bg-[#fff5f5] hover:text-[#c0392b]'
+                                : 'text-[#141b2b] hover:bg-[#f0f4ff] hover:text-[#0058be]'
+                            }`}
                         onClick={() => { onAction(item.id); onClose(); }}
                     >
                         <item.icon size={14} />
                         <span>{item.label}</span>
-                        {item.hasSubmenu && <ArrowRight size={12} className="ctx-submenu-arrow" />}
+                        {item.hasSubmenu && <ArrowRight size={12} className="ml-auto text-[#c2c9e0]" />}
                     </button>
-                    {item.divider && <div className="ctx-menu-divider" />}
+                    {item.divider && <div className="mx-2 my-0.75 h-px bg-[#f0f2f5]" />}
                 </div>
             ))}
         </div>

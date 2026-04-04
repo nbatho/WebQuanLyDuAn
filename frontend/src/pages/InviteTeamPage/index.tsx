@@ -2,12 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Input, Select } from 'antd';
 import { Trash2, PlusCircle, Grid3X3, Users, CheckCircle } from 'lucide-react';
+import type { InviteRow } from '../../types/team';
 
-interface InviteRow {
-    id: number;
-    email: string;
-    role: string;
-}
 
 const roleOptions = [
     { value: 'member', label: 'Member' },

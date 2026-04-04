@@ -1,12 +1,10 @@
-import { useState, useRef, useEffect, type DragEvent } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
-    ChevronDown, ChevronRight, Plus, Calendar, Flag, MessageSquare,
-    MoreHorizontal, CheckCircle2, Search, Star, Hash,
-    LayoutList, Trello, LayoutDashboard, BookMarked, FolderOpen,
+    ChevronDown, Plus, Calendar, CheckCircle2, Search, Star, Hash,
+    LayoutList, Trello, LayoutDashboard,
     FileText, BarChart2, AlignLeft, Activity, PenSquare,
-    Sparkles, Grid, X, Maximize2, Users, Share2, Zap, Bot, Clock
+    Sparkles, Grid, Users, Share2, Zap, Bot, Clock
 } from 'lucide-react';
-import { Avatar } from 'antd';
 import TaskDetailModal from '../../components/TaskDetailModal';
 import CreateTaskModal, { type NewTaskData } from '../../components/CreateTaskModal';
 import ContextMenu from '../../components/ContextMenu';
@@ -16,24 +14,10 @@ import {
     FilterPanel,
     CustomizePanel,
 } from '../../components/ToolbarDropdowns';
-import './space-view.css';
-
-/* ═══════════════════════════════════════════════
-   TYPES
-═══════════════════════════════════════════════ */
-interface SubTask {
-    id: string; title: string; status: string; statusColor: string; assignee?: string;
-}
-interface Task {
-    id: string; title: string; status: string; statusColor: string;
-    priority: string; priorityColor: string; dueDate: string | null;
-    assignees: string[]; comments: number; subtasks: SubTask[];
-    description?: string;
-}
-interface StatusGroup {
-    id: string; name: string; color: string; tasks: Task[]; isExpanded: boolean;
-}
-
+import type { StatusGroup, Task } from '../../types/tasks';
+import OverviewView from './component/OverviewView/overviewView';
+import ListView from './component/ListView/listView';
+import BoardView from './component/BoardView/boardView';
 type ViewType = 'overview' | 'list' | 'board';
 
 /* ═══════════════════════════════════════════════
@@ -65,14 +49,6 @@ const initialGroups: StatusGroup[] = [
     },
 ];
 
-const avatarColors: Record<string, string> = {
-    AR: '#4285F4', MC: '#7c5cfc', SJ: '#0058be', ER: '#e84393'
-};
-
-const PRIORITY_COLORS: Record<string, string> = {
-    Urgent: '#e74c3c', High: '#f0a220', Normal: '#00b894', Low: '#9aa0a6'
-};
-
 const VIEW_OPTIONS = [
     { id: 'list', icon: LayoutList, label: 'List', desc: 'Track tasks, bugs, people & more', color: '#5f6368', bg: '#f0f0f0' },
     { id: 'gantt', icon: BarChart2, label: 'Gantt', desc: 'Plan dependencies & time', color: '#fff', bg: '#e74c3c' },
@@ -89,415 +65,6 @@ const VIEW_OPTIONS = [
 ];
 
 let taskIdCounter = 100;
-
-/* ═══════════════════════════════════════════════
-   OVERVIEW VIEW
-═══════════════════════════════════════════════ */
-function OverviewView() {
-    return (
-        <div className="sv-overview">
-            <div className="sv-info-banner">
-                <span>Get the most out of your Overview! Add, reorder, and resize cards to customize this page <a href="#" className="sv-info-link">Get Started</a></span>
-                <button className="sv-info-close"><X size={14} /></button>
-            </div>
-            <div className="sv-ov-toolbar">
-                <button className="sv-filter-btn"><BarChart2 size={14} /> Filters</button>
-                <div className="sv-ov-toolbar-right">
-                    <span className="sv-refresh-text">🔄 Refreshed: 9 mins ago</span>
-                    <span className="sv-auto-refresh">⏰ Auto refresh: On</span>
-                    <button className="sv-ov-btn">Customize</button>
-                    <button className="sv-ov-btn sv-ov-btn--primary">Add card</button>
-                </div>
-            </div>
-            <div className="sv-ov-cards-row">
-                {[1, 2].map(i => (
-                    <div key={i} className="sv-ov-card">
-                        <div className="sv-ov-card-header">
-                            <span className="sv-ov-card-drag">⠿</span>
-                            <FileText size={15} className="sv-ov-card-icon" />
-                            <span className="sv-ov-card-title">Docs</span>
-                            <div className="sv-ov-card-actions">
-                                <button className="sv-ov-card-btn"><Maximize2 size={12} /></button>
-                                <button className="sv-ov-card-btn"><Plus size={12} /></button>
-                                <button className="sv-ov-card-btn"><MoreHorizontal size={12} /></button>
-                            </div>
-                        </div>
-                        <div className="sv-ov-card-empty">
-                            <div className="sv-ov-empty-icon">📄</div>
-                            <p className="sv-ov-empty-text">There are no Docs in this location yet.</p>
-                            <button className="sv-ov-empty-btn">Add a Doc</button>
-                        </div>
-                    </div>
-                ))}
-                <div className="sv-ov-card">
-                    <div className="sv-ov-card-header">
-                        <span className="sv-ov-card-drag">⠿</span>
-                        <BookMarked size={15} className="sv-ov-card-icon" />
-                        <span className="sv-ov-card-title">Bookmarks</span>
-                        <div className="sv-ov-card-actions">
-                            <button className="sv-ov-card-btn"><Maximize2 size={12} /></button>
-                            <button className="sv-ov-card-btn"><Plus size={12} /></button>
-                            <button className="sv-ov-card-btn"><MoreHorizontal size={12} /></button>
-                        </div>
-                    </div>
-                    <div className="sv-ov-card-empty">
-                        <div className="sv-ov-empty-icon">🔖</div>
-                        <p className="sv-ov-empty-text">Bookmarks make it easy to save items or any URL.</p>
-                        <button className="sv-ov-empty-btn">Add Bookmark</button>
-                    </div>
-                </div>
-            </div>
-            <div className="sv-ov-section">
-                <h3 className="sv-ov-section-title">Folders</h3>
-                <div className="sv-ov-folder-row">
-                    <div className="sv-ov-folder-item"><FolderOpen size={16} className="sv-ov-folder-icon" /><span>Task Management</span></div>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-/* ═══════════════════════════════════════════════
-   LIST VIEW
-═══════════════════════════════════════════════ */
-function ListView({
-    groups, setGroups, setSelectedTask, showClosed, columns,
-    onContextMenu,
-}: {
-    groups: StatusGroup[];
-    setGroups: React.Dispatch<React.SetStateAction<StatusGroup[]>>;
-    setSelectedTask: (t: Task | null) => void;
-    showClosed: boolean;
-    columns: Record<string, boolean>;
-    onContextMenu: (e: React.MouseEvent, task: Task) => void;
-}) {
-    const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
-    const [inlineGroup, setInlineGroup] = useState<string | null>(null);
-    const [inlineText, setInlineText] = useState('');
-    const inlineRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        if (inlineGroup) setTimeout(() => inlineRef.current?.focus(), 50);
-    }, [inlineGroup]);
-
-    const toggleGroup = (id: string) =>
-        setGroups(g => g.map(g2 => g2.id === id ? { ...g2, isExpanded: !g2.isExpanded } : g2));
-
-    const toggleTask = (e: React.MouseEvent, id: string) => {
-        e.stopPropagation();
-        setExpandedTasks(p => ({ ...p, [id]: !p[id] }));
-    };
-
-    const handleInlineCreate = (groupId: string) => {
-        if (!inlineText.trim()) { setInlineGroup(null); return; }
-        const group = groups.find(g => g.id === groupId);
-        if (!group) return;
-        const newTask: Task = {
-            id: `t${taskIdCounter++}`,
-            title: inlineText.trim(),
-            status: group.name,
-            statusColor: group.color,
-            priority: 'Normal',
-            priorityColor: '#00b894',
-            dueDate: null,
-            assignees: [],
-            comments: 0,
-            subtasks: [],
-        };
-        setGroups(prev => prev.map(g =>
-            g.id === groupId ? { ...g, tasks: [...g.tasks, newTask] } : g
-        ));
-        setInlineText('');
-        setInlineGroup(null);
-    };
-
-    const displayGroups = showClosed ? groups : groups.filter(g => g.id !== 'done');
-
-    return (
-        <div className="sv-list-view">
-            <div className="sv-breadcrumb">Main Space / Task Management</div>
-            <div className="sv-table-wrap">
-                {displayGroups.map(group => (
-                    <div key={group.id} className="sv-group">
-                        <div className="sv-group-header" onClick={() => toggleGroup(group.id)}>
-                            <button className="sv-group-toggle">
-                                {group.isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                            </button>
-                            <span className="sv-group-badge" style={{ backgroundColor: group.color }}>{group.name}</span>
-                            <span className="sv-group-count">{group.tasks.length}</span>
-                            <div className="sv-group-line" />
-                            <button className="sv-group-add" onClick={e => { e.stopPropagation(); }}><MoreHorizontal size={14} /></button>
-                        </div>
-
-                        {group.isExpanded && (
-                            <>
-                                <div className="sv-col-header">
-                                    <div className="sv-col-name">Name</div>
-                                    {columns.assignee && <div className="sv-col-assignee">Assignee</div>}
-                                    {columns.dueDate && <div className="sv-col-date">Due date</div>}
-                                    {columns.priority && <div className="sv-col-priority">Priority</div>}
-                                    <div className="sv-col-more" />
-                                </div>
-
-                                <div className="sv-group-tasks">
-                                    {group.tasks.map(task => (
-                                        <div key={task.id} className="sv-task-wrapper">
-                                            <div
-                                                className="sv-task-row"
-                                                onClick={() => setSelectedTask(task)}
-                                                onContextMenu={e => onContextMenu(e, task)}
-                                            >
-                                                <div className="sv-td-name">
-                                                    <div className="sv-task-indicator" style={{ backgroundColor: group.color }} />
-                                                    <div className="sv-task-name-content">
-                                                        <CheckCircle2 size={16} className="sv-check-icon" />
-                                                        <span className="sv-task-title-text">{task.title}</span>
-                                                        {task.subtasks.length > 0 && (
-                                                            <button className="sv-subtask-toggle" onClick={e => toggleTask(e, task.id)}>
-                                                                <span className="sv-subtask-badge">
-                                                                    {expandedTasks[task.id] ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
-                                                                    {task.subtasks.length}
-                                                                </span>
-                                                            </button>
-                                                        )}
-                                                        {task.comments > 0 && (
-                                                            <span className="sv-comment-badge"><MessageSquare size={11} /> {task.comments}</span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                {columns.assignee && (
-                                                    <div className="sv-td-assignee">
-                                                        {task.assignees.length > 0
-                                                            ? task.assignees.map(a => (
-                                                                <Avatar key={a} size={22} style={{ backgroundColor: avatarColors[a], fontSize: '9px', fontWeight: 'bold', marginLeft: '-4px' }}>{a}</Avatar>
-                                                            ))
-                                                            : <span className="sv-empty-assignee">—</span>}
-                                                    </div>
-                                                )}
-                                                {columns.dueDate && (
-                                                    <div className="sv-td-date">
-                                                        {task.dueDate
-                                                            ? <span className={`sv-date-val ${['10/31/23', '11/1/23', '10/3/23'].includes(task.dueDate) ? 'sv-date-val--red' : ''}`}>
-                                                                <Calendar size={11} /> {task.dueDate}
-                                                            </span>
-                                                            : <Calendar size={13} className="sv-empty-icon" />}
-                                                    </div>
-                                                )}
-                                                {columns.priority && (
-                                                    <div className="sv-td-priority">
-                                                        {task.priority !== 'Normal' ? (
-                                                            <span className="sv-priority-flag" style={{ color: task.priorityColor }}>
-                                                                <Flag size={11} fill={task.priorityColor} /> {task.priority}
-                                                            </span>
-                                                        ) : <Flag size={13} className="sv-empty-icon" />}
-                                                    </div>
-                                                )}
-                                                <div className="sv-td-more">
-                                                    <button className="sv-row-action" onClick={e => { e.stopPropagation(); onContextMenu(e, task); }}>
-                                                        <MoreHorizontal size={14} />
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {/* Subtasks */}
-                                            {expandedTasks[task.id] && task.subtasks.map(sub => (
-                                                <div key={sub.id} className="sv-task-row sv-subtask-row">
-                                                    <div className="sv-td-name">
-                                                        <div className="sv-task-indicator" style={{ backgroundColor: sub.statusColor }} />
-                                                        <div className="sv-task-name-content sv-subtask-name">
-                                                            <span className="sv-subtask-curve-icon">↳</span>
-                                                            <CheckCircle2 size={14} className="sv-check-icon" />
-                                                            <span className="sv-task-title-text" style={{ fontSize: '12px' }}>{sub.title}</span>
-                                                        </div>
-                                                    </div>
-                                                    {columns.assignee && (
-                                                        <div className="sv-td-assignee">
-                                                            {sub.assignee
-                                                                ? <Avatar size={20} style={{ backgroundColor: avatarColors[sub.assignee], fontSize: '8px' }}>{sub.assignee}</Avatar>
-                                                                : <span className="sv-empty-assignee">—</span>}
-                                                        </div>
-                                                    )}
-                                                    {columns.dueDate && <div className="sv-td-date"><Calendar size={13} className="sv-empty-icon" /></div>}
-                                                    {columns.priority && <div className="sv-td-priority"><Flag size={13} className="sv-empty-icon" /></div>}
-                                                    <div className="sv-td-more" />
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ))}
-
-                                    {/* Inline add task */}
-                                    {inlineGroup === group.id ? (
-                                        <div className="sv-inline-add">
-                                            <CheckCircle2 size={16} className="sv-check-icon" />
-                                            <input
-                                                ref={inlineRef}
-                                                className="sv-inline-input"
-                                                value={inlineText}
-                                                onChange={e => setInlineText(e.target.value)}
-                                                placeholder="Task name"
-                                                onKeyDown={e => {
-                                                    if (e.key === 'Enter') handleInlineCreate(group.id);
-                                                    if (e.key === 'Escape') { setInlineGroup(null); setInlineText(''); }
-                                                }}
-                                                onBlur={() => handleInlineCreate(group.id)}
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className="sv-add-task-inline" onClick={() => setInlineGroup(group.id)}>
-                                            <Plus size={13} /> Add Task
-                                        </div>
-                                    )}
-                                </div>
-                            </>
-                        )}
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-}
-
-/* ═══════════════════════════════════════════════
-   BOARD VIEW
-═══════════════════════════════════════════════ */
-function BoardView({
-    groups, setGroups, setSelectedTask, showClosed,
-    onContextMenu,
-}: {
-    groups: StatusGroup[];
-    setGroups: React.Dispatch<React.SetStateAction<StatusGroup[]>>;
-    setSelectedTask: (t: Task | null) => void;
-    showClosed: boolean;
-    onContextMenu: (e: React.MouseEvent, task: Task) => void;
-}) {
-    const dragItem = useRef<{ fromGroupId: string; taskId: string } | null>(null);
-    const [dragOverGroup, setDragOverGroup] = useState<string | null>(null);
-    const [inlineCol, setInlineCol] = useState<string | null>(null);
-    const [inlineText, setInlineText] = useState('');
-    const inlineRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        if (inlineCol) setTimeout(() => inlineRef.current?.focus(), 50);
-    }, [inlineCol]);
-
-    const displayGroups = showClosed ? groups : groups.filter(g => g.id !== 'done');
-
-    const onDragStart = (e: DragEvent, groupId: string, taskId: string) => {
-        dragItem.current = { fromGroupId: groupId, taskId };
-        e.dataTransfer.effectAllowed = 'move';
-        (e.currentTarget as HTMLElement).style.opacity = '0.5';
-    };
-    const onDragEnd = (e: DragEvent) => {
-        (e.currentTarget as HTMLElement).style.opacity = '1';
-        setDragOverGroup(null);
-    };
-    const onDrop = (e: DragEvent, toGroupId: string) => {
-        e.preventDefault(); setDragOverGroup(null);
-        if (!dragItem.current) return;
-        const { fromGroupId, taskId } = dragItem.current;
-        if (fromGroupId === toGroupId) return;
-        setGroups(prev => {
-            const tgt = prev.find(g => g.id === toGroupId)!;
-            const task = prev.find(g => g.id === fromGroupId)!.tasks.find(t => t.id === taskId)!;
-            return prev.map(g => {
-                if (g.id === fromGroupId) return { ...g, tasks: g.tasks.filter(t => t.id !== taskId) };
-                if (g.id === toGroupId) return { ...g, tasks: [...g.tasks, { ...task, status: tgt.name, statusColor: tgt.color }] };
-                return g;
-            });
-        });
-        dragItem.current = null;
-    };
-
-    const handleInlineCreate = (groupId: string) => {
-        if (!inlineText.trim()) { setInlineCol(null); return; }
-        const group = groups.find(g => g.id === groupId)!;
-        const newTask: Task = {
-            id: `t${taskIdCounter++}`, title: inlineText.trim(),
-            status: group.name, statusColor: group.color,
-            priority: 'Normal', priorityColor: '#00b894',
-            dueDate: null, assignees: [], comments: 0, subtasks: [],
-        };
-        setGroups(prev => prev.map(g => g.id === groupId ? { ...g, tasks: [...g.tasks, newTask] } : g));
-        setInlineText(''); setInlineCol(null);
-    };
-
-    return (
-        <div className="sv-board-view">
-            <div className="sv-kanban-columns">
-                {displayGroups.map(group => (
-                    <div key={group.id}
-                        className={`sv-kanban-col ${dragOverGroup === group.id ? 'sv-kanban-col--dragover' : ''}`}
-                        onDragOver={e => { e.preventDefault(); setDragOverGroup(group.id); }}
-                        onDragLeave={() => setDragOverGroup(null)}
-                        onDrop={e => onDrop(e, group.id)}
-                    >
-                        <div className="sv-kanban-col-header">
-                            <div className="sv-kanban-col-title">
-                                <span className="sv-kanban-status-dot" style={{ backgroundColor: group.color }} />
-                                <span className="sv-kanban-col-name">{group.name}</span>
-                                <span className="sv-kanban-col-count">{group.tasks.length}</span>
-                            </div>
-                            <div className="sv-kanban-col-actions">
-                                <button className="sv-kanban-col-btn"><MoreHorizontal size={14} /></button>
-                                <button className="sv-kanban-col-btn" onClick={() => setInlineCol(group.id)}><Plus size={14} /></button>
-                            </div>
-                        </div>
-                        <div className="sv-kanban-cards">
-                            {group.tasks.map(task => (
-                                <div key={task.id} className="sv-kanban-card" draggable
-                                    onDragStart={e => onDragStart(e, group.id, task.id)}
-                                    onDragEnd={onDragEnd}
-                                    onClick={() => setSelectedTask(task)}
-                                    onContextMenu={e => onContextMenu(e, task)}
-                                >
-                                    <div className="sv-kanban-card-title">{task.title}</div>
-                                    <div className="sv-kanban-card-marks"><span>≡</span></div>
-                                    <div className="sv-kanban-card-meta">
-                                        {task.dueDate && (
-                                            <span className={`sv-kanban-date ${['10/31/23', '11/1/23', '10/3/23'].includes(task.dueDate) ? 'sv-kanban-date--red' : ''}`}>
-                                                <Calendar size={11} /> {task.dueDate}
-                                            </span>
-                                        )}
-                                        {task.priority !== 'Normal' && (
-                                            <span className="sv-kanban-priority" style={{ color: task.priorityColor }}>
-                                                <Flag size={11} fill={task.priorityColor} /> {task.priority}
-                                            </span>
-                                        )}
-                                        {task.assignees.map(a => (
-                                            <Avatar key={a} size={20} style={{ backgroundColor: avatarColors[a], fontSize: '8px', fontWeight: 'bold' }}>{a}</Avatar>
-                                        ))}
-                                    </div>
-                                </div>
-                            ))}
-
-                            {inlineCol === group.id ? (
-                                <div className="sv-kanban-card sv-kanban-card--inline">
-                                    <input
-                                        ref={inlineRef}
-                                        className="sv-inline-input"
-                                        value={inlineText}
-                                        onChange={e => setInlineText(e.target.value)}
-                                        placeholder="Task name"
-                                        onKeyDown={e => {
-                                            if (e.key === 'Enter') handleInlineCreate(group.id);
-                                            if (e.key === 'Escape') { setInlineCol(null); setInlineText(''); }
-                                        }}
-                                        onBlur={() => handleInlineCreate(group.id)}
-                                    />
-                                </div>
-                            ) : (
-                                <button className="sv-kanban-add-task" onClick={() => setInlineCol(group.id)}>
-                                    <Plus size={13} /> Add Task
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                ))}
-                <div className="sv-kanban-add-group"><Plus size={14} /> Add group</div>
-            </div>
-        </div>
-    );
-}
 
 /* ═══════════════════════════════════════════════
    MAIN COMPONENT
@@ -615,86 +182,86 @@ export default function SpaceViewPage() {
     const moreViews = filteredViews.slice(7);
 
     return (
-        <div className="sv-page">
+        <div className="flex h-full flex-col overflow-hidden bg-white" style={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}>
             {/* ═══════ HEADER ═══════ */}
-            <header className="sv-header">
-                <div className="sv-header-top">
-                    <div className="sv-title-area">
-                        <div className="sv-space-icon" style={{ backgroundColor: '#0058be' }}>
+            <header className="shrink-0 border-b border-[#eef0f5] bg-white">
+                <div className="flex items-center justify-between px-5 pb-2 pt-2.5">
+                    <div className="flex items-center gap-2">
+                        <div className="flex h-6 w-6 items-center justify-center rounded-md" style={{ backgroundColor: '#0058be' }}>
                             <Hash size={16} color="#fff" />
                         </div>
-                        <h1 className="sv-title">Main Space</h1>
-                        <button className="sv-title-icon"><ChevronDown size={16} /></button>
-                        <button className="sv-title-icon"><Star size={15} /></button>
+                        <h1 className="m-0 text-base font-bold text-[#141b2b]">Main Space</h1>
+                        <button className="flex items-center rounded px-1 py-0.5 text-[#9aa0a6] hover:bg-[#f0f4ff] hover:text-[#0058be]"><ChevronDown size={16} /></button>
+                        <button className="flex items-center rounded px-1 py-0.5 text-[#9aa0a6] hover:bg-[#f0f4ff] hover:text-[#0058be]"><Star size={15} /></button>
                     </div>
-                    <div className="sv-header-actions">
-                        <button className="sv-hdr-btn"><Clock size={14} /> Agents</button>
-                        <button className="sv-hdr-btn"><Zap size={14} /> Automate</button>
-                        <button className="sv-hdr-btn"><Bot size={14} /> Ask AI</button>
-                        <button className="sv-hdr-btn sv-hdr-btn--primary"><Share2 size={14} /> Share</button>
+                    <div className="flex items-center gap-1.5">
+                        <button className="flex cursor-pointer items-center gap-1.25 rounded-md border border-[#eef0f5] bg-transparent px-2.5 py-1 text-xs font-semibold text-[#5f6368] transition-all duration-150 hover:border-[#dcdfe4] hover:bg-[#f8fafc]"><Clock size={14} /> Agents</button>
+                        <button className="flex cursor-pointer items-center gap-1.25 rounded-md border border-[#eef0f5] bg-transparent px-2.5 py-1 text-xs font-semibold text-[#5f6368] transition-all duration-150 hover:border-[#dcdfe4] hover:bg-[#f8fafc]"><Zap size={14} /> Automate</button>
+                        <button className="flex cursor-pointer items-center gap-1.25 rounded-md border border-[#eef0f5] bg-transparent px-2.5 py-1 text-xs font-semibold text-[#5f6368] transition-all duration-150 hover:border-[#dcdfe4] hover:bg-[#f8fafc]"><Bot size={14} /> Ask AI</button>
+                        <button className="flex cursor-pointer items-center gap-1.25 rounded-md border border-[#0058be] bg-[#0058be] px-2.5 py-1 text-xs font-semibold text-white transition-all duration-150 hover:bg-[#004aab]"><Share2 size={14} /> Share</button>
                     </div>
                 </div>
-                <div className="sv-tab-bar">
-                    <button className="sv-tab-item sv-tab-label">Add Channel</button>
-                    <button className={`sv-tab-item ${activeView === 'overview' ? 'sv-tab-item--active' : ''}`} onClick={() => setActiveView('overview')}>
+                <div className="flex items-center gap-0.5 px-5">
+                    <button className="flex items-center gap-1.25 whitespace-nowrap rounded-t-md border-b-2 border-b-transparent px-3 py-2 text-[13px] font-medium text-[#9aa0a6] transition-all duration-150 hover:bg-[#f8fafc] hover:text-[#5f6368]">Add Channel</button>
+                    <button className={`flex items-center gap-1.25 whitespace-nowrap rounded-t-md border-b-2 px-3 py-2 text-[13px] font-semibold transition-all duration-150 hover:bg-[#f8fafc] hover:text-[#141b2b] ${activeView === 'overview' ? 'border-b-[#0058be] text-[#0058be]' : 'border-b-transparent text-[#5f6368]'}`} onClick={() => setActiveView('overview')}>
                         <LayoutDashboard size={14} /> Overview
                     </button>
-                    <button className={`sv-tab-item ${activeView === 'list' ? 'sv-tab-item--active' : ''}`} onClick={() => setActiveView('list')}>
+                    <button className={`flex items-center gap-1.25 whitespace-nowrap rounded-t-md border-b-2 px-3 py-2 text-[13px] font-semibold transition-all duration-150 hover:bg-[#f8fafc] hover:text-[#141b2b] ${activeView === 'list' ? 'border-b-[#0058be] text-[#0058be]' : 'border-b-transparent text-[#5f6368]'}`} onClick={() => setActiveView('list')}>
                         <LayoutList size={14} /> List
                     </button>
-                    <button className={`sv-tab-item ${activeView === 'board' ? 'sv-tab-item--active' : ''}`} onClick={() => setActiveView('board')}>
+                    <button className={`flex items-center gap-1.25 whitespace-nowrap rounded-t-md border-b-2 px-3 py-2 text-[13px] font-semibold transition-all duration-150 hover:bg-[#f8fafc] hover:text-[#141b2b] ${activeView === 'board' ? 'border-b-[#0058be] text-[#0058be]' : 'border-b-transparent text-[#5f6368]'}`} onClick={() => setActiveView('board')}>
                         <Trello size={14} /> Board
                     </button>
-                    <div className="sv-view-picker-wrap" ref={pickerRef}>
-                        <button className="sv-tab-add" onClick={() => setShowViewPicker(v => !v)}>
+                    <div className="relative" ref={pickerRef}>
+                        <button className="flex items-center gap-1 whitespace-nowrap rounded-t-md px-2.5 py-2 text-[13px] font-semibold text-[#9aa0a6] transition-all duration-150 hover:bg-[#f8fafc] hover:text-[#5f6368]" onClick={() => setShowViewPicker(v => !v)}>
                             <Plus size={13} /> View
                         </button>
                         {showViewPicker && (
-                            <div className="sv-view-picker">
-                                <div className="sv-view-picker-search">
-                                    <Search size={14} className="sv-vpc-search-icon" />
+                            <div className="absolute left-0 top-[calc(100%+4px)] z-1000 w-125 rounded-xl border border-[#eef0f5] bg-white p-3 shadow-[0_8px_32px_rgba(0,0,0,0.14)]">
+                                <div className="mb-3.5 flex items-center gap-2 rounded-lg border border-[#dcdfe4] px-3 py-1.5">
+                                    <Search size={14} className="shrink-0 text-[#9aa0a6]" />
                                     <input autoFocus value={viewSearch} onChange={e => setViewSearch(e.target.value)}
-                                        placeholder="Search or describe views" className="sv-vpc-search-input" />
+                                        placeholder="Search or describe views" className="flex-1 border-none bg-transparent text-[13px] text-[#141b2b] outline-none" />
                                 </div>
-                                <div className="sv-vpc-section-label">Popular</div>
-                                <div className="sv-vpc-grid">
+                                <div className="mb-2 mt-1 text-[11px] font-bold uppercase tracking-[0.06em] text-[#9aa0a6]">Popular</div>
+                                <div className="mb-3 grid grid-cols-2 gap-1">
                                     {popularViews.map(v => (
-                                        <button key={v.id} className="sv-vpc-item" onClick={() => {
+                                        <button key={v.id} className="flex cursor-pointer items-center gap-2.5 rounded-lg border-none bg-transparent px-2.5 py-2 text-left transition-colors duration-150 hover:bg-[#f8fafc]" onClick={() => {
                                             if (v.id === 'list') setActiveView('list');
                                             if (v.id === 'board') setActiveView('board');
                                             setShowViewPicker(false);
                                         }}>
-                                            <div className="sv-vpc-icon" style={{ backgroundColor: v.bg }}>
+                                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: v.bg }}>
                                                 <v.icon size={18} color={v.color} />
                                             </div>
-                                            <div className="sv-vpc-info">
-                                                <span className="sv-vpc-label">{v.label}</span>
-                                                <span className="sv-vpc-desc">{v.desc}</span>
+                                            <div className="flex flex-col gap-0.5">
+                                                <span className="text-[13px] font-bold text-[#141b2b]">{v.label}</span>
+                                                <span className="text-[11px] text-[#9aa0a6]">{v.desc}</span>
                                             </div>
                                         </button>
                                     ))}
                                 </div>
                                 {moreViews.length > 0 && (
                                     <>
-                                        <div className="sv-vpc-section-label">More views</div>
-                                        <div className="sv-vpc-grid">
+                                        <div className="mb-2 mt-1 text-[11px] font-bold uppercase tracking-[0.06em] text-[#9aa0a6]">More views</div>
+                                        <div className="mb-3 grid grid-cols-2 gap-1">
                                             {moreViews.map(v => (
-                                                <button key={v.id} className="sv-vpc-item" onClick={() => setShowViewPicker(false)}>
-                                                    <div className="sv-vpc-icon" style={{ backgroundColor: v.bg }}>
+                                                <button key={v.id} className="flex cursor-pointer items-center gap-2.5 rounded-lg border-none bg-transparent px-2.5 py-2 text-left transition-colors duration-150 hover:bg-[#f8fafc]" onClick={() => setShowViewPicker(false)}>
+                                                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: v.bg }}>
                                                         <v.icon size={18} color={v.color} />
                                                     </div>
-                                                    <div className="sv-vpc-info">
-                                                        <span className="sv-vpc-label">{v.label}</span>
-                                                        <span className="sv-vpc-desc">{v.desc}</span>
+                                                    <div className="flex flex-col gap-0.5">
+                                                        <span className="text-[13px] font-bold text-[#141b2b]">{v.label}</span>
+                                                        <span className="text-[11px] text-[#9aa0a6]">{v.desc}</span>
                                                     </div>
                                                 </button>
                                             ))}
                                         </div>
                                     </>
                                 )}
-                                <div className="sv-vpc-footer">
-                                    <label className="sv-vpc-check"><input type="checkbox" /> Private view</label>
-                                    <label className="sv-vpc-check"><input type="checkbox" /> Pin view</label>
+                                <div className="mt-1 flex gap-5 border-t border-[#eef0f5] pt-2.5">
+                                    <label className="flex cursor-pointer items-center gap-1.5 text-xs text-[#5f6368]"><input type="checkbox" /> Private view</label>
+                                    <label className="flex cursor-pointer items-center gap-1.5 text-xs text-[#5f6368]"><input type="checkbox" /> Pin view</label>
                                 </div>
                             </div>
                         )}
@@ -704,30 +271,30 @@ export default function SpaceViewPage() {
 
             {/* ═══════ TOOLBAR ═══════ */}
             {activeView !== 'overview' && (
-                <div className="sv-list-toolbar">
-                    <div className="sv-list-toolbar-left">
+                <div className="flex shrink-0 items-center justify-between border-b border-[#eef0f5] bg-white px-5 py-2">
+                    <div className="flex items-center gap-1.5">
                         <GroupByDropdown value={groupBy} onChange={setGroupBy}
                             isOpen={activeDropdown === 'group'} onToggle={() => toggleDropdown('group')} />
                         <SubtasksDropdown value={subtaskMode} onChange={setSubtaskMode}
                             isOpen={activeDropdown === 'subtask'} onToggle={() => toggleDropdown('subtask')} />
                     </div>
-                    <div className="sv-list-toolbar-right">
+                    <div className="flex items-center gap-1.5">
                         {activeView === 'board' && (
-                            <button className="sv-chip-icon">Sort</button>
+                            <button className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-transparent px-2 py-1 text-xs font-semibold whitespace-nowrap text-[#5f6368] hover:bg-[#f0f4ff] hover:text-[#0058be]">Sort</button>
                         )}
                         <FilterPanel isOpen={activeDropdown === 'filter'} onToggle={() => toggleDropdown('filter')}
                             filters={filters} onFiltersChange={setFilters} />
                         <button
-                            className={`sv-chip-icon ${showClosed ? 'sv-chip-icon--active-subtle' : ''}`}
+                            className={`flex cursor-pointer items-center gap-1 rounded-md border-none bg-transparent px-2 py-1 text-xs font-semibold whitespace-nowrap hover:bg-[#f0f4ff] hover:text-[#0058be] ${showClosed ? 'text-[#0058be]' : 'text-[#5f6368]'}`}
                             onClick={() => setShowClosed(v => !v)}
                         >
                             {showClosed ? <CheckCircle2 size={13} /> : null} Closed
                         </button>
-                        <button className="sv-chip-icon"><Users size={13} /> Assignee</button>
-                        <button className="sv-chip-icon"><Search size={13} /></button>
+                        <button className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-transparent px-2 py-1 text-xs font-semibold whitespace-nowrap text-[#5f6368] hover:bg-[#f0f4ff] hover:text-[#0058be]"><Users size={13} /> Assignee</button>
+                        <button className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-transparent px-2 py-1 text-xs font-semibold whitespace-nowrap text-[#5f6368] hover:bg-[#f0f4ff] hover:text-[#0058be]"><Search size={13} /></button>
                         <CustomizePanel isOpen={activeDropdown === 'customize'} onToggle={() => toggleDropdown('customize')}
                             columns={columns} onColumnsChange={setColumns} />
-                        <button className="sv-add-task-btn" onClick={() => setShowCreateTask(true)}>
+                        <button className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-[#0058be] px-3 py-1.25 text-xs font-bold text-white transition-colors duration-150 hover:bg-[#004aab]" onClick={() => setShowCreateTask(true)}>
                             <Plus size={14} /> Add Task <ChevronDown size={12} />
                         </button>
                     </div>
@@ -735,7 +302,7 @@ export default function SpaceViewPage() {
             )}
 
             {/* ═══════ CONTENT ═══════ */}
-            <main className="sv-content">
+            <main className="flex flex-1 flex-col overflow-hidden">
                 {activeView === 'overview' && <OverviewView />}
                 {activeView === 'list' && (
                     <ListView groups={filteredGroups} setGroups={setGroups}

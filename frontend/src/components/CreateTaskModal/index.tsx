@@ -3,7 +3,6 @@ import {
     X, ChevronDown, Calendar, Flag, User, AlignLeft,
     Paperclip, FolderOpen, Hash
 } from 'lucide-react';
-import './create-task-modal.css';
 
 export interface NewTaskData {
     title: string;
@@ -109,29 +108,43 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
     };
 
     return (
-        <div className="ctm-overlay" onClick={onClose}>
-            <div className="ctm-modal" onClick={e => { e.stopPropagation(); closeAllDropdowns(); }}>
+        <div className="fixed inset-0 z-2000 flex items-center justify-center bg-[rgba(20,27,43,0.5)]" onClick={onClose}>
+            <div
+                className="flex w-145 max-w-[95vw] flex-col rounded-xl bg-white shadow-[0_16px_48px_rgba(0,0,0,0.2)]"
+                onClick={e => { e.stopPropagation(); closeAllDropdowns(); }}
+            >
                 {/* Header */}
-                <div className="ctm-header">
-                    <div className="ctm-header-left">
-                        <Hash size={16} className="ctm-header-icon" />
-                        <span className="ctm-header-title">Create Task</span>
+                <div className="flex items-center justify-between border-b border-[#eef0f5] px-4.5 py-3.5">
+                    <div className="flex items-center gap-2">
+                        <Hash size={16} className="text-[#0058be]" />
+                        <span className="text-sm font-bold text-[#141b2b]">Create Task</span>
                     </div>
-                    <button className="ctm-close-btn" onClick={onClose}><X size={18} /></button>
+                    <button
+                        className="flex cursor-pointer items-center rounded-md border-none bg-transparent p-1 text-[#9aa0a6] hover:bg-[#f0f2f5] hover:text-[#5f6368]"
+                        onClick={onClose}
+                    >
+                        <X size={18} />
+                    </button>
                 </div>
 
                 {/* List selector */}
-                <div className="ctm-list-row">
+                <div className="flex items-center gap-1.5 border-b border-[#f8f9fc] px-4.5 py-2.5 text-xs text-[#9aa0a6]">
                     <FolderOpen size={14} />
-                    <span className="ctm-list-label">in</span>
-                    <div className="ctm-dropdown-wrap" onClick={e => e.stopPropagation()}>
-                        <button className="ctm-list-btn" onClick={() => { closeAllDropdowns(); setShowList(!showList); }}>
+                    <span className="font-medium">in</span>
+                    <div className="relative" onClick={e => e.stopPropagation()}>
+                        <button
+                            className="flex cursor-pointer items-center gap-1 rounded-md border border-[#eef0f5] bg-transparent px-2.5 py-0.75 text-xs font-semibold text-[#141b2b] hover:border-[#dcdfe4] hover:bg-[#f8fafb]"
+                            onClick={() => { closeAllDropdowns(); setShowList(!showList); }}
+                        >
                             {listName} <ChevronDown size={12} />
                         </button>
                         {showList && (
-                            <div className="ctm-dropdown">
+                            <div className="absolute left-0 top-[calc(100%+4px)] z-10 min-w-45 rounded-lg border border-[#eef0f5] bg-white p-1 shadow-[0_6px_20px_rgba(0,0,0,0.12)]">
                                 {LIST_OPTIONS.map(l => (
-                                    <button key={l} className={`ctm-dropdown-item ${listName === l ? 'ctm-dropdown-item--active' : ''}`}
+                                    <button
+                                        key={l}
+                                        className={`flex w-full cursor-pointer items-center gap-2 rounded-md border-none px-2.5 py-1.75 text-left text-xs font-semibold ${listName === l ? 'bg-[#f0f4ff] text-[#0058be]' : 'bg-transparent text-[#141b2b] hover:bg-[#f0f4ff]'
+                                            }`}
                                         onClick={() => { setListName(l); setShowList(false); }}>
                                         <FolderOpen size={13} /> {l}
                                     </button>
@@ -142,10 +155,10 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
                 </div>
 
                 {/* Title input */}
-                <div className="ctm-title-area">
+                <div className="px-4.5 pb-2 pt-4">
                     <input
                         ref={titleRef}
-                        className="ctm-title-input"
+                        className="w-full border-none text-lg font-bold text-[#141b2b] outline-none"
                         value={title}
                         onChange={e => setTitle(e.target.value)}
                         placeholder="Task name"
@@ -154,10 +167,10 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
                 </div>
 
                 {/* Description */}
-                <div className="ctm-desc-area">
-                    <AlignLeft size={14} className="ctm-desc-icon" />
+                <div className="flex items-start gap-2 px-4.5 pb-3 pt-1">
+                    <AlignLeft size={14} className="mt-1.5 shrink-0 text-[#c2c9e0]" />
                     <textarea
-                        className="ctm-desc-input"
+                        className="min-h-10 flex-1 resize-y border-none text-[13px] leading-6 text-[#5f6368] outline-none"
                         value={description}
                         onChange={e => setDescription(e.target.value)}
                         placeholder="Add description..."
@@ -166,24 +179,24 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
                 </div>
 
                 {/* Fields row */}
-                <div className="ctm-fields-row">
+                <div className="flex flex-wrap items-center gap-1.5 border-t border-[#f8f9fc] px-4.5 py-2.5">
                     {/* Status */}
-                    <div className="ctm-dropdown-wrap" onClick={e => e.stopPropagation()}>
+                    <div className="relative" onClick={e => e.stopPropagation()}>
                         <button
-                            className="ctm-field-btn"
+                            className="flex cursor-pointer items-center gap-1.25 whitespace-nowrap rounded-md border border-[#eef0f5] bg-transparent px-2.5 py-1.25 text-xs font-semibold text-[#5f6368] transition-all hover:border-[#dcdfe4] hover:bg-[#f8fafb]"
                             onClick={() => { closeAllDropdowns(); setShowStatus(!showStatus); }}
-                            style={{ '--field-color': statusObj.color } as React.CSSProperties}
                         >
-                            <span className="ctm-status-dot" style={{ backgroundColor: statusObj.color }} />
+                            <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: statusObj.color }} />
                             {status} <ChevronDown size={11} />
                         </button>
                         {showStatus && (
-                            <div className="ctm-dropdown">
+                            <div className="absolute left-0 top-[calc(100%+4px)] z-10 min-w-45 rounded-lg border border-[#eef0f5] bg-white p-1 shadow-[0_6px_20px_rgba(0,0,0,0.12)]">
                                 {STATUS_OPTIONS.map(s => (
                                     <button key={s.value}
-                                        className={`ctm-dropdown-item ${status === s.value ? 'ctm-dropdown-item--active' : ''}`}
+                                        className={`flex w-full cursor-pointer items-center gap-2 rounded-md border-none px-2.5 py-1.75 text-left text-xs font-semibold ${status === s.value ? 'bg-[#f0f4ff] text-[#0058be]' : 'bg-transparent text-[#141b2b] hover:bg-[#f0f4ff]'
+                                            }`}
                                         onClick={() => { setStatus(s.value); setShowStatus(false); }}>
-                                        <span className="ctm-status-dot" style={{ backgroundColor: s.color }} />
+                                        <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
                                         {s.label}
                                     </button>
                                 ))}
@@ -192,21 +205,30 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
                     </div>
 
                     {/* Assignee */}
-                    <div className="ctm-dropdown-wrap" onClick={e => e.stopPropagation()}>
-                        <button className="ctm-field-btn" onClick={() => { closeAllDropdowns(); setShowAssignee(!showAssignee); }}>
+                    <div className="relative" onClick={e => e.stopPropagation()}>
+                        <button
+                            className="flex cursor-pointer items-center gap-1.25 whitespace-nowrap rounded-md border border-[#eef0f5] bg-transparent px-2.5 py-1.25 text-xs font-semibold text-[#5f6368] transition-all hover:border-[#dcdfe4] hover:bg-[#f8fafb]"
+                            onClick={() => { closeAllDropdowns(); setShowAssignee(!showAssignee); }}
+                        >
                             <User size={13} />
                             {assignees.length > 0 ? `${assignees.length} member${assignees.length > 1 ? 's' : ''}` : 'Assignee'}
                             <ChevronDown size={11} />
                         </button>
                         {showAssignee && (
-                            <div className="ctm-dropdown ctm-dropdown--wide">
+                            <div className="absolute left-0 top-[calc(100%+4px)] z-10 min-w-55 rounded-lg border border-[#eef0f5] bg-white p-1 shadow-[0_6px_20px_rgba(0,0,0,0.12)]">
                                 {MEMBER_OPTIONS.map(m => (
                                     <button key={m.id}
-                                        className={`ctm-dropdown-item ${assignees.includes(m.id) ? 'ctm-dropdown-item--active' : ''}`}
+                                        className={`flex w-full cursor-pointer items-center gap-2 rounded-md border-none px-2.5 py-1.75 text-left text-xs font-semibold ${assignees.includes(m.id) ? 'bg-[#f0f4ff] text-[#0058be]' : 'bg-transparent text-[#141b2b] hover:bg-[#f0f4ff]'
+                                            }`}
                                         onClick={() => toggleAssignee(m.id)}>
-                                        <span className="ctm-member-avatar" style={{ backgroundColor: m.color }}>{m.id}</span>
+                                        <span
+                                            className="flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white"
+                                            style={{ backgroundColor: m.color }}
+                                        >
+                                            {m.id}
+                                        </span>
                                         {m.name}
-                                        {assignees.includes(m.id) && <span className="ctm-check">✓</span>}
+                                        {assignees.includes(m.id) && <span className="ml-auto text-sm text-[#0058be]">✓</span>}
                                     </button>
                                 ))}
                             </div>
@@ -214,29 +236,33 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
                     </div>
 
                     {/* Due Date */}
-                    <div className="ctm-field-btn ctm-date-field">
+                    <div className="relative flex items-center gap-1.25 whitespace-nowrap rounded-md border border-[#eef0f5] bg-transparent px-2.5 py-1.25 text-xs font-semibold text-[#5f6368] transition-all hover:border-[#dcdfe4] hover:bg-[#f8fafb]">
                         <Calendar size={13} />
                         <input
                             type="date"
-                            className="ctm-date-input"
+                            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                             value={dueDate}
                             onChange={e => setDueDate(e.target.value)}
                         />
-                        {!dueDate && <span className="ctm-date-placeholder">Due date</span>}
+                        {!dueDate && <span className="text-[#9aa0a6]">Due date</span>}
                     </div>
 
                     {/* Priority */}
-                    <div className="ctm-dropdown-wrap" onClick={e => e.stopPropagation()}>
-                        <button className="ctm-field-btn" onClick={() => { closeAllDropdowns(); setShowPriority(!showPriority); }}
-                            style={{ color: priorityObj.color }}>
+                    <div className="relative" onClick={e => e.stopPropagation()}>
+                        <button
+                            className="flex cursor-pointer items-center gap-1.25 whitespace-nowrap rounded-md border border-[#eef0f5] bg-transparent px-2.5 py-1.25 text-xs font-semibold transition-all hover:border-[#dcdfe4] hover:bg-[#f8fafb]"
+                            onClick={() => { closeAllDropdowns(); setShowPriority(!showPriority); }}
+                            style={{ color: priorityObj.color }}
+                        >
                             <Flag size={13} fill={priority !== 'Normal' ? priorityObj.color : 'none'} />
                             {priority} <ChevronDown size={11} />
                         </button>
                         {showPriority && (
-                            <div className="ctm-dropdown">
+                            <div className="absolute left-0 top-[calc(100%+4px)] z-10 min-w-45 rounded-lg border border-[#eef0f5] bg-white p-1 shadow-[0_6px_20px_rgba(0,0,0,0.12)]">
                                 {PRIORITY_OPTIONS.map(p => (
                                     <button key={p.value}
-                                        className={`ctm-dropdown-item ${priority === p.value ? 'ctm-dropdown-item--active' : ''}`}
+                                        className={`flex w-full cursor-pointer items-center gap-2 rounded-md border-none px-2.5 py-1.75 text-left text-xs font-semibold ${priority === p.value ? 'bg-[#f0f4ff] text-[#0058be]' : 'bg-transparent text-[#141b2b] hover:bg-[#f0f4ff]'
+                                            }`}
                                         onClick={() => { setPriority(p.value); setShowPriority(false); }}>
                                         <Flag size={13} fill={p.value !== 'Normal' ? p.color : 'none'} color={p.color} />
                                         {p.value}
@@ -248,13 +274,24 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
                 </div>
 
                 {/* Footer */}
-                <div className="ctm-footer">
-                    <div className="ctm-footer-left">
-                        <button className="ctm-attach-btn"><Paperclip size={14} /> Attach</button>
+                <div className="flex items-center justify-between border-t border-[#eef0f5] px-4.5 py-3">
+                    <div className="flex gap-1.5">
+                        <button className="flex cursor-pointer items-center gap-1.25 rounded-md border-none bg-transparent px-2 py-1 text-xs font-semibold text-[#9aa0a6] hover:bg-[#f0f2f5] hover:text-[#5f6368]">
+                            <Paperclip size={14} /> Attach
+                        </button>
                     </div>
-                    <div className="ctm-footer-right">
-                        <button className="ctm-cancel-btn" onClick={onClose}>Cancel</button>
-                        <button className="ctm-create-btn" onClick={handleCreate} disabled={!title.trim()}>
+                    <div className="flex gap-2">
+                        <button
+                            className="cursor-pointer rounded-md border border-[#eef0f5] bg-transparent px-4 py-1.5 text-[13px] font-semibold text-[#5f6368] hover:bg-[#f8fafb]"
+                            onClick={onClose}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            className="cursor-pointer rounded-md border-none bg-[#0058be] px-4.5 py-1.5 text-[13px] font-bold text-white transition-colors hover:bg-[#004aab] disabled:cursor-not-allowed disabled:bg-[#b0c4de]"
+                            onClick={handleCreate}
+                            disabled={!title.trim()}
+                        >
                             Create Task
                         </button>
                     </div>

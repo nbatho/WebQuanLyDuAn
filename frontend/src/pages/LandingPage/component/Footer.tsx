@@ -9,7 +9,7 @@ const footerLinks = {
 export default function Footer() {
     return (
         <footer className="w-full pt-16 pb-10 bg-[#141b2b]">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-10 px-10 max-w-[1280px] mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-10 px-10 max-w-7xl mx-auto">
                 {/* Brand */}
                 <div className="col-span-2 md:col-span-1">
                     <div className="text-xl font-extrabold text-white mb-4">Flowise</div>
@@ -36,7 +36,7 @@ export default function Footer() {
             </div>
 
             {/* Bottom bar */}
-            <div className="max-w-[1280px] mx-auto px-10 mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="max-w-7xl mx-auto px-10 mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div className="text-slate-500 text-sm">© 2025 Flowise — Dự án bài tập quản lý dự án</div>
                 <div className="flex gap-5">
                     <a href="#" className="text-slate-500 hover:text-white transition-colors">
