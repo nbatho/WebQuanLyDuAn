@@ -5,12 +5,12 @@ import {
 } from 'lucide-react';
 
 export interface NewTaskData {
-    title: string;
+    name: string;
     status: string;
     statusColor: string;
     priority: string;
     priorityColor: string;
-    dueDate: string | null;
+    due_date: string | null;
     assignees: string[];
     description: string;
     listName: string;
@@ -46,7 +46,7 @@ const MEMBER_OPTIONS = [
 const LIST_OPTIONS = ['Action Items', 'Backlog', 'Ideas'];
 
 export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStatus }: CreateTaskModalProps) {
-    const [title, setTitle] = useState('');
+    const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [status, setStatus] = useState(defaultStatus || 'TO DO');
     const [priority, setPriority] = useState('Normal');
@@ -64,7 +64,7 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
 
     useEffect(() => {
         if (isOpen) {
-            setTitle('');
+            setName('');
             setDescription('');
             setStatus(defaultStatus || 'TO DO');
             setPriority('Normal');
@@ -81,14 +81,14 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
     const priorityObj = PRIORITY_OPTIONS.find(p => p.value === priority) || PRIORITY_OPTIONS[2];
 
     const handleCreate = () => {
-        if (!title.trim()) return;
+        if (!name.trim()) return;
         onCreate({
-            title: title.trim(),
+            name: name.trim(),
             status,
             statusColor: statusObj.color,
             priority,
             priorityColor: priorityObj.color,
-            dueDate: dueDate || null,
+            due_date: dueDate || null,
             assignees,
             description,
             listName,
@@ -159,10 +159,10 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
                     <input
                         ref={titleRef}
                         className="w-full border-none text-lg font-bold text-[#141b2b] outline-none"
-                        value={title}
-                        onChange={e => setTitle(e.target.value)}
+                        value={name}
+                        onChange={e => setName(e.target.value)}
                         placeholder="Task name"
-                        onKeyDown={e => { if (e.key === 'Enter' && title.trim()) handleCreate(); }}
+                        onKeyDown={e => { if (e.key === 'Enter' && name.trim()) handleCreate(); }}
                     />
                 </div>
 
@@ -290,7 +290,7 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
                         <button
                             className="cursor-pointer rounded-md border-none bg-[#0058be] px-4.5 py-1.5 text-[13px] font-bold text-white transition-colors hover:bg-[#004aab] disabled:cursor-not-allowed disabled:bg-[#b0c4de]"
                             onClick={handleCreate}
-                            disabled={!title.trim()}
+                            disabled={!name.trim()}
                         >
                             Create Task
                         </button>

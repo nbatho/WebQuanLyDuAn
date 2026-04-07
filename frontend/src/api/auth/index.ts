@@ -13,7 +13,7 @@ export const signOut = async () => {
 }
 
 export const getToken = (): string | null => {
-    return localStorage.getItem('access_token');
+    return localStorage.getItem('accessToken');
 };
 
 export const isTokenExpired = (): boolean => {

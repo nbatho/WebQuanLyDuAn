@@ -1,214 +1,252 @@
 import { useState } from 'react';
-import { Search, Filter, AtSign, CornerUpLeft, Bell, Paperclip, Smile, Image, Download } from 'lucide-react';
+import {
+    Hash, AtSign, Bell, User, Plus, Search, HelpCircle,
+    Paperclip, Smile, Image, Mic, Send, MoreHorizontal,
+    Video, Phone, Pin
+} from 'lucide-react';
 
-const messages = [
+const channels = [
+    { id: 'announcements', name: 'announcements', unread: 2 },
+    { id: 'general', name: 'general', unread: 0 },
+    { id: 'launchpad', name: 'launchpad', unread: 0 },
+    { id: 'marketing', name: 'marketing', unread: 5 },
+];
+
+const directMessages = [
+    { id: 'user-1', name: 'Sarah Jenkins', avatarBg: '#0058be', unread: 1 },
+    { id: 'user-2', name: 'Marcus Chen', avatarBg: '#7c5cfc', unread: 0 },
+    { id: 'user-3', name: 'Elena Rodriguez', avatarBg: '#00b894', unread: 0 },
+];
+
+const mockMessages = [
     {
         id: 1,
         sender: 'Sarah Jenkins',
         avatar: 'SJ',
         avatarBg: '#0058be',
-        subject: 'Review Q4 Brand Guidelines',
-        preview: "I've attached the latest drafts for the visual...",
         time: '10:24 AM',
-        priority: true,
-        section: 'NEEDS ACTION • TODAY',
+        content: `Welcome to the Launchpad! Let's track our Q4 deliverables here. Make sure to ping me if you need access to the Figma files.`,
+        isSystem: false,
     },
     {
         id: 2,
         sender: 'Marcus Chen',
         avatar: 'MC',
         avatarBg: '#7c5cfc',
-        subject: 'Architecture Review: API v3',
-        preview: 'Can we hop on a quick call to discuss the rate...',
-        time: '09:15 AM',
-        priority: false,
-        section: '',
+        time: '11:05 AM',
+        content: `Awesome. I'm working on the new API endpoints right now. Should be ready for review by tomorrow morning.`,
+        isSystem: false,
     },
     {
         id: 3,
-        sender: 'System Bot',
-        avatar: '🤖',
-        avatarBg: '#e8edf5',
-        subject: 'Monthly Usage Report',
-        preview: 'Your team has reached 85% of storage quot...',
-        time: 'Yesterday',
-        priority: false,
-        section: 'OTHER UPDATES',
+        sender: 'System',
+        time: '11:30 AM',
+        content: `Marcus Chen updated the due date of "API Endpoints" to Tomorrow.`,
+        isSystem: true,
+    },
+    {
+        id: 4,
+        sender: 'Elena Rodriguez',
+        avatar: 'ER',
+        avatarBg: '#00b894',
+        time: '2:15 PM',
+        content: `Can someone review the updated color palette? I've attached it below.`,
+        isSystem: false,
+        attachment: { name: 'Brand_Colors_V2.pdf', size: '2.4 MB' }
     },
 ];
 
-
-
 export default function InboxPage() {
-    const [activeMsg, setActiveMsg] = useState(1);
-    const [activeFilter, setActiveFilter] = useState('all');
+    const [activeChannel, setActiveChannel] = useState('launchpad');
+    const [messageInput, setMessageInput] = useState('');
 
     return (
         <div className="flex h-screen overflow-hidden bg-white font-['Plus_Jakarta_Sans',sans-serif]">
-            {/* ═══════ Filter Column ═══════ */}
-            <div className="w-40 shrink-0 border-r border-[#eef0f5] px-3 py-4 max-[1100px]:hidden">
-                <h2 className="mb-3.5 text-[20px] font-black text-[#141b2b]">Inbox</h2>
-                <div className="mb-4 flex flex-col gap-0.5">
-                    {[
-                        { id: 'all', label: 'All', count: 12 },
-                        { id: 'unread', label: 'Unread', count: 4 },
-                        { id: 'assigned', label: 'Assigned', count: null },
-                    ].map((f) => (
-                        <button
-                            key={f.id}
-                            className={`flex items-center justify-between rounded-lg border-none bg-transparent px-2.5 py-1.75 text-left text-[13px] font-semibold text-[#5f6368] transition-all duration-150 hover:bg-[#f0f4ff] ${activeFilter === f.id ? 'font-bold text-[#0058be]' : ''
-                                }`}
-                            onClick={() => setActiveFilter(f.id)}
-                        >
-                            <span>{f.label}</span>
-                            {f.count && <span className="text-[11px] font-bold text-[#9aa0a6]">{f.count}</span>}
+            {/* ═══════ Sidebar (Chat Navigation) ═══════ */}
+            <div className="flex w-64 shrink-0 flex-col border-r border-[#eef0f5] bg-[#fafbfc] max-[1100px]:hidden">
+                <div className="flex items-center justify-between border-b border-[#eef0f5] px-4 py-4">
+                    <h2 className="m-0 text-xl font-black text-[#141b2b]">Chat</h2>
+                    <div className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md hover:bg-[#e8edf5]">
+                        <Search size={16} className="text-[#5f6368]" />
+                    </div>
+                </div>
+
+                <div className="flex flex-1 flex-col overflow-y-auto px-2 py-4">
+                    {/* Common Filters */}
+                    <div className="mb-6 flex flex-col gap-0.5">
+                        <button className="flex items-center gap-2.5 rounded-lg border-none bg-transparent px-3 py-2 text-[13px] font-bold text-[#5f6368] transition-all hover:bg-[#f0f4ff] hover:text-[#141b2b]">
+                            <AtSign size={16} className="text-[#b0b5c1]" /> Activity
                         </button>
-                    ))}
-                </div>
-
-                <div className="px-2.5 py-1.5 text-[10px] font-extrabold tracking-[0.08em] text-[#9aa0a6]">CATEGORIES</div>
-                <div className="flex flex-col gap-0.5">
-                    <button className="flex items-center gap-2.25 rounded-lg border-none bg-transparent px-2.5 py-1.75 text-[13px] font-semibold text-[#5f6368] transition-colors duration-150 hover:bg-[#f0f4ff]"><AtSign size={15} /><span>Mentions</span></button>
-                    <button className="flex items-center gap-2.25 rounded-lg border-none bg-transparent px-2.5 py-1.75 text-[13px] font-semibold text-[#5f6368] transition-colors duration-150 hover:bg-[#f0f4ff]"><CornerUpLeft size={15} /><span>Replies</span></button>
-                    <button className="flex items-center gap-2.25 rounded-lg border-none bg-transparent px-2.5 py-1.75 text-[13px] font-semibold text-[#5f6368] transition-colors duration-150 hover:bg-[#f0f4ff]"><Bell size={15} /><span>System Updates</span></button>
-                </div>
-            </div>
-
-            {/* ═══════ Message List ═══════ */}
-            <div className="flex w-70 shrink-0 flex-col border-r border-[#eef0f5] max-[700px]:hidden">
-                <div className="flex items-center gap-2 border-b border-[#eef0f5] px-3 py-2.5">
-                    <div className="flex h-8.5 flex-1 items-center gap-2 rounded-lg bg-[#f5f7ff] px-2.5">
-                        <Search size={16} className="shrink-0 text-[#9aa0a6]" />
-                        <input type="text" placeholder="Search messages..." className="w-full border-none bg-transparent font-['Plus_Jakarta_Sans',sans-serif] text-xs font-medium text-[#141b2b] outline-none" />
+                        <button className="flex items-center gap-2.5 rounded-lg border-none bg-transparent px-3 py-2 text-[13px] font-bold text-[#5f6368] transition-all hover:bg-[#f0f4ff] hover:text-[#141b2b]">
+                            <Bell size={16} className="text-[#b0b5c1]" /> Notifications
+                        </button>
                     </div>
-                    <Filter size={16} className="cursor-pointer text-[#9aa0a6]" />
-                </div>
 
-                <div className="flex-1 overflow-y-auto py-1.5">
-                    {messages.map((msg) => (
-                        <div key={msg.id}>
-                            {msg.section && (
-                                <div className="flex items-center gap-1.5 px-3.5 pb-1 pt-2 text-[10px] font-extrabold tracking-[0.06em] text-[#9aa0a6]">
-                                    {msg.section.includes('NEEDS') && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#e74c3c]" />}
-                                    {msg.section}
-                                </div>
-                            )}
-                            <div
-                                className={`flex cursor-pointer items-start gap-2.5 border-l-[3px] px-3.5 py-2.5 transition-colors duration-100 ${activeMsg === msg.id
-                                        ? 'border-l-[#0058be] bg-[#e8edff]'
-                                        : 'border-l-transparent hover:bg-[#f5f7ff]'
-                                    }`}
-                                onClick={() => setActiveMsg(msg.id)}
+                    {/* Channels */}
+                    <div className="mb-2 flex items-center justify-between px-3 text-[11px] font-extrabold tracking-[0.06em] text-[#9aa0a6]">
+                        <span>CHANNELS</span>
+                        <Plus size={14} className="cursor-pointer transition-colors hover:text-[#0058be]" />
+                    </div>
+                    <div className="mb-6 flex flex-col gap-0.5">
+                        {channels.map(ch => (
+                            <button
+                                key={ch.id}
+                                onClick={() => setActiveChannel(ch.id)}
+                                className={`group flex items-center justify-between rounded-lg border-none bg-transparent px-3 py-2 text-[13px] font-bold transition-all ${activeChannel === ch.id ? 'bg-[#f0f4ff] text-[#0058be]' : 'text-[#5f6368] hover:bg-[#f0f4ff] hover:text-[#141b2b]'}`}
                             >
-                                <div className={`flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-full text-xs font-extrabold ${msg.avatarBg === '#e8edf5' ? 'text-[#5f6368]' : 'text-white'}`} style={{ backgroundColor: msg.avatarBg }}>
-                                    {msg.avatar.length > 2 ? msg.avatar : msg.avatar}
+                                <div className="flex items-center gap-2.5">
+                                    <Hash size={15} className={activeChannel === ch.id ? 'text-[#0058be]' : 'text-[#b0b5c1] group-hover:text-[#5f6368]'} />
+                                    <span>{ch.name}</span>
                                 </div>
-                                <div className="min-w-0 flex-1">
-                                    <div className="mb-0.5 flex items-center justify-between">
-                                        <span className="text-xs font-bold text-[#141b2b]">{msg.sender}</span>
-                                        <span className="text-[10px] font-semibold text-[#c2c9e0]">{msg.time}</span>
-                                    </div>
-                                    <span className="mb-0.5 block overflow-hidden text-ellipsis whitespace-nowrap text-xs font-bold text-[#141b2b]">{msg.subject}</span>
-                                    <span className="flex items-center gap-1 overflow-hidden text-ellipsis whitespace-nowrap text-[11px] font-medium text-[#9aa0a6]">
-                                        {msg.priority && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#0058be]" />}
-                                        {msg.preview}
+                                {ch.unread > 0 && (
+                                    <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#e74c3c] text-[10px] font-extrabold text-white">
+                                        {ch.unread}
                                     </span>
+                                )}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Direct Messages */}
+                    <div className="mb-2 flex items-center justify-between px-3 text-[11px] font-extrabold tracking-[0.06em] text-[#9aa0a6]">
+                        <span>DIRECT MESSAGES</span>
+                        <Plus size={14} className="cursor-pointer transition-colors hover:text-[#0058be]" />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                        {directMessages.map(dm => (
+                            <button
+                                key={dm.id}
+                                onClick={() => setActiveChannel(dm.id)}
+                                className={`group flex items-center justify-between rounded-lg border-none bg-transparent px-3 py-1.5 text-[13px] font-bold transition-all ${activeChannel === dm.id ? 'bg-[#f0f4ff] text-[#0058be]' : 'text-[#5f6368] hover:bg-[#f0f4ff] hover:text-[#141b2b]'}`}
+                            >
+                                <div className="flex items-center gap-2.5">
+                                    <div className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white" style={{ backgroundColor: dm.avatarBg }}>
+                                        {dm.name.split(' ').map(n => n[0]).join('')}
+                                    </div>
+                                    <span>{dm.name}</span>
                                 </div>
-                            </div>
-                        </div>
-                    ))}
+                                {dm.unread > 0 && (
+                                    <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#e74c3c] text-[10px] font-extrabold text-white">
+                                        {dm.unread}
+                                    </span>
+                                )}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
 
-            {/* ═══════ Conversation Detail ═══════ */}
-            <div className="flex min-w-0 flex-1 flex-col bg-[#fafbff]">
-                <div className="flex items-center justify-between border-b border-[#eef0f5] px-5 py-3">
-                    <h2 className="m-0 text-lg font-extrabold text-[#141b2b]">Review Q4 Brand Guidelines</h2>
-                    <div className="flex items-center gap-1.5">
-                        <span className="rounded-[5px] bg-[#eef0f5] px-2 py-0.5 text-[10px] font-extrabold tracking-[0.04em] text-[#9aa0a6]">FLOW-829</span>
-                        <button className="flex h-7.5 w-7.5 items-center justify-center rounded-md border-none bg-transparent text-sm hover:bg-[#e8edf5]">📎</button>
-                        <button className="flex h-7.5 w-7.5 items-center justify-center rounded-md border-none bg-transparent text-sm hover:bg-[#e8edf5]">🗑</button>
-                        <button className="flex h-7.5 w-7.5 items-center justify-center rounded-md border-none bg-transparent text-sm hover:bg-[#e8edf5]">⋮</button>
+            {/* ═══════ Main Chat View ═══════ */}
+            <div className="flex min-w-0 flex-1 flex-col bg-white">
+                
+                {/* Chat Header */}
+                <div className="flex h-16 shrink-0 items-center justify-between border-b border-[#eef0f5] px-6">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded bg-[#f0f4ff]">
+                            <Hash size={18} className="text-[#0058be]" />
+                        </div>
+                        <div>
+                            <h3 className="m-0 text-base font-extrabold text-[#141b2b]"># launchpad</h3>
+                            <div className="text-[11px] font-semibold text-[#9aa0a6]">General updates and track planning.</div>
+                        </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-4">
+                        <div className="hidden items-center md:flex">
+                            <div className="-mr-2 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-[#0058be] text-[10px] font-bold text-white">SJ</div>
+                            <div className="-mr-2 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-[#7c5cfc] text-[10px] font-bold text-white">MC</div>
+                            <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-[#00b894] text-[10px] font-bold text-white">ER</div>
+                        </div>
+                        <div className="h-4 w-px bg-[#eef0f5]" />
+                        <div className="flex gap-1">
+                            <button className="flex h-8 w-8 items-center justify-center rounded hover:bg-[#f0f4ff]"><Video size={16} className="text-[#5f6368]" /></button>
+                            <button className="flex h-8 w-8 items-center justify-center rounded hover:bg-[#f0f4ff]"><Phone size={16} className="text-[#5f6368]" /></button>
+                            <button className="flex h-8 w-8 items-center justify-center rounded hover:bg-[#f0f4ff]"><Pin size={16} className="text-[#5f6368]" /></button>
+                            <button className="flex h-8 w-8 items-center justify-center rounded hover:bg-[#f0f4ff]"><MoreHorizontal size={16} className="text-[#5f6368]" /></button>
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-5 py-4">
-                    {/* Message 1 */}
-                    <div className="flex gap-2.5">
-                        <img
-                            src="https://ui-avatars.com/api/?name=Sarah+Jenkins&background=0058be&color=fff&size=36&bold=true"
-                            alt="Sarah Jenkins"
-                            className="h-9 w-9 shrink-0 rounded-full object-cover"
-                        />
-                        <div className="min-w-0 flex-1">
-                            <div className="mb-1.5 flex items-center gap-2">
-                                <span className="text-[13px] font-bold text-[#141b2b]">Sarah Jenkins</span>
-                                <span className="text-[11px] font-semibold text-[#c2c9e0]">10:24 AM</span>
-                            </div>
-                            <div className="rounded-[0_12px_12px_12px] border border-[#eef0f5] bg-white px-3.5 py-3">
-                                <p className="m-0 text-[13px] font-medium leading-[1.55] text-[#3a3f47]">Hi team! I've just finalized the initial draft for the Q4 Brand Guidelines. We need to focus specifically on the "Reductive Geometry" section. @Marcus Chen, could you take a look at the color palette accessibility?</p>
-                                <div className="mt-2.5 flex items-center gap-2.5 rounded-lg bg-[#f5f7ff] px-3 py-2">
-                                    <div className="text-[22px]">📄</div>
-                                    <div className="flex-1">
-                                        <span className="block text-xs font-bold text-[#141b2b]">Brand_Guidelines_V1.pdf</span>
-                                        <span className="text-[10px] font-semibold text-[#9aa0a6]">4.2 MB</span>
-                                    </div>
-                                    <Download size={16} className="cursor-pointer text-[#9aa0a6] hover:text-[#0058be]" />
+                {/* Chat Messages */}
+                <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+                    <div className="flex justify-center">
+                        <div className="rounded-full bg-[#f0f2f5] px-3 py-1 text-[11px] font-bold text-[#5f6368]">
+                            Today
+                        </div>
+                    </div>
+
+                    {mockMessages.map((msg) => (
+                        <div key={msg.id} className={`group flex gap-3 ${msg.isSystem ? 'items-center justify-center' : ''}`}>
+                            {msg.isSystem ? (
+                                <div className="text-[12px] font-semibold text-[#9aa0a6] flex items-center gap-2">
+                                    <div className="h-px w-8 bg-[#eef0f5]" />
+                                    <span>{msg.content}</span>
+                                    <div className="h-px w-8 bg-[#eef0f5]" />
                                 </div>
-                            </div>
+                            ) : (
+                                <>
+                                    <div 
+                                        className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-md font-bold text-white text-[12px]" 
+                                        style={{ backgroundColor: msg.avatarBg }}
+                                    >
+                                        {msg.avatar}
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex items-baseline gap-2 mb-1">
+                                            <span className="text-[14px] font-bold text-[#141b2b]">{msg.sender}</span>
+                                            <span className="text-[11px] font-semibold text-[#9aa0a6]">{msg.time}</span>
+                                        </div>
+                                        <div className="text-[14px] font-medium leading-[1.5] text-[#3a3f47]">
+                                            {msg.content}
+                                        </div>
+                                        {msg.attachment && (
+                                            <div className="mt-3 inline-flex items-center gap-3 rounded-lg border border-[#eef0f5] p-3 hover:bg-[#fafbfc] cursor-pointer transition-colors">
+                                                <div className="flex h-8 w-8 items-center justify-center rounded bg-[#e8edff] text-[#0058be]">
+                                                    <Paperclip size={16} />
+                                                </div>
+                                                <div>
+                                                    <div className="text-[13px] font-bold text-[#141b2b]">{msg.attachment.name}</div>
+                                                    <div className="text-[11px] font-semibold text-[#9aa0a6]">{msg.attachment.size}</div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    {/* Message Actions (Visible on Hover) */}
+                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white border border-[#eef0f5] rounded-md shadow-sm h-9 px-1 -mt-4">
+                                        <button className="p-1.5 rounded hover:bg-[#f0f2f5] text-[#5f6368]"><Smile size={14} /></button>
+                                        <button className="p-1.5 rounded hover:bg-[#f0f2f5] text-[#5f6368]">Reply</button>
+                                        <button className="p-1.5 rounded hover:bg-[#f0f2f5] text-[#5f6368]"><MoreHorizontal size={14} /></button>
+                                    </div>
+                                </>
+                            )}
                         </div>
-                    </div>
-
-                    {/* Message 2 */}
-                    <div className="flex gap-2.5">
-                        <img
-                            src="https://ui-avatars.com/api/?name=Marcus+Chen&background=7c5cfc&color=fff&size=36&bold=true"
-                            alt="Marcus Chen"
-                            className="h-9 w-9 shrink-0 rounded-full object-cover"
-                        />
-                        <div className="min-w-0 flex-1">
-                            <div className="mb-1.5 flex items-center gap-2">
-                                <span className="text-[13px] font-bold text-[#141b2b]">Marcus Chen</span>
-                                <span className="text-[11px] font-semibold text-[#c2c9e0]">11:05 AM</span>
-                            </div>
-                            <div className="rounded-[0_12px_12px_12px] border border-[#eef0f5] bg-white px-3.5 py-3">
-                                <p className="m-0 text-[13px] font-medium leading-[1.55] text-[#3a3f47]">On it, Sarah. The geometric shapes look great. Checking the contrast ratios for the primary blue (#0058be) against the container backgrounds now.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Linked Task */}
-                    <div className="mt-2 rounded-xl border border-[#eef0f5] bg-white px-3.5 py-3">
-                        <div className="mb-1.5 flex flex-wrap items-center gap-2">
-                            <span className="text-[10px] font-extrabold tracking-[0.06em] text-[#9aa0a6]">LINKED TASK</span>
-                            <span className="rounded bg-[#e8edff] px-2 py-0.5 text-[10px] font-extrabold text-[#0058be]">In Review</span>
-                            <span className="text-[10px] font-bold text-[#5f6368]">65% Complete</span>
-                            <span className="ml-auto text-[10px] font-extrabold tracking-[0.06em] text-[#9aa0a6]">STAKEHOLDERS</span>
-                        </div>
-                        <div className="mb-2 flex items-center justify-between">
-                            <span className="text-sm font-extrabold text-[#141b2b]">Finalize Styleguide</span>
-                            <div className="flex items-center">
-                                <img src="https://ui-avatars.com/api/?name=S+J&background=0058be&color=fff&size=24&bold=true" alt="" className="ml-0 h-6 w-6 rounded-full border-2 border-white" />
-                                <img src="https://ui-avatars.com/api/?name=M+C&background=7c5cfc&color=fff&size=24&bold=true" alt="" className="-ml-1.5 h-6 w-6 rounded-full border-2 border-white" />
-                                <span className="-ml-1.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-[#e2e6f0] text-[9px] font-extrabold text-[#5f6368]">+4</span>
-                            </div>
-                        </div>
-                        <div className="h-1.25 rounded bg-[#e8edf5]">
-                            <div className="h-full rounded bg-[#0058be]" style={{ width: '65%' }} />
-                        </div>
-                    </div>
+                    ))}
                 </div>
 
-                {/* Reply Box */}
-                <div className="border-t border-[#eef0f5] bg-white px-5 py-3">
-                    <input type="text" placeholder="Write a reply..." className="mb-2 w-full rounded-[10px] border border-[#e2e6f0] px-3.5 py-2.5 font-['Plus_Jakarta_Sans',sans-serif] text-[13px] font-medium text-[#141b2b] outline-none focus:border-[#0058be]" />
-                    <div className="flex items-center justify-between">
-                        <div className="flex gap-2.5">
-                            <Paperclip size={16} className="cursor-pointer text-[#9aa0a6] hover:text-[#0058be]" />
-                            <Smile size={16} className="cursor-pointer text-[#9aa0a6] hover:text-[#0058be]" />
-                            <Image size={16} className="cursor-pointer text-[#9aa0a6] hover:text-[#0058be]" />
+                {/* Composer */}
+                <div className="px-6 pb-6 pt-2">
+                    <div className="rounded-xl border border-[#dcdfe4] bg-white shadow-sm focus-within:border-[#b0b5c1] focus-within:shadow-md transition-all">
+                        <textarea 
+                            value={messageInput}
+                            onChange={(e) => setMessageInput(e.target.value)}
+                            placeholder="Message #launchpad..."
+                            className="w-full resize-none bg-transparent px-4 py-3 text-[14px] font-medium text-[#141b2b] outline-none min-h-[60px]"
+                            rows={1}
+                        />
+                        <div className="flex items-center justify-between rounded-b-xl bg-[#fafbfc] px-2 py-2 border-t border-[#eef0f5]">
+                            <div className="flex items-center gap-1">
+                                <button className="flex h-8 w-8 items-center justify-center rounded hover:bg-[#eef0f5]"><Plus size={16} className="text-[#5f6368]" /></button>
+                                <div className="h-4 w-px bg-[#dcdfe4] mx-1" />
+                                <button className="flex h-8 w-8 items-center justify-center rounded hover:bg-[#eef0f5]"><AtSign size={16} className="text-[#5f6368]" /></button>
+                                <button className="flex h-8 w-8 items-center justify-center rounded hover:bg-[#eef0f5]"><Smile size={16} className="text-[#5f6368]" /></button>
+                                <button className="flex h-8 w-8 items-center justify-center rounded hover:bg-[#eef0f5]"><Image size={16} className="text-[#5f6368]" /></button>
+                                <button className="flex h-8 w-8 items-center justify-center rounded hover:bg-[#eef0f5]"><Mic size={16} className="text-[#5f6368]" /></button>
+                            </div>
+                            <button className={`flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-[13px] font-bold transition-all ${messageInput ? 'bg-[#0058be] text-white hover:bg-[#004aa0]' : 'bg-[#e2e6f0] text-[#9aa0a6] pointer-events-none'}`}>
+                                Send <Send size={14} />
+                            </button>
                         </div>
-                        <button className="rounded-lg border-none bg-[#0058be] px-6 py-2 text-[13px] font-bold text-white transition-colors duration-150 hover:bg-[#004aa0]">Reply</button>
                     </div>
                 </div>
             </div>

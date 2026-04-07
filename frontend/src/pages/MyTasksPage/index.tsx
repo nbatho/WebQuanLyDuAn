@@ -6,40 +6,156 @@ import {
 } from 'lucide-react';
 import { Avatar } from 'antd';
 import TaskDetailModal from '../../components/TaskDetailModal';
+import type { MyTaskRow } from '../../types/myTasks';
 import groupByDate from './component/groupByDate';
-interface Task {
-    id: string;
-    title: string;
-    status: string;
-    statusColor: string;
-    priority: string;
-    priorityColor: string;
-    dueDate: string | null;
-    space: string;
-    spaceColor: string;
-    comments: number;
-    assignees: string[];
-    description?: string;
-    subtasks: any[];
-}
 
 type TabType = 'assigned' | 'mentions' | 'created';
 
-/* ── Mock Data ── */
-const allTasks: Task[] = [
-    // Today
-    { id: 't1', title: 'Finalize Q1 Marketing Roadmap', status: 'IN PROGRESS', statusColor: '#0058be', priority: 'Urgent', priorityColor: '#e74c3c', dueDate: 'Today', space: 'Marketing', spaceColor: '#e84393', comments: 3, assignees: ['AR'], subtasks: [], description: 'Draft due by end of day for the stakeholder meeting.' },
-    { id: 't2', title: 'Review UI Components Documentation', status: 'TO DO', statusColor: '#5f6368', priority: 'High', priorityColor: '#f0a220', dueDate: 'Today', space: 'Design', spaceColor: '#00b894', comments: 1, assignees: ['AR', 'MC'], subtasks: [], description: 'Coordinate with the Design Space to align on tokens.' },
-    // This week
-    { id: 't3', title: 'Setup CI/CD Pipeline', status: 'IN PROGRESS', statusColor: '#0058be', priority: 'High', priorityColor: '#f0a220', dueDate: 'Wed, Oct 25', space: 'Development', spaceColor: '#0984e3', comments: 0, assignees: ['AR'], subtasks: [] },
-    { id: 't4', title: 'Review Brand Identity v2', status: 'TO DO', statusColor: '#5f6368', priority: 'Normal', priorityColor: '#00b894', dueDate: 'Thu, Oct 26', space: 'Marketing', spaceColor: '#e84393', comments: 2, assignees: ['AR', 'SJ'], subtasks: [] },
-    { id: 't5', title: 'Security Audit Report Q4', status: 'IN PROGRESS', statusColor: '#0058be', priority: 'Urgent', priorityColor: '#e74c3c', dueDate: 'Fri, Oct 27', space: 'Development', spaceColor: '#0984e3', comments: 1, assignees: ['AR'], subtasks: [] },
-    // Next week
-    { id: 't6', title: 'Multi-currency Payment Support', status: 'TO DO', statusColor: '#5f6368', priority: 'Normal', priorityColor: '#00b894', dueDate: 'Mon, Oct 30', space: 'Development', spaceColor: '#0984e3', comments: 0, assignees: ['AR', 'ER'], subtasks: [] },
-    { id: 't7', title: 'Database Indexing for Reports', status: 'TO DO', statusColor: '#5f6368', priority: 'Normal', priorityColor: '#00b894', dueDate: 'Tue, Oct 31', space: 'Development', spaceColor: '#0984e3', comments: 0, assignees: ['AR'], subtasks: [] },
-    // Completed
-    { id: 't8', title: 'SSO Integration with Azure AD', status: 'COMPLETE', statusColor: '#27ae60', priority: 'High', priorityColor: '#f0a220', dueDate: 'Oct 18', space: 'Development', spaceColor: '#0984e3', comments: 4, assignees: ['AR'], subtasks: [] },
-    { id: 't9', title: 'Dark Mode Interface Alpha', status: 'COMPLETE', statusColor: '#27ae60', priority: 'Normal', priorityColor: '#00b894', dueDate: 'Oct 21', space: 'Design', spaceColor: '#00b894', comments: 2, assignees: ['AR', 'ER'], subtasks: [] },
+const allTasks: MyTaskRow[] = [
+    {
+        task_id: 101,
+        space_id: 1,
+        parent_task_id: null,
+        name: 'Finalize Q1 Marketing Roadmap',
+        description: 'Draft due by end of day for the stakeholder meeting.',
+        status: 'IN PROGRESS',
+        statusColor: '#0058be',
+        priority: 'Urgent',
+        priorityColor: '#e74c3c',
+        due_date: 'Today',
+        comment_count: 3,
+        assignees: ['AR'],
+        space_name: 'Marketing',
+        space_color: '#e84393',
+    },
+    {
+        task_id: 102,
+        space_id: 2,
+        parent_task_id: null,
+        name: 'Review UI Components Documentation',
+        description: 'Coordinate with the Design Space to align on tokens.',
+        status: 'TO DO',
+        statusColor: '#5f6368',
+        priority: 'High',
+        priorityColor: '#f0a220',
+        due_date: 'Today',
+        comment_count: 1,
+        assignees: ['AR', 'MC'],
+        space_name: 'Design',
+        space_color: '#00b894',
+    },
+    {
+        task_id: 103,
+        space_id: 3,
+        parent_task_id: null,
+        name: 'Setup CI/CD Pipeline',
+        description: null,
+        status: 'IN PROGRESS',
+        statusColor: '#0058be',
+        priority: 'High',
+        priorityColor: '#f0a220',
+        due_date: 'Wed, Oct 25',
+        comment_count: 0,
+        assignees: ['AR'],
+        space_name: 'Development',
+        space_color: '#0984e3',
+    },
+    {
+        task_id: 104,
+        space_id: 1,
+        parent_task_id: null,
+        name: 'Review Brand Identity v2',
+        description: null,
+        status: 'TO DO',
+        statusColor: '#5f6368',
+        priority: 'Normal',
+        priorityColor: '#00b894',
+        due_date: 'Thu, Oct 26',
+        comment_count: 2,
+        assignees: ['AR', 'SJ'],
+        space_name: 'Marketing',
+        space_color: '#e84393',
+    },
+    {
+        task_id: 105,
+        space_id: 3,
+        parent_task_id: null,
+        name: 'Security Audit Report Q4',
+        description: null,
+        status: 'IN PROGRESS',
+        statusColor: '#0058be',
+        priority: 'Urgent',
+        priorityColor: '#e74c3c',
+        due_date: 'Fri, Oct 27',
+        comment_count: 1,
+        assignees: ['AR'],
+        space_name: 'Development',
+        space_color: '#0984e3',
+    },
+    {
+        task_id: 106,
+        space_id: 3,
+        parent_task_id: null,
+        name: 'Multi-currency Payment Support',
+        description: null,
+        status: 'TO DO',
+        statusColor: '#5f6368',
+        priority: 'Normal',
+        priorityColor: '#00b894',
+        due_date: 'Mon, Oct 30',
+        comment_count: 0,
+        assignees: ['AR', 'ER'],
+        space_name: 'Development',
+        space_color: '#0984e3',
+    },
+    {
+        task_id: 107,
+        space_id: 3,
+        parent_task_id: null,
+        name: 'Database Indexing for Reports',
+        description: null,
+        status: 'TO DO',
+        statusColor: '#5f6368',
+        priority: 'Normal',
+        priorityColor: '#00b894',
+        due_date: 'Tue, Oct 31',
+        comment_count: 0,
+        assignees: ['AR'],
+        space_name: 'Development',
+        space_color: '#0984e3',
+    },
+    {
+        task_id: 108,
+        space_id: 3,
+        parent_task_id: null,
+        name: 'SSO Integration with Azure AD',
+        description: null,
+        status: 'COMPLETE',
+        statusColor: '#27ae60',
+        priority: 'High',
+        priorityColor: '#f0a220',
+        due_date: 'Oct 18',
+        comment_count: 4,
+        assignees: ['AR'],
+        space_name: 'Development',
+        space_color: '#0984e3',
+    },
+    {
+        task_id: 109,
+        space_id: 2,
+        parent_task_id: null,
+        name: 'Dark Mode Interface Alpha',
+        description: null,
+        status: 'COMPLETE',
+        statusColor: '#27ae60',
+        priority: 'Normal',
+        priorityColor: '#00b894',
+        due_date: 'Oct 21',
+        comment_count: 2,
+        assignees: ['AR', 'ER'],
+        space_name: 'Design',
+        space_color: '#00b894',
+    },
 ];
 
 const avatarColors: Record<string, string> = {
@@ -48,14 +164,15 @@ const avatarColors: Record<string, string> = {
 
 export default function MyTasksPage() {
     const [activeTab, setActiveTab] = useState<TabType>('assigned');
-    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+    const [selectedTask, setSelectedTask] = useState<MyTaskRow | null>(null);
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({ '📌 Today': true, '📅 This Week': true, '📆 Next Week': true, '📋 No date': true, '✅ Completed': false });
     const [searchText, setSearchText] = useState('');
     const [showCompleted, setShowCompleted] = useState(true);
 
-    const filteredTasks = allTasks.filter(t => {
+    const filteredTasks = allTasks.filter((t) => {
+        if (t.parent_task_id !== null) return false;
         if (!showCompleted && t.status === 'COMPLETE') return false;
-        if (searchText && !t.title.toLowerCase().includes(searchText.toLowerCase())) return false;
+        if (searchText && !t.name.toLowerCase().includes(searchText.toLowerCase())) return false;
         return true;
     });
 
@@ -66,7 +183,9 @@ export default function MyTasksPage() {
     };
 
     const totalActive = allTasks.filter(t => t.status !== 'COMPLETE').length;
-    const totalOverdue = allTasks.filter(t => t.dueDate === 'Today' && t.status !== 'COMPLETE').length;
+    const totalOverdue = allTasks.filter(
+        (t) => t.parent_task_id === null && t.due_date === 'Today' && t.status !== 'COMPLETE',
+    ).length;
 
     return (
         <div className="flex h-full flex-col overflow-hidden bg-white font-['Plus_Jakarta_Sans','Inter',sans-serif]">
@@ -138,7 +257,7 @@ export default function MyTasksPage() {
                         {expandedGroups[group.label] && (
                             <div className="flex flex-col">
                                 {group.tasks.map(task => (
-                                    <div key={task.id} className="group flex cursor-pointer items-center rounded-md border-b border-[#f5f7fa] px-2 py-2 transition-colors duration-100 hover:bg-[#f8fafb]" onClick={() => setSelectedTask(task)}>
+                                    <div key={task.task_id} className="group flex cursor-pointer items-center rounded-md border-b border-[#f5f7fa] px-2 py-2 transition-colors duration-100 hover:bg-[#f8fafb]" onClick={() => setSelectedTask(task)}>
                                         <div className="flex w-8 shrink-0 justify-center">
                                             <CheckCircle2
                                                 size={16}
@@ -148,14 +267,14 @@ export default function MyTasksPage() {
                                         </div>
                                         <div className="flex min-w-0 flex-1 flex-col gap-1">
                                             <span className={`text-[13px] font-semibold ${task.status === 'COMPLETE' ? 'text-[#9aa0a6] line-through' : 'text-[#141b2b]'}`}>
-                                                {task.title}
+                                                {task.name}
                                             </span>
                                             <div className="flex items-center gap-1.5">
-                                                <span className="rounded px-1.5 py-px text-[10px] font-bold tracking-[0.04em]" style={{ backgroundColor: task.spaceColor + '18', color: task.spaceColor }}>
-                                                    {task.space}
+                                                <span className="rounded px-1.5 py-px text-[10px] font-bold tracking-[0.04em]" style={{ backgroundColor: task.space_color + '18', color: task.space_color }}>
+                                                    {task.space_name}
                                                 </span>
-                                                {task.comments > 0 && (
-                                                    <span className="flex items-center gap-0.75 text-[11px] text-[#9aa0a6]"><MessageSquare size={11} /> {task.comments}</span>
+                                                {task.comment_count > 0 && (
+                                                    <span className="flex items-center gap-0.75 text-[11px] text-[#9aa0a6]"><MessageSquare size={11} /> {task.comment_count}</span>
                                                 )}
                                             </div>
                                         </div>
@@ -165,9 +284,9 @@ export default function MyTasksPage() {
                                             </span>
                                         </div>
                                         <div className="w-30 shrink-0">
-                                            {task.dueDate && (
-                                                <span className={`flex items-center gap-1 text-xs font-medium ${task.dueDate === 'Today' ? 'font-bold text-[#e74c3c]' : 'text-[#5f6368]'}`}>
-                                                    <Calendar size={11} /> {task.dueDate}
+                                            {task.due_date && (
+                                                <span className={`flex items-center gap-1 text-xs font-medium ${task.due_date === 'Today' ? 'font-bold text-[#e74c3c]' : 'text-[#5f6368]'}`}>
+                                                    <Calendar size={11} /> {task.due_date}
                                                 </span>
                                             )}
                                         </div>
@@ -194,7 +313,12 @@ export default function MyTasksPage() {
                 ))}
             </div>
 
-            <TaskDetailModal isOpen={!!selectedTask} onClose={() => setSelectedTask(null)} task={selectedTask} />
+            <TaskDetailModal
+                isOpen={!!selectedTask}
+                onClose={() => setSelectedTask(null)}
+                task={selectedTask}
+                allTasks={allTasks}
+            />
         </div>
     );
 }

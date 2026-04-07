@@ -55,4 +55,6 @@ function createAxiosInstance(baseURL: string): AxiosInstance {
 // Gateway URL - single entry point for all services
 const GATEWAY_URL = import.meta.env.VITE_API_GATEWAY_URL;
 // Tạo các API client thuần túy
-export const beApi = createAxiosInstance(GATEWAY_URL ? `${GATEWAY_URL}/api` : '/api');
+export const beApi = createAxiosInstance(
+    GATEWAY_URL ? `${GATEWAY_URL}/api/v1` : '/api/v1',
+);

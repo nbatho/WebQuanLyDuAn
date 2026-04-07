@@ -1,53 +1,21 @@
-import { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react';
+import * as React from 'react';
+import { cn } from '@/lib/utils';
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
-  error?: string;
-  icon?: ReactNode;
-}
-
-const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, icon, className = '', id, ...props }, ref) => {
-    const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
-
-    return (
-      <div className="flex flex-col gap-1.5">
-        {label && (
-          <label
-            htmlFor={inputId}
-            className="text-sm font-medium text-[var(--color-text-secondary)]"
-          >
-            {label}
-          </label>
-        )}
-        <div className="relative">
-          {icon && (
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]">
-              {icon}
-            </span>
-          )}
-          <input
-            ref={ref}
-            id={inputId}
-            className={`w-full px-4 py-2.5 rounded-xl text-sm
-              bg-[var(--color-bg-secondary)] border
-              text-[var(--color-text-primary)]
-              placeholder:text-[var(--color-text-tertiary)]
-              transition-all duration-200
-              focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-primary)]/50 focus:border-[var(--color-border-focus)]
-              ${error ? 'border-[var(--color-danger)]' : 'border-[var(--color-border-primary)]'}
-              ${icon ? 'pl-10' : ''}
-              ${className}`}
-            {...props}
-          />
-        </div>
-        {error && (
-          <p className="text-xs text-[var(--color-danger)] mt-0.5">{error}</p>
-        )}
-      </div>
-    );
-  }
+const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
+    ({ className, type, ...props }, ref) => {
+        return (
+            <input
+                type={type}
+                className={cn(
+                    'flex h-9 w-full rounded-md border border-[#eef0f5] bg-white px-3 py-1 text-sm text-[#141b2b] shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-[#9aa0a6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0058be]/25 disabled:cursor-not-allowed disabled:opacity-50',
+                    className,
+                )}
+                ref={ref}
+                {...props}
+            />
+        );
+    },
 );
-
 Input.displayName = 'Input';
-export default Input;
+
+export { Input };

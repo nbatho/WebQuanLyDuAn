@@ -5,11 +5,15 @@ import {
     MessageSquare, Activity, ChevronRight, ChevronDown, Tag
 } from 'lucide-react';
 import { Button, Input, Avatar, Tooltip } from 'antd';
+import type { Task } from '../../types/tasks';
+import { directChildTasks } from '../../pages/SpaceViewPage/lib/taskFamily';
 
 export interface TaskDetailModalProps {
     isOpen: boolean;
     onClose: () => void;
-    task: any;
+    task: Task | null;
+    /** Flat list of tasks in the current space (or My Tasks list) for resolving `parent_task_id` children. */
+    allTasks?: Task[];
 }
 
 const STATUS_OPTIONS = [
@@ -32,7 +36,12 @@ const MEMBER_OPTIONS = [
     { id: 'ER', name: 'Elena Rodriguez', color: '#e84393' },
 ];
 
-export default function TaskDetailModal({ isOpen, onClose, task }: TaskDetailModalProps) {
+export default function TaskDetailModal({
+    isOpen,
+    onClose,
+    task,
+    allTasks = [],
+}: TaskDetailModalProps) {
     const [isMaximized, setIsMaximized] = useState(false);
     const [activeTab, setActiveTab] = useState<'comments' | 'activity'>('comments');
     const [taskTitle, setTaskTitle] = useState('');
@@ -51,12 +60,14 @@ export default function TaskDetailModal({ isOpen, onClose, task }: TaskDetailMod
 
     useEffect(() => {
         if (task) {
-            setTaskTitle(task.title || '');
+            setTaskTitle(task.name || '');
             setTaskDesc(task.description || '');
             setTaskStatus(task.status || 'TO DO');
             setTaskPriority(task.priority || 'Normal');
         }
     }, [task]);
+
+    const childTasks = task ? directChildTasks(allTasks, task.task_id) : [];
 
     // Close dropdowns on outside click
     useEffect(() => {
@@ -287,7 +298,7 @@ export default function TaskDetailModal({ isOpen, onClose, task }: TaskDetailMod
                                 <span className="text-[11px] font-bold uppercase tracking-[0.04em] text-[#9aa0a6]">Due Date</span>
                                 <div className="relative flex cursor-pointer items-center gap-1.5 rounded-md px-1.5 py-1 text-[13px] font-medium text-[#5f6368] transition-colors hover:bg-[#f0f4ff]">
                                     <Calendar size={14} className="shrink-0 text-[#9aa0a6]" />
-                                    <span>{task.dueDate || 'Set date'}</span>
+                                    <span>{task.due_date || 'Set date'}</span>
                                     <input type="date" className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
                                 </div>
                             </div>
@@ -343,15 +354,18 @@ export default function TaskDetailModal({ isOpen, onClose, task }: TaskDetailMod
 
                         <div className="border-t border-[#f0f2f5] pt-2">
                             <h4 className="mb-2 text-xs font-bold text-[#141b2b]">Subtasks</h4>
-                            {task.subtasks && task.subtasks.length > 0 ? (
+                            {childTasks.length > 0 ? (
                                 <div className="mb-2 flex flex-col gap-1">
-                                    {task.subtasks.map((sub: any) => (
+                                    {childTasks.map((sub) => (
                                         <div
-                                            key={sub.id}
+                                            key={sub.task_id}
                                             className="flex cursor-pointer items-center gap-1.5 rounded px-1.5 py-1 text-xs font-medium text-[#141b2b] hover:bg-[#f0f4ff]"
                                         >
-                                            <CheckCircle2 size={14} style={{ color: sub.statusColor || '#dcdfe4' }} />
-                                            <span>{sub.title}</span>
+                                            <CheckCircle2
+                                                size={14}
+                                                style={{ color: sub.statusColor || '#dcdfe4' }}
+                                            />
+                                            <span>{sub.name}</span>
                                         </div>
                                     ))}
                                 </div>

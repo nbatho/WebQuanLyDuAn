@@ -11,6 +11,7 @@ import SpaceViewPage from '../pages/SpaceViewPage';
 import TimeTrackingPage from '../pages/TimeTrackingPage';
 import DashboardsPage from '../pages/DashboardsPage';
 import SettingsPage from '../pages/SettingsPage';
+import AIPage from '../pages/AIPage';
 import AppLayout from "../layouts/AppLayout";
 import type { RouteConfig } from "../types/app";
 export const routes: RouteConfig[] = [
@@ -52,6 +53,10 @@ export const routes: RouteConfig[] = [
             {
                 path: '/inbox',
                 element: <InboxPage />
+            },
+            {
+                path: '/ai',
+                element: <AIPage />
             },
             {
                 path: '/my-tasks',

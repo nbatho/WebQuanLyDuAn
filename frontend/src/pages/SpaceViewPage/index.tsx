@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
     ChevronDown, Plus, Calendar, CheckCircle2, Search, Star, Hash,
     LayoutList, Trello, LayoutDashboard,
@@ -15,39 +16,16 @@ import {
     CustomizePanel,
 } from '../../components/ToolbarDropdowns';
 import type { StatusGroup, Task } from '../../types/tasks';
+import { initialSpaces } from '../../layouts/AppLayout/data/initialSpaces';
+import { useSpaceTree } from '../../layouts/AppLayout/SpaceTreeContext';
+import { resolveSpaceBreadcrumbSegment } from '../../layouts/AppLayout/lib/resolveSpaceBreadcrumb';
+import { cloneInitialGroupsForSpace } from './lib/cloneInitialGroups';
+import { familyTaskIds, visibleRootsWithFamily } from './lib/taskFamily';
+import { nextTaskId } from './lib/nextTaskId';
 import OverviewView from './component/OverviewView/overviewView';
 import ListView from './component/ListView/listView';
 import BoardView from './component/BoardView/boardView';
 type ViewType = 'overview' | 'list' | 'board';
-
-/* ═══════════════════════════════════════════════
-   MOCK DATA
-═══════════════════════════════════════════════ */
-const initialGroups: StatusGroup[] = [
-    {
-        id: 'inprogress', name: 'IN PROGRESS', color: '#0058be', isExpanded: true,
-        tasks: [
-            { id: 't1', title: 'Finalize Budget', status: 'IN PROGRESS', statusColor: '#0058be', priority: 'Urgent', priorityColor: '#e74c3c', dueDate: '10/31/23', assignees: ['AR'], comments: 2, subtasks: [{ id: 's1', title: 'Review Q3 spend', status: 'IN PROGRESS', statusColor: '#0058be', assignee: 'AR' }], description: 'Review and finalize the budget for Q4.' },
-            { id: 't2', title: 'Review Proposal', status: 'IN PROGRESS', statusColor: '#0058be', priority: 'High', priorityColor: '#f0a220', dueDate: '11/7/23', assignees: ['MC'], comments: 0, subtasks: [], description: 'Review the client proposal and provide feedback.' },
-            { id: 't3', title: 'Send Project Update', status: 'IN PROGRESS', statusColor: '#0058be', priority: 'High', priorityColor: '#f0a220', dueDate: '11/16/23', assignees: ['SJ'], comments: 1, subtasks: [], description: 'Send weekly project status update.' },
-        ]
-    },
-    {
-        id: 'todo', name: 'TO DO', color: '#5f6368', isExpanded: true,
-        tasks: [
-            { id: 't4', title: 'Schedule Team Meeting', status: 'TO DO', statusColor: '#5f6368', priority: 'Urgent', priorityColor: '#e74c3c', dueDate: '11/1/23', assignees: ['AR', 'MC'], comments: 3, subtasks: [], description: 'Schedule the weekly team sync meeting.' },
-            { id: 't5', title: 'Update Website Content', status: 'TO DO', statusColor: '#5f6368', priority: 'Normal', priorityColor: '#00b894', dueDate: '12/1/23', assignees: ['ER'], comments: 0, subtasks: [], description: 'Update the homepage and product pages.' },
-            { id: 't6', title: 'Revise Handbook', status: 'TO DO', statusColor: '#5f6368', priority: 'Normal', priorityColor: '#00b894', dueDate: '12/13/23', assignees: ['SJ'], comments: 0, subtasks: [] },
-            { id: 't7', title: 'Conduct Audit', status: 'TO DO', statusColor: '#5f6368', priority: 'Normal', priorityColor: '#00b894', dueDate: '11/29/23', assignees: ['AR'], comments: 5, subtasks: [] },
-        ]
-    },
-    {
-        id: 'done', name: 'COMPLETE', color: '#27ae60', isExpanded: true,
-        tasks: [
-            { id: 't8', title: 'Order Supplies', status: 'COMPLETE', statusColor: '#27ae60', priority: 'Urgent', priorityColor: '#e74c3c', dueDate: '10/3/23', assignees: ['MC'], comments: 0, subtasks: [] },
-        ]
-    },
-];
 
 const VIEW_OPTIONS = [
     { id: 'list', icon: LayoutList, label: 'List', desc: 'Track tasks, bugs, people & more', color: '#5f6368', bg: '#f0f0f0' },
@@ -64,14 +42,102 @@ const VIEW_OPTIONS = [
     { id: 'workload', icon: Users, label: 'Workload', desc: 'Balance team capacity', color: '#fff', bg: '#27ae60' },
 ];
 
-let taskIdCounter = 100;
+function buildInitialTasksBySpace(): Record<string, StatusGroup[]> {
+    const m: Record<string, StatusGroup[]> = {};
+    for (const s of initialSpaces) {
+        m[s.id] = cloneInitialGroupsForSpace(s.id);
+    }
+    return m;
+}
 
 /* ═══════════════════════════════════════════════
    MAIN COMPONENT
 ═══════════════════════════════════════════════ */
 export default function SpaceViewPage() {
+    const { spaceId } = useParams<{ spaceId: string }>();
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const { spaces } = useSpaceTree();
+
+    const currentSpace = spaceId ? spaces.find((s) => s.id === spaceId) : undefined;
+
+    const listParam = searchParams.get('list');
+    const folderParam = searchParams.get('folder');
+
+    const breadcrumbContext =
+        spaceId != null && spaceId !== ''
+            ? resolveSpaceBreadcrumbSegment(spaces, spaceId, listParam, folderParam)
+            : null;
+
+    useEffect(() => {
+        if (!spaceId || (!listParam && !folderParam)) return;
+        const resolved = resolveSpaceBreadcrumbSegment(
+            spaces,
+            spaceId,
+            listParam,
+            folderParam,
+        );
+        if (resolved != null) return;
+        setSearchParams(
+            (prev) => {
+                const next = new URLSearchParams(prev);
+                next.delete('list');
+                next.delete('folder');
+                return next;
+            },
+            { replace: true },
+        );
+    }, [spaceId, listParam, folderParam, spaces, setSearchParams]);
+
+    const [tasksBySpace, setTasksBySpace] = useState<Record<string, StatusGroup[]>>(
+        buildInitialTasksBySpace,
+    );
+
+    useEffect(() => {
+        setTasksBySpace((prev) => {
+            const next = { ...prev };
+            let changed = false;
+            for (const s of spaces) {
+                if (!next[s.id]) {
+                    next[s.id] = cloneInitialGroupsForSpace(s.id);
+                    changed = true;
+                }
+            }
+            for (const id of Object.keys(next)) {
+                if (!spaces.some((s) => s.id === id)) {
+                    delete next[id];
+                    changed = true;
+                }
+            }
+            return changed ? next : prev;
+        });
+    }, [spaces]);
+
+    useEffect(() => {
+        if (spaceId && !spaces.some((s) => s.id === spaceId)) {
+            navigate('/home', { replace: true });
+        }
+    }, [spaceId, spaces, navigate]);
+
+    const groups = spaceId ? tasksBySpace[spaceId] ?? [] : [];
+
+    const setGroups = useCallback(
+        (updater: React.SetStateAction<StatusGroup[]>) => {
+            if (!spaceId) return;
+            setTasksBySpace((prev) => {
+                const current = prev[spaceId];
+                if (!current) return prev;
+                const nextGroups =
+                    typeof updater === 'function'
+                        ? (updater as (g: StatusGroup[]) => StatusGroup[])(current)
+                        : updater;
+                return { ...prev, [spaceId]: nextGroups };
+            });
+        },
+        [spaceId],
+    );
+
     const [activeView, setActiveView] = useState<ViewType>('list');
-    const [groups, setGroups] = useState<StatusGroup[]>(initialGroups);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [showViewPicker, setShowViewPicker] = useState(false);
     const [viewSearch, setViewSearch] = useState('');
@@ -82,6 +148,13 @@ export default function SpaceViewPage() {
 
     // Context Menu
     const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; task: Task } | null>(null);
+
+    useEffect(() => {
+        setSelectedTask(null);
+        setCtxMenu(null);
+        setShowCreateTask(false);
+        setShowViewPicker(false);
+    }, [spaceId, listParam, folderParam]);
 
     // Toolbar states
     const [groupBy, setGroupBy] = useState('status');
@@ -103,65 +176,107 @@ export default function SpaceViewPage() {
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    // Apply filters to groups
-    const filteredGroups = groups.map(g => {
-        let tasks = g.tasks;
-        if (filters.status.length > 0) tasks = tasks.filter(t => filters.status.includes(t.status));
-        if (filters.priority.length > 0) tasks = tasks.filter(t => filters.priority.includes(t.priority));
-        if (filters.assignee.length > 0) tasks = tasks.filter(t => t.assignees.some(a => filters.assignee.includes(a)));
-        return { ...g, tasks };
-    });
+    const filteredGroups = useMemo(
+        () =>
+            groups.map((g) => {
+                const matches = (t: Task) => {
+                    if (filters.status.length > 0 && !filters.status.includes(t.status)) return false;
+                    if (filters.priority.length > 0 && !filters.priority.includes(t.priority)) return false;
+                    if (
+                        filters.assignee.length > 0 &&
+                        !t.assignees.some((a) => filters.assignee.includes(a))
+                    )
+                        return false;
+                    return true;
+                };
+                const roots = visibleRootsWithFamily(g.tasks, matches);
+                const keep = new Set(roots.flatMap((r) => familyTaskIds(g.tasks, r.task_id)));
+                return { ...g, tasks: g.tasks.filter((t) => keep.has(t.task_id)) };
+            }),
+        [groups, filters],
+    );
+
+    const flatTasks = useMemo(() => groups.flatMap((g) => g.tasks), [groups]);
 
     const handleCreateTask = (data: NewTaskData) => {
-        const statusMap: Record<string, string> = { 'TO DO': 'todo', 'IN PROGRESS': 'inprogress', 'COMPLETE': 'done' };
+        const statusMap: Record<string, string> = {
+            'TO DO': 'todo',
+            'IN PROGRESS': 'inprogress',
+            COMPLETE: 'done',
+        };
         const groupId = statusMap[data.status] || 'todo';
+        const spaceNumericId = groups.flatMap((g) => g.tasks)[0]?.space_id ?? 1;
         const newTask: Task = {
-            id: `t${taskIdCounter++}`,
-            title: data.title,
+            task_id: nextTaskId(),
+            space_id: spaceNumericId,
+            parent_task_id: null,
+            name: data.name,
+            description: data.description || null,
             status: data.status,
             statusColor: data.statusColor,
             priority: data.priority,
             priorityColor: data.priorityColor,
-            dueDate: data.dueDate ? new Date(data.dueDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' }) : null,
+            due_date: data.due_date
+                ? new Date(data.due_date).toLocaleDateString('en-US', {
+                      month: '2-digit',
+                      day: '2-digit',
+                      year: '2-digit',
+                  })
+                : null,
             assignees: data.assignees,
-            comments: 0,
-            subtasks: [],
-            description: data.description,
+            comment_count: 0,
         };
-        setGroups(prev => prev.map(g =>
-            g.id === groupId ? { ...g, tasks: [...g.tasks, newTask] } : g
-        ));
+        setGroups((prev) =>
+            prev.map((g) => (g.id === groupId ? { ...g, tasks: [...g.tasks, newTask] } : g)),
+        );
     };
 
     const handleContextAction = (action: string) => {
         if (!ctxMenu) return;
         const { task } = ctxMenu;
         switch (action) {
-            case 'delete':
-                setGroups(prev => prev.map(g => ({
-                    ...g, tasks: g.tasks.filter(t => t.id !== task.id)
-                })));
+            case 'delete': {
+                const isRoot = task.parent_task_id === null;
+                setGroups((prev) =>
+                    prev.map((g) => {
+                        if (isRoot) {
+                            const drop = new Set(familyTaskIds(g.tasks, task.task_id));
+                            return { ...g, tasks: g.tasks.filter((t) => !drop.has(t.task_id)) };
+                        }
+                        return { ...g, tasks: g.tasks.filter((t) => t.task_id !== task.task_id) };
+                    }),
+                );
                 break;
+            }
             case 'duplicate':
-                setGroups(prev => prev.map(g => {
-                    const idx = g.tasks.findIndex(t => t.id === task.id);
-                    if (idx === -1) return g;
-                    const clone = { ...task, id: `t${taskIdCounter++}`, title: `${task.title} (copy)` };
-                    const newTasks = [...g.tasks];
-                    newTasks.splice(idx + 1, 0, clone);
-                    return { ...g, tasks: newTasks };
-                }));
+                setGroups((prev) =>
+                    prev.map((g) => {
+                        const idx = g.tasks.findIndex((t) => t.task_id === task.task_id);
+                        if (idx === -1) return g;
+                        const clone: Task = {
+                            ...task,
+                            task_id: nextTaskId(),
+                            name: `${task.name} (copy)`,
+                        };
+                        const newTasks = [...g.tasks];
+                        newTasks.splice(idx + 1, 0, clone);
+                        return { ...g, tasks: newTasks };
+                    }),
+                );
                 break;
             case 'copy-link':
-                navigator.clipboard?.writeText(`task/${task.id}`);
+                navigator.clipboard?.writeText(`task/${task.task_id}`);
                 break;
             case 'rename':
                 setSelectedTask(task);
                 break;
             case 'archive':
-                setGroups(prev => prev.map(g => ({
-                    ...g, tasks: g.tasks.filter(t => t.id !== task.id)
-                })));
+                setGroups((prev) =>
+                    prev.map((g) => ({
+                        ...g,
+                        tasks: g.tasks.filter((t) => t.task_id !== task.task_id),
+                    })),
+                );
                 break;
             default:
                 break;
@@ -187,10 +302,15 @@ export default function SpaceViewPage() {
             <header className="shrink-0 border-b border-[#eef0f5] bg-white">
                 <div className="flex items-center justify-between px-5 pb-2 pt-2.5">
                     <div className="flex items-center gap-2">
-                        <div className="flex h-6 w-6 items-center justify-center rounded-md" style={{ backgroundColor: '#0058be' }}>
+                        <div
+                            className="flex h-6 w-6 items-center justify-center rounded-md"
+                            style={{ backgroundColor: currentSpace?.color ?? '#0058be' }}
+                        >
                             <Hash size={16} color="#fff" />
                         </div>
-                        <h1 className="m-0 text-base font-bold text-[#141b2b]">Main Space</h1>
+                        <h1 className="m-0 text-base font-bold text-[#141b2b]">
+                            {currentSpace?.name ?? 'Space'}
+                        </h1>
                         <button className="flex items-center rounded px-1 py-0.5 text-[#9aa0a6] hover:bg-[#f0f4ff] hover:text-[#0058be]"><ChevronDown size={16} /></button>
                         <button className="flex items-center rounded px-1 py-0.5 text-[#9aa0a6] hover:bg-[#f0f4ff] hover:text-[#0058be]"><Star size={15} /></button>
                     </div>
@@ -305,9 +425,16 @@ export default function SpaceViewPage() {
             <main className="flex flex-1 flex-col overflow-hidden">
                 {activeView === 'overview' && <OverviewView />}
                 {activeView === 'list' && (
-                    <ListView groups={filteredGroups} setGroups={setGroups}
-                        setSelectedTask={setSelectedTask} showClosed={showClosed}
-                        columns={columns} onContextMenu={handleContextMenu} />
+                    <ListView
+                        groups={filteredGroups}
+                        setGroups={setGroups}
+                        setSelectedTask={setSelectedTask}
+                        showClosed={showClosed}
+                        columns={columns}
+                        onContextMenu={handleContextMenu}
+                        spaceTitle={currentSpace?.name ?? 'Space'}
+                        breadcrumbContext={breadcrumbContext}
+                    />
                 )}
                 {activeView === 'board' && (
                     <BoardView groups={filteredGroups} setGroups={setGroups}
@@ -317,14 +444,19 @@ export default function SpaceViewPage() {
             </main>
 
             {/* ═══════ MODALS & OVERLAYS ═══════ */}
-            <TaskDetailModal isOpen={!!selectedTask} onClose={() => setSelectedTask(null)} task={selectedTask} />
+            <TaskDetailModal
+                isOpen={!!selectedTask}
+                onClose={() => setSelectedTask(null)}
+                task={selectedTask}
+                allTasks={flatTasks}
+            />
             <CreateTaskModal isOpen={showCreateTask} onClose={() => setShowCreateTask(false)} onCreate={handleCreateTask} />
             <ContextMenu
                 x={ctxMenu?.x || 0} y={ctxMenu?.y || 0}
                 isOpen={!!ctxMenu}
                 onClose={() => setCtxMenu(null)}
                 onAction={handleContextAction}
-                taskTitle={ctxMenu?.task.title}
+                taskTitle={ctxMenu?.task.name}
             />
         </div>
     );

@@ -80,19 +80,17 @@ app.get('/db-health', async (req, res) => {
         })
     }
 });
-app.use('api/v1/auth', authRoutes);
+app.use('/api/v1/auth', authRoutes);
 
-
-
-//private route'
+//private route
 app.use(protectedRoute);
-app.use('api/v1/user', userRoutes);
-app.use('api/v1/workspaces', workspacesRoutes);
-app.use('api/v1/spaces', spaceRoutes);
-app.use('api/v1/tasks', taskRoutes);
-app.use('api/v1/milestones', milestoneRoutes);
-app.use('api/v1/sprints', sprintRoutes);
-app.use('api/v1/notifications', notificationRoutes);
+app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/workspaces', workspacesRoutes);
+app.use('/api/v1/spaces', spaceRoutes);
+app.use('/api/v1/tasks', taskRoutes);
+app.use('/api/v1/milestones', milestoneRoutes);
+app.use('/api/v1/sprints', sprintRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 
 
 //error handling middleware

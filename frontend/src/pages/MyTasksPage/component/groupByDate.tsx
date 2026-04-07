@@ -1,35 +1,29 @@
-interface Task {
-    id: string;
-    title: string;
-    status: string;
-    statusColor: string;
-    priority: string;
-    priorityColor: string;
-    dueDate: string | null;
-    space: string;
-    spaceColor: string;
-    comments: number;
-    assignees: string[];
-    description?: string;
-    subtasks: any[];
-}
-
+import type { MyTaskRow } from '../../../types/myTasks';
 
 interface TaskGroup {
     label: string;
     icon?: string;
-    tasks: Task[];
+    tasks: MyTaskRow[];
 }
 
-
-export default function groupByDate(tasks: Task[]): TaskGroup[] {
-    const today: Task[] = [], thisWeek: Task[] = [], nextWeek: Task[] = [], completed: Task[] = [], noDate: Task[] = [];
-    tasks.forEach(t => {
+export default function groupByDate(tasks: MyTaskRow[]): TaskGroup[] {
+    const today: MyTaskRow[] = [],
+        thisWeek: MyTaskRow[] = [],
+        nextWeek: MyTaskRow[] = [],
+        completed: MyTaskRow[] = [],
+        noDate: MyTaskRow[] = [];
+    tasks.forEach((t) => {
         if (t.status === 'COMPLETE') completed.push(t);
-        else if (t.dueDate === 'Today') today.push(t);
-        else if (t.dueDate?.includes('Oct 2') || t.dueDate?.includes('Oct 3')) thisWeek.push(t);
-        else if (t.dueDate?.includes('Oct 3') || t.dueDate?.includes('Nov') || t.dueDate?.includes('Mon') || t.dueDate?.includes('Tue')) nextWeek.push(t);
-        else if (!t.dueDate) noDate.push(t);
+        else if (t.due_date === 'Today') today.push(t);
+        else if (t.due_date?.includes('Oct 2') || t.due_date?.includes('Oct 3')) thisWeek.push(t);
+        else if (
+            t.due_date?.includes('Oct 3') ||
+            t.due_date?.includes('Nov') ||
+            t.due_date?.includes('Mon') ||
+            t.due_date?.includes('Tue')
+        )
+            nextWeek.push(t);
+        else if (!t.due_date) noDate.push(t);
         else thisWeek.push(t);
     });
     const groups: TaskGroup[] = [];
