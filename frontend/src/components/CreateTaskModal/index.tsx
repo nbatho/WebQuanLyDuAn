@@ -3,25 +3,8 @@ import {
     X, ChevronDown, Calendar, Flag, User, AlignLeft,
     Paperclip, FolderOpen, Hash
 } from 'lucide-react';
+import type { CreateTaskModalProps } from '@/types/modal';
 
-export interface NewTaskData {
-    name: string;
-    status: string;
-    statusColor: string;
-    priority: string;
-    priorityColor: string;
-    due_date: string | null;
-    assignees: string[];
-    description: string;
-    listName: string;
-}
-
-interface CreateTaskModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onCreate: (task: NewTaskData) => void;
-    defaultStatus?: string;
-}
 
 const STATUS_OPTIONS = [
     { value: 'TO DO', color: '#5f6368', label: 'TO DO' },

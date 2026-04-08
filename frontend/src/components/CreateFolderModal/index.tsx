@@ -1,13 +1,6 @@
 import { useState } from 'react';
 import { FolderPlus, X } from 'lucide-react';
-
-export interface CreateFolderModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onCreate: (name: string) => void;
-    spaceName: string;
-}
-
+import type { CreateFolderModalProps } from '@/types/modal';
 export default function CreateFolderModal({ isOpen, onClose, onCreate, spaceName }: CreateFolderModalProps) {
     const [name, setName] = useState('');
 

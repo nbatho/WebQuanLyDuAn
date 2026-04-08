@@ -3,9 +3,12 @@ import { Button, Input, Checkbox } from 'antd';
 import { ArrowRight, Mail, Lock, User, CheckCircle, Users, BarChart3, Blocks, GitBranch, Code } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import './auth.css';
-
+import { useDispatch } from 'react-redux';
+import type { AppDispatch } from '@/store/configureStore';
+import { fetchSignIn, fetchSignUp } from '@/store/modules/auth';
 export default function AuthPage() {
     const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
     const [isRegister, setIsRegister] = useState(false);
 
     /* ── Login state ── */
@@ -17,16 +20,29 @@ export default function AuthPage() {
     const [regName, setRegName] = useState('');
     const [regEmail, setRegEmail] = useState('');
     const [regPass, setRegPass] = useState('');
+    const [regConfirmPass, setRegConfirmPass] = useState('');
     const [agreed, setAgreed] = useState(false);
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Login:', { loginEmail, loginPass, remember });
+        try {
+            dispatch(fetchSignIn({ email: loginEmail, password: loginPass }));
+            navigate('/home');
+        } catch (error) {
+            console.error('Login failed:', error);
+        }
+
     };
 
     const handleRegister = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Register:', { regName, regEmail, regPass, agreed });
+        console.log('Register:', { regName, regEmail, regPass, regConfirmPass, agreed });
+        try {
+            dispatch(fetchSignUp({ email: regEmail, password: regPass, username: regName, name: regName }));
+            navigate('/login');
+        } catch (error) {
+            console.error('Registration failed:', error);
+        }
     };
 
     return (
@@ -308,6 +324,20 @@ export default function AuthPage() {
                                         placeholder="••••••••"
                                         value={regPass}
                                         onChange={(e) => setRegPass(e.target.value)}
+                                        className="h-12! bg-white! rounded-lg! border-2! border-[#c2c6d6]! focus-within:border-[#0058be]! transition-colors!"
+                                    />
+                                    <p className="text-xs text-[#424754]">Must be at least 8 characters with a symbol.</p>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="block text-xs font-bold text-[#424754] uppercase tracking-widest">
+                                        Confirm Password
+                                    </label>
+                                    <Input.Password
+                                        size="large"
+                                        prefix={<Lock size={16} className="text-[#727785]" />}
+                                        placeholder="••••••••"
+                                        value={regConfirmPass}
+                                        onChange={(e) => setRegConfirmPass(e.target.value)}
                                         className="h-12! bg-white! rounded-lg! border-2! border-[#c2c6d6]! focus-within:border-[#0058be]! transition-colors!"
                                     />
                                     <p className="text-xs text-[#424754]">Must be at least 8 characters with a symbol.</p>

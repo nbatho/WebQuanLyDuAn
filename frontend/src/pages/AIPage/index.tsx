@@ -99,10 +99,10 @@ export default function AIPage() {
             {/* AI Secondary Sidebar */}
             <div 
                 className={`flex shrink-0 flex-col bg-[#fafbfc] transition-all duration-300 ease-in-out z-30 ${
-                    isSidebarOpen ? 'w-[240px] border-r border-[#eef0f5] opacity-100' : 'w-0 border-none opacity-0 overflow-hidden'
+                    isSidebarOpen ? 'w-60 border-r border-[#eef0f5] opacity-100' : 'w-0 border-none opacity-0 overflow-hidden'
                 }`}
             >
-                <div className="flex h-12 w-[240px] items-center justify-between px-4 pb-2 pt-4">
+                <div className="flex h-12 w-60 items-center justify-between px-4 pb-2 pt-4">
                     <span className="text-[14px] font-extrabold text-[#141b2b]">AI</span>
                     <div className="flex items-center gap-1.5">
                         <button 
@@ -118,7 +118,7 @@ export default function AIPage() {
                     </div>
                 </div>
 
-                <div className="flex w-[240px] flex-col gap-0.5 px-2 mt-2">
+                <div className="flex w-60 flex-col gap-0.5 px-2 mt-2">
                     <div className="flex cursor-pointer items-center gap-2.5 rounded-lg bg-[#f0f4ff] px-2.5 py-1.5 text-[13px] font-semibold text-[#0058be]">
                         <div className="flex items-center justify-center">
                             <Sparkles size={14} className="text-[#e84393]" />
@@ -127,7 +127,7 @@ export default function AIPage() {
                     </div>
                 </div>
 
-                <div className="mt-6 flex w-[240px] flex-col px-2">
+                <div className="mt-6 flex w-60 flex-col px-2">
                     <div className="mb-1 px-2.5 text-[11px] font-extrabold text-[#9aa0a6] uppercase tracking-[0.05em]">
                         Super Agents
                     </div>
@@ -180,7 +180,7 @@ export default function AIPage() {
                     // ==========================================
                     <div className="flex h-full w-full flex-col items-center justify-center relative">
                         {/* Top Gradient Blur matching ClickUp Brain */}
-                        <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-[#e84393]/[0.08] via-[#7c5cfc]/[0.08] to-transparent pointer-events-none blur-3xl opacity-60" />
+                        <div className="absolute top-0 left-0 right-0 h-64 bg-linear-to-b from-[#e84393]/8 via-[#7c5cfc]/8 to-transparent pointer-events-none blur-3xl opacity-60" />
 
                         <div className="z-10 flex w-full max-w-3xl flex-col items-center px-6">
                             {/* Giant Brain Logo */}
@@ -190,9 +190,9 @@ export default function AIPage() {
                             </div>
 
                             {/* Centered Composer */}
-                            <div className="relative w-full rounded-[24px] p-[2px] bg-gradient-to-r from-[#e3e8f8] via-[#fdecf5] to-[#f0ebff] shadow-[0_8px_30px_rgb(0,0,0,0.06)]">
+                            <div className="relative w-full rounded-3xl p-0.5 bg-linear-to-r from-[#e3e8f8] via-[#fdecf5] to-[#f0ebff] shadow-[0_8px_30px_rgb(0,0,0,0.06)]">
                                 {/* floating tabs */}
-                                <div className="absolute -top-[30px] left-6 flex">
+                                <div className="absolute -top-7.5 left-6 flex">
                                     <div className="flex h-8 items-center gap-1.5 rounded-t-xl bg-white px-4 text-[13px] font-bold text-[#0058be] shadow-[0_-2px_10px_rgb(0,0,0,0.02)]">
                                         <Sparkles size={12} className="text-[#e84393]" fill="#e84393" /> Ask
                                     </div>
@@ -213,7 +213,7 @@ export default function AIPage() {
                                         }}
                                         placeholder="Get instant answers, insights, and ideas."
                                         autoFocus
-                                        className="min-h-[70px] max-h-[200px] w-full resize-none border-none bg-transparent px-3 py-1 text-[15px] font-medium text-[#141b2b] outline-none placeholder:text-[#b0b5c1] scrollbar-hide"
+                                        className="min-h-17.5 max-h-50 w-full resize-none border-none bg-transparent px-3 py-1 text-[15px] font-medium text-[#141b2b] outline-none placeholder:text-[#b0b5c1] scrollbar-hide"
                                     />
                                     
                                     <div className="mt-3 flex items-center justify-between">
@@ -282,7 +282,7 @@ export default function AIPage() {
                     // ==========================================
                     <>
                         {/* Glow Background Elements simulating ClickUp's soft atmospheric lighting */}
-                        <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-[#e84393]/[0.03] via-[#7c5cfc]/[0.03] to-transparent pointer-events-none" />
+                        <div className="absolute top-0 left-0 right-0 h-64 bg-linear-to-b from-[#e84393]/3 via-[#7c5cfc]/3 to-transparent pointer-events-none" />
 
                         <div className="flex-1 w-full overflow-y-auto px-10 pb-40 pt-10 scrollbar-hide z-10 flex flex-col items-center">
                             <div className="w-full max-w-4xl flex flex-col gap-6">
@@ -303,7 +303,7 @@ export default function AIPage() {
                                                 </div>
                                                 
                                                 {message.isSearching ? (
-                                                    <div className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#e3e8f8]/30 to-transparent py-2 px-3 animate-pulse w-max">
+                                                    <div className="flex items-center gap-2 rounded-lg bg-linear-to-r from-[#e3e8f8]/30 to-transparent py-2 px-3 animate-pulse w-max">
                                                         <Search size={14} className="text-[#7c5cfc] animate-spin-slow" />
                                                         <span className="text-[13px] font-semibold text-[#7c5cfc]">Searching workspace...</span>
                                                     </div>
@@ -354,7 +354,7 @@ export default function AIPage() {
 
                         {/* Floating Input Composer at Bottom */}
                         <div className="absolute bottom-6 left-0 right-0 z-20 flex justify-center w-full px-8">
-                            <div className="w-full max-w-4xl relative rounded-[24px] p-[2px] bg-gradient-to-r from-[#e3e8f8] via-[#fdecf5] to-[#f0ebff] shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                            <div className="w-full max-w-4xl relative rounded-3xl p-0.5 bg-linear-to-r from-[#e3e8f8] via-[#fdecf5] to-[#f0ebff] shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                                 <div className="flex flex-col rounded-[22px] bg-white pt-2.5 pb-2 px-3">
                                     <textarea
                                         value={inputValue}
@@ -366,7 +366,7 @@ export default function AIPage() {
                                             }
                                         }}
                                         placeholder="Tell AI what to do next"
-                                        className="min-h-[44px] max-h-[200px] w-full resize-none border-none bg-transparent px-2 py-1 text-[14px] font-medium text-[#141b2b] outline-none placeholder:text-[#b0b5c1] scrollbar-hide"
+                                        className="min-h-11 max-h-50 w-full resize-none border-none bg-transparent px-2 py-1 text-[14px] font-medium text-[#141b2b] outline-none placeholder:text-[#b0b5c1] scrollbar-hide"
                                     />
                                     
                                     <div className="mt-2 flex items-center justify-between">

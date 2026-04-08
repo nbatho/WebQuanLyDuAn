@@ -21,7 +21,9 @@ import {
 } from 'lucide-react';
 import type { SpaceItem } from './types';
 import WorkspaceSwitcher from './workspace/WorkspaceSwitcher';
-
+import { fetchSignOut } from '@/store/modules/auth';
+import type { AppDispatch } from '@/store/configureStore';
+import { useDispatch } from 'react-redux';
 type SpaceTree = {
     spaces: SpaceItem[];
     setIsCreateSpaceOpen: (v: boolean) => void;
@@ -57,9 +59,17 @@ export default function AppSidebar({
 }: SpaceTree) {
     const navigate = useNavigate();
     const location = useLocation();
-
+    const dispatch = useDispatch<AppDispatch>();
     const isSpaceActive = (spaceId: string) => location.pathname.startsWith(`/space/${spaceId}`);
 
+    const handleLogout = () => {
+        try {
+            dispatch(fetchSignOut());
+            navigate('/login');
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    }
     return (
         <>
             <aside className="flex w-60 shrink-0 flex-col overflow-y-auto border-r border-[#eef0f5] bg-white px-2.5 py-4 max-[900px]:hidden">
@@ -296,7 +306,7 @@ export default function AppSidebar({
                         <BarChart3 size={17} />
                         <span>Dashboards</span>
                     </div>
-                    <div 
+                    <div
                         className={`flex cursor-pointer select-none items-center gap-2.5 rounded-lg border ${location.pathname === '/ai' ? 'border-[#7c5cfc] bg-[linear-gradient(90deg,#7c5cfc_0%,#e84393_100%)] text-white shadow-sm' : 'border-[#e8edff] bg-[linear-gradient(90deg,#f0f4ff_0%,#fff_100%)] text-[#0058be] hover:bg-[#eef2ff]'} px-2.5 py-2 text-[13px] font-bold transition-all`}
                         onClick={() => navigate('/ai')}
                     >
@@ -323,7 +333,7 @@ export default function AppSidebar({
                     </div>
                     <div
                         className="flex cursor-pointer select-none items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-bold text-[#e74c3c] transition-all hover:bg-[#fff1f0] hover:text-[#e74c3c]"
-                        onClick={() => navigate('/login')}
+                        onClick={handleLogout}
                     >
                         <LogOut size={17} />
                         <span>Logout</span>

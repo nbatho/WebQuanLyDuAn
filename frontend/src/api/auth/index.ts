@@ -1,19 +1,23 @@
 import { beApi } from "../callApi";
+import type { SignInResponse, SignUpResponse } from "../../types/auth";
+import { getAccessToken } from "../../utils/localStorage";
 
-export const signIn = async (email: string, password: string) => {
+export const signIn = async (email: string, password: string): Promise<SignInResponse> => {
     return beApi.post("/auth/signin", { email, password });
 }
 
-export const signUp = async (email: string, password: string, username : string, name : string) => {
+export const signUp = async (email: string, password: string, username : string, name : string): Promise<SignUpResponse> => {
     return beApi.post("/auth/signup", { email, password, username, name });
 }
 
-export const signOut = async () => {
+export const signOut = async (): Promise<void> => {
     return beApi.post("/auth/signout");
 }
-
+export const refreshToken = async (): Promise<SignInResponse> => {
+    return beApi.post("/auth/refresh");
+}
 export const getToken = (): string | null => {
-    return localStorage.getItem('accessToken');
+    return getAccessToken();
 };
 
 export const isTokenExpired = (): boolean => {

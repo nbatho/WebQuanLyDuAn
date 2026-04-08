@@ -1,12 +1,6 @@
 import { useState } from 'react';
 import { List, X } from 'lucide-react';
-
-export interface CreateListModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onCreate: (name: string) => void;
-    folderName: string;
-}
+import type { CreateListModalProps } from '@/types/modal';
 
 export default function CreateListModal({ isOpen, onClose, onCreate, folderName }: CreateListModalProps) {
     const [name, setName] = useState('');

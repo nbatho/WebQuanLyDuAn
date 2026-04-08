@@ -7,6 +7,7 @@ import {
     getWorkspaceById,
     getWorkspaceMembers,
 } from '../../../api/workspaces';
+import type { WorkspacesData, WorkspaceMemberData, WorkspacesState } from '../../../types/workspaces';
 import {
     persistCurrentWorkspaceId,
     readStoredWorkspaceId,
@@ -32,7 +33,7 @@ export const addWorkspace = createAsyncThunk<
 >('workspaces/addWorkspace', async (body, { rejectWithValue }) => {
     try {
         const response = await createWorkspace(body.name, body.slug, body.description);
-        return response as unknown as WorkspacesData;
+        return response;
     } catch (error: unknown) {
         const msg =
             (error as { response?: { data?: { error?: string } } })?.response?.data?.error ||
@@ -53,7 +54,7 @@ export const editWorkspace = createAsyncThunk<
             body.slug,
             body.description,
         );
-        return response as unknown as WorkspacesData;
+        return response;
     } catch (error: unknown) {
         const msg = error instanceof Error ? error.message : 'Failed to update workspace';
         return rejectWithValue(msg);
@@ -78,7 +79,7 @@ export const fetchWorkspaceById = createAsyncThunk<WorkspacesData, number, { rej
     async (workspace_id, { rejectWithValue }) => {
         try {
             const response = await getWorkspaceById(workspace_id);
-            return response as unknown as WorkspacesData;
+            return response;
         } catch (error: unknown) {
             const msg = error instanceof Error ? error.message : 'Failed to fetch workspace details';
             return rejectWithValue(msg);
@@ -100,33 +101,7 @@ export const fetchWorkspaceMembers = createAsyncThunk<
     }
 });
 
-export interface WorkspaceMemberData {
-    user_id: number;
-    username: string;
-    email: string;
-    role: string;
-    avatar_url: string;
-    role_name: string;
-}
 
-/** Mirrors PostgreSQL `workspaces` columns (snake_case). */
-export interface WorkspacesData {
-    workspace_id: number;
-    name: string;
-    slug: string;
-    description: string | null;
-    plan?: string;
-    created_by: number | null;
-    created_at?: string;
-    updated_at?: string;
-}
-
-export interface WorkspacesState {
-    listWorkspaces: WorkspacesData[];
-    currentWorkspaceId: number | null;
-    isLoadingWorkspaces: boolean;
-    error: string | null;
-}
 
 const initialState: WorkspacesState = {
     listWorkspaces: [],

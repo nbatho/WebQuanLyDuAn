@@ -13,6 +13,17 @@ export interface Task {
     comment_count: number;
     assignees: string[];
 }
+export interface NewTaskData {
+    name: string;
+    status: string;
+    statusColor: string;
+    priority: string;
+    priorityColor: string;
+    due_date: string | null;
+    assignees: string[];
+    description: string;
+    listName: string;
+}
 
 export interface StatusGroup {
     id: string;

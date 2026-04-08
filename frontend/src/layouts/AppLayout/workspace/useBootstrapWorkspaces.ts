@@ -5,11 +5,11 @@ import { fetchWorkspaces } from '../../../store/modules/workspaces';
 
 export function useBootstrapWorkspaces() {
     const dispatch = useDispatch<AppDispatch>();
-    const accessToken = useSelector((s: RootState) => s.auth.accessToken);
+    const access_token = useSelector((s: RootState) => s.auth.access_token);
 
     useEffect(() => {
-        if (accessToken) {
+        if (access_token) {
             void dispatch(fetchWorkspaces());
         }
-    }, [accessToken, dispatch]);
+    }, [access_token, dispatch]);
 }

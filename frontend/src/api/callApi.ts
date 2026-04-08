@@ -4,6 +4,7 @@ import { getAccessToken, removeAccessToken } from '../utils/localStorage';
 function createAxiosInstance(baseURL: string): AxiosInstance {
     const instance = axios.create({
         baseURL,
+        withCredentials: true,
         headers: {
             'Content-Type': 'application/json',
         },

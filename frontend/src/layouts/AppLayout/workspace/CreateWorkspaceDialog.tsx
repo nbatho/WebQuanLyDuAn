@@ -47,17 +47,11 @@ export default function CreateWorkspaceDialog({ open, onOpenChange }: Props) {
         if (!trimmedName) return;
         setSubmitting(true);
         try {
-            await dispatch(
-                addWorkspace({
-                    name: trimmedName,
-                    slug: trimmedSlug,
-                    description: description.trim(),
-                }),
-            ).unwrap();
+            dispatch(addWorkspace({ name: trimmedName, slug: trimmedSlug, description: description.trim() }));
             onOpenChange(false);
             reset();
-        } catch {
-            /* rejected — error in store */
+        } catch (error) {
+            console.error('Failed to create workspace:', error);
         } finally {
             setSubmitting(false);
         }

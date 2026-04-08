@@ -35,7 +35,7 @@ export default function DueDatePopover({ date, onSave, onClose }: DueDatePopover
     };
 
     return (
-        <div className="flex w-[260px] flex-col rounded-xl bg-white p-2">
+        <div className="flex w-65 flex-col rounded-xl bg-white p-2">
             <div className="mb-2">
                 <input
                     type="text"

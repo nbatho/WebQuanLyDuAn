@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Sparkles, Users } from 'lucide-react';
+import { Search, Users } from 'lucide-react';
 import { Avatar } from 'antd';
 
 export interface AssigneePopoverProps {
@@ -35,7 +35,7 @@ export default function AssigneePopover({ assignees, onSave, onClose }: Assignee
     const unassignedPeople = filtered.filter(p => !assignees.includes(p.id));
 
     return (
-        <div className="flex w-[260px] flex-col rounded-xl bg-white p-2 text-[#141b2b] shadow-sm">
+        <div className="flex w-65 flex-col rounded-xl bg-white p-2 text-[#141b2b] shadow-sm">
             <div className="relative mb-2">
                 <Search size={14} className="absolute left-2.5 top-2.5 text-[#9aa0a6]" />
                 <input

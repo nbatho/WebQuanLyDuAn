@@ -13,17 +13,29 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 const ACCESS_TOKEN_TTL = "15m";
 const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000; // 14 ngày
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+
+const refreshCookieOptions = {
+  httpOnly: true,
+  secure: IS_PRODUCTION,
+  sameSite: IS_PRODUCTION ? "none" : "lax",
+  maxAge: REFRESH_TOKEN_TTL,
+};
+
+const refreshCookieClearOptions = {
+  httpOnly: true,
+  secure: IS_PRODUCTION,
+  sameSite: IS_PRODUCTION ? "none" : "lax",
+};
 
 export const signUp = async (req, res) => {
   try {
     const { username, password, email, name } = req.body;
 
     if (!username || !password || !email || !name) {
-      return res
-        .status(400)
-        .json({
-          message: "Khong the thieu username, password, email hoac name",
-        });
+      return res.status(400).json({
+        message: "Khong the thieu username, password, email hoac name",
+      });
     }
 
     const duplicateUsername = await findUserByUsername(username);
@@ -86,7 +98,7 @@ export const signIn = async (req, res) => {
     }
 
     //nếu khớp, tạo token và trả về cho client
-    const accessToken = jwt.sign(
+    const access_token = jwt.sign(
       { user_id: user.user_id },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: ACCESS_TOKEN_TTL },
@@ -98,18 +110,13 @@ export const signIn = async (req, res) => {
     await createSession(user.user_id, refreshToken);
 
     // trả refresh token về trong cookie
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
-      maxAge: REFRESH_TOKEN_TTL,
-    });
+    res.cookie("refreshToken", refreshToken, refreshCookieOptions);
     // trả access token về cho res
     return res.status(200).json({
       message: "Dang nhap thanh cong",
       user: {
         user_id: user.user_id,
-        accessToken,
+        access_token,
       },
     });
   } catch (error) {
@@ -129,7 +136,7 @@ export const signOut = async (req, res) => {
       await deleteSessionByRefreshToken(token);
 
       // xóa cookie refresh token
-      res.clearCookie("refreshToken");
+      res.clearCookie("refreshToken", refreshCookieClearOptions);
     }
 
     return res.status(200).json({ message: "Dang xuat thanh cong" });
@@ -155,16 +162,19 @@ export const refreshToken = async (req, res) => {
     }
 
     if (session.expires_at < new Date()) {
-        return res.status(403).json({ message: "Token da het han" });
+      return res.status(403).json({ message: "Token da het han" });
     }
-    const accessToken = jwt.sign(
+    const access_token = jwt.sign(
       { user_id: session.user_id },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: ACCESS_TOKEN_TTL },
     );
     return res.status(200).json({
       message: "Refresh token thanh cong",
-      accessToken,
+      user: {
+        user_id: session.user_id,
+        access_token,
+      },
     });
   } catch (error) {
     return res

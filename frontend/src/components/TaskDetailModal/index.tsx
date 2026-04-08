@@ -5,17 +5,8 @@ import {
     MessageSquare, Activity, ChevronRight, ChevronDown, Tag
 } from 'lucide-react';
 import { Button, Input, Avatar, Tooltip } from 'antd';
-import type { Task } from '../../types/tasks';
 import { directChildTasks } from '../../pages/SpaceViewPage/lib/taskFamily';
-
-export interface TaskDetailModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    task: Task | null;
-    /** Flat list of tasks in the current space (or My Tasks list) for resolving `parent_task_id` children. */
-    allTasks?: Task[];
-}
-
+import type { TaskDetailModalProps } from '@/types/modal';
 const STATUS_OPTIONS = [
     { value: 'TO DO', color: '#5f6368' },
     { value: 'IN PROGRESS', color: '#0058be' },

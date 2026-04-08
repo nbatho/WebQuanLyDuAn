@@ -3,15 +3,8 @@ import {
     Copy, Trash2, Move, Archive, Link2, Edit3,
     ArrowRight, CheckCircle2, Flag
 } from 'lucide-react';
+import type { ContextMenuProps } from '@/types/modal';
 
-interface ContextMenuProps {
-    x: number;
-    y: number;
-    isOpen: boolean;
-    onClose: () => void;
-    onAction: (action: string) => void;
-    taskTitle?: string;
-}
 
 const MENU_ITEMS = [
     { id: 'rename', icon: Edit3, label: 'Rename', divider: false },

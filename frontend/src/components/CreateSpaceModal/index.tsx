@@ -1,12 +1,8 @@
 import { useState } from 'react';
 import { X, Grid3X3, Lock, Users } from 'lucide-react';
 import { Button } from 'antd';
+import type { CreateSpaceModalProps } from '@/types/modal';
 
-export interface CreateSpaceModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onCreate: (name: string, color: string) => void;
-}
 
 const COLORS = [
     '#e84393', '#d63031', '#e17055', '#fdcb6e', '#00b894', '#00cec9', '#0984e3', '#6c5ce7'

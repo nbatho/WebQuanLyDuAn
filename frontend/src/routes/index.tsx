@@ -14,6 +14,7 @@ import SettingsPage from '../pages/SettingsPage';
 import AIPage from '../pages/AIPage';
 import AppLayout from "../layouts/AppLayout";
 import type { RouteConfig } from "../types/app";
+import PrivateRoute from "./PrivateRoutes";
 export const routes: RouteConfig[] = [
     {
         path: '/',
@@ -44,7 +45,7 @@ export const routes: RouteConfig[] = [
         element: <InviteTeamPage />
     },
     {
-        element: <AppLayout />,
+        element: <PrivateRoute><AppLayout /></PrivateRoute>,
         children: [
             {
                 path: '/home',
