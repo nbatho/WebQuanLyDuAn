@@ -1,5 +1,11 @@
 import express from "express";
-import { signUp, signIn, signOut, refreshToken } from "../controllers/authControllers.js";
+import {
+  signUp,
+  signIn,
+  signOut,
+  refreshToken,
+  googleSignIn,
+} from "../controllers/authControllers.js";
 const router = express.Router();
 
 /**
@@ -79,6 +85,7 @@ router.post("/signup", signUp);
  *         description: Thông tin đăng nhập không hợp lệ
  */
 router.post("/signin", signIn);
+router.post("/google", googleSignIn);
 
 /**
  * @swagger

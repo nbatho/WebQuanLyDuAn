@@ -16,6 +16,9 @@ export const signOut = async (): Promise<void> => {
 export const refreshToken = async (): Promise<SignInResponse> => {
     return beApi.post("/auth/refresh");
 }
+export const signInWithGoogle = async (idToken: string): Promise<SignInResponse> => {
+    return beApi.post("/auth/google", { idToken });
+}
 export const getToken = (): string | null => {
     return getAccessToken();
 };

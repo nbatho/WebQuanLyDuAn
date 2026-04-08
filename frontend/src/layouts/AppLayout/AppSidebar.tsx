@@ -38,6 +38,7 @@ type SpaceTree = {
     onDeleteSpace: (spaceId: string) => void;
     onDeleteFolder: (spaceId: string, folderId: string) => void;
     onDeleteList: (spaceId: string, folderId: string | null, listId: string) => void;
+    onOpenInvitePeople: () => void;
     onOpenCreateWorkspace: () => void;
 };
 
@@ -55,6 +56,7 @@ export default function AppSidebar({
     onDeleteSpace,
     onDeleteFolder,
     onDeleteList,
+    onOpenInvitePeople,
     onOpenCreateWorkspace,
 }: SpaceTree) {
     const navigate = useNavigate();
@@ -319,7 +321,7 @@ export default function AppSidebar({
                 <div className="mt-auto flex flex-col gap-1 border-t border-[#eef0f5] pt-3">
                     <button
                         className="mb-1 flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-[#0058be] bg-[#f0f4ff] px-2 py-2 text-xs font-extrabold text-[#0058be] transition-all hover:bg-[#0058be] hover:text-white"
-                        onClick={() => navigate('/invite-team')}
+                        onClick={onOpenInvitePeople}
                     >
                         <Users size={16} />
                         <span>Invite People</span>

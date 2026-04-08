@@ -35,20 +35,18 @@ export default function TopNav() {
                 {/* Desktop Actions */}
                 <div className="hidden md:flex items-center gap-4">
                     <Link
-                        to="/register"
-                        className="text-[#424754] font-semibold text-sm hover:text-[#7c5cfc] transition-colors no-underline"
+                        to="/login"
+                        className="text-[#424754] font-semibold text-sm hover:text-[#0058be] transition-colors no-underline"
                     >
-                        Đăng ký
+                        Đăng nhập
                     </Link>
-                    <Link to="/login">
-                        <Button
-                            type="primary"
-                            size="large"
-                            className="!rounded-xl !font-bold !text-sm !px-6 !h-11 !border-0 !bg-[#7c5cfc] hover:!bg-[#6a4aca]"
-                        >
-                            Đăng nhập
-                        </Button>
-                    </Link>
+                    <Button
+                        type="primary"
+                        size="large"
+                        className="!rounded-xl !font-bold !text-sm !px-6 !h-11 !border-0"
+                    >
+                        Bắt đầu miễn phí
+                    </Button>
                 </div>
 
                 {/* Mobile Hamburger */}
@@ -78,12 +76,10 @@ export default function TopNav() {
                             </a>
                         ))}
                         <hr className="border-[#e9edff] my-4" />
-                        <Link to="/register" className="text-[#141b2b] font-semibold text-base no-underline hover:text-[#7c5cfc]">Đăng ký</Link>
-                        <Link to="/login" className="w-full">
-                            <Button type="primary" size="large" className="!rounded-xl !font-bold !border-0 !h-11 w-full mt-2 !bg-[#7c5cfc]">
-                                Đăng nhập
-                            </Button>
-                        </Link>
+                        <Link to="/login" className="text-[#141b2b] font-semibold text-base no-underline">Đăng nhập</Link>
+                        <Button type="primary" size="large" className="!rounded-xl !font-bold !border-0 !h-11 mt-2">
+                            Bắt đầu miễn phí
+                        </Button>
                     </div>
                 </Drawer>
             </nav>

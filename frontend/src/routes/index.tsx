@@ -4,12 +4,10 @@ import GoogleLoginPage from "../pages/AuthPage/GoogleLoginPage";
 import WorkspaceSetupPage from "../pages/WorkspaceSetupPage";
 import WorkspaceBrandingPage from "../pages/WorkspaceBrandingPage";
 import InviteTeamPage from "../pages/InviteTeamPage";
-import HomePage from "../pages/HomePage";
 import InboxPage from "../pages/InboxPage";
 import MyTasksPage from "../pages/MyTasksPage";
 import SpaceViewPage from '../pages/SpaceViewPage';
 import TimeTrackingPage from '../pages/TimeTrackingPage';
-import DashboardsPage from '../pages/DashboardsPage';
 import SettingsPage from '../pages/SettingsPage';
 import AIPage from '../pages/AIPage';
 import AppLayout from "../layouts/AppLayout";
@@ -49,7 +47,7 @@ export const routes: RouteConfig[] = [
         children: [
             {
                 path: '/home',
-                element: <HomePage />
+                element: <MyTasksPage />
             },
             {
                 path: '/inbox',
@@ -60,20 +58,12 @@ export const routes: RouteConfig[] = [
                 element: <AIPage />
             },
             {
-                path: '/my-tasks',
-                element: <MyTasksPage />
-            },
-            {
                 path: 'space/:spaceId',
                 element: <SpaceViewPage />
             },
             {
                 path: '/time-tracking',
                 element: <TimeTrackingPage />
-            },
-            {
-                path: '/dashboards',
-                element: <DashboardsPage />
             },
             {
                 path: '/settings',

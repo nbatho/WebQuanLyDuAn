@@ -18,13 +18,15 @@ export default function HeroSection() {
                     Được tin dùng bởi các đội nhóm hàng đầu
                 </div>
 
-                <h1 className="text-5xl md:text-[68px] leading-[1.05] font-extrabold tracking-tight text-[#141b2b] mb-6">
-                    Một không gian duy nhất.<br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7c5cfc] via-[#e84393] to-[#ffaa4c]">Cho mọi dự án của bạn.</span>
+                <h1 className="text-5xl md:text-6xl leading-[1.08] font-extrabold tracking-tight text-[#141b2b] mb-6">
+                    Mọi dự án.{' '}
+                    <span className="text-[#0058be]">Mọi thành viên.</span>
+                    <br />
+                    Một nền tảng duy nhất.
                 </h1>
 
-                <p className="text-[#424754] text-lg md:text-xl leading-relaxed mb-10 max-w-2xl mx-auto font-medium">
-                    Flowise giúp đội nhóm của bạn gom toàn bộ Công việc, Tự động hóa bằng AI và Theo dõi thời gian vào một nền tảng hợp nhất.
+                <p className="text-[#424754] text-lg md:text-xl leading-relaxed mb-10 max-w-2xl mx-auto">
+                    Flowise giúp đội nhóm của bạn quản lý dự án, phân công công việc và theo dõi tiến độ — tất cả trong một không gian làm việc thống nhất.
                 </p>
 
                 {/* CTA Buttons */}
@@ -32,17 +34,15 @@ export default function HeroSection() {
                     <Button
                         type="primary"
                         size="large"
-                        href="/login"
-                        className="!rounded-xl !font-bold !text-base !px-8 !h-14 !border-0 !flex !items-center !gap-2 !bg-[#7c5cfc] hover:!bg-[#6a4aca] !shadow-lg !shadow-[#7c5cfc]/30"
+                        className="!rounded-xl !font-bold !text-base !px-8 !h-14 !border-0 !flex !items-center !gap-2"
                     >
-                        Đăng nhập <ArrowRight size={18} />
+                        Bắt đầu miễn phí <ArrowRight size={18} />
                     </Button>
                     <Button
                         size="large"
-                        href="/register"
-                        className="!bg-white !text-[#141b2b] !border-2 !border-[#e9edff] !rounded-xl !font-bold !text-base !px-8 !h-14 hover:!border-[#7c5cfc] hover:!text-[#7c5cfc] transition-all"
+                        className="!bg-white !text-[#141b2b] !border-2 !border-[#e9edff] !rounded-xl !font-bold !text-base !px-8 !h-14 hover:!border-[#0058be] transition-all"
                     >
-                        Đăng ký ngay
+                        Xem Demo
                     </Button>
                 </div>
 

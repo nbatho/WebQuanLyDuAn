@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import CreateSpaceModal from '../../components/CreateSpaceModal';
 import CreateFolderModal from '../../components/CreateFolderModal';
 import CreateListModal from '../../components/CreateListModal';
+import InvitePeopleModal from '../../components/InvitePeopleModal';
 import AppSidebar from './AppSidebar';
 import { SpaceTreeProvider } from './SpaceTreeContext';
 import CreateWorkspaceDialog from './workspace/CreateWorkspaceDialog';
@@ -17,6 +18,7 @@ export default function AppLayoutMain() {
     const dispatch = useDispatch<AppDispatch>();
     const tree = useSpaceTreeState();
     const [workspaceDialogOpen, setWorkspaceDialogOpen] = useState(false);
+    const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
     const openWorkspaceDialog = () => {
         dispatch(clearWorkspacesError());
@@ -40,6 +42,7 @@ export default function AppLayoutMain() {
                 onDeleteSpace={tree.handleDeleteSpace}
                 onDeleteFolder={tree.handleDeleteFolder}
                 onDeleteList={tree.handleDeleteList}
+                onOpenInvitePeople={() => setInviteModalOpen(true)}
                 onOpenCreateWorkspace={openWorkspaceDialog}
             />
 
@@ -67,6 +70,10 @@ export default function AppLayoutMain() {
             <CreateWorkspaceDialog
                 open={workspaceDialogOpen}
                 onOpenChange={setWorkspaceDialogOpen}
+            />
+            <InvitePeopleModal
+                open={inviteModalOpen}
+                onOpenChange={setInviteModalOpen}
             />
         </div>
         </SpaceTreeProvider>

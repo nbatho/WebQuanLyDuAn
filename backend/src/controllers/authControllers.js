@@ -11,9 +11,11 @@ import {
 } from "../models/Session.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import { OAuth2Client } from "google-auth-library";
 const ACCESS_TOKEN_TTL = "15m";
 const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000; // 14 ngày
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const refreshCookieOptions = {
   httpOnly: true,
@@ -123,6 +125,78 @@ export const signIn = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Loi server khi dang nhap", error: error.message });
+  }
+};
+
+const sanitizeGoogleUsername = (source = "") =>
+  source.toLowerCase().replace(/[^a-z0-9._-]/g, "").slice(0, 30);
+
+const generateUniqueUsername = async (email, fallbackName = "google_user") => {
+  const emailPart = sanitizeGoogleUsername(email.split("@")[0] || "");
+  const base = emailPart || sanitizeGoogleUsername(fallbackName) || "google_user";
+  let candidate = base;
+  let suffix = 1;
+  while (await findUserByUsername(candidate)) {
+    candidate = `${base}_${suffix++}`;
+  }
+  return candidate;
+};
+
+export const googleSignIn = async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    if (!idToken) {
+      return res.status(400).json({ message: "Khong the thieu idToken" });
+    }
+    if (!process.env.GOOGLE_CLIENT_ID) {
+      return res.status(500).json({ message: "GOOGLE_CLIENT_ID chua duoc cau hinh" });
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    if (!payload?.email) {
+      return res.status(400).json({ message: "Google token khong hop le" });
+    }
+
+    let user = await findUserByEmail(payload.email);
+    if (!user) {
+      const username = await generateUniqueUsername(payload.email, payload.name || "google_user");
+      const randomPasswordHash = await bcrypt.hash(
+        crypto.randomBytes(32).toString("hex"),
+        10,
+      );
+      user = await createUser(
+        username,
+        randomPasswordHash,
+        payload.email,
+        payload.name || username,
+        payload.picture || null,
+      );
+    }
+
+    const access_token = jwt.sign(
+      { user_id: user.user_id },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: ACCESS_TOKEN_TTL },
+    );
+    const refreshToken = crypto.randomBytes(64).toString("hex");
+    await createSession(user.user_id, refreshToken);
+    res.cookie("refreshToken", refreshToken, refreshCookieOptions);
+
+    return res.status(200).json({
+      message: "Dang nhap Google thanh cong",
+      user: {
+        user_id: user.user_id,
+        access_token,
+      },
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Loi server khi dang nhap Google", error: error.message });
   }
 };
 
