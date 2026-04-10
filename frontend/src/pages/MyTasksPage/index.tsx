@@ -1,177 +1,112 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
     CheckCircle2, Calendar, Flag, ChevronDown, ChevronRight,
     Plus, Search, LayoutList, Filter, Star, MoreHorizontal,
     MessageSquare, Clock
 } from 'lucide-react';
 import { Avatar } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
 import TaskDetailModal from '../../components/TaskDetailModal';
-import type { MyTaskRow } from '../../types/myTasks';
 import groupByDate from './component/groupByDate';
-
+import type { AppDispatch, RootState } from '@/store/configureStore';
+import { fetchTasksForSpace } from '@/store/modules/tasks';
+import type { TaskWithSpaceData } from '@/store/modules/tasks';
+import type { Task } from '@/types/tasks';
 type TabType = 'assigned' | 'mentions' | 'created';
+const DEFAULT_STATUS = { name: 'TO DO', color: '#5f6368' };
+const DEFAULT_PRIORITY = { name: 'Normal', color: '#00b894' };
 
-const allTasks: MyTaskRow[] = [
-    {
-        task_id: 101,
-        space_id: 1,
-        parent_task_id: null,
-        name: 'Finalize Q1 Marketing Roadmap',
-        description: 'Draft due by end of day for the stakeholder meeting.',
-        status: 'IN PROGRESS',
-        statusColor: '#0058be',
-        priority: 'Urgent',
-        priorityColor: '#e74c3c',
-        due_date: 'Today',
-        comment_count: 3,
-        assignees: ['AR'],
-        space_name: 'Marketing',
-        space_color: '#e84393',
-    },
-    {
-        task_id: 102,
-        space_id: 2,
-        parent_task_id: null,
-        name: 'Review UI Components Documentation',
-        description: 'Coordinate with the Design Space to align on tokens.',
-        status: 'TO DO',
-        statusColor: '#5f6368',
-        priority: 'High',
-        priorityColor: '#f0a220',
-        due_date: 'Today',
-        comment_count: 1,
-        assignees: ['AR', 'MC'],
-        space_name: 'Design',
-        space_color: '#00b894',
-    },
-    {
-        task_id: 103,
-        space_id: 3,
-        parent_task_id: null,
-        name: 'Setup CI/CD Pipeline',
-        description: null,
-        status: 'IN PROGRESS',
-        statusColor: '#0058be',
-        priority: 'High',
-        priorityColor: '#f0a220',
-        due_date: 'Wed, Oct 25',
+function getInitials(name: string): string {
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return 'NA';
+    if (parts.length === 1) return parts[0]!.slice(0, 2).toUpperCase();
+    return `${parts[0]![0]}${parts[1]![0]}`.toUpperCase();
+}
+
+function isCompletedTask(task: TaskWithSpaceData): boolean {
+    return (task.status_name ?? '').toUpperCase() === 'COMPLETE' || !!task.completed_at;
+}
+
+function isDueToday(rawDueDate: string | null): boolean {
+    if (!rawDueDate) return false;
+    const parsed = new Date(rawDueDate);
+    if (Number.isNaN(parsed.getTime())) return rawDueDate === 'Today';
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const due = new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+    return due.getTime() === today.getTime();
+}
+
+function toTaskForModal(task: TaskWithSpaceData): Task {
+    return {
+        task_id: task.task_id,
+        space_id: task.space_id,
+        parent_task_id: task.parent_task_id,
+        name: task.name,
+        description: task.description,
+        status: task.status_name ?? DEFAULT_STATUS.name,
+        statusColor: task.status_color ?? DEFAULT_STATUS.color,
+        priority: task.priority_name ?? DEFAULT_PRIORITY.name,
+        priorityColor: task.priority_color ?? DEFAULT_PRIORITY.color,
+        due_date: task.due_date,
         comment_count: 0,
-        assignees: ['AR'],
-        space_name: 'Development',
-        space_color: '#0984e3',
-    },
-    {
-        task_id: 104,
-        space_id: 1,
-        parent_task_id: null,
-        name: 'Review Brand Identity v2',
-        description: null,
-        status: 'TO DO',
-        statusColor: '#5f6368',
-        priority: 'Normal',
-        priorityColor: '#00b894',
-        due_date: 'Thu, Oct 26',
-        comment_count: 2,
-        assignees: ['AR', 'SJ'],
-        space_name: 'Marketing',
-        space_color: '#e84393',
-    },
-    {
-        task_id: 105,
-        space_id: 3,
-        parent_task_id: null,
-        name: 'Security Audit Report Q4',
-        description: null,
-        status: 'IN PROGRESS',
-        statusColor: '#0058be',
-        priority: 'Urgent',
-        priorityColor: '#e74c3c',
-        due_date: 'Fri, Oct 27',
-        comment_count: 1,
-        assignees: ['AR'],
-        space_name: 'Development',
-        space_color: '#0984e3',
-    },
-    {
-        task_id: 106,
-        space_id: 3,
-        parent_task_id: null,
-        name: 'Multi-currency Payment Support',
-        description: null,
-        status: 'TO DO',
-        statusColor: '#5f6368',
-        priority: 'Normal',
-        priorityColor: '#00b894',
-        due_date: 'Mon, Oct 30',
-        comment_count: 0,
-        assignees: ['AR', 'ER'],
-        space_name: 'Development',
-        space_color: '#0984e3',
-    },
-    {
-        task_id: 107,
-        space_id: 3,
-        parent_task_id: null,
-        name: 'Database Indexing for Reports',
-        description: null,
-        status: 'TO DO',
-        statusColor: '#5f6368',
-        priority: 'Normal',
-        priorityColor: '#00b894',
-        due_date: 'Tue, Oct 31',
-        comment_count: 0,
-        assignees: ['AR'],
-        space_name: 'Development',
-        space_color: '#0984e3',
-    },
-    {
-        task_id: 108,
-        space_id: 3,
-        parent_task_id: null,
-        name: 'SSO Integration with Azure AD',
-        description: null,
-        status: 'COMPLETE',
-        statusColor: '#27ae60',
-        priority: 'High',
-        priorityColor: '#f0a220',
-        due_date: 'Oct 18',
-        comment_count: 4,
-        assignees: ['AR'],
-        space_name: 'Development',
-        space_color: '#0984e3',
-    },
-    {
-        task_id: 109,
-        space_id: 2,
-        parent_task_id: null,
-        name: 'Dark Mode Interface Alpha',
-        description: null,
-        status: 'COMPLETE',
-        statusColor: '#27ae60',
-        priority: 'Normal',
-        priorityColor: '#00b894',
-        due_date: 'Oct 21',
-        comment_count: 2,
-        assignees: ['AR', 'ER'],
-        space_name: 'Design',
-        space_color: '#00b894',
-    },
-];
+        assignees: (task.assignees ?? []).map((a) => getInitials(a.name)),
+    };
+}
 
 const avatarColors: Record<string, string> = {
     AR: '#4285F4', MC: '#7c5cfc', SJ: '#0058be', ER: '#e84393'
 };
 
+function toHumanDueLabel(rawDueDate: string | null): string | null {
+    if (!rawDueDate) return null;
+    if (rawDueDate === 'Today') return 'Today';
+
+    const parsed = new Date(rawDueDate);
+    if (Number.isNaN(parsed.getTime())) return rawDueDate;
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const due = new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+    const diffDays = Math.round((due.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Tomorrow';
+
+    return due.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+    });
+}
 export default function MyTasksPage() {
+    const dispatch = useDispatch<AppDispatch>();
+    const listSpaces = useSelector((state: RootState) => state.spaces.listSpaces);
+    const { listTask, isLoadingTasks } = useSelector((state: RootState) => state.tasks);
     const [activeTab, setActiveTab] = useState<TabType>('assigned');
-    const [selectedTask, setSelectedTask] = useState<MyTaskRow | null>(null);
+    const [selectedTask, setSelectedTask] = useState<TaskWithSpaceData | null>(null);
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({ '📌 Today': true, '📅 This Week': true, '📆 Next Week': true, '📋 No date': true, '✅ Completed': false });
     const [searchText, setSearchText] = useState('');
     const [showCompleted, setShowCompleted] = useState(true);
+    const [activeSpaceId, setActiveSpaceId] = useState<number | null>(null);
+    useEffect(() => {
+        if (listSpaces.length > 0 && activeSpaceId == null) {
+            setActiveSpaceId(listSpaces[0]!.space_id);
+        }
+    }, [listSpaces, activeSpaceId]);
+
+    useEffect(() => {
+        if (activeSpaceId != null) {
+            void dispatch(fetchTasksForSpace(activeSpaceId));
+        }
+    }, [activeSpaceId, dispatch]);
+
+    const allTasks = useMemo<TaskWithSpaceData[]>(() => listTask, [listTask]);
 
     const filteredTasks = allTasks.filter((t) => {
         if (t.parent_task_id !== null) return false;
-        if (!showCompleted && t.status === 'COMPLETE') return false;
+        if (!showCompleted && isCompletedTask(t)) return false;
         if (searchText && !t.name.toLowerCase().includes(searchText.toLowerCase())) return false;
         return true;
     });
@@ -182,9 +117,9 @@ export default function MyTasksPage() {
         setExpandedGroups(prev => ({ ...prev, [label]: !prev[label] }));
     };
 
-    const totalActive = allTasks.filter(t => t.status !== 'COMPLETE').length;
+    const totalActive = allTasks.filter((t) => !isCompletedTask(t)).length;
     const totalOverdue = allTasks.filter(
-        (t) => t.parent_task_id === null && t.due_date === 'Today' && t.status !== 'COMPLETE',
+        (t) => t.parent_task_id === null && isDueToday(t.due_date) && !isCompletedTask(t),
     ).length;
 
     return (
@@ -201,6 +136,19 @@ export default function MyTasksPage() {
                         </div>
                     </div>
                     <div className="flex items-center gap-1.5">
+                        <select
+                            className="rounded-md border border-[#eef0f5] bg-white px-2 py-1 text-xs font-semibold text-[#5f6368]"
+                            value={activeSpaceId ?? ''}
+                            onChange={(e) => setActiveSpaceId(Number(e.target.value))}
+                            disabled={listSpaces.length === 0}
+                        >
+                            {listSpaces.length === 0 ? <option value="">No space</option> : null}
+                            {listSpaces.map((space) => (
+                                <option key={space.space_id} value={space.space_id}>
+                                    {space.name}
+                                </option>
+                            ))}
+                        </select>
                         <button className="flex cursor-pointer items-center gap-1.5 rounded-md border border-[#eef0f5] bg-transparent px-3 py-1.25 text-xs font-semibold text-[#5f6368] transition-all duration-150 hover:border-[#dcdfe4] hover:bg-[#f8fafc]"><Star size={14} /> Favorites</button>
                         <button className="flex cursor-pointer items-center gap-1.5 rounded-md border border-[#0058be] bg-[#0058be] px-3 py-1.25 text-xs font-semibold text-white transition-colors duration-150 hover:bg-[#004aab]"><Plus size={14} /> Add Task</button>
                     </div>
@@ -243,6 +191,14 @@ export default function MyTasksPage() {
 
             {/* ═══════ TASK LIST ═══════ */}
             <div className="flex-1 overflow-y-auto px-6 pb-6 pt-3">
+                {isLoadingTasks ? (
+                    <div className="px-2 py-6 text-sm font-medium text-[#9aa0a6]">Loading tasks...</div>
+                ) : null}
+
+                {!isLoadingTasks && taskGroups.length === 0 ? (
+                    <div className="px-2 py-6 text-sm font-medium text-[#9aa0a6]">No tasks found for this space.</div>
+                ) : null}
+
                 {taskGroups.map(group => (
                     <div key={group.label} className="mb-5">
                         <div className="mb-1.5 flex cursor-pointer items-center gap-1.5 py-1" onClick={() => toggleGroup(group.label)}>
@@ -261,46 +217,46 @@ export default function MyTasksPage() {
                                         <div className="flex w-8 shrink-0 justify-center">
                                             <CheckCircle2
                                                 size={16}
-                                                className={`${task.status === 'COMPLETE' ? 'text-[#27ae60]' : 'text-[#dcdfe4] transition-colors duration-150 group-hover:text-[#b0b5c1]'}`}
-                                                style={task.status === 'COMPLETE' ? { color: '#27ae60' } : undefined}
+                                                className={`${isCompletedTask(task) ? 'text-[#27ae60]' : 'text-[#dcdfe4] transition-colors duration-150 group-hover:text-[#b0b5c1]'}`}
+                                                style={isCompletedTask(task) ? { color: '#27ae60' } : undefined}
                                             />
                                         </div>
                                         <div className="flex min-w-0 flex-1 flex-col gap-1">
-                                            <span className={`text-[13px] font-semibold ${task.status === 'COMPLETE' ? 'text-[#9aa0a6] line-through' : 'text-[#141b2b]'}`}>
+                                            <span className={`text-[13px] font-semibold ${isCompletedTask(task) ? 'text-[#9aa0a6] line-through' : 'text-[#141b2b]'}`}>
                                                 {task.name}
                                             </span>
                                             <div className="flex items-center gap-1.5">
                                                 <span className="rounded px-1.5 py-px text-[10px] font-bold tracking-[0.04em]" style={{ backgroundColor: task.space_color + '18', color: task.space_color }}>
                                                     {task.space_name}
                                                 </span>
-                                                {task.comment_count > 0 && (
-                                                    <span className="flex items-center gap-0.75 text-[11px] text-[#9aa0a6]"><MessageSquare size={11} /> {task.comment_count}</span>
-                                                )}
                                             </div>
                                         </div>
                                         <div className="w-25 shrink-0 text-center">
-                                            <span className="inline-block rounded px-2 py-0.5 text-[10px] font-extrabold tracking-[0.03em] text-white" style={{ backgroundColor: task.statusColor }}>
-                                                {task.status}
+                                            <span className="inline-block rounded px-2 py-0.5 text-[10px] font-extrabold tracking-[0.03em] text-white" style={{ backgroundColor: task.status_color ?? DEFAULT_STATUS.color }}>
+                                                {task.status_name ?? DEFAULT_STATUS.name}
                                             </span>
                                         </div>
                                         <div className="w-30 shrink-0">
                                             {task.due_date && (
-                                                <span className={`flex items-center gap-1 text-xs font-medium ${task.due_date === 'Today' ? 'font-bold text-[#e74c3c]' : 'text-[#5f6368]'}`}>
-                                                    <Calendar size={11} /> {task.due_date}
+                                                <span className={`flex items-center gap-1 text-xs font-medium ${isDueToday(task.due_date) ? 'font-bold text-[#e74c3c]' : 'text-[#5f6368]'}`}>
+                                                    <Calendar size={11} /> {toHumanDueLabel(task.due_date)}
                                                 </span>
                                             )}
                                         </div>
                                         <div className="w-10 shrink-0 text-center">
-                                            {task.priority !== 'Normal' && (
-                                                <span className="flex items-center justify-center" style={{ color: task.priorityColor }}>
-                                                    <Flag size={11} fill={task.priorityColor} />
+                                            {(task.priority_name ?? DEFAULT_PRIORITY.name).toUpperCase() !== 'NORMAL' && (
+                                                <span className="flex items-center justify-center" style={{ color: task.priority_color ?? DEFAULT_PRIORITY.color }}>
+                                                    <Flag size={11} fill={task.priority_color ?? DEFAULT_PRIORITY.color} />
                                                 </span>
                                             )}
                                         </div>
                                         <div className="flex w-15 shrink-0 items-center justify-end">
-                                            {task.assignees.map(a => (
-                                                <Avatar key={a} size={22} style={{ backgroundColor: avatarColors[a], fontSize: '9px', fontWeight: 'bold', marginLeft: '-4px' }}>{a}</Avatar>
-                                            ))}
+                                            {task.assignees.map((a) => {
+                                                const initials = getInitials(a.name);
+                                                return (
+                                                    <Avatar key={a.user_id} size={22} style={{ backgroundColor: avatarColors[initials] ?? '#9aa0a6', fontSize: '9px', fontWeight: 'bold', marginLeft: '-4px' }}>{initials}</Avatar>
+                                                );
+                                            })}
                                         </div>
                                         <div className="flex w-8 shrink-0 justify-center">
                                             <MoreHorizontal size={14} className="opacity-0 transition-opacity duration-150 group-hover:opacity-100 text-[#dcdfe4]" />
@@ -316,8 +272,8 @@ export default function MyTasksPage() {
             <TaskDetailModal
                 isOpen={!!selectedTask}
                 onClose={() => setSelectedTask(null)}
-                task={selectedTask}
-                allTasks={allTasks}
+                task={selectedTask ? toTaskForModal(selectedTask) : null}
+                allTasks={allTasks.map(toTaskForModal)}
             />
         </div>
     );

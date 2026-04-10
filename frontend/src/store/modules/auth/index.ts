@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { signIn, signUp,signOut, refreshToken } from "../../../api/auth";
 import type { SignInRequest, SignInResponse, SignUpRequest,SignUpResponse, AuthState } from "../../../types/auth";
+import { getAccessToken } from "@/utils/localStorage";
 export const fetchSignIn = createAsyncThunk<SignInResponse, SignInRequest, { rejectValue: string }>(
     "auth/fetchSignIn",
     async ({ email, password }, { rejectWithValue }) => {
@@ -52,7 +53,7 @@ export const fetchRefreshToken = createAsyncThunk<SignInResponse, void, { reject
 const initialState : AuthState = {
     signIn : null,
     signUp : null,
-    access_token : null,
+    access_token : getAccessToken(),
     isLoadingSignIn: false,
     isLoadingSignUp: false,
     isLoadingSignOut: false,

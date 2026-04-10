@@ -17,7 +17,7 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
 
     const handleCreate = () => {
         if (!spaceName.trim()) return;
-        onCreate(spaceName, selectedColor);
+        onCreate(spaceName, selectedColor, privacy === 'private');
         setSpaceName('');
         onClose();
     };

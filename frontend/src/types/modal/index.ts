@@ -25,7 +25,7 @@ export interface CreateListModalProps {
 export interface CreateSpaceModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onCreate: (name: string, color: string) => void;
+    onCreate: (name: string, color: string, is_private?: boolean) => void;
 }
 
 export interface CreateTaskModalProps {
