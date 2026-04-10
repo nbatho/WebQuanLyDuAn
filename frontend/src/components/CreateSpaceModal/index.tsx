@@ -1,138 +1,165 @@
-import { useState } from 'react';
-import { X, Grid3X3, Lock, Users } from 'lucide-react';
-import { Button } from 'antd';
+import { useState, useEffect, useRef } from 'react';
+import { X } from 'lucide-react';
 import type { CreateSpaceModalProps } from '@/types/modal';
 
-
 const COLORS = [
-    '#e84393', '#d63031', '#e17055', '#fdcb6e', '#00b894', '#00cec9', '#0984e3', '#6c5ce7'
+    '#e84393', '#d63031', '#e17055', '#fdcb6e', '#00b894', '#00cec9', '#0984e3', '#6c5ce7',
+    '#636e72', '#2d3436', '#fab1a0', '#74b9ff',
 ];
 
 export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSpaceModalProps) {
     const [spaceName, setSpaceName] = useState('');
+    const [description, setDescription] = useState('');
     const [selectedColor, setSelectedColor] = useState(COLORS[6]); // Default blue
-    const [privacy, setPrivacy] = useState<'public' | 'private'>('public');
+    const [isPrivate, setIsPrivate] = useState(false);
+    const [showColorPicker, setShowColorPicker] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (isOpen) {
+            setSpaceName('');
+            setDescription('');
+            setSelectedColor(COLORS[6]);
+            setIsPrivate(false);
+            setShowColorPicker(false);
+            setTimeout(() => inputRef.current?.focus(), 100);
+        }
+    }, [isOpen]);
 
     if (!isOpen) return null;
 
     const handleCreate = () => {
         if (!spaceName.trim()) return;
-        onCreate(spaceName, selectedColor, privacy === 'private');
-        setSpaceName('');
+        onCreate(spaceName.trim(), selectedColor, isPrivate);
         onClose();
     };
 
+    const initial = spaceName.trim().charAt(0).toUpperCase() || 'S';
+
     return (
         <div
-            className="fixed inset-0 z-9999 flex items-center justify-center bg-[rgba(20,27,43,0.4)] backdrop-blur-[2px]"
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-[rgba(0,0,0,0.35)] backdrop-blur-[2px]"
             onClick={onClose}
         >
             <div
-                className="flex w-120 flex-col rounded-xl bg-white font-['Plus_Jakarta_Sans',sans-serif] shadow-[0_10px_40px_rgba(0,0,0,0.15)]"
-                onClick={e => e.stopPropagation()}
+                className="w-[520px] flex flex-col rounded-2xl bg-white font-['Plus_Jakarta_Sans',sans-serif] shadow-[0_24px_80px_rgba(0,0,0,0.18)] overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
             >
-                {/* Header */}
-                <div className="flex items-center justify-between border-b border-[#eef0f5] px-6 pb-4 pt-5">
-                    <h2 className="m-0 text-lg font-extrabold tracking-[-0.01em] text-[#141b2b]">Create New Space</h2>
+                {/* ── Header ── */}
+                <div className="relative px-7 pt-7 pb-4">
                     <button
-                        className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-none bg-transparent text-[#9aa0a6] transition-all hover:bg-[#f0f4ff] hover:text-[#141b2b]"
+                        className="absolute right-5 top-5 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border-none bg-transparent text-[#9aa0a6] transition-all hover:bg-[#f0f2f5] hover:text-[#3c4043]"
                         onClick={onClose}
                     >
                         <X size={18} />
                     </button>
+                    <h2 className="m-0 text-[20px] font-bold text-[#202124] tracking-[-0.01em]">
+                        Create a Space
+                    </h2>
+                    <p className="m-0 mt-1.5 text-[13.5px] leading-[1.5] text-[#5f6368]">
+                        A Space represents teams, departments, or groups, each with its own Lists, workflows, and settings.
+                    </p>
                 </div>
 
-                {/* Body */}
-                <div className="flex flex-col gap-5 p-6">
-                    {/* Space Name */}
-                    <div className="flex flex-col gap-2">
-                        <label className="text-xs font-bold uppercase tracking-[0.04em] text-[#5f6368]">Space Name</label>
-                        <input
-                            type="text"
-                            className="h-10 rounded-lg border border-[#dcdfe4] px-3.5 text-sm font-medium text-[#141b2b] outline-none transition-all focus:border-[#0058be] focus:shadow-[0_0_0_3px_rgba(0,88,190,0.1)]"
-                            placeholder="e.g., Marketing, Engineering, HR"
-                            value={spaceName}
-                            onChange={e => setSpaceName(e.target.value)}
-                            autoFocus
+                {/* ── Body ── */}
+                <div className="flex flex-col gap-5 px-7 pb-6">
+                    {/* Icon & Name */}
+                    <div>
+                        <label className="mb-2 block text-[12px] font-semibold text-[#5f6368]">Icon & name</label>
+                        <div className="flex items-center gap-3">
+                            {/* Avatar preview — click to show color picker */}
+                            <div className="relative">
+                                <button
+                                    type="button"
+                                    className="flex h-[42px] w-[42px] shrink-0 cursor-pointer items-center justify-center rounded-xl border-2 border-[#e8eaed] text-[17px] font-bold text-white transition-all hover:shadow-md"
+                                    style={{ backgroundColor: selectedColor, borderColor: selectedColor }}
+                                    onClick={() => setShowColorPicker(!showColorPicker)}
+                                >
+                                    {initial}
+                                </button>
+
+                                {/* Color palette dropdown */}
+                                {showColorPicker && (
+                                    <div className="absolute top-full left-0 z-10 mt-2 flex w-[200px] flex-wrap gap-2 rounded-xl bg-white p-3 shadow-[0_8px_32px_rgba(0,0,0,0.14)] border border-[#e8eaed]">
+                                        {COLORS.map((c) => (
+                                            <button
+                                                key={c}
+                                                type="button"
+                                                className={`h-7 w-7 cursor-pointer rounded-full border-2 transition-all hover:scale-110 ${selectedColor === c
+                                                        ? 'scale-110 border-white shadow-[0_0_0_2px_#1a73e8]'
+                                                        : 'border-transparent'
+                                                    }`}
+                                                style={{ backgroundColor: c }}
+                                                onClick={() => {
+                                                    setSelectedColor(c);
+                                                    setShowColorPicker(false);
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            <input
+                                ref={inputRef}
+                                type="text"
+                                className="min-w-0 flex-1 h-[42px] rounded-lg border border-[#dadce0] px-3.5 text-[14px] font-medium text-[#202124] outline-none transition-all placeholder:text-[#9aa0a6] focus:border-[#1a73e8] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.08)]"
+                                placeholder="e.g. Marketing, Engineering, HR"
+                                value={spaceName}
+                                onChange={(e) => setSpaceName(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                        <label className="mb-2 block text-[12px] font-semibold text-[#5f6368]">
+                            Description <span className="font-normal text-[#9aa0a6]">(optional)</span>
+                        </label>
+                        <textarea
+                            className="w-full min-h-[60px] resize-none rounded-lg border border-[#dadce0] px-3.5 py-2.5 text-[13.5px] font-medium text-[#202124] outline-none transition-all placeholder:text-[#9aa0a6] focus:border-[#1a73e8] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.08)]"
+                            placeholder="What's this space about?"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
                         />
                     </div>
 
-                    {/* Avatar & Color */}
-                    <div className="flex flex-col gap-2">
-                        <label className="text-xs font-bold uppercase tracking-[0.04em] text-[#5f6368]">Space Avatar & Color</label>
-                        <div className="flex items-center gap-4">
-                            <div
-                                className="flex h-12 w-12 items-center justify-center rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
-                                style={{ backgroundColor: selectedColor }}
-                            >
-                                <Grid3X3 size={20} color="#fff" />
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                                {COLORS.map(c => (
-                                    <div
-                                        key={c}
-                                        className={`h-6 w-6 cursor-pointer rounded-full border-2 transition-all hover:scale-110 ${selectedColor === c
-                                            ? 'scale-110 border-white shadow-[0_0_0_2px_#0058be]'
-                                            : 'border-transparent'
-                                            }`}
-                                        style={{ backgroundColor: c }}
-                                        onClick={() => setSelectedColor(c)}
-                                    />
-                                ))}
-                            </div>
+                    {/* Make Private toggle */}
+                    <div className="flex items-center justify-between rounded-xl bg-[#f8f9fa] px-4 py-3.5">
+                        <div>
+                            <div className="text-[13.5px] font-semibold text-[#202124]">Make Private</div>
+                            <div className="text-[12px] text-[#5f6368] mt-0.5">Only you and invited members have access</div>
                         </div>
-                    </div>
-
-                    {/* Privacy */}
-                    <div className="flex flex-col gap-2">
-                        <label className="text-xs font-bold uppercase tracking-[0.04em] text-[#5f6368]">Privacy</label>
-                        <div className="flex gap-3">
-                            <div
-                                className={`flex flex-1 cursor-pointer items-start gap-2.5 rounded-lg border p-3 transition-all ${privacy === 'public'
-                                    ? 'border-[#0058be] bg-[#f0f4ff]'
-                                    : 'border-[#eef0f5] bg-white hover:border-[#c2c9e0]'
-                                    }`}
-                                onClick={() => setPrivacy('public')}
-                            >
-                                <Users size={20} className={privacy === 'public' ? 'mt-0.5 text-[#0058be]' : 'mt-0.5 text-[#5f6368]'} />
-                                <div>
-                                    <h4 className="m-0 mb-0.5 text-[13px] font-bold text-[#141b2b]">Workspace</h4>
-                                    <p className="m-0 text-[11px] text-[#6b7280]">Anyone in this Workspace</p>
-                                </div>
-                            </div>
-                            <div
-                                className={`flex flex-1 cursor-pointer items-start gap-2.5 rounded-lg border p-3 transition-all ${privacy === 'private'
-                                    ? 'border-[#0058be] bg-[#f0f4ff]'
-                                    : 'border-[#eef0f5] bg-white hover:border-[#c2c9e0]'
-                                    }`}
-                                onClick={() => setPrivacy('private')}
-                            >
-                                <Lock size={20} className={privacy === 'private' ? 'mt-0.5 text-[#0058be]' : 'mt-0.5 text-[#5f6368]'} />
-                                <div>
-                                    <h4 className="m-0 mb-0.5 text-[13px] font-bold text-[#141b2b]">Private</h4>
-                                    <p className="m-0 text-[11px] text-[#6b7280]">Only invited people</p>
-                                </div>
-                            </div>
-                        </div>
+                        <button
+                            type="button"
+                            className={`relative h-[22px] w-[40px] cursor-pointer rounded-full border-none transition-colors duration-200 ${isPrivate ? 'bg-[#1a73e8]' : 'bg-[#dadce0]'}`}
+                            onClick={() => setIsPrivate(!isPrivate)}
+                        >
+                            <span
+                                className={`absolute top-[2px] h-[18px] w-[18px] rounded-full bg-white shadow-sm transition-transform duration-200 ${isPrivate ? 'left-[20px]' : 'left-[2px]'}`}
+                            />
+                        </button>
                     </div>
                 </div>
 
-                {/* Footer */}
-                <div className="flex justify-end gap-3 rounded-b-xl border-t border-[#eef0f5] bg-[#f8fafc] px-6 py-4">
+                {/* ── Footer ── */}
+                <div className="flex items-center justify-between border-t border-[#e8eaed] bg-[#f8f9fa] px-7 py-4">
                     <button
-                        className="cursor-pointer rounded-md border-none bg-transparent px-4 text-[13px] font-semibold text-[#5f6368] hover:bg-[#eef0f5] hover:text-[#141b2b]"
+                        type="button"
+                        className="cursor-pointer rounded-lg border-none bg-transparent px-1 py-1.5 text-[13px] font-medium text-[#5f6368] hover:text-[#202124] transition-colors"
                         onClick={onClose}
                     >
                         Cancel
                     </button>
-                    <Button
-                        type="primary"
-                        className="h-9 rounded-md border-none bg-[#0058be] text-[13px] font-bold tracking-[0.02em] hover:bg-[#004aa0]!"
+                    <button
+                        type="button"
+                        className="h-[38px] cursor-pointer rounded-lg border-none bg-[#1a73e8] px-6 text-[13.5px] font-bold text-white transition-all hover:bg-[#1557b0] hover:shadow-md disabled:cursor-default disabled:opacity-40"
                         onClick={handleCreate}
                         disabled={!spaceName.trim()}
                     >
-                        Create Space
-                    </Button>
+                        Continue
+                    </button>
                 </div>
             </div>
         </div>

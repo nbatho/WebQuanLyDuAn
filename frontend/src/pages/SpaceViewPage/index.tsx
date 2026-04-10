@@ -137,7 +137,7 @@ export default function SpaceViewPage() {
         [spaceId],
     );
 
-    const [activeView, setActiveView] = useState<ViewType>('list');
+    const [activeView, setActiveView] = useState<ViewType>('overview');
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [showViewPicker, setShowViewPicker] = useState(false);
     const [viewSearch, setViewSearch] = useState('');
@@ -155,6 +155,11 @@ export default function SpaceViewPage() {
         setShowCreateTask(false);
         setShowViewPicker(false);
     }, [spaceId, listParam, folderParam]);
+
+    /* Opening a space (sidebar or navigation) should land on Overview */
+    useEffect(() => {
+        setActiveView('overview');
+    }, [spaceId]);
 
     // Toolbar states
     const [groupBy, setGroupBy] = useState('status');

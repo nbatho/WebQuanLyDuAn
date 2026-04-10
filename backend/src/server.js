@@ -19,6 +19,8 @@ import {
   activityLogRoutes,
   roleRoutes,
   dashboardRoutes,
+  folderRoutes,
+  listRoutes,
 } from "./routes/index.js";
 import { protectedRoute } from "./middlewares/authMiddlewares.js";
 
@@ -110,6 +112,8 @@ app.use("/api/v1/timelogs", timeLogRoutes);
 app.use("/api/v1/activities", activityLogRoutes);
 app.use("/api/v1/roles", roleRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
+app.use("/api/v1/folders", folderRoutes);
+app.use("/api/v1/lists", listRoutes);
 
 //error handling middleware
 app.listen(PORT, HOST, () => {

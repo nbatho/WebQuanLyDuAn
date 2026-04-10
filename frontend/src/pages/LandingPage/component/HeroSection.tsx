@@ -19,8 +19,8 @@ export default function HeroSection() {
                 </div>
 
                 <h1 className="text-5xl md:text-[68px] leading-[1.05] font-extrabold tracking-tight text-[#141b2b] mb-6">
-                    Một không gian duy nhất.<br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7c5cfc] via-[#e84393] to-[#ffaa4c]">Cho mọi dự án của bạn.</span>
+                    <span className="whitespace-nowrap">Một không gian duy nhất.</span>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7c5cfc] via-[#e84393] to-[#ffaa4c]"> Cho mọi dự án của bạn.</span>
                 </h1>
 
                 <p className="text-[#424754] text-lg md:text-xl leading-relaxed mb-10 max-w-2xl mx-auto font-medium">

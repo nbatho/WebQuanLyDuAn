@@ -1,0 +1,37 @@
+import con from "../config/connect.js";
+
+export const findListsByFolderId = async (folder_id) => {
+  const query = `SELECT * FROM lists WHERE folder_id = $1 AND deleted_at IS NULL ORDER BY position, created_at`;
+  const result = await con.query(query, [folder_id]);
+  return result.rows;
+};
+
+export const findListsBySpaceId = async (space_id) => {
+  const query = `SELECT * FROM lists WHERE space_id = $1 AND deleted_at IS NULL ORDER BY position, created_at`;
+  const result = await con.query(query, [space_id]);
+  return result.rows;
+};
+
+export const findListById = async (list_id) => {
+  const query = `SELECT * FROM lists WHERE list_id = $1 AND deleted_at IS NULL`;
+  const result = await con.query(query, [list_id]);
+  return result.rows[0];
+};
+
+export const createList = async (space_id, folder_id, name, created_by) => {
+  const query = `INSERT INTO lists (space_id, folder_id, name, created_by) VALUES ($1, $2, $3, $4) RETURNING *`;
+  const result = await con.query(query, [space_id, folder_id || null, name, created_by]);
+  return result.rows[0];
+};
+
+export const updateList = async (list_id, name) => {
+  const query = `UPDATE lists SET name = $1, updated_at = CURRENT_TIMESTAMP WHERE list_id = $2 AND deleted_at IS NULL RETURNING *`;
+  const result = await con.query(query, [name, list_id]);
+  return result.rows[0];
+};
+
+export const deleteList = async (list_id) => {
+  const query = `UPDATE lists SET deleted_at = CURRENT_TIMESTAMP WHERE list_id = $1 RETURNING *`;
+  const result = await con.query(query, [list_id]);
+  return result.rows[0];
+};

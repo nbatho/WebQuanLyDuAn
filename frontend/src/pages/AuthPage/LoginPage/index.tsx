@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Button, Input, Checkbox } from 'antd';
+import { Button, Input, Checkbox, message } from 'antd';
 import { ArrowRight, Mail, Lock, User, CheckCircle, Users, BarChart3, Blocks, GitBranch, Code } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import './auth.css';
 import { useDispatch } from 'react-redux';
 import type { AppDispatch } from '@/store/configureStore';
 import { fetchSignIn, fetchSignUp } from '@/store/modules/auth';
+import { getWorkspaces } from '@/api/workspaces';
 export default function AuthPage() {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
@@ -23,25 +24,49 @@ export default function AuthPage() {
     const [regConfirmPass, setRegConfirmPass] = useState('');
     const [agreed, setAgreed] = useState(false);
 
-    const handleLogin = (e: React.FormEvent) => {
-        e.preventDefault();
-        try {
-            dispatch(fetchSignIn({ email: loginEmail, password: loginPass }));
-            navigate('/home');
-        } catch (error) {
-            console.error('Login failed:', error);
-        }
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
+    const [isRegistering, setIsRegistering] = useState(false);
 
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (isLoggingIn) return;
+        setIsLoggingIn(true);
+        try {
+            await dispatch(fetchSignIn({ email: loginEmail, password: loginPass })).unwrap();
+            // Check if user has workspaces
+            const workspaces = await getWorkspaces();
+            if (Array.isArray(workspaces) && workspaces.length > 0) {
+                navigate('/home');
+            } else {
+                navigate('/workspace-setup');
+            }
+        } catch (error: any) {
+            console.error('Login failed:', error);
+            message.error(typeof error === 'string' ? error : 'Đăng nhập thất bại. Kiểm tra lại email và mật khẩu.');
+        } finally {
+            setIsLoggingIn(false);
+        }
     };
 
-    const handleRegister = (e: React.FormEvent) => {
+    const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Register:', { regName, regEmail, regPass, regConfirmPass, agreed });
+        if (isRegistering) return;
+        if (regPass !== regConfirmPass) {
+            message.error('Mật khẩu xác nhận không khớp!');
+            return;
+        }
+        setIsRegistering(true);
         try {
-            dispatch(fetchSignUp({ email: regEmail, password: regPass, username: regName, name: regName }));
-            navigate('/login');
-        } catch (error) {
+            await dispatch(fetchSignUp({ email: regEmail, password: regPass, username: regName, name: regName })).unwrap();
+            message.success('Đăng ký thành công! Đang đăng nhập...');
+            // Auto-login after register
+            await dispatch(fetchSignIn({ email: regEmail, password: regPass })).unwrap();
+            navigate('/workspace-setup');
+        } catch (error: any) {
             console.error('Registration failed:', error);
+            message.error(typeof error === 'string' ? error : 'Đăng ký thất bại. Vui lòng thử lại.');
+        } finally {
+            setIsRegistering(false);
         }
     };
 

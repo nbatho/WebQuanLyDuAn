@@ -115,6 +115,29 @@ CREATE TABLE space_members (
     PRIMARY KEY (space_id, user_id)
 );
 
+CREATE TABLE folders (
+    folder_id    SERIAL       PRIMARY KEY,
+    space_id     INT          NOT NULL REFERENCES spaces(space_id) ON DELETE CASCADE,
+    name         VARCHAR(255) NOT NULL,
+    position     INT          NOT NULL DEFAULT 0,
+    created_by   INT          REFERENCES users(user_id) ON DELETE SET NULL,
+    created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at   TIMESTAMP    DEFAULT NULL
+);
+
+CREATE TABLE lists (
+    list_id      SERIAL       PRIMARY KEY,
+    folder_id    INT          REFERENCES folders(folder_id) ON DELETE CASCADE,
+    space_id     INT          NOT NULL REFERENCES spaces(space_id) ON DELETE CASCADE,
+    name         VARCHAR(255) NOT NULL,
+    position     INT          NOT NULL DEFAULT 0,
+    created_by   INT          REFERENCES users(user_id) ON DELETE SET NULL,
+    created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at   TIMESTAMP    DEFAULT NULL
+);
+
 -- ================================================================
 -- 4. SPACE ATTRIBUTES
 -- ================================================================
@@ -296,6 +319,10 @@ CREATE INDEX idx_tasks_position      ON tasks(space_id, status_id, position) WHE
 
 CREATE INDEX idx_comments_task_id    ON comments(task_id) WHERE deleted_at IS NULL;
 CREATE INDEX idx_notifications_user  ON notifications(user_id, is_read) WHERE deleted_at IS NULL;
+
+CREATE INDEX idx_folders_space_id ON folders(space_id) WHERE deleted_at IS NULL;
+CREATE INDEX idx_lists_folder_id  ON lists(folder_id)  WHERE deleted_at IS NULL;
+CREATE INDEX idx_lists_space_id   ON lists(space_id)   WHERE deleted_at IS NULL;
 
 CREATE INDEX idx_spaces_workspace_id ON spaces(workspace_id) WHERE deleted_at IS NULL;
 

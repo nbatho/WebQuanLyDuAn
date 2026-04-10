@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Input, Select } from 'antd';
+import { Button, Input, Select, message } from 'antd';
 import { ArrowLeft, ArrowRight, Camera } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+import type { AppDispatch } from '@/store/configureStore';
+import { addWorkspace } from '@/store/modules/workspaces';
 
 const orgSizeOptions = [
     { value: '1-10', label: '1–10 employees' },
@@ -24,10 +27,12 @@ const industryOptions = [
 
 export default function WorkspaceSetupPage() {
     const navigate = useNavigate();
-    const [name, setName] = useState('Acme Corp');
-    const [slug, setSlug] = useState('acme-hq');
+    const dispatch = useDispatch<AppDispatch>();
+    const [name, setName] = useState('');
+    const [slug, setSlug] = useState('');
     const [orgSize, setOrgSize] = useState('1-10');
     const [industry, setIndustry] = useState('technology');
+    const [isCreating, setIsCreating] = useState(false);
 
     /* auto-generate slug from name */
     const handleNameChange = (val: string) => {
@@ -41,9 +46,29 @@ export default function WorkspaceSetupPage() {
         setSlug(autoSlug);
     };
 
-    const handleNext = () => {
-        console.log('Create workspace:', { name, slug, orgSize, industry });
-        navigate('/workspace-branding');
+    const handleNext = async () => {
+        if (!name.trim()) {
+            message.warning('Vui lòng nhập tên workspace');
+            return;
+        }
+        if (isCreating) return;
+        setIsCreating(true);
+        try {
+            await dispatch(
+                addWorkspace({
+                    name: name.trim(),
+                    slug: slug || name.trim().toLowerCase().replace(/\s+/g, '-'),
+                    description: `${orgSize} | ${industry}`,
+                }),
+            ).unwrap();
+            message.success('Workspace đã được tạo thành công!');
+            navigate('/home');
+        } catch (error: any) {
+            console.error('Failed to create workspace:', error);
+            message.error(typeof error === 'string' ? error : 'Không thể tạo workspace. Vui lòng thử lại.');
+        } finally {
+            setIsCreating(false);
+        }
     };
 
     /* first letter for the preview avatar */
@@ -136,7 +161,7 @@ export default function WorkspaceSetupPage() {
                         <button
                             type="button"
                             className="flex cursor-pointer items-center gap-1.5 border-none bg-transparent px-1 py-2 text-[15px] font-bold text-[#5f6368] transition-colors hover:text-[#141b2b]"
-                            onClick={() => navigate('/google-login')}
+                            onClick={() => navigate('/login')}
                         >
                             <ArrowLeft size={16} />
                             <span>Back</span>
@@ -145,6 +170,7 @@ export default function WorkspaceSetupPage() {
                             type="primary"
                             size="large"
                             onClick={handleNext}
+                            loading={isCreating}
                             className="!flex !h-12 !min-w-[140px] !items-center !justify-center !gap-2 !rounded-xl !text-[16px] !font-extrabold"
                         >
                             <span>Next</span>

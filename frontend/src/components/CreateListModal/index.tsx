@@ -38,7 +38,7 @@ export default function CreateListModal({ isOpen, onClose, onCreate, folderName 
                 </div>
 
                 <p className="m-0 px-5 pb-0 pt-3 text-[13px] text-[#5f6368]">
-                    Add a List to <strong>{folderName}</strong>
+                    Add a List to <strong>{folderName || 'this Space'}</strong>
                 </p>
 
                 <div className="px-5 py-4">
