@@ -1,5 +1,4 @@
-import type { SpaceItem } from '../types';
-
+import type { SpaceItem } from '@/types/spaces';
 /** Tên list (ưu tiên) hoặc folder để hiển thị sau tên space trong breadcrumb. */
 export function resolveSpaceBreadcrumbSegment(
     spaces: SpaceItem[],

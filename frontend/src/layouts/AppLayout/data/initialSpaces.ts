@@ -1,4 +1,4 @@
-import type { SpaceItem } from '../types';
+import type { SpaceItem } from '@/types/spaces';
 
 export const initialSpaces: SpaceItem[] = [
     {

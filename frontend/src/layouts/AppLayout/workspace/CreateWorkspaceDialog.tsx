@@ -13,12 +13,12 @@ import {
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/Input';
 import { Label } from '../../../components/ui/label';
-import { workspaceSlugFromName } from './slugFromName';
 
 type Props = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
 };
+
 
 export default function CreateWorkspaceDialog({ open, onOpenChange }: Props) {
     const dispatch = useDispatch<AppDispatch>();
@@ -29,6 +29,14 @@ export default function CreateWorkspaceDialog({ open, onOpenChange }: Props) {
     const [slugTouched, setSlugTouched] = useState(false);
     const [submitting, setSubmitting] = useState(false);
 
+    const workspaceSlugFromName = (name: string): string => {
+        const base = name
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+        return base.length > 0 ? base : 'workspace';
+    };
     const syncSlug = (n: string) => {
         if (!slugTouched) setSlug(workspaceSlugFromName(n));
     };

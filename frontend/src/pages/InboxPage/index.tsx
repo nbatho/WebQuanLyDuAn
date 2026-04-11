@@ -196,7 +196,7 @@ export default function InboxPage() {
                                             <span className="text-[14px] font-bold text-[#141b2b]">{msg.sender}</span>
                                             <span className="text-[11px] font-semibold text-[#9aa0a6]">{msg.time}</span>
                                         </div>
-                                        <div className="text-[14px] font-medium leading-[1.5] text-[#3a3f47]">
+                                        <div className="text-[14px] font-medium leading-normal text-[#3a3f47]">
                                             {msg.content}
                                         </div>
                                         {msg.attachment && (
@@ -231,7 +231,7 @@ export default function InboxPage() {
                             value={messageInput}
                             onChange={(e) => setMessageInput(e.target.value)}
                             placeholder="Message #launchpad..."
-                            className="w-full resize-none bg-transparent px-4 py-3 text-[14px] font-medium text-[#141b2b] outline-none min-h-[60px]"
+                            className="w-full resize-none bg-transparent px-4 py-3 text-[14px] font-medium text-[#141b2b] outline-none min-h-15"
                             rows={1}
                         />
                         <div className="flex items-center justify-between rounded-b-xl bg-[#fafbfc] px-2 py-2 border-t border-[#eef0f5]">

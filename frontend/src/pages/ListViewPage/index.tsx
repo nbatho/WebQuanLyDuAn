@@ -376,7 +376,7 @@ export default function ListViewPage() {
                     </button>
                     <button
                         type="button"
-                        className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-[#1e1f21] px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-[#000]"
+                        className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-[#1e1f21] px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-black"
                     >
                         <Plus size={14} /> Add Task <ChevronDown size={12} />
                     </button>
@@ -504,7 +504,7 @@ export default function ListViewPage() {
                                                             <button title="Tags" className="p-1 hover:bg-[#f0f2f5] hover:text-[#5f6368] rounded transition-colors"><Tag size={14} /></button>
                                                             
                                                             <button 
-                                                                className="ml-2 flex items-center gap-1.5 rounded bg-[#1e1f21] px-3 py-1.5 text-[11.5px] font-bold text-white hover:bg-[#000] transition-all shadow-sm group/btn"
+                                                                className="ml-2 flex items-center gap-1.5 rounded bg-[#1e1f21] px-3 py-1.5 text-[11.5px] font-bold text-white hover:bg-black transition-all shadow-sm group/btn"
                                                                 onClick={() => handleInlineAdd(status)}
                                                             >
                                                                 Save <CornerDownLeft size={11} strokeWidth={2.5} className="opacity-70 group-hover/btn:opacity-100" />

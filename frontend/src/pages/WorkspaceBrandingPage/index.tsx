@@ -53,16 +53,16 @@ export default function WorkspaceBrandingPage() {
     return (
         <div className="flex h-screen flex-col overflow-hidden bg-white">
             {/* ── Top Nav ── */}
-            <nav className="flex h-[52px] shrink-0 items-center justify-between border-b border-[#eef0f5] px-7">
+            <nav className="flex h-13 shrink-0 items-center justify-between border-b border-[#eef0f5] px-7">
                 <span className="text-[20px] font-black tracking-[-0.04em] text-[#141b2b]">Flowise</span>
                 <div className="flex items-center gap-2">
-                    <button type="button" className="flex h-[34px] w-[34px] cursor-pointer items-center justify-center rounded-full border-none bg-[#e8edf5] text-[#5f6368] transition-colors hover:bg-[#d4dbe8]">
+                    <button type="button" className="flex h-8.5 w-8.5 cursor-pointer items-center justify-center rounded-full border-none bg-[#e8edf5] text-[#5f6368] transition-colors hover:bg-[#d4dbe8]">
                         <HelpCircle size={18} />
                     </button>
-                    <button type="button" className="flex h-[34px] w-[34px] cursor-pointer items-center justify-center rounded-full border-none bg-[#e8edf5] text-[#5f6368] transition-colors hover:bg-[#d4dbe8]">
+                    <button type="button" className="flex h-8.5 w-8.5 cursor-pointer items-center justify-center rounded-full border-none bg-[#e8edf5] text-[#5f6368] transition-colors hover:bg-[#d4dbe8]">
                         <Settings size={18} />
                     </button>
-                    <div className="h-[34px] w-[34px] cursor-pointer overflow-hidden rounded-full">
+                    <div className="h-8.5 w-8.5 cursor-pointer overflow-hidden rounded-full">
                         <img
                             src="https://ui-avatars.com/api/?name=A+R&background=1a1a2e&color=fff&size=32&bold=true"
                             alt="User"
@@ -75,11 +75,11 @@ export default function WorkspaceBrandingPage() {
             <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
                 {/* ═══════ LEFT — Form ═══════ */}
                 <section className="flex flex-1 items-center justify-center overflow-y-auto px-5 py-6 lg:px-12">
-                    <div className="w-full max-w-[420px]">
+                    <div className="w-full max-w-105">
                         <h1 className="mb-2 text-[32px] leading-[1.12] font-black tracking-[-0.03em] text-[#141b2b]">
                             Brand your<br />Workspace
                         </h1>
-                        <p className="mb-6 text-[14px] leading-[1.5] font-medium text-[#6b7280]">
+                        <p className="mb-6 text-[14px] leading-normal font-medium text-[#6b7280]">
                             Choose a primary color and upload your logo to
                             make this space your own.
                         </p>
@@ -106,7 +106,7 @@ export default function WorkspaceBrandingPage() {
                         <div className="mb-5">
                             <label className="mb-2.5 block text-[11px] font-extrabold tracking-[0.08em] text-[#141b2b] uppercase">WORKSPACE LOGO</label>
                             <div
-                                className={`relative flex min-h-[160px] flex-col items-center justify-center rounded-[14px] border-2 border-dashed p-6 transition-all ${isDragging
+                                className={`relative flex min-h-40 flex-col items-center justify-center rounded-[14px] border-2 border-dashed p-6 transition-all ${isDragging
                                         ? 'border-[#0058be] bg-[#eef2ff]'
                                         : 'border-[#c2c9e0] bg-[#fafbff]'
                                     }`}
@@ -158,7 +158,7 @@ export default function WorkspaceBrandingPage() {
                                 type="primary"
                                 size="large"
                                 onClick={handleNext}
-                                className="!flex !h-11 !min-w-[120px] !items-center !justify-center !gap-1.5 !rounded-[10px] !border-none !text-[15px] !font-extrabold hover:!brightness-110"
+                                className="!flex !h-11 !min-w-30 !items-center !justify-center !gap-1.5 !rounded-[10px] !border-none !text-[15px] !font-extrabold hover:!brightness-110"
                                 style={{ backgroundColor: selectedColor }}
                             >
                                 <span>Next</span>
@@ -173,11 +173,11 @@ export default function WorkspaceBrandingPage() {
                     <div className="overflow-hidden rounded-[14px] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_28px_rgba(0,88,190,0.07)]">
                         {/* Sidebar Mock */}
                         <div className="flex">
-                            <div className="flex min-h-[340px] w-[200px] flex-col gap-1.5 border-r border-[#f0f2f5] px-3 py-4">
+                            <div className="flex min-h-85 w-50 flex-col gap-1.5 border-r border-[#f0f2f5] px-3 py-4">
                                 {/* Header */}
                                 <div className="flex items-center gap-2.5 border-b border-[#f0f2f5] pb-3">
                                     <div
-                                        className="flex h-[34px] w-[34px] shrink-0 items-center justify-center overflow-hidden rounded-lg text-[16px] font-extrabold text-white transition-colors duration-300"
+                                        className="flex h-8.5 w-8.5 shrink-0 items-center justify-center overflow-hidden rounded-lg text-[16px] font-extrabold text-white transition-colors duration-300"
                                         style={{ backgroundColor: selectedColor }}
                                     >
                                         {logoPreview ? (
@@ -225,7 +225,7 @@ export default function WorkspaceBrandingPage() {
                                     <img
                                         src="https://ui-avatars.com/api/?name=Alex+Rivera&background=4285F4&color=fff&size=32&bold=true"
                                         alt=""
-                                        className="h-[30px] w-[30px] rounded-full object-cover"
+                                        className="h-7.5 w-7.5 rounded-full object-cover"
                                     />
                                     <div className="flex flex-col">
                                         <span className="text-[12px] font-bold text-[#141b2b]">Alex Rivera</span>
@@ -235,14 +235,14 @@ export default function WorkspaceBrandingPage() {
                             </div>
 
                             {/* Content Mock */}
-                            <div className="flex w-[180px] flex-col gap-3 bg-[#f9faff] p-4">
+                            <div className="flex w-45 flex-col gap-3 bg-[#f9faff] p-4">
                                 <div className="h-2.5 w-3/5 rounded-[5px] bg-[#e2e6f0]" />
                                 <div className="flex gap-2">
-                                    <div className="h-[100px] flex-1 rounded-lg bg-[#e8edf5]" />
+                                    <div className="h-25 flex-1 rounded-lg bg-[#e8edf5]" />
                                 </div>
                                 <div className="flex gap-2">
-                                    <div className="h-[70px] flex-1 rounded-lg bg-[#e8edf5]" />
-                                    <div className="h-[70px] flex-1 rounded-lg bg-[#e8edf5]" />
+                                    <div className="h-17.5 flex-1 rounded-lg bg-[#e8edf5]" />
+                                    <div className="h-17.5 flex-1 rounded-lg bg-[#e8edf5]" />
                                 </div>
                             </div>
                         </div>
@@ -250,10 +250,10 @@ export default function WorkspaceBrandingPage() {
 
                     {/* Caption */}
                     <div
-                        className="max-w-[380px] rounded-[10px] border px-5 py-3 text-center"
+                        className="max-w-95 rounded-[10px] border px-5 py-3 text-center"
                         style={{ borderColor: selectedColor + '30', backgroundColor: selectedColor + '08' }}
                     >
-                        <p className="text-[13px] leading-[1.5] font-semibold text-[#5f6368]">
+                        <p className="text-[13px] leading-normal font-semibold text-[#5f6368]">
                             This color and logo will be applied to the entire application interface.
                         </p>
                     </div>

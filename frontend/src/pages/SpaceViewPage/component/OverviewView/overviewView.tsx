@@ -40,7 +40,7 @@ export default function OverviewView() {
                                 <button className="cursor-pointer rounded p-1 text-[#9aa0a6] hover:bg-[#eef0f5] hover:text-[#5f6368] transition-colors"><MoreHorizontal size={13} /></button>
                             </div>
                         </div>
-                        <div className="flex min-h-[220px] flex-col items-center justify-center px-6 py-8 text-center bg-white">
+                        <div className="flex min-h-55 flex-col items-center justify-center px-6 py-8 text-center bg-white">
                             <div className="mb-4 text-5xl drop-shadow-sm">{w.emptyEmoji}</div>
                             <p className="mb-5 text-[13px] font-medium leading-relaxed text-[#5f6368]">{w.desc}</p>
                             <button className="cursor-pointer rounded-lg border border-[#eef0f5] bg-white px-5 py-2 text-[13px] font-bold text-[#141b2b] shadow-sm hover:bg-[#f8fafb] hover:border-[#dcdfe4] transition-all">

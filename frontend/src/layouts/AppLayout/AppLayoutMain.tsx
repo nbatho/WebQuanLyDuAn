@@ -1,21 +1,26 @@
 import { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import AppSidebar from './AppSidebar';
+import AppSidebar from './sidebar/AppSidebar';
 import { SpaceTreeProvider } from './SpaceTreeContext';
-import { useBootstrapWorkspaces } from './workspace/useBootstrapWorkspaces';
 import { useSpaceTreeState } from './useSpaceTreeState';
 import type { AppDispatch, RootState } from '../../store/configureStore';
 import { fetchSpacesForWorkspace } from '@/store/modules/spaces';
 import ModalsContainer from './ModalsContainer';
+import { fetchWorkspaces } from '@/store/modules/workspaces';
 
 export default function AppLayoutMain() {
-    useBootstrapWorkspaces();
     const dispatch = useDispatch<AppDispatch>();
     const tree = useSpaceTreeState();
-    
     const currentWorkspaceId = useSelector((s: RootState) => s.workspaces.currentWorkspaceId);
-    
+    const access_token = useSelector((s: RootState) => s.auth.access_token);
+
+    useEffect(() => {
+        if (access_token) {
+            void dispatch(fetchWorkspaces());
+        }
+    }, [access_token, dispatch]);
+
     useEffect(() => {
         if (currentWorkspaceId != null) {
             dispatch(fetchSpacesForWorkspace(currentWorkspaceId));

@@ -78,7 +78,7 @@ export default function WorkspaceSetupPage() {
         <div className="flex min-h-screen flex-col bg-[#f5f7ff] lg:flex-row">
             {/* ═══════ LEFT — Form ═══════ */}
             <section className="flex flex-1 items-center justify-center bg-white px-6 py-8 lg:px-14 lg:py-12">
-                <div className="w-full max-w-[460px]">
+                <div className="w-full max-w-115">
                     <h1 className="mb-2.5 text-[34px] leading-[1.15] font-black tracking-[-0.03em] text-[#141b2b]">
                         What's the name of<br />your workspace?
                     </h1>
@@ -90,7 +90,7 @@ export default function WorkspaceSetupPage() {
                     <div className="mb-7 flex items-center gap-4">
                         <button
                             type="button"
-                            className="flex h-[72px] w-[72px] cursor-pointer items-center justify-center rounded-[14px] border-2 border-dashed border-[#c2c9e0] bg-[#f0f4ff] transition-colors hover:border-[#0058be] hover:bg-[#e8edff]"
+                            className="flex h-18 w-18 cursor-pointer items-center justify-center rounded-[14px] border-2 border-dashed border-[#c2c9e0] bg-[#f0f4ff] transition-colors hover:border-[#0058be] hover:bg-[#e8edff]"
                         >
                             <Camera size={24} className="text-[#8b95b0]" />
                         </button>
@@ -108,7 +108,7 @@ export default function WorkspaceSetupPage() {
                             value={name}
                             onChange={(e) => handleNameChange(e.target.value)}
                             placeholder="Acme Corp"
-                            className="!h-[46px] !rounded-[10px] !border-2 !border-[#e2e6f0] !text-[15px] !font-medium !text-[#141b2b] hover:!border-[#0058be] focus:!border-[#0058be]"
+                            className="!h-11.5 !rounded-[10px] !border-2 !border-[#e2e6f0] !text-[15px] !font-medium !text-[#141b2b] hover:!border-[#0058be] focus:!border-[#0058be]"
                         />
                     </div>
 
@@ -122,7 +122,7 @@ export default function WorkspaceSetupPage() {
                                 value={slug}
                                 onChange={(e) => setSlug(e.target.value)}
                                 placeholder="acme-hq"
-                                className="!h-[46px] !rounded-none !border-none !text-[15px] !font-medium !text-[#141b2b] hover:!border-none focus:!border-none"
+                                className="!h-11.5 !rounded-none !border-none !text-[15px] !font-medium !text-[#141b2b] hover:!border-none focus:!border-none"
                             />
                         </div>
                     </div>
@@ -136,7 +136,7 @@ export default function WorkspaceSetupPage() {
                                 value={orgSize}
                                 onChange={setOrgSize}
                                 options={orgSizeOptions}
-                                className="w-full [&_.ant-select-selector]:!h-[46px] [&_.ant-select-selector]:!rounded-[10px] [&_.ant-select-selector]:!border-2 [&_.ant-select-selector]:!border-[#e2e6f0] [&_.ant-select-selector]:!px-3 [&_.ant-select-selector]:!text-[14px] [&_.ant-select-selector]:!font-semibold hover:[&_.ant-select-selector]:!border-[#0058be] [&.ant-select-focused_.ant-select-selector]:!border-[#0058be]"
+                                className="w-full [&_.ant-select-selector]:!h-11.5 [&_.ant-select-selector]:!rounded-[10px] [&_.ant-select-selector]:!border-2 [&_.ant-select-selector]:!border-[#e2e6f0] [&_.ant-select-selector]:!px-3 [&_.ant-select-selector]:!text-[14px] [&_.ant-select-selector]:!font-semibold hover:[&_.ant-select-selector]:!border-[#0058be] [&.ant-select-focused_.ant-select-selector]:!border-[#0058be]"
                                 popupMatchSelectWidth
                             />
                         </div>
@@ -147,7 +147,7 @@ export default function WorkspaceSetupPage() {
                                 value={industry}
                                 onChange={setIndustry}
                                 options={industryOptions}
-                                className="w-full [&_.ant-select-selector]:!h-[46px] [&_.ant-select-selector]:!rounded-[10px] [&_.ant-select-selector]:!border-2 [&_.ant-select-selector]:!border-[#e2e6f0] [&_.ant-select-selector]:!px-3 [&_.ant-select-selector]:!text-[14px] [&_.ant-select-selector]:!font-semibold hover:[&_.ant-select-selector]:!border-[#0058be] [&.ant-select-focused_.ant-select-selector]:!border-[#0058be]"
+                                className="w-full [&_.ant-select-selector]:!h-11.5 [&_.ant-select-selector]:!rounded-[10px] [&_.ant-select-selector]:!border-2 [&_.ant-select-selector]:!border-[#e2e6f0] [&_.ant-select-selector]:!px-3 [&_.ant-select-selector]:!text-[14px] [&_.ant-select-selector]:!font-semibold hover:[&_.ant-select-selector]:!border-[#0058be] [&.ant-select-focused_.ant-select-selector]:!border-[#0058be]"
                                 popupMatchSelectWidth
                             />
                         </div>
@@ -190,10 +190,10 @@ export default function WorkspaceSetupPage() {
                     </div>
 
                     {/* Mock Sidebar */}
-                    <div className="relative z-[2] flex min-h-[360px] w-[200px] flex-col gap-2.5 rounded-l-2xl bg-white px-3 py-4 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_32px_rgba(0,88,190,0.08)]">
+                    <div className="relative z-2 flex min-h-90 w-50 flex-col gap-2.5 rounded-l-2xl bg-white px-3 py-4 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_32px_rgba(0,88,190,0.08)]">
                         {/* Sidebar Header */}
                         <div className="flex items-center gap-2.5 border-b border-[#f0f2f5] px-1 pt-1 pb-3">
-                            <div className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg text-[16px] font-extrabold tracking-[-0.02em] text-white transition-colors duration-300" style={{ backgroundColor: '#0058be' }}>
+                            <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-lg text-[16px] font-extrabold tracking-[-0.02em] text-white transition-colors duration-300" style={{ backgroundColor: '#0058be' }}>
                                 {initial}
                             </div>
                             <div className="flex min-w-0 flex-col">
@@ -216,25 +216,25 @@ export default function WorkspaceSetupPage() {
                         {/* Nav Items */}
                         <div className="flex flex-1 flex-col gap-1">
                             <div className="flex items-center gap-2.5 rounded-lg bg-[#eef2ff] px-2 py-2">
-                                <div className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-md bg-[#0058be]">
+                                <div className="flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-md bg-[#0058be]">
                                     <svg width="14" height="14" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5" fill="#fff" /><rect x="14" y="3" width="7" height="7" rx="1.5" fill="#fff" /><rect x="3" y="14" width="7" height="7" rx="1.5" fill="#fff" /><rect x="14" y="14" width="7" height="7" rx="1.5" fill="#fff" /></svg>
                                 </div>
                                 <div className="h-2 w-[60%] rounded bg-[#0058be]" />
                             </div>
                             <div className="flex items-center gap-2.5 rounded-lg px-2 py-2">
-                                <div className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-md">
+                                <div className="flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-md">
                                     <svg width="12" height="12" viewBox="0 0 24 24"><path d="M3 7h18v2H3zm0 4h18v2H3zm0 4h18v2H3z" fill="#5f6368" /></svg>
                                 </div>
                                 <div className="h-2 w-[40%] rounded bg-[#d2d6e8]" />
                             </div>
                             <div className="flex items-center gap-2.5 rounded-lg px-2 py-2">
-                                <div className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-md">
+                                <div className="flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-md">
                                     <svg width="12" height="12" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="#5f6368" /></svg>
                                 </div>
                                 <div className="h-2 w-[50%] rounded bg-[#d2d6e8]" />
                             </div>
                             <div className="flex items-center gap-2.5 rounded-lg px-2 py-2">
-                                <div className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-md">
+                                <div className="flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-md">
                                     <svg width="12" height="12" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z" fill="#5f6368" /></svg>
                                 </div>
                                 <div className="h-2 w-[35%] rounded bg-[#d2d6e8]" />
@@ -251,7 +251,7 @@ export default function WorkspaceSetupPage() {
                     </div>
 
                     {/* Content area mock (right side of sidebar) */}
-                    <div className="absolute top-2 left-48 flex min-h-[340px] w-[180px] flex-col gap-3.5 rounded-r-2xl bg-[#f9faff] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
+                    <div className="absolute top-2 left-48 flex min-h-85 w-45 flex-col gap-3.5 rounded-r-2xl bg-[#f9faff] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
                         <div className="mb-1">
                             <div className="h-2.5 w-[70%] rounded-[5px] bg-[#e2e6f0]" />
                         </div>
@@ -260,12 +260,12 @@ export default function WorkspaceSetupPage() {
                             <div className="h-20 flex-1 rounded-[10px] bg-white shadow-[0_1px_4px_rgba(0,0,0,0.04)]" />
                         </div>
                         <div className="flex gap-2.5">
-                            <div className="h-[120px] flex-1 rounded-[10px] bg-white shadow-[0_1px_4px_rgba(0,0,0,0.04)]" />
+                            <div className="h-30 flex-1 rounded-[10px] bg-white shadow-[0_1px_4px_rgba(0,0,0,0.04)]" />
                         </div>
                     </div>
 
                     {/* Caption */}
-                    <p className="mt-10 max-w-[340px] text-center text-[13px] leading-[1.5] font-medium italic text-[#6b7280]">
+                    <p className="mt-10 max-w-85 text-center text-[13px] leading-normal font-medium italic text-[#6b7280]">
                         "Changes to your workspace name and logo will update across
                         the entire application interface in real-time."
                     </p>

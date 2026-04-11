@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, type MouseEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import type { SpaceItem } from './types';
+import type { SpaceItem } from '@/types/spaces';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '../../store/configureStore';
 import { fetchSpacesForWorkspace, fetchCreateSpace } from '@/store/modules/spaces';

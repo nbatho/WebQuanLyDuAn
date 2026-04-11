@@ -24,7 +24,7 @@ export default function PriorityPopover({ priority, onSave, onClose }: PriorityP
     };
 
     return (
-        <div className="flex w-[210px] flex-col rounded-xl bg-white p-2">
+        <div className="flex w-52.5 flex-col rounded-xl bg-white p-2">
             <div className="mb-1 px-2 pt-1 text-[11px] font-semibold text-[#9aa0a6]">
                 Priority
             </div>

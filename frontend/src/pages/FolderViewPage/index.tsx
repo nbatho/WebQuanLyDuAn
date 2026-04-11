@@ -322,7 +322,7 @@ export default function FolderViewPage() {
             {listMenu && (
                 <div
                     ref={listMenuRef}
-                    className="fixed z-[9999] w-[220px] rounded-lg border border-[#e2e4e9] bg-white py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)]"
+                    className="fixed z-9999 w-55 rounded-lg border border-[#e2e4e9] bg-white py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)]"
                     style={{
                         top: Math.min(listMenu.y, typeof window !== 'undefined' ? window.innerHeight - 320 : listMenu.y),
                         left: Math.min(listMenu.x, typeof window !== 'undefined' ? window.innerWidth - 230 : listMenu.x),
@@ -331,14 +331,14 @@ export default function FolderViewPage() {
                 >
                     <button
                         type="button"
-                        className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-[6px] text-left text-[13px] text-[#1e1f21] hover:bg-[#f3f4f8]"
+                        className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[#1e1f21] hover:bg-[#f3f4f8]"
                         onClick={() => setListMenu(null)}
                     >
                         <Pencil size={14} className="text-[#6b6f76]" /> <span className="font-medium">Rename</span>
                     </button>
                     <button
                         type="button"
-                        className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-[6px] text-left text-[13px] text-[#1e1f21] hover:bg-[#f3f4f8]"
+                        className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[#1e1f21] hover:bg-[#f3f4f8]"
                         onClick={() => setListMenu(null)}
                     >
                         <Link2 size={14} className="text-[#6b6f76]" /> <span className="font-medium">Copy link</span>
@@ -346,14 +346,14 @@ export default function FolderViewPage() {
                     <div className="my-1 mx-2.5 h-px bg-[#eef0f3]" />
                     <button
                         type="button"
-                        className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-[6px] text-left text-[13px] text-[#1e1f21] hover:bg-[#f3f4f8]"
+                        className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[#1e1f21] hover:bg-[#f3f4f8]"
                         onClick={() => setListMenu(null)}
                     >
                         <Palette size={14} className="text-[#6b6f76]" /> <span className="font-medium">Color & Icon</span>
                     </button>
                     <button
                         type="button"
-                        className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-[6px] text-left text-[13px] text-[#1e1f21] hover:bg-[#f3f4f8]"
+                        className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[#1e1f21] hover:bg-[#f3f4f8]"
                         onClick={() => setListMenu(null)}
                     >
                         <Columns3 size={14} className="text-[#6b6f76]" /> <span className="font-medium">Custom Fields</span>
@@ -361,21 +361,21 @@ export default function FolderViewPage() {
                     <div className="my-1 mx-2.5 h-px bg-[#eef0f3]" />
                     <button
                         type="button"
-                        className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-[6px] text-left text-[13px] text-[#1e1f21] hover:bg-[#f3f4f8]"
+                        className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[#1e1f21] hover:bg-[#f3f4f8]"
                         onClick={() => setListMenu(null)}
                     >
                         <Copy size={14} className="text-[#6b6f76]" /> <span className="font-medium">Duplicate</span>
                     </button>
                     <button
                         type="button"
-                        className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-[6px] text-left text-[13px] text-[#1e1f21] hover:bg-[#f3f4f8]"
+                        className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[#1e1f21] hover:bg-[#f3f4f8]"
                         onClick={() => setListMenu(null)}
                     >
                         <Archive size={14} className="text-[#6b6f76]" /> <span className="font-medium">Archive</span>
                     </button>
                     <button
                         type="button"
-                        className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-[6px] text-left text-[13px] text-[#dc3545] hover:bg-[#fef2f2]"
+                        className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[#dc3545] hover:bg-[#fef2f2]"
                         onClick={async () => {
                             const id = listMenu.listId;
                             await handleDeleteList(spaceId, folder.id, id);

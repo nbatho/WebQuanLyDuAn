@@ -17,7 +17,7 @@ const mockPeople = [
     { id: 'ER', name: 'Emily', initials: 'ER', color: '#e84393' },
 ];
 
-export default function AssigneePopover({ assignees, onSave, onClose }: AssigneePopoverProps) {
+export default function AssigneePopover({ assignees, onSave }: AssigneePopoverProps) {
     const [search, setSearch] = useState('');
 
     const toggleAssignee = (id: string) => {
@@ -26,7 +26,6 @@ export default function AssigneePopover({ assignees, onSave, onClose }: Assignee
         } else {
             onSave([...assignees, id]);
         }
-        // Remove onClose() here so we can select/deselect multiple people without reopening
     };
 
     const filtered = mockPeople.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));

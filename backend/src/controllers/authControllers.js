@@ -12,7 +12,7 @@ import {
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { OAuth2Client } from "google-auth-library";
-const ACCESS_TOKEN_TTL = "45m"; // dev  - production nên để 15m hoặc 30m tùy nhu cầu bảo mật và trải nghiệm người dùng
+const ACCESS_TOKEN_TTL = "15m"; 
 const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000; // 14 ngày
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);

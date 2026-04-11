@@ -38,11 +38,11 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
 
     return (
         <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-[rgba(0,0,0,0.35)] backdrop-blur-[2px]"
+            className="fixed inset-0 z-9999 flex items-center justify-center bg-[rgba(0,0,0,0.35)] backdrop-blur-[2px]"
             onClick={onClose}
         >
             <div
-                className="w-[520px] flex flex-col rounded-2xl bg-white font-['Plus_Jakarta_Sans',sans-serif] shadow-[0_24px_80px_rgba(0,0,0,0.18)] overflow-hidden"
+                className="w-130 flex flex-col rounded-2xl bg-white font-['Plus_Jakarta_Sans',sans-serif] shadow-[0_24px_80px_rgba(0,0,0,0.18)] overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* ── Header ── */}
@@ -56,7 +56,7 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
                     <h2 className="m-0 text-[20px] font-bold text-[#202124] tracking-[-0.01em]">
                         Create a Space
                     </h2>
-                    <p className="m-0 mt-1.5 text-[13.5px] leading-[1.5] text-[#5f6368]">
+                    <p className="m-0 mt-1.5 text-[13.5px] leading-normal text-[#5f6368]">
                         A Space represents teams, departments, or groups, each with its own Lists, workflows, and settings.
                     </p>
                 </div>
@@ -71,7 +71,7 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
                             <div className="relative">
                                 <button
                                     type="button"
-                                    className="flex h-[42px] w-[42px] shrink-0 cursor-pointer items-center justify-center rounded-xl border-2 border-[#e8eaed] text-[17px] font-bold text-white transition-all hover:shadow-md"
+                                    className="flex h-10.5 w-10.5 shrink-0 cursor-pointer items-center justify-center rounded-xl border-2 border-[#e8eaed] text-[17px] font-bold text-white transition-all hover:shadow-md"
                                     style={{ backgroundColor: selectedColor, borderColor: selectedColor }}
                                     onClick={() => setShowColorPicker(!showColorPicker)}
                                 >
@@ -80,7 +80,7 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
 
                                 {/* Color palette dropdown */}
                                 {showColorPicker && (
-                                    <div className="absolute top-full left-0 z-10 mt-2 flex w-[200px] flex-wrap gap-2 rounded-xl bg-white p-3 shadow-[0_8px_32px_rgba(0,0,0,0.14)] border border-[#e8eaed]">
+                                    <div className="absolute top-full left-0 z-10 mt-2 flex w-50 flex-wrap gap-2 rounded-xl bg-white p-3 shadow-[0_8px_32px_rgba(0,0,0,0.14)] border border-[#e8eaed]">
                                         {COLORS.map((c) => (
                                             <button
                                                 key={c}
@@ -103,7 +103,7 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
                             <input
                                 ref={inputRef}
                                 type="text"
-                                className="min-w-0 flex-1 h-[42px] rounded-lg border border-[#dadce0] px-3.5 text-[14px] font-medium text-[#202124] outline-none transition-all placeholder:text-[#9aa0a6] focus:border-[#1a73e8] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.08)]"
+                                className="min-w-0 flex-1 h-10.5 rounded-lg border border-[#dadce0] px-3.5 text-[14px] font-medium text-[#202124] outline-none transition-all placeholder:text-[#9aa0a6] focus:border-[#1a73e8] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.08)]"
                                 placeholder="e.g. Marketing, Engineering, HR"
                                 value={spaceName}
                                 onChange={(e) => setSpaceName(e.target.value)}
@@ -118,7 +118,7 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
                             Description <span className="font-normal text-[#9aa0a6]">(optional)</span>
                         </label>
                         <textarea
-                            className="w-full min-h-[60px] resize-none rounded-lg border border-[#dadce0] px-3.5 py-2.5 text-[13.5px] font-medium text-[#202124] outline-none transition-all placeholder:text-[#9aa0a6] focus:border-[#1a73e8] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.08)]"
+                            className="w-full min-h-15 resize-none rounded-lg border border-[#dadce0] px-3.5 py-2.5 text-[13.5px] font-medium text-[#202124] outline-none transition-all placeholder:text-[#9aa0a6] focus:border-[#1a73e8] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.08)]"
                             placeholder="What's this space about?"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
@@ -133,11 +133,11 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
                         </div>
                         <button
                             type="button"
-                            className={`relative h-[22px] w-[40px] cursor-pointer rounded-full border-none transition-colors duration-200 ${isPrivate ? 'bg-[#1a73e8]' : 'bg-[#dadce0]'}`}
+                            className={`relative h-5.5 w-10 cursor-pointer rounded-full border-none transition-colors duration-200 ${isPrivate ? 'bg-[#1a73e8]' : 'bg-[#dadce0]'}`}
                             onClick={() => setIsPrivate(!isPrivate)}
                         >
                             <span
-                                className={`absolute top-[2px] h-[18px] w-[18px] rounded-full bg-white shadow-sm transition-transform duration-200 ${isPrivate ? 'left-[20px]' : 'left-[2px]'}`}
+                                className={`absolute top-0.5 h-4.5 w-4.5 rounded-full bg-white shadow-sm transition-transform duration-200 ${isPrivate ? 'left-5' : 'left-0.5'}`}
                             />
                         </button>
                     </div>
@@ -154,7 +154,7 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
                     </button>
                     <button
                         type="button"
-                        className="h-[38px] cursor-pointer rounded-lg border-none bg-[#1a73e8] px-6 text-[13.5px] font-bold text-white transition-all hover:bg-[#1557b0] hover:shadow-md disabled:cursor-default disabled:opacity-40"
+                        className="h-9.5 cursor-pointer rounded-lg border-none bg-[#1a73e8] px-6 text-[13.5px] font-bold text-white transition-all hover:bg-[#1557b0] hover:shadow-md disabled:cursor-default disabled:opacity-40"
                         onClick={handleCreate}
                         disabled={!spaceName.trim()}
                     >

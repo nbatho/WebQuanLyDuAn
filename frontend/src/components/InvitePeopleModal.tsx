@@ -51,7 +51,7 @@ export default function InvitePeopleModal({ open, onOpenChange }: InvitePeopleMo
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-[500px] gap-0 rounded-2xl border-0 bg-[#f7f7f8] p-0 [&>button]:hidden">
+            <DialogContent className="max-w-125 gap-0 rounded-2xl border-0 bg-[#f7f7f8] p-0 [&>button]:hidden">
                 <div className="relative px-5 pb-4 pt-5">
                     <button
                         type="button"
@@ -96,13 +96,13 @@ export default function InvitePeopleModal({ open, onOpenChange }: InvitePeopleMo
                         </button>
 
                         <div
-                            className={`absolute left-0 top-[calc(100%+8px)] z-20 w-[340px] origin-top rounded-2xl border border-[#dfdfdf] bg-[#f7f7f8] p-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-180 ease-out ${
+                            className={`absolute left-0 top-[calc(100%+8px)] z-20 w-85 origin-top rounded-2xl border border-[#dfdfdf] bg-[#f7f7f8] p-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-180 ease-out ${
                                 showRolePicker
                                     ? 'translate-y-0 scale-100 opacity-100'
                                     : 'pointer-events-none -translate-y-1 scale-[0.98] opacity-0'
                             }`}
                         >
-                                <div className="max-h-[240px] overflow-y-auto pr-1">
+                                <div className="max-h-60 overflow-y-auto pr-1">
                                     {roleOptions.map((opt) => (
                                         <button
                                             key={opt.id}
