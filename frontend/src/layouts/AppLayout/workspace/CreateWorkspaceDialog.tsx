@@ -64,7 +64,7 @@ export default function CreateWorkspaceDialog({ open, onOpenChange }: Props) {
             open={open}
             onCancel={handleCancel}
             title={
-                <span className="text-lg font-bold text-[var(--color-on-surface)]">
+                <span className="text-lg font-bold text-(--color-on-surface)">
                     Tạo workspace mới
                 </span>
             }
@@ -83,7 +83,7 @@ export default function CreateWorkspaceDialog({ open, onOpenChange }: Props) {
             width={448}
             destroyOnClose
         >
-            <p className="mt-0 mb-4 text-sm text-[var(--color-text-secondary)]">
+            <p className="mt-0 mb-4 text-sm text-(--color-text-secondary)">
                 Workspace nhóm các space và thành viên. Slug dùng trong URL (chữ thường, số,
                 dấu gạch ngang).
             </p>
@@ -92,7 +92,7 @@ export default function CreateWorkspaceDialog({ open, onOpenChange }: Props) {
                 <div className="flex flex-col gap-1.5">
                     <label
                         htmlFor="ws-name"
-                        className="text-xs font-bold uppercase tracking-wide text-[var(--color-text-secondary)]"
+                        className="text-xs font-bold uppercase tracking-wide text-(--color-text-secondary)"
                     >
                         Tên
                     </label>
@@ -109,7 +109,7 @@ export default function CreateWorkspaceDialog({ open, onOpenChange }: Props) {
                 <div className="flex flex-col gap-1.5">
                     <label
                         htmlFor="ws-slug"
-                        className="text-xs font-bold uppercase tracking-wide text-[var(--color-text-secondary)]"
+                        className="text-xs font-bold uppercase tracking-wide text-(--color-text-secondary)"
                     >
                         Slug
                     </label>
@@ -126,7 +126,7 @@ export default function CreateWorkspaceDialog({ open, onOpenChange }: Props) {
                 <div className="flex flex-col gap-1.5">
                     <label
                         htmlFor="ws-desc"
-                        className="text-xs font-bold uppercase tracking-wide text-[var(--color-text-secondary)]"
+                        className="text-xs font-bold uppercase tracking-wide text-(--color-text-secondary)"
                     >
                         Mô tả (tuỳ chọn)
                     </label>
@@ -138,7 +138,7 @@ export default function CreateWorkspaceDialog({ open, onOpenChange }: Props) {
                     />
                 </div>
                 {error ? (
-                    <p className="text-xs font-medium text-[var(--color-error)]">{error}</p>
+                    <p className="text-xs font-medium text-(--color-error)">{error}</p>
                 ) : null}
             </div>
         </Modal>

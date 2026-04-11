@@ -1,9 +1,9 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import {
     getTasksForSpace,
     createTask,
-    updateTask,
-    deleteTask
+    // updateTask,
+    // deleteTask
 } from "@/api/tasks";
 export interface TaskData {
     task_id: number;
@@ -58,6 +58,8 @@ export interface TasksState {
     listTask : TaskWithSpaceData[];
     isLoadingTasks : boolean;
     errorTasks : string | null;
+    isCreatingTask : boolean;
+    errorCreateTask : string | null;
 }
 
 export const fetchTasksForSpace = createAsyncThunk<TaskWithSpaceData[], number>(
@@ -71,11 +73,24 @@ export const fetchTasksForSpace = createAsyncThunk<TaskWithSpaceData[], number>(
         }
     }
 );
+export const fetchCreateTask = createAsyncThunk<TaskData, { space_id: number; taskData: TaskData }>(
+    'tasks/createTask',
+    async ({ space_id, taskData }, { rejectWithValue }) => {
+        try {
 
+            const response = await createTask(space_id, taskData);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to create task');
+        }
+    }
+);
 const initialState : TasksState = {
     listTask : [],
     isLoadingTasks : false,
-    errorTasks : null
+    errorTasks : null,
+    isCreatingTask : false,
+    errorCreateTask : null,
 
 };
 
@@ -97,6 +112,18 @@ export const tasksSlice = createSlice({
         builder.addCase(fetchTasksForSpace.rejected, (state, action) => {
             state.isLoadingTasks = false;
             state.errorTasks = action.payload as string;
+        });
+        builder.addCase(fetchCreateTask.pending, (state) => {
+            state.isCreatingTask = true;
+            state.errorCreateTask = null;
+        });
+        builder.addCase(fetchCreateTask.fulfilled, (state) => {
+            state.isCreatingTask = false;
+            state.errorCreateTask = null;
+        }); 
+        builder.addCase(fetchCreateTask.rejected, (state, action) => {
+            state.isCreatingTask = false;
+            state.errorCreateTask = action.payload as string;
         });
     }
 });

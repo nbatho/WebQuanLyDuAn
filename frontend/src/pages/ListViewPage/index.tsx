@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
     ChevronDown, Star, FolderClosed, Clock, Bot, Share2,
     LayoutList, Trello, Calendar, BarChart2, Users, Plus,
-    Search, CheckCircle2, ListTodo, Circle, Settings2,
+    Search, CheckCircle2, ListTodo, Settings2,
     CircleDashed, Box, Wand2, Flag, Tag, CornerDownLeft
 } from 'lucide-react';
 import { useSpaceTree } from '../../layouts/AppLayout/SpaceTreeContext';

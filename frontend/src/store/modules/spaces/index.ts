@@ -3,7 +3,6 @@ import {
     getSpacesForWorkspace,
     createSpace,
     updateSpace,
-    deleteSpace
 } from "@/api/spaces";
 
 export interface SpaceData {

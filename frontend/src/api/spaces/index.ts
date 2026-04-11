@@ -16,3 +16,7 @@ export const updateSpace = async (space_id: number, name: string, description: s
 export const deleteSpace = async (space_id: number) => {
     return beApi.delete(`/spaces/${space_id}`);
 }
+
+export const getSpaceMembers = async (space_id: number) => {
+    return beApi.get(`/spaces/${space_id}/members`);
+}

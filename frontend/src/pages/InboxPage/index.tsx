@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-    Hash, AtSign, Bell, User, Plus, Search, HelpCircle,
+    Hash, AtSign, Bell, Plus, Search,
     Paperclip, Smile, Image, Mic, Send, MoreHorizontal,
     Video, Phone, Pin
 } from 'lucide-react';

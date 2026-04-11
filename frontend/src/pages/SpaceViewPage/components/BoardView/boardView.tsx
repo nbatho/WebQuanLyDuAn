@@ -5,8 +5,7 @@ import { Calendar, Flag, MoreHorizontal, Plus } from 'lucide-react';
 import { Avatar } from 'antd';
 import { useEffect, useRef, useState, type DragEvent } from 'react';
 import type { Task, StatusGroup } from '../../../../types/tasks';
-import { familyTaskIds, rootTasks } from '../../lib/taskFamily';
-import { nextTaskId } from '../../lib/nextTaskId';
+import { familyTaskIds, rootTasks } from '../../../../utils/taskFamily';
 
 const avatarColors: Record<string, string> = {
     AR: '#4285F4',
@@ -91,7 +90,7 @@ export default function BoardView({
         const spaceNumeric =
             groups.flatMap((g) => g.tasks)[0]?.space_id ?? 1;
         const newTask: Task = {
-            task_id: nextTaskId(),
+            task_id: Math.floor(Math.random() * 999999),
             space_id: spaceNumeric,
             parent_task_id: null,
             name: inlineText.trim(),
@@ -119,11 +118,10 @@ export default function BoardView({
                     return (
                         <div
                             key={group.id}
-                            className={`w-70 shrink-0 overflow-hidden rounded-[10px] border-2 transition-colors ${
-                                dragOverGroup === group.id
+                            className={`w-70 shrink-0 overflow-hidden rounded-[10px] border-2 transition-colors ${dragOverGroup === group.id
                                     ? 'border-[#0058be] bg-[#f0f4ff]'
                                     : 'border-transparent bg-[#f8fafb]'
-                            }`}
+                                }`}
                             onDragOver={(e) => {
                                 e.preventDefault();
                                 setDragOverGroup(group.id);
@@ -176,13 +174,12 @@ export default function BoardView({
                                         <div className="flex flex-wrap items-center gap-2">
                                             {task.due_date && (
                                                 <span
-                                                    className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-medium ${
-                                                        ['10/31/23', '11/1/23', '10/3/23'].includes(
-                                                            task.due_date,
-                                                        )
+                                                    className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-medium ${['10/31/23', '11/1/23', '10/3/23'].includes(
+                                                        task.due_date,
+                                                    )
                                                             ? 'bg-[#fff3f0] font-bold text-[#e74c3c]'
                                                             : 'bg-[#f8fafb] text-[#5f6368]'
-                                                    }`}
+                                                        }`}
                                                 >
                                                     <Calendar size={11} /> {task.due_date}
                                                 </span>

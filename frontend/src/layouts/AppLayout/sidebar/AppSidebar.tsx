@@ -1,31 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import {
-    Home,
-    MessageSquare,
-    Clock,
-    Plus,
-    Settings,
-    Users,
-    LogOut,
-    Sparkles,
-    Grid3X3,
-    ChevronDown,
-    ChevronRight,
-} from 'lucide-react';
+import { Home, MessageSquare, Clock, Plus, Settings, Users, LogOut, Sparkles, Grid3X3, ChevronDown, ChevronRight } from 'lucide-react';
 import WorkspaceSwitcher from '../workspace/WorkspaceSwitcher';
 import { fetchSignOut } from '@/store/modules/auth';
-import type { AppDispatch } from '@/store/configureStore';
+import type { AppDispatch, RootState } from '@/store/configureStore';
 import { useSpaceTree } from '../SpaceTreeContext';
 import { SpaceNode } from './components/nodes/SpaceNode';
-
+import { fetchSpacesForWorkspace } from '@/store/modules/spaces';
+import { fetchWorkspaces } from '@/store/modules/workspaces';
 export default function AppSidebar() {
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch<AppDispatch>();
     const tree = useSpaceTree();
     const [spacesCollapsed, setSpacesCollapsed] = useState(false);
+    const currentWorkspaceId = useSelector((s: RootState) => s.workspaces.currentWorkspaceId);
+    const access_token = useSelector((s: RootState) => s.auth.access_token);
 
     const handleLogout = () => {
         try {
@@ -45,11 +36,10 @@ export default function AppSidebar() {
         const isActive = location.pathname === path;
         return (
             <div
-                className={`flex cursor-pointer select-none items-center gap-2.5 rounded-md px-2.5 py-1.75 text-[13.5px] font-medium transition-all ${
-                    isActive
-                        ? 'bg-[#e8f0fe] text-[#1a73e8] font-semibold'
-                        : 'text-[#1e1f21] hover:bg-[#f3f4f8]'
-                }`}
+                className={`flex cursor-pointer select-none items-center gap-2.5 rounded-md px-2.5 py-1.75 text-[13.5px] font-medium transition-all ${isActive
+                    ? 'bg-[#e8f0fe] text-[#1a73e8] font-semibold'
+                    : 'text-[#1e1f21] hover:bg-[#f3f4f8]'
+                    }`}
                 onClick={() => navigate(path)}
             >
                 {icon}
@@ -59,6 +49,17 @@ export default function AppSidebar() {
         );
     };
 
+    useEffect(() => {
+        if (access_token) {
+            dispatch(fetchWorkspaces());
+        }
+    }, [access_token, dispatch]);
+
+    useEffect(() => {
+        if (currentWorkspaceId != null) {
+            dispatch(fetchSpacesForWorkspace(currentWorkspaceId));
+        }
+    }, [currentWorkspaceId, dispatch]);
     return (
         <aside className="flex w-65 shrink-0 flex-col overflow-y-auto border-r border-[#e2e4e9] bg-white px-2.5 py-3 max-[900px]:hidden">
             {/* ── Header / Workspace ── */}
@@ -90,11 +91,10 @@ export default function AppSidebar() {
 
                 {/* Flowise AI */}
                 <div
-                    className={`flex cursor-pointer select-none items-center gap-2.5 rounded-md px-2.5 py-1.75 text-[13.5px] font-medium transition-all ${
-                        location.pathname === '/ai'
-                            ? 'bg-linear-to-r from-[#7c5cfc] to-[#e84393] text-white shadow-sm'
-                            : 'text-[#1e1f21] hover:bg-[#f3f4f8]'
-                    }`}
+                    className={`flex cursor-pointer select-none items-center gap-2.5 rounded-md px-2.5 py-1.75 text-[13.5px] font-medium transition-all ${location.pathname === '/ai'
+                        ? 'bg-linear-to-r from-[#7c5cfc] to-[#e84393] text-white shadow-sm'
+                        : 'text-[#1e1f21] hover:bg-[#f3f4f8]'
+                        }`}
                     onClick={() => navigate('/ai')}
                 >
                     <Sparkles size={18} strokeWidth={1.8} />

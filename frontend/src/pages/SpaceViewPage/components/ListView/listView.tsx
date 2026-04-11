@@ -9,10 +9,9 @@ import {
     Trash2,
 } from 'lucide-react';
 import { Dropdown } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import type { Task, StatusGroup } from '../../../../types/tasks';
-import { directChildCount, directChildTasks, rootTasks } from '../../lib/taskFamily';
-import { nextTaskId } from '../../lib/nextTaskId';
+import { directChildCount, directChildTasks, rootTasks } from '../../../../utils/taskFamily';
 import ListHeader from './components/ListHeader';
 import TaskRow from './components/TaskRow';
 import InlineCreateTask from './components/InlineCreateTask';
@@ -74,7 +73,7 @@ export default function ListView({
         const spaceNumeric =
             groups.flatMap((g) => g.tasks)[0]?.space_id ?? 1;
         const newTask: Task = {
-            task_id: nextTaskId(),
+            task_id: Math.floor(Math.random() * 999999),
             space_id: spaceNumeric,
             parent_task_id: null,
             name: inlineText.trim(),

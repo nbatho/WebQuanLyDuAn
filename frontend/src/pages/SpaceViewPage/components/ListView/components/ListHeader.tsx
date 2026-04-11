@@ -1,4 +1,3 @@
-import React from 'react';
 
 interface ListHeaderProps {
     columns: Record<string, boolean>;

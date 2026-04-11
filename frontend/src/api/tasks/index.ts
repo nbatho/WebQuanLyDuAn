@@ -11,7 +11,7 @@ export const getTasksForList = async (list_id: number) : Promise<any[]> => {
     return beApi.get(`/tasks/lists/${list_id}`);
 }
 
-export const createTask = async (space_id: number, taskData: any) : Promise<TaskData> => {
+export const createTask = async (space_id: number, taskData: TaskData) : Promise<TaskData> => {
     return beApi.post(`/tasks/spaces/${space_id}`, taskData);
 }
 

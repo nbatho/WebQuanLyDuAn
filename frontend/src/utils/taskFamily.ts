@@ -1,4 +1,4 @@
-import type { Task } from '../../../types/tasks';
+import type { Task } from '../types/tasks';
 
 export function descendantTaskIds(tasks: Task[], parentTaskId: number): number[] {
     const direct = tasks
