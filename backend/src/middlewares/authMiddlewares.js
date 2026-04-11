@@ -16,7 +16,6 @@ export const protectedRoute = (req, res, next) => {
                 return res.status(403).json({ message: 'Access Token khong hop le' });
             }
             // tìm user 
-            console.log('Decoded token:', decoded);
             const user = await findUserById(decoded.user_id);
             if (!user) {
                 return res.status(404).json({ message: 'Nguoi dung khong ton tai' });

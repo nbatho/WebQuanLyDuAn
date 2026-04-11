@@ -1,24 +1,13 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Modal, Input, Button } from 'antd';
 import type { AppDispatch, RootState } from '../../../store/configureStore';
 import { addWorkspace } from '../../../store/modules/workspaces';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '../../../components/ui/dialog';
-import { Button } from '../../../components/ui/button';
-import { Input } from '../../../components/ui/Input';
-import { Label } from '../../../components/ui/label';
 
 type Props = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
 };
-
 
 export default function CreateWorkspaceDialog({ open, onOpenChange }: Props) {
     const dispatch = useDispatch<AppDispatch>();
@@ -65,67 +54,93 @@ export default function CreateWorkspaceDialog({ open, onOpenChange }: Props) {
         }
     };
 
+    const handleCancel = () => {
+        onOpenChange(false);
+        reset();
+    };
+
     return (
-        <Dialog
+        <Modal
             open={open}
-            onOpenChange={(v) => {
-                onOpenChange(v);
-                if (!v) reset();
-            }}
-        >
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>Tạo workspace mới</DialogTitle>
-                    <DialogDescription>
-                        Workspace nhóm các space và thành viên. Slug dùng trong URL (chữ thường, số,
-                        dấu gạch ngang).
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-3 py-2">
-                    <div className="grid gap-1.5">
-                        <Label htmlFor="ws-name">Tên</Label>
-                        <Input
-                            id="ws-name"
-                            value={name}
-                            placeholder="Ví dụ: Sản phẩm A"
-                            onChange={(e) => {
-                                setName(e.target.value);
-                                syncSlug(e.target.value);
-                            }}
-                        />
-                    </div>
-                    <div className="grid gap-1.5">
-                        <Label htmlFor="ws-slug">Slug</Label>
-                        <Input
-                            id="ws-slug"
-                            value={slug}
-                            placeholder="san-pham-a"
-                            onChange={(e) => {
-                                setSlugTouched(true);
-                                setSlug(e.target.value);
-                            }}
-                        />
-                    </div>
-                    <div className="grid gap-1.5">
-                        <Label htmlFor="ws-desc">Mô tả (tuỳ chọn)</Label>
-                        <Input
-                            id="ws-desc"
-                            value={description}
-                            placeholder="Ngắn gọn về workspace"
-                            onChange={(e) => setDescription(e.target.value)}
-                        />
-                    </div>
-                    {error ? <p className="text-xs font-medium text-[#e74c3c]">{error}</p> : null}
-                </div>
-                <DialogFooter>
-                    <Button variant="outline" type="button" onClick={() => onOpenChange(false)}>
-                        Huỷ
-                    </Button>
-                    <Button type="button" disabled={!name.trim() || submitting} onClick={handleSubmit}>
+            onCancel={handleCancel}
+            title={
+                <span className="text-lg font-bold text-[var(--color-on-surface)]">
+                    Tạo workspace mới
+                </span>
+            }
+            footer={
+                <div className="flex justify-end gap-2">
+                    <Button onClick={handleCancel}>Huỷ</Button>
+                    <Button
+                        type="primary"
+                        disabled={!name.trim() || submitting}
+                        onClick={handleSubmit}
+                    >
                         {submitting ? 'Đang tạo…' : 'Tạo workspace'}
                     </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                </div>
+            }
+            width={448}
+            destroyOnClose
+        >
+            <p className="mt-0 mb-4 text-sm text-[var(--color-text-secondary)]">
+                Workspace nhóm các space và thành viên. Slug dùng trong URL (chữ thường, số,
+                dấu gạch ngang).
+            </p>
+
+            <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-1.5">
+                    <label
+                        htmlFor="ws-name"
+                        className="text-xs font-bold uppercase tracking-wide text-[var(--color-text-secondary)]"
+                    >
+                        Tên
+                    </label>
+                    <Input
+                        id="ws-name"
+                        value={name}
+                        placeholder="Ví dụ: Sản phẩm A"
+                        onChange={(e) => {
+                            setName(e.target.value);
+                            syncSlug(e.target.value);
+                        }}
+                    />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                    <label
+                        htmlFor="ws-slug"
+                        className="text-xs font-bold uppercase tracking-wide text-[var(--color-text-secondary)]"
+                    >
+                        Slug
+                    </label>
+                    <Input
+                        id="ws-slug"
+                        value={slug}
+                        placeholder="san-pham-a"
+                        onChange={(e) => {
+                            setSlugTouched(true);
+                            setSlug(e.target.value);
+                        }}
+                    />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                    <label
+                        htmlFor="ws-desc"
+                        className="text-xs font-bold uppercase tracking-wide text-[var(--color-text-secondary)]"
+                    >
+                        Mô tả (tuỳ chọn)
+                    </label>
+                    <Input
+                        id="ws-desc"
+                        value={description}
+                        placeholder="Ngắn gọn về workspace"
+                        onChange={(e) => setDescription(e.target.value)}
+                    />
+                </div>
+                {error ? (
+                    <p className="text-xs font-medium text-[var(--color-error)]">{error}</p>
+                ) : null}
+            </div>
+        </Modal>
     );
 }

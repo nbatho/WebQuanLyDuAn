@@ -17,7 +17,7 @@ import { useSpaceTree } from '../../../SpaceTreeContext';
 import { ContextMenu } from '../ContextMenu';
 import { ListNode } from './ListNode';
 import type { MenuEntry } from '../../types';
-import type { FolderItem } from '../../../useSpaceTreeState';
+import type { FolderItem } from '@/types/tree';
 
 export const FolderNode = ({ folder, spaceId, spaceName }: { folder: FolderItem; spaceId: string; spaceName: string }) => {
     const navigate = useNavigate();

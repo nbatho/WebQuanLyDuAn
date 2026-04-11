@@ -3,43 +3,10 @@
 @plugin "tailwindcss-animate";
 
 @layer base {
-  :root {
-    /* ─── Flowise Color Tokens (Material Design 3 inspired) ─── */
-    --color-surface-bright: #f9f9ff;
-    --color-surface: #f9f9ff;
-    --color-surface-container-lowest: #ffffff;
-    --color-surface-container-low: #f1f3ff;
-    --color-surface-container: #e9edff;
-    --color-surface-container-high: #e1e8fd;
-    --color-surface-container-highest: #dce2f7;
-    --color-surface-variant: #dce2f7;
-    --color-on-surface: #141b2b;
-    --color-on-surface-variant: #424754;
-    --color-outline: #727785;
-    --color-outline-variant: #c2c6d6;
-    --color-primary: #0058be;
-    --color-primary-container: #2170e4;
-    --color-on-primary: #ffffff;
-    --color-primary-fixed: #d8e2ff;
-    --color-primary-fixed-dim: #adc6ff;
-    --color-secondary: #006c49;
-    --color-secondary-container: #6cf8bb;
-    --color-secondary-fixed: #6ffbbe;
-    --color-secondary-fixed-dim: #4edea3;
-    --color-tertiary: #825100;
-    --color-tertiary-container: #a36700;
-    --color-tertiary-fixed: #ffddb8;
-    --color-tertiary-fixed-dim: #ffb95f;
-    --color-error: #ba1a1a;
-    --color-inverse-surface: #293040;
-    --color-background: #f9f9ff;
-    --color-border: #c2c6d6;
-  }
-
   html, body {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    background-color: #f9f9ff;
-    color: #141b2b;
+    background-color: var(--color-background);
+    color: var(--color-on-surface);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -61,10 +28,10 @@
 
   /* ─── Poster Card ─── */
   .poster-card {
-    background-color: #ffffff;
-    border: 2px solid #e9edff;
+    background-color: var(--color-surface-container-lowest);
+    border: 2px solid var(--color-surface-container);
   }
   .poster-card:hover {
-    border-color: #0058be;
+    border-color: var(--color-primary);
   }
 }

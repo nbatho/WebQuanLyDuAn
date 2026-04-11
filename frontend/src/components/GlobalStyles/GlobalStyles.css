@@ -1,0 +1,62 @@
+/* ═══════════════════════════════════════════════
+   Design Token Palette — Single Source of Truth
+   ═══════════════════════════════════════════════ */
+
+:root {
+    /* ─── Surface & Background ─── */
+    --color-surface-bright: #f9f9ff;
+    --color-surface: #f9f9ff;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #f1f3ff;
+    --color-surface-container: #e9edff;
+    --color-surface-container-high: #e1e8fd;
+    --color-surface-container-highest: #dce2f7;
+    --color-surface-variant: #dce2f7;
+    --color-surface-subtle: #f8f9fa;
+    --color-surface-hover: #f0f2f5;
+    --color-background: #f9f9ff;
+
+    /* ─── Text ─── */
+    --color-on-surface: #141b2b;
+    --color-on-surface-variant: #424754;
+    --color-text-secondary: #5f6368;
+    --color-text-tertiary: #9aa0a6;
+    --color-on-primary: #ffffff;
+
+    /* ─── Primary ─── */
+    --color-primary: #0058be;
+    --color-primary-hover: #004aab;
+    --color-primary-alt: #1a73e8;
+    --color-primary-container: #2170e4;
+    --color-primary-bg: #f0f4ff;
+    --color-primary-fixed: #d8e2ff;
+    --color-primary-fixed-dim: #adc6ff;
+
+    /* ─── Secondary ─── */
+    --color-secondary: #006c49;
+    --color-secondary-container: #6cf8bb;
+    --color-secondary-fixed: #6ffbbe;
+    --color-secondary-fixed-dim: #4edea3;
+
+    /* ─── Tertiary ─── */
+    --color-tertiary: #825100;
+    --color-tertiary-container: #a36700;
+    --color-tertiary-fixed: #ffddb8;
+    --color-tertiary-fixed-dim: #ffb95f;
+
+    /* ─── Accent (Purple) ─── */
+    --color-accent: #7c5cfc;
+    --color-accent-hover: #6b4ce0;
+
+    /* ─── Error / Danger ─── */
+    --color-error: #ba1a1a;
+
+    /* ─── Border / Outline ─── */
+    --color-border: #c2c6d6;
+    --color-border-light: #eef0f5;
+    --color-outline: #727785;
+    --color-outline-variant: #c2c6d6;
+
+    /* ─── Misc ─── */
+    --color-inverse-surface: #293040;
+}

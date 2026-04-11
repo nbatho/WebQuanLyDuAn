@@ -42,21 +42,21 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
             onClick={onClose}
         >
             <div
-                className="w-130 flex flex-col rounded-2xl bg-white font-['Plus_Jakarta_Sans',sans-serif] shadow-[0_24px_80px_rgba(0,0,0,0.18)] overflow-hidden"
+                className="w-130 flex flex-col rounded-2xl bg-[var(--color-surface-container-lowest)] font-['Plus_Jakarta_Sans',sans-serif] shadow-[0_24px_80px_rgba(0,0,0,0.18)] overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* ── Header ── */}
                 <div className="relative px-7 pt-7 pb-4">
                     <button
-                        className="absolute right-5 top-5 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border-none bg-transparent text-[#9aa0a6] transition-all hover:bg-[#f0f2f5] hover:text-[#3c4043]"
+                        className="absolute right-5 top-5 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border-none bg-transparent text-[var(--color-text-tertiary)] transition-all hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-on-surface-variant)]"
                         onClick={onClose}
                     >
                         <X size={18} />
                     </button>
-                    <h2 className="m-0 text-[20px] font-bold text-[#202124] tracking-[-0.01em]">
+                    <h2 className="m-0 text-[20px] font-bold text-[var(--color-on-surface)] tracking-[-0.01em]">
                         Create a Space
                     </h2>
-                    <p className="m-0 mt-1.5 text-[13.5px] leading-normal text-[#5f6368]">
+                    <p className="m-0 mt-1.5 text-[13.5px] leading-normal text-[var(--color-text-secondary)]">
                         A Space represents teams, departments, or groups, each with its own Lists, workflows, and settings.
                     </p>
                 </div>
@@ -65,13 +65,13 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
                 <div className="flex flex-col gap-5 px-7 pb-6">
                     {/* Icon & Name */}
                     <div>
-                        <label className="mb-2 block text-[12px] font-semibold text-[#5f6368]">Icon & name</label>
+                        <label className="mb-2 block text-[12px] font-semibold text-[var(--color-text-secondary)]">Icon & name</label>
                         <div className="flex items-center gap-3">
                             {/* Avatar preview — click to show color picker */}
                             <div className="relative">
                                 <button
                                     type="button"
-                                    className="flex h-10.5 w-10.5 shrink-0 cursor-pointer items-center justify-center rounded-xl border-2 border-[#e8eaed] text-[17px] font-bold text-white transition-all hover:shadow-md"
+                                    className="flex h-10.5 w-10.5 shrink-0 cursor-pointer items-center justify-center rounded-xl border-2 text-[17px] font-bold text-white transition-all hover:shadow-md"
                                     style={{ backgroundColor: selectedColor, borderColor: selectedColor }}
                                     onClick={() => setShowColorPicker(!showColorPicker)}
                                 >
@@ -80,13 +80,13 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
 
                                 {/* Color palette dropdown */}
                                 {showColorPicker && (
-                                    <div className="absolute top-full left-0 z-10 mt-2 flex w-50 flex-wrap gap-2 rounded-xl bg-white p-3 shadow-[0_8px_32px_rgba(0,0,0,0.14)] border border-[#e8eaed]">
+                                    <div className="absolute top-full left-0 z-10 mt-2 flex w-50 flex-wrap gap-2 rounded-xl bg-[var(--color-surface-container-lowest)] p-3 shadow-[0_8px_32px_rgba(0,0,0,0.14)] border border-[var(--color-border-light)]">
                                         {COLORS.map((c) => (
                                             <button
                                                 key={c}
                                                 type="button"
                                                 className={`h-7 w-7 cursor-pointer rounded-full border-2 transition-all hover:scale-110 ${selectedColor === c
-                                                        ? 'scale-110 border-white shadow-[0_0_0_2px_#1a73e8]'
+                                                        ? 'scale-110 border-white shadow-[0_0_0_2px_var(--color-primary-alt)]'
                                                         : 'border-transparent'
                                                     }`}
                                                 style={{ backgroundColor: c }}
@@ -103,7 +103,7 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
                             <input
                                 ref={inputRef}
                                 type="text"
-                                className="min-w-0 flex-1 h-10.5 rounded-lg border border-[#dadce0] px-3.5 text-[14px] font-medium text-[#202124] outline-none transition-all placeholder:text-[#9aa0a6] focus:border-[#1a73e8] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.08)]"
+                                className="min-w-0 flex-1 h-10.5 rounded-lg border border-[var(--color-border)] px-3.5 text-[14px] font-medium text-[var(--color-on-surface)] outline-none transition-all placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-primary-alt)] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.08)]"
                                 placeholder="e.g. Marketing, Engineering, HR"
                                 value={spaceName}
                                 onChange={(e) => setSpaceName(e.target.value)}
@@ -114,11 +114,11 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
 
                     {/* Description */}
                     <div>
-                        <label className="mb-2 block text-[12px] font-semibold text-[#5f6368]">
-                            Description <span className="font-normal text-[#9aa0a6]">(optional)</span>
+                        <label className="mb-2 block text-[12px] font-semibold text-[var(--color-text-secondary)]">
+                            Description <span className="font-normal text-[var(--color-text-tertiary)]">(optional)</span>
                         </label>
                         <textarea
-                            className="w-full min-h-15 resize-none rounded-lg border border-[#dadce0] px-3.5 py-2.5 text-[13.5px] font-medium text-[#202124] outline-none transition-all placeholder:text-[#9aa0a6] focus:border-[#1a73e8] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.08)]"
+                            className="w-full min-h-15 resize-none rounded-lg border border-[var(--color-border)] px-3.5 py-2.5 text-[13.5px] font-medium text-[var(--color-on-surface)] outline-none transition-all placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-primary-alt)] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.08)]"
                             placeholder="What's this space about?"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
@@ -126,14 +126,14 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
                     </div>
 
                     {/* Make Private toggle */}
-                    <div className="flex items-center justify-between rounded-xl bg-[#f8f9fa] px-4 py-3.5">
+                    <div className="flex items-center justify-between rounded-xl bg-[var(--color-surface-subtle)] px-4 py-3.5">
                         <div>
-                            <div className="text-[13.5px] font-semibold text-[#202124]">Make Private</div>
-                            <div className="text-[12px] text-[#5f6368] mt-0.5">Only you and invited members have access</div>
+                            <div className="text-[13.5px] font-semibold text-[var(--color-on-surface)]">Make Private</div>
+                            <div className="text-[12px] text-[var(--color-text-secondary)] mt-0.5">Only you and invited members have access</div>
                         </div>
                         <button
                             type="button"
-                            className={`relative h-5.5 w-10 cursor-pointer rounded-full border-none transition-colors duration-200 ${isPrivate ? 'bg-[#1a73e8]' : 'bg-[#dadce0]'}`}
+                            className={`relative h-5.5 w-10 cursor-pointer rounded-full border-none transition-colors duration-200 ${isPrivate ? 'bg-[var(--color-primary-alt)]' : 'bg-[var(--color-border)]'}`}
                             onClick={() => setIsPrivate(!isPrivate)}
                         >
                             <span
@@ -144,17 +144,17 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
                 </div>
 
                 {/* ── Footer ── */}
-                <div className="flex items-center justify-between border-t border-[#e8eaed] bg-[#f8f9fa] px-7 py-4">
+                <div className="flex items-center justify-between border-t border-[var(--color-border-light)] bg-[var(--color-surface-subtle)] px-7 py-4">
                     <button
                         type="button"
-                        className="cursor-pointer rounded-lg border-none bg-transparent px-1 py-1.5 text-[13px] font-medium text-[#5f6368] hover:text-[#202124] transition-colors"
+                        className="cursor-pointer rounded-lg border-none bg-transparent px-1 py-1.5 text-[13px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-on-surface)] transition-colors"
                         onClick={onClose}
                     >
                         Cancel
                     </button>
                     <button
                         type="button"
-                        className="h-9.5 cursor-pointer rounded-lg border-none bg-[#1a73e8] px-6 text-[13.5px] font-bold text-white transition-all hover:bg-[#1557b0] hover:shadow-md disabled:cursor-default disabled:opacity-40"
+                        className="h-9.5 cursor-pointer rounded-lg border-none bg-[var(--color-primary-alt)] px-6 text-[13.5px] font-bold text-white transition-all hover:bg-[var(--color-primary-hover)] hover:shadow-md disabled:cursor-default disabled:opacity-40"
                         onClick={handleCreate}
                         disabled={!spaceName.trim()}
                     >
