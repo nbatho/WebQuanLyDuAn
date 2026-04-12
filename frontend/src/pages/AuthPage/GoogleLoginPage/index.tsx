@@ -1,9 +1,33 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { ArrowLeft } from 'lucide-react';
 import { signInWithGoogle } from '../../../api/auth';
+import { getWorkspaces } from '@/api/workspaces';
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
+const GOOGLE_CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined)?.trim();
+
+function GoogleBrandPanel() {
+    return (
+        <section className="relative flex min-h-[40vh] w-full flex-col justify-between overflow-hidden bg-[#0058be] p-8 md:min-h-screen md:w-[52%] md:p-14">
+            <div className="pointer-events-none absolute -left-20 -top-20 h-100 w-100 rounded-full bg-white opacity-5" />
+            <div className="pointer-events-none absolute -right-16 top-1/3 h-48 w-48 rotate-12 bg-white opacity-[0.08]" />
+            <div className="relative z-10">
+                <Link to="/" className="inline-flex items-end gap-1 no-underline">
+                    <span className="text-3xl font-extrabold tracking-tighter text-white">Flowise</span>
+                    <span className="mb-1.5 h-2.5 w-2.5 rounded-full bg-[#825100]" aria-hidden />
+                </Link>
+                <h1 className="mt-10 max-w-md text-3xl font-bold leading-tight tracking-tight text-white md:text-4xl">
+                    Sign in with Google
+                </h1>
+                <p className="mt-4 max-w-sm text-base leading-relaxed text-white/85">
+                    One secure sign-in. No extra password to remember for your Flowise workspace.
+                </p>
+            </div>
+            <p className="relative z-10 text-sm font-medium uppercase tracking-widest text-white/50">© 2025 Flowise</p>
+        </section>
+    );
+}
 
 function GoogleLoginContent() {
     const navigate = useNavigate();
@@ -16,11 +40,16 @@ function GoogleLoginContent() {
         try {
             const result = await signInWithGoogle(credential);
             const accessToken = result?.user?.access_token;
-            if (!accessToken) throw new Error('Khong nhan duoc access token');
+            if (!accessToken) throw new Error('Could not receive access token');
             localStorage.setItem('access_token', accessToken);
-            navigate('/workspace-setup');
+            const workspaces = await getWorkspaces();
+            if (Array.isArray(workspaces) && workspaces.length > 0) {
+                navigate('/home');
+            } else {
+                navigate('/workspace-setup');
+            }
         } catch (err: unknown) {
-            const msg = err instanceof Error ? err.message : 'Dang nhap Google that bai';
+            const msg = err instanceof Error ? err.message : 'Google sign-in failed';
             setError(msg);
         } finally {
             setIsLoading(false);
@@ -28,51 +57,145 @@ function GoogleLoginContent() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-[#f0f4ff] p-5 font-['Plus_Jakarta_Sans','Roboto',Arial,sans-serif]">
-            <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_24px_rgba(0,88,190,0.06)]">
-                <h1 className="mb-2 text-center text-2xl font-black tracking-tight text-[#141b2b]">
-                    Continue with Google
-                </h1>
-                <p className="mb-6 text-center text-sm text-[#5f6368]">
-                    Use your Google account to sign in to{' '}
-                    <Link to="/" className="font-semibold text-[#0058be] no-underline hover:underline">
-                        Flowise
-                    </Link>
-                </p>
-                <div className="flex justify-center">
-                    <GoogleLogin
-                        onSuccess={(credentialResponse) => {
-                            if (!credentialResponse.credential) {
-                                setError('Google khong tra ve credential');
-                                return;
-                            }
-                            void handleCredential(credentialResponse.credential);
-                        }}
-                        onError={() => setError('Google login bi huy hoac that bai')}
-                        useOneTap={false}
-                    />
+        <div className="flex min-h-screen flex-col bg-[#eceff3] md:flex-row">
+            <GoogleBrandPanel />
+            <main className="flex w-full flex-1 flex-col justify-center px-5 py-10 md:w-[48%] md:px-12 md:py-8">
+                <div className="mx-auto w-full max-w-[420px]">
+                    <button
+                        type="button"
+                        onClick={() => navigate('/login')}
+                        className="mb-6 inline-flex cursor-pointer items-center gap-2 border-0 bg-transparent text-sm font-bold text-[#0058be] hover:underline"
+                    >
+                        <ArrowLeft size={18} strokeWidth={2.5} aria-hidden />
+                        Back to sign in
+                    </button>
+
+                    <div className="rounded-2xl border border-[#dadce0] bg-white px-8 py-9 shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
+                        <div className="mb-6 flex justify-center">
+                            <Link to="/" className="inline-flex items-end gap-1 no-underline">
+                                <span className="text-2xl font-extrabold tracking-tight text-[#141b2b]">Flowise</span>
+                                <span className="mb-1 h-2 w-2 rounded-full bg-[#825100]" aria-hidden />
+                            </Link>
+                        </div>
+
+                        <h1 className="text-center text-2xl font-normal text-[#202124]">Choose an account</h1>
+                        <p className="mt-1 text-center text-[15px] text-[#5f6368]">
+                            to continue to <span className="font-medium text-[#202124]">Flowise</span>
+                        </p>
+
+                        <div className="mt-8 flex flex-col items-center border-t border-[#e8eaed] pt-8">
+                            <p className="mb-4 max-w-[320px] text-center text-sm leading-snug text-[#5f6368]">
+                                Use the button below. Google will open a secure window where you pick your account.
+                            </p>
+                            <div className="flex w-full max-w-[320px] justify-center [&_iframe]:!w-full">
+                                <GoogleLogin
+                                    onSuccess={(credentialResponse) => {
+                                        if (!credentialResponse.credential) {
+                                            setError('Google did not return a credential');
+                                            return;
+                                        }
+                                        void handleCredential(credentialResponse.credential);
+                                    }}
+                                    onError={() => setError('Google sign-in was cancelled or failed')}
+                                    useOneTap={false}
+                                    size="large"
+                                    width="320"
+                                    text="continue_with"
+                                    shape="rectangular"
+                                    theme="outline"
+                                />
+                            </div>
+                            {isLoading ? (
+                                <p className="mt-4 text-center text-sm text-[#5f6368]">Signing you in…</p>
+                            ) : null}
+                            {error ? (
+                                <p className="mt-4 text-center text-sm font-medium text-[#d93025]">{error}</p>
+                            ) : null}
+                        </div>
+
+                        <p className="mt-8 border-t border-[#e8eaed] pt-6 text-center text-xs leading-relaxed text-[#5f6368]">
+                            To continue, Google will share your name, email address, language preference, and profile
+                            picture with{' '}
+                            <span className="font-medium text-[#202124]">Flowise</span>. See our{' '}
+                            <a href="#" className="font-medium text-[#0058be] no-underline hover:underline">
+                                Privacy Policy
+                            </a>{' '}
+                            and{' '}
+                            <a href="#" className="font-medium text-[#0058be] no-underline hover:underline">
+                                Terms of Service
+                            </a>
+                            .
+                        </p>
+                    </div>
+
+                    <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[11px] font-semibold uppercase tracking-wide text-[#5f6368]">
+                        <span>English (US)</span>
+                        <span className="text-[#dadce0]">·</span>
+                        <a href="#" className="text-[#5f6368] no-underline hover:text-[#202124]">
+                            Help
+                        </a>
+                        <a href="#" className="text-[#5f6368] no-underline hover:text-[#202124]">
+                            Privacy
+                        </a>
+                        <a href="#" className="text-[#5f6368] no-underline hover:text-[#202124]">
+                            Terms
+                        </a>
+                    </div>
                 </div>
-                {isLoading ? (
-                    <p className="mt-4 text-center text-sm text-[#5f6368]">Dang dang nhap...</p>
-                ) : null}
-                {error ? <p className="mt-4 text-center text-sm font-medium text-[#e74c3c]">{error}</p> : null}
-            </div>
+            </main>
+        </div>
+    );
+}
+
+function UnconfiguredPanel() {
+    return (
+        <div className="flex min-h-screen flex-col bg-[#eceff3] md:flex-row">
+            <GoogleBrandPanel />
+            <main className="flex w-full flex-1 items-center justify-center px-5 py-10 md:w-[48%] md:px-12">
+                <div className="w-full max-w-md rounded-2xl border border-[#dadce0] bg-white p-8 shadow-sm">
+                    <h2 className="mb-2 text-lg font-bold text-[#141b2b]">Google sign-in is not configured</h2>
+                    <p className="mb-3 text-sm text-[#5f6368]">
+                        Add your OAuth 2.0 Web Client ID to <code className="text-[#141b2b]">frontend/.env</code>:
+                    </p>
+                    <pre className="mb-3 rounded-lg bg-[#f5f7fa] p-3 text-left text-xs text-[#141b2b]">
+                        VITE_GOOGLE_CLIENT_ID=xxxxx.apps.googleusercontent.com
+                    </pre>
+                    <p className="mb-2 text-sm text-[#5f6368]">
+                        And the same value in <code className="text-[#141b2b]">backend/.env</code>:
+                    </p>
+                    <pre className="mb-4 rounded-lg bg-[#f5f7fa] p-3 text-left text-xs text-[#141b2b]">
+                        GOOGLE_CLIENT_ID=xxxxx.apps.googleusercontent.com
+                    </pre>
+                    <p className="text-sm text-[#5f6368]">
+                        Create credentials in{' '}
+                        <a
+                            href="https://console.cloud.google.com/apis/credentials"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-semibold text-[#0058be] hover:underline"
+                        >
+                            Google Cloud Console
+                        </a>
+                        . Add <code className="text-[#141b2b]">http://localhost:5173</code> under Authorized JavaScript
+                        origins. Restart <code className="text-[#141b2b]">npm run dev</code> after editing{' '}
+                        <code className="text-[#141b2b]">.env</code>.
+                    </p>
+                    <Link
+                        to="/login"
+                        className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[#0058be] no-underline hover:underline"
+                    >
+                        <ArrowLeft size={16} strokeWidth={2.5} aria-hidden />
+                        Back to sign in
+                    </Link>
+                </div>
+            </main>
         </div>
     );
 }
 
 export default function GoogleLoginPage() {
     if (!GOOGLE_CLIENT_ID) {
-        return (
-            <div className="flex min-h-screen items-center justify-center bg-[#f0f4ff] p-5">
-                <div className="w-full max-w-md rounded-xl bg-white p-6 text-center shadow">
-                    <h2 className="mb-2 text-lg font-bold text-[#141b2b]">Google login chua cau hinh</h2>
-                    <p className="text-sm text-[#5f6368]">
-                        Thieu bien <code>VITE_GOOGLE_CLIENT_ID</code> trong frontend/.env
-                    </p>
-                </div>
-            </div>
-        );
+        return <UnconfiguredPanel />;
     }
 
     return (
