@@ -1,17 +1,12 @@
 import { beApi } from '../callApi';
+import type { StatusData } from '@/store/modules/statuses';
 
-export type SpaceStatusRow = {
-    status_id: number;
-    space_id: number;
-    status_name: string;
-    color: string | null;
-    position: number;
-    is_done_state?: boolean;
-    is_default?: boolean;
+export const getStatusesBySpace = async (spaceId: number): Promise<StatusData[]> => {
+    return beApi.get(`/statuses/spaces/${spaceId}`);
 };
 
-export const getStatusesBySpace = async (spaceId: number): Promise<SpaceStatusRow[]> => {
-    return beApi.get(`/statuses/spaces/${spaceId}`);
+export const getStatusById = async (statusId: number): Promise<StatusData> => {
+    return beApi.get(`/statuses/${statusId}`);
 };
 
 export const createTaskStatus = async (
@@ -23,6 +18,25 @@ export const createTaskStatus = async (
         isDoneState?: boolean;
         isDefault?: boolean;
     },
-): Promise<SpaceStatusRow> => {
+): Promise<StatusData> => {
     return beApi.post(`/statuses/spaces/${spaceId}`, body);
+};
+
+export const updateTaskStatus = async (
+    statusId: number,
+    body: {
+        statusName?: string;
+        color?: string;
+        isDoneState?: boolean;
+    },
+): Promise<StatusData> => {
+    return beApi.put(`/statuses/${statusId}`, body);
+};
+
+export const deleteTaskStatus = async (statusId: number): Promise<void> => {
+    return beApi.delete(`/statuses/${statusId}`);
+};
+
+export const reorderStatus = async (statusId: number, position: number): Promise<StatusData> => {
+    return beApi.put(`/statuses/${statusId}/reorder`, { position });
 };

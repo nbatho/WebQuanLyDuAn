@@ -1,9 +1,10 @@
-import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
     getTasksForSpace,
+    getTaskById,
     createTask,
-    // updateTask,
-    // deleteTask
+    updateTask,
+    deleteTask,
 } from "@/api/tasks";
 export interface TaskData {
     task_id: number;
@@ -55,11 +56,16 @@ export interface TaskWithSpaceData extends TaskData {
     tags: TaskTag[];
 }
 export interface TasksState {
-    listTask : TaskWithSpaceData[];
-    isLoadingTasks : boolean;
-    errorTasks : string | null;
-    isCreatingTask : boolean;
-    errorCreateTask : string | null;
+    listTask: TaskWithSpaceData[];
+    selectedTask: TaskWithSpaceData | null;
+    isLoadingTasks: boolean;
+    errorTasks: string | null;
+    isCreatingTask: boolean;
+    errorCreateTask: string | null;
+    isUpdatingTask: boolean;
+    errorUpdateTask: string | null;
+    isDeletingTask: boolean;
+    errorDeleteTask: string | null;
 }
 
 export const fetchTasksForSpace = createAsyncThunk<TaskWithSpaceData[], number>(
@@ -85,13 +91,53 @@ export const fetchCreateTask = createAsyncThunk<TaskData, { space_id: number; ta
         }
     }
 );
-const initialState : TasksState = {
-    listTask : [],
-    isLoadingTasks : false,
-    errorTasks : null,
-    isCreatingTask : false,
-    errorCreateTask : null,
+export const fetchTaskById = createAsyncThunk<TaskWithSpaceData, number>(
+    'tasks/fetchTaskById',
+    async (task_id, { rejectWithValue }) => {
+        try {
+            const response = await getTaskById(task_id);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch task');
+        }
+    }
+);
 
+export const fetchUpdateTask = createAsyncThunk<TaskData, { task_id: number; updates: Partial<TaskData> }>(
+    'tasks/updateTask',
+    async ({ task_id, updates }, { rejectWithValue }) => {
+        try {
+            const response = await updateTask(task_id, updates);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to update task');
+        }
+    }
+);
+
+export const fetchDeleteTask = createAsyncThunk<number, number>(
+    'tasks/deleteTask',
+    async (task_id, { rejectWithValue }) => {
+        try {
+            await deleteTask(task_id);
+            return task_id;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to delete task');
+        }
+    }
+);
+
+const initialState: TasksState = {
+    listTask: [],
+    selectedTask: null,
+    isLoadingTasks: false,
+    errorTasks: null,
+    isCreatingTask: false,
+    errorCreateTask: null,
+    isUpdatingTask: false,
+    errorUpdateTask: null,
+    isDeletingTask: false,
+    errorDeleteTask: null,
 };
 
 export const tasksSlice = createSlice({
@@ -120,10 +166,43 @@ export const tasksSlice = createSlice({
         builder.addCase(fetchCreateTask.fulfilled, (state) => {
             state.isCreatingTask = false;
             state.errorCreateTask = null;
-        }); 
+        });
         builder.addCase(fetchCreateTask.rejected, (state, action) => {
             state.isCreatingTask = false;
             state.errorCreateTask = action.payload as string;
+        });
+
+        builder.addCase(fetchTaskById.fulfilled, (state, action) => {
+            state.selectedTask = action.payload;
+        });
+
+        builder.addCase(fetchUpdateTask.pending, (state) => {
+            state.isUpdatingTask = true;
+            state.errorUpdateTask = null;
+        });
+        builder.addCase(fetchUpdateTask.fulfilled, (state, action) => {
+            state.isUpdatingTask = false;
+            const index = state.listTask.findIndex(t => t.task_id === action.payload.task_id);
+            if (index !== -1) {
+                state.listTask[index] = { ...state.listTask[index], ...action.payload };
+            }
+        });
+        builder.addCase(fetchUpdateTask.rejected, (state, action) => {
+            state.isUpdatingTask = false;
+            state.errorUpdateTask = action.payload as string;
+        });
+
+        builder.addCase(fetchDeleteTask.pending, (state) => {
+            state.isDeletingTask = true;
+            state.errorDeleteTask = null;
+        });
+        builder.addCase(fetchDeleteTask.fulfilled, (state, action) => {
+            state.isDeletingTask = false;
+            state.listTask = state.listTask.filter(t => t.task_id !== action.payload);
+        });
+        builder.addCase(fetchDeleteTask.rejected, (state, action) => {
+            state.isDeletingTask = false;
+            state.errorDeleteTask = action.payload as string;
         });
     }
 });
