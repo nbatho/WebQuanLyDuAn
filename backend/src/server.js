@@ -21,6 +21,7 @@ import {
   dashboardRoutes,
   folderRoutes,
   listRoutes,
+  memberRoutes,
 } from "./routes/index.js";
 import { protectedRoute } from "./middlewares/authMiddlewares.js";
 
@@ -114,6 +115,7 @@ app.use("/api/v1/roles", roleRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/folders", folderRoutes);
 app.use("/api/v1/lists", listRoutes);
+app.use('/api/v1/members', memberRoutes);
 
 //error handling middleware
 app.listen(PORT, HOST, () => {
