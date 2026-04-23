@@ -34,4 +34,38 @@
   .poster-card:hover {
     border-color: var(--color-primary);
   }
+
+  /* ─── Markdown AI Response Styles ─── */
+  .markdown-content p {
+    margin-bottom: 0.75rem;
+  }
+  .markdown-content p:last-child {
+    margin-bottom: 0;
+  }
+  .markdown-content ul, .markdown-content ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+  .markdown-content ul {
+    list-style-type: disc;
+  }
+  .markdown-content ol {
+    list-style-type: decimal;
+  }
+  .markdown-content li {
+    margin-bottom: 0.25rem;
+  }
+  .markdown-content strong {
+    font-weight: 700;
+    color: #141b2b;
+  }
+  .markdown-content h1, .markdown-content h2, .markdown-content h3 {
+    font-weight: 800;
+    color: #141b2b;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .markdown-content h1 { font-size: 1.25rem; }
+  .markdown-content h2 { font-size: 1.1rem; }
+  .markdown-content h3 { font-size: 1rem; }
 }

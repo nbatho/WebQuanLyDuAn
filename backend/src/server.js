@@ -22,6 +22,7 @@ import {
   folderRoutes,
   listRoutes,
   memberRoutes,
+  aiRoutes,
 } from "./routes/index.js";
 import { protectedRoute } from "./middlewares/authMiddlewares.js";
 
@@ -99,6 +100,7 @@ app.use("/api/v1/auth", authRoutes);
 
 //private route
 app.use(protectedRoute);
+app.use("/api/v1/ai", aiRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/workspaces", workspacesRoutes);
 app.use("/api/v1/spaces", spaceRoutes);

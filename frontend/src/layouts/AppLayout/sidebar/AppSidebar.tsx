@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, MessageSquare, Clock, Plus, Settings, Users, LogOut, Sparkles, Grid3X3, ChevronDown, ChevronRight } from 'lucide-react';
+import { Home, MessageSquare, Clock, Plus, Settings, Users, LogOut, Sparkles, Grid3X3, ChevronDown, ChevronRight, RefreshCcw } from 'lucide-react';
 import WorkspaceSwitcher from '../workspace/WorkspaceSwitcher';
 import { fetchSignOut } from '@/store/modules/auth';
 import type { AppDispatch, RootState } from '@/store/configureStore';
@@ -9,14 +9,24 @@ import { useSpaceTree } from '../SpaceTreeContext';
 import { SpaceNode } from './components/nodes/SpaceNode';
 import { fetchSpacesForWorkspace } from '@/store/modules/spaces';
 import { fetchWorkspaces } from '@/store/modules/workspaces';
+
 export default function AppSidebar() {
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch<AppDispatch>();
     const tree = useSpaceTree();
     const [spacesCollapsed, setSpacesCollapsed] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const currentWorkspaceId = useSelector((s: RootState) => s.workspaces.currentWorkspaceId);
     const access_token = useSelector((s: RootState) => s.auth.access_token);
+
+    const handleRefreshSpaces = async () => {
+        if (currentWorkspaceId != null) {
+            setIsRefreshing(true);
+            await dispatch(fetchSpacesForWorkspace(currentWorkspaceId));
+            setTimeout(() => setIsRefreshing(false), 600);
+        }
+    };
 
     const handleLogout = () => {
         try {
@@ -60,9 +70,9 @@ export default function AppSidebar() {
             dispatch(fetchSpacesForWorkspace(currentWorkspaceId));
         }
     }, [currentWorkspaceId, dispatch]);
+
     return (
         <aside className="flex w-65 shrink-0 flex-col overflow-y-auto border-r border-[#e2e4e9] bg-white px-2.5 py-3 max-[900px]:hidden">
-            {/* ── Header / Workspace ── */}
             <div
                 className="mb-2 flex cursor-pointer items-center gap-2.5 rounded-lg px-2 pb-3 pt-1 border-b border-[#e2e4e9]"
                 onClick={() => navigate('/home')}
@@ -76,7 +86,6 @@ export default function AppSidebar() {
                 </div>
             </div>
 
-            {/* ── Global Navigation ── */}
             <nav className="mb-1 flex flex-col gap-0.5">
                 {navItem('/home', <Home size={18} strokeWidth={1.8} />, 'Home')}
                 {navItem(
@@ -89,7 +98,6 @@ export default function AppSidebar() {
                 )}
                 {navItem('/time-tracking', <Clock size={18} strokeWidth={1.8} />, 'Time Tracking')}
 
-                {/* Flowise AI */}
                 <div
                     className={`flex cursor-pointer select-none items-center gap-2.5 rounded-md px-2.5 py-1.75 text-[13.5px] font-medium transition-all ${location.pathname === '/ai'
                         ? 'bg-linear-to-r from-[#7c5cfc] to-[#e84393] text-white shadow-sm'
@@ -102,7 +110,6 @@ export default function AppSidebar() {
                 </div>
             </nav>
 
-            {/* ── Spaces Section ── */}
             <div className="mb-1 mt-2 flex flex-1 flex-col overflow-y-auto">
                 <div className="flex items-center justify-between px-2.5 py-1.5">
                     <button
@@ -113,11 +120,19 @@ export default function AppSidebar() {
                         {spacesCollapsed ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
                         Spaces
                     </button>
-                    <Plus
-                        size={15}
-                        className="cursor-pointer text-[#6b6f76] transition-colors hover:text-[#1a73e8]"
-                        onClick={() => tree.setIsCreateSpaceOpen(true)}
-                    />
+                    <div className="flex items-center gap-2">
+                        <RefreshCcw
+                            size={14}
+                            className={`cursor-pointer text-[#6b6f76] transition-all hover:text-[#1a73e8] ${isRefreshing ? 'animate-spin' : ''}`}
+                            onClick={handleRefreshSpaces}
+                            title="Refresh list"
+                        />
+                        <Plus
+                            size={15}
+                            className="cursor-pointer text-[#6b6f76] transition-colors hover:text-[#1a73e8]"
+                            onClick={() => tree.setIsCreateSpaceOpen(true)}
+                        />
+                    </div>
                 </div>
 
                 {!spacesCollapsed && (
@@ -129,7 +144,6 @@ export default function AppSidebar() {
                 )}
             </div>
 
-            {/* ── Bottom Actions ── */}
             <div className="mt-auto flex flex-col gap-0.5 border-t border-[#e2e4e9] pt-2">
                 <div
                     className="flex cursor-pointer select-none items-center gap-2.5 rounded-md px-2.5 py-1.75 text-[13.5px] font-medium text-[#1e1f21] transition-all hover:bg-[#f3f4f8]"
