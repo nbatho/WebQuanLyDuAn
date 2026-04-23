@@ -1,4 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { beApi } from '../../api/callApi';
 import { 
     Sparkles, 
     Plus, 
@@ -18,7 +21,9 @@ import {
     Bell,
     Lightbulb,
     PanelLeftClose,
-    PanelLeftOpen
+    PanelLeftOpen,
+    MoreHorizontal,
+    Trash2
 } from 'lucide-react';
 
 export interface AIChatMessage {
@@ -30,67 +35,181 @@ export interface AIChatMessage {
     followUps?: string[];
 }
 
+interface ChatSession {
+    id: string;
+    title: string;
+    messages: AIChatMessage[];
+    timestamp: number;
+}
+
 export default function AIPage() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [messages, setMessages] = useState<AIChatMessage[]>([]);
+    
+    // Quản lý nhiều phiên chat
+    const [sessions, setSessions] = useState<ChatSession[]>(() => {
+        const saved = localStorage.getItem('flowise_ai_sessions');
+        if (saved) return JSON.parse(saved);
+        
+        // Mặc định tạo 1 session nếu chưa có gì
+        return [{
+            id: 'default',
+            title: 'Cuộc trò chuyện mới',
+            messages: [],
+            timestamp: Date.now()
+        }];
+    });
+
+    const [activeSessionId, setActiveSessionId] = useState<string>(() => {
+        const lastActive = localStorage.getItem('flowise_ai_active_session');
+        const savedSessions = localStorage.getItem('flowise_ai_sessions');
+        const parsedSessions = savedSessions ? JSON.parse(savedSessions) : [];
+        
+        if (parsedSessions.length > 0) {
+            const sessionExists = parsedSessions.some((s: any) => s.id === lastActive);
+            return sessionExists ? lastActive! : parsedSessions[0].id;
+        }
+        return 'default';
+    });
+
     const [inputValue, setInputValue] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // Session hiện tại đang được chọn
+    const activeSession = sessions.find(s => s.id === activeSessionId) || sessions[0];
+    const messages = activeSession?.messages || [];
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
+    // Đồng bộ session vào localStorage
+    useEffect(() => {
+        localStorage.setItem('flowise_ai_sessions', JSON.stringify(sessions));
+        localStorage.setItem('flowise_ai_active_session', activeSessionId);
+    }, [sessions, activeSessionId]);
+
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    const handleNewChat = () => {
+        const newId = Date.now().toString();
+        const newSession: ChatSession = {
+            id: newId,
+            title: 'Cuộc trò chuyện mới',
+            messages: [],
+            timestamp: Date.now()
+        };
+        setSessions([newSession, ...sessions]);
+        setActiveSessionId(newId);
+    };
+
+    const handleDeleteSession = (sessionId: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        const updatedSessions = sessions.filter(s => s.id !== sessionId);
+        
+        if (updatedSessions.length === 0) {
+            const newId = Date.now().toString();
+            const newSession = { id: newId, title: 'Cuộc trò chuyện mới', messages: [], timestamp: Date.now() };
+            setSessions([newSession]);
+            setActiveSessionId(newId);
+        } else {
+            setSessions(updatedSessions);
+            if (activeSessionId === sessionId) {
+                setActiveSessionId(updatedSessions[0].id);
+            }
+        }
+    };
 
     const handleSendMessage = async (forceText?: string) => {
         const text = forceText || inputValue.trim();
         if (!text || isGenerating) return;
 
         const userMessage: AIChatMessage = { id: Date.now().toString(), role: 'user', content: text };
-        setMessages((prev) => [...prev, userMessage]);
+        
+        // Cập nhật tin nhắn và đổi tên tiêu đề nếu là tin nhắn đầu tiên
+        setSessions(prev => prev.map(s => {
+            if (s.id === activeSessionId) {
+                const newTitle = s.messages.length === 0 
+                    ? (text.length > 25 ? text.substring(0, 25) + '...' : text)
+                    : s.title;
+                return { ...s, title: newTitle, messages: [...s.messages, userMessage] };
+            }
+            return s;
+        }));
+
         setInputValue('');
         setIsGenerating(true);
 
         const aiMessageId = (Date.now() + 1).toString();
-        // Start with Searching state
-        setMessages((prev) => [...prev, { id: aiMessageId, role: 'ai', content: '', isSearching: true, isStreaming: true }]);
-
-        // Simulate "Searching" delay
-        await new Promise(r => setTimeout(r, 1500));
-
-        // Switch to typing state
-        setMessages((prev) => prev.map(msg => 
-            msg.id === aiMessageId ? { ...msg, isSearching: false } : msg
+        
+        // Thêm tin nhắn AI với trạng thái Searching
+        setSessions(prev => prev.map(s => 
+            s.id === activeSessionId 
+                ? { ...s, messages: [...s.messages, { id: aiMessageId, role: 'ai', content: '', isSearching: true, isStreaming: true }] } 
+                : s
         ));
 
-        const mockResponse = "I can certainly help with that! Based on your workspace files and recent tasks, this is a simulated response. You will connect the Gemini API here shortly to provide real context.";
-        
-        let currentText = '';
-        const words = mockResponse.split(' ');
-        
-        for (let i = 0; i < words.length; i++) {
-            await new Promise(r => setTimeout(r, 60));
-            currentText += words[i] + ' ';
-            setMessages((prev) => prev.map(msg => 
-                msg.id === aiMessageId ? { ...msg, content: currentText } : msg
+        try {
+            const chatHistory = messages.slice(-5).map(msg => ({
+                role: msg.role === 'user' ? 'user' : 'assistant',
+                content: msg.content
+            }));
+
+            const response: any = await beApi.post('ai/chat', { 
+                message: text,
+                history: chatHistory
+            });
+
+            const fullResponse = response.response;
+            const words = fullResponse.split(' ');
+            let currentText = '';
+
+            // Tắt Searching
+            setSessions(prev => prev.map(s => 
+                s.id === activeSessionId 
+                    ? { ...s, messages: s.messages.map(m => m.id === aiMessageId ? { ...m, isSearching: false, isStreaming: true } : m) } 
+                    : s
             ));
-        }
 
-        setMessages((prev) => prev.map(msg => 
-            msg.id === aiMessageId ? { 
-                ...msg, 
-                isStreaming: false,
-                followUps: [
-                    'Write a detailed plan based on this',
-                    'Create tasks for the mentioned items',
-                    'Summarize the key points'
-                ]
-            } : msg
-        ));
-        setIsGenerating(false);
+            for (let i = 0; i < words.length; i++) {
+                await new Promise(r => setTimeout(r, 30));
+                currentText += words[i] + ' ';
+                setSessions(prev => prev.map(s => 
+                    s.id === activeSessionId 
+                        ? { ...s, messages: s.messages.map(m => m.id === aiMessageId ? { ...m, content: currentText } : m) } 
+                        : s
+                ));
+            }
+
+            setSessions(prev => prev.map(s => 
+                s.id === activeSessionId 
+                    ? { ...s, 
+                        title: response.suggestedTitle || s.title, // Cập nhật tiêu đề từ AI
+                        messages: s.messages.map(m => m.id === aiMessageId ? { 
+                            ...m, 
+                            content: fullResponse, 
+                            isStreaming: false,
+                            followUps: response.suggestions || []
+                        } : m) } 
+                    : s
+            ));
+
+        } catch (error: any) {
+            setSessions(prev => prev.map(s => 
+                s.id === activeSessionId 
+                    ? { ...s, messages: s.messages.map(m => m.id === aiMessageId ? { 
+                        ...m, 
+                        content: "Rất tiếc, AI đang gặp lỗi kết nối. Vui lòng thử lại sau.", 
+                        isSearching: false,
+                        isStreaming: false 
+                    } : m) } 
+                    : s
+            ));
+        } finally {
+            setIsGenerating(false);
+        }
     };
 
     return (
@@ -149,13 +268,47 @@ export default function AIPage() {
                     </div>
                 </div>
 
-                <div className="mt-6 flex flex-1 flex-col px-2">
+                <div className="mt-6 flex flex-1 flex-col px-2 overflow-y-auto scrollbar-thin">
                     <div className="mb-1 px-2.5 text-[11px] font-extrabold text-[#9aa0a6] uppercase tracking-[0.05em]">
                         Recent Chats
                     </div>
-                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg bg-[#eef0f5] px-2.5 py-1.5 text-[13px] font-semibold text-[#141b2b]">
-                        <MessageSquarePlus size={14} className="text-[#5f6368]" />
+                    <button 
+                        onClick={handleNewChat}
+                        className="mb-2 flex cursor-pointer items-center gap-2.5 rounded-lg border border-dashed border-[#d0d4d9] px-2.5 py-1.5 text-[13px] font-semibold text-[#5f6368] hover:bg-[#eef0f5] hover:border-[#7c5cfc] hover:text-[#7c5cfc] transition-all"
+                    >
+                        <Plus size={14} />
                         <span>New Conversation</span>
+                    </button>
+
+                    <div className="flex flex-col gap-0.5">
+                        {sessions
+                            .filter(session => session.messages.length > 0) // Chỉ hiện session đã có tin nhắn
+                            .map((session) => (
+                                <div 
+                                    key={session.id}
+                                    onClick={() => setActiveSessionId(session.id)}
+                                    className={`group relative flex items-center justify-between rounded-lg px-2.5 py-1.5 transition-all cursor-pointer ${
+                                        activeSessionId === session.id 
+                                        ? 'bg-[#eef0f5] text-[#141b2b]' 
+                                        : 'text-[#5f6368] hover:bg-[#eef0f5] hover:text-[#141b2b]'
+                                    }`}
+                                >
+                                <div className="flex items-center gap-2 overflow-hidden">
+                                    <History size={14} className="shrink-0 opacity-70" />
+                                    <span className="truncate text-[13px] font-semibold leading-tight">{session.title}</span>
+                                </div>
+                                
+                                <button 
+                                    onClick={(e) => handleDeleteSession(session.id, e)}
+                                    className={`flex h-6 w-6 items-center justify-center rounded text-[#9aa0a6] hover:bg-red-50 hover:text-red-500 transition-all ${
+                                        activeSessionId === session.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                                    }`}
+                                    title="Delete chat"
+                                >
+                                    <Trash2 size={13} />
+                                </button>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
@@ -305,12 +458,13 @@ export default function AIPage() {
                                                 {message.isSearching ? (
                                                     <div className="flex items-center gap-2 rounded-lg bg-linear-to-r from-[#e3e8f8]/30 to-transparent py-2 px-3 animate-pulse w-max">
                                                         <Search size={14} className="text-[#7c5cfc] animate-spin-slow" />
-                                                        <span className="text-[13px] font-semibold text-[#7c5cfc]">Searching workspace...</span>
+                                                        <span className="text-[13px] font-semibold text-[#7c5cfc]">Flowise thinking...</span>
                                                     </div>
                                                 ) : (
-                                                    <div className="text-[14px] font-medium leading-[1.6] text-[#3a3f47] whitespace-pre-wrap">
-                                                        {message.content}
-                                                        {message.isStreaming && <span className="ml-1 inline-block h-4 w-2 animate-pulse bg-[#e84393] align-middle rounded-sm" />}
+                                                    <div className="text-[14px] font-medium leading-[1.6] text-[#3a3f47] markdown-content overflow-hidden">
+                                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                            {message.content + (message.isStreaming ? ' █' : '')}
+                                                        </ReactMarkdown>
                                                     </div>
                                                 )}
                                                 
