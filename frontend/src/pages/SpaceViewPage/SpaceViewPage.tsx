@@ -54,7 +54,7 @@ export default function SpaceViewPage() {
 
     // Custom Hooks
     const viewState = useSpaceViewState(spaceId, listParam, folderParam);
-    const { groups, setGroups, handleCreateTask, handleContextAction } = useSpaceTasks(spaceId);
+    const { groups, setGroups, handleCreateTask, handleInlineCreate, handleContextAction } = useSpaceTasks(spaceId);
     const { filters, setFilters, filteredGroups, flatTasks } = useTaskFilters(groups);
 
     const onContextActionSelect = (action: string) => {
@@ -92,6 +92,7 @@ export default function SpaceViewPage() {
                         groups={filteredGroups} setGroups={setGroups}
                         setSelectedTask={viewState.setSelectedTask} showClosed={viewState.showClosed}
                         columns={viewState.columns} onContextMenu={viewState.handleContextMenu}
+                        onCreateTask={handleInlineCreate}
                         spaceTitle={currentSpace?.name ?? 'Space'}
                         breadcrumbContext={breadcrumbContext}
                     />

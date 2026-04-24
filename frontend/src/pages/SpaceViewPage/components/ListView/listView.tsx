@@ -23,6 +23,7 @@ export default function ListView({
     showClosed,
     columns,
     onContextMenu,
+    onCreateTask,
     spaceTitle = 'Space',
     breadcrumbContext = null,
 }: {
@@ -32,6 +33,7 @@ export default function ListView({
     showClosed: boolean;
     columns: Record<string, boolean>;
     onContextMenu: (e: React.MouseEvent, task: Task) => void;
+    onCreateTask: (groupId: string, name: string) => void;
     spaceTitle?: string;
     breadcrumbContext?: string | null;
 }) {
@@ -64,33 +66,11 @@ export default function ListView({
     };
 
     const handleInlineCreate = (groupId: string) => {
-        if (!inlineText.trim()) {
-            setInlineGroup(null);
-            return;
-        }
-        const group = groups.find((g) => g.id === groupId);
-        if (!group) return;
-        const spaceNumeric =
-            groups.flatMap((g) => g.tasks)[0]?.space_id ?? 1;
-        const newTask: Task = {
-            task_id: Math.floor(Math.random() * 999999),
-            space_id: spaceNumeric,
-            parent_task_id: null,
-            name: inlineText.trim(),
-            description: null,
-            status: group.name,
-            statusColor: group.color,
-            priority: 'Normal',
-            priorityColor: '#00b894',
-            due_date: null,
-            assignees: [],
-            comment_count: 0,
-        };
-        setGroups((prev) =>
-            prev.map((g) => (g.id === groupId ? { ...g, tasks: [...g.tasks, newTask] } : g)),
-        );
+        const trimmed = inlineText.trim();
         setInlineText('');
         setInlineGroup(null);
+        if (!trimmed) return;
+        onCreateTask(groupId, trimmed);
     };
 
     const displayGroups = showClosed ? groups : groups.filter((g) => g.id !== 'done');
