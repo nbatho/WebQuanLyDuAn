@@ -1,7 +1,10 @@
 import { useMemo, useState } from 'react';
 import { ChevronDown, ChevronUp, UserRound, X } from 'lucide-react';
 import { Modal, Input } from 'antd';
-
+import { sendInvitations } from '@/store/modules/workspaces';
+import type { AppDispatch } from '@/store/configureStore';
+import { useDispatch, useSelector } from 'react-redux';
+import type { WorkspacesState } from '@/types/workspaces';
 type InvitePeopleModalProps = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -15,38 +18,52 @@ const roleOptions: Array<{
     description: string;
     badge?: string;
 }> = [
-    {
-        id: 'member',
-        label: 'Member',
-        description: 'Can access all public items in your Workspace.',
-    },
-    {
-        id: 'limited_member',
-        label: 'Limited Member',
-        description: 'Can only access items shared with them.',
-        badge: 'Chat Collaborator',
-    },
-    {
-        id: 'guest',
-        label: 'Guest',
-        description: "Can't use all features or be added to Spaces. Can only access items shared with them.",
-    },
-    {
-        id: 'admin',
-        label: 'Admin',
-        description: 'Can manage Spaces, People, Billing and other Workspace settings.',
-    },
-];
+        {
+            id: 'member',
+            label: 'Member',
+            description: 'Can access all public items in your Workspace.',
+        },
+        {
+            id: 'limited_member',
+            label: 'Limited Member',
+            description: 'Can only access items shared with them.',
+            badge: 'Chat Collaborator',
+        },
+        {
+            id: 'guest',
+            label: 'Guest',
+            description: "Can't use all features or be added to Spaces. Can only access items shared with them.",
+        },
+        {
+            id: 'admin',
+            label: 'Admin',
+            description: 'Can manage Spaces, People, Billing and other Workspace settings.',
+        },
+    ];
 
 export default function InvitePeopleModal({ open, onOpenChange }: InvitePeopleModalProps) {
     const [emails, setEmails] = useState('');
     const [role, setRole] = useState<InviteRole>('member');
     const [showRolePicker, setShowRolePicker] = useState(false);
-
+    const dispatch = useDispatch<AppDispatch>();
     const roleValue = useMemo(
         () => roleOptions.find((r) => r.id === role) ?? roleOptions[0],
         [role],
     );
+    const currentWorkspaceId = useSelector((state: { workspaces: WorkspacesState }) => state.workspaces.currentWorkspaceId);
+    const handleSendInvite = async () => {
+        console.log('Send invite to', emails, 'with role', role);
+
+        if (!emails.trim()) {
+            return;
+        }
+
+        await dispatch(sendInvitations({
+            workspaceId: currentWorkspaceId?.toString() || '',
+            emails: emails.trim(),
+        }));
+        onOpenChange(false);
+    };
 
     return (
         <Modal
@@ -80,7 +97,7 @@ export default function InvitePeopleModal({ open, onOpenChange }: InvitePeopleMo
                 </button>
 
                 <h2 className="mb-3 text-[24px] font-black tracking-[-0.02em] text-[var(--color-on-surface)]">
-                    Invite people for free
+                    Invite people
                 </h2>
 
                 <div className="mb-3">
@@ -115,11 +132,10 @@ export default function InvitePeopleModal({ open, onOpenChange }: InvitePeopleMo
                     </button>
 
                     <div
-                        className={`absolute left-0 top-[calc(100%+8px)] z-20 w-85 origin-top rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-subtle)] p-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-180 ease-out ${
-                            showRolePicker
+                        className={`absolute left-0 top-[calc(100%+8px)] z-20 w-85 origin-top rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-subtle)] p-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-180 ease-out ${showRolePicker
                                 ? 'translate-y-0 scale-100 opacity-100'
                                 : 'pointer-events-none -translate-y-1 scale-[0.98] opacity-0'
-                        }`}
+                            }`}
                     >
                         <div className="max-h-60 overflow-y-auto pr-1">
                             {roleOptions.map((opt) => (
@@ -166,9 +182,9 @@ export default function InvitePeopleModal({ open, onOpenChange }: InvitePeopleMo
                     <button
                         type="button"
                         className="rounded-xl border-0 bg-[var(--color-inverse-surface)] px-5 py-2 text-[13px] font-bold text-white cursor-pointer"
-                        onClick={() => onOpenChange(false)}
+                        onClick={handleSendInvite}
                     >
-                        Send free invite
+                        Send invite
                     </button>
                 </div>
             </div>

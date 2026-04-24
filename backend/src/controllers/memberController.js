@@ -112,3 +112,5 @@ export const RespondToInvitation = async (req, res) => {
         return res.status(500).json({ message: "Lỗi Server nội bộ" });
     }
 };
+
+export const RemoveMember = async (req, res) => {}

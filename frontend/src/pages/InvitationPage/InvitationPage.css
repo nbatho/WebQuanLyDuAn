@@ -1,0 +1,99 @@
+.invitation-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: radial-gradient(circle at top right, var(--color-surface-container) 0%, var(--color-background) 58%);
+}
+
+.invitation-card {
+    width: 100%;
+    max-width: 640px;
+    text-align: center;
+    padding: 32px;
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    background: var(--color-surface-container-lowest);
+    box-shadow: 0 12px 36px rgba(20, 27, 43, 0.08);
+}
+
+.invitation-label {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-text-secondary);
+}
+
+.invitation-project-name {
+    margin: 8px 0 0;
+    font-size: clamp(1.75rem, 2.8vw, 2.25rem);
+    line-height: 1.2;
+    color: var(--color-on-surface);
+}
+
+.invitation-title {
+    margin: 24px 0 0;
+    font-size: clamp(1.125rem, 2.2vw, 1.5rem);
+    line-height: 1.35;
+    color: var(--color-on-surface-variant);
+}
+
+.invitation-email {
+    margin: 10px 0 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.invitation-actions {
+    margin-top: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.invitation-btn {
+    min-width: 148px;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-weight: 700;
+    color: var(--color-on-primary);
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.invitation-btn:hover {
+    transform: translateY(-1px);
+}
+
+.invitation-btn-accept {
+    background: var(--color-secondary);
+}
+
+.invitation-btn-accept:hover {
+    background: #005c3f;
+}
+
+.invitation-btn-reject {
+    background: var(--color-error);
+}
+
+.invitation-btn-reject:hover {
+    background: #a01313;
+}
+
+@media (max-width: 560px) {
+    .invitation-card {
+        padding: 24px 18px;
+    }
+
+    .invitation-btn {
+        width: 100%;
+    }
+}

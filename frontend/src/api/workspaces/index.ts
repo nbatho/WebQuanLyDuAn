@@ -24,3 +24,11 @@ export const getWorkspaceById = async (workspace_id: number): Promise<Workspaces
 export const getWorkspaceMembers = async (workspace_id: number): Promise<WorkspaceMemberData[]> => {
     return beApi.get(`/workspaces/${workspace_id}/members`);
 }
+
+export const inviteMembers = async (workspaceId: string, emails: string) => {
+    
+    return beApi.post(`/members/invitations`, {
+        email : emails,
+        workspace_id : workspaceId
+    });
+}

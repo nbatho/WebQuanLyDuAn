@@ -6,6 +6,7 @@ import {
     deleteWorkspace,
     getWorkspaceById,
     getWorkspaceMembers,
+    inviteMembers
 } from '../../../api/workspaces';
 import type { WorkspacesData, WorkspaceMemberData, WorkspacesState } from '../../../types/workspaces';
 import {
@@ -101,12 +102,24 @@ export const fetchWorkspaceMembers = createAsyncThunk<
     }
 });
 
-
+export const sendInvitations = createAsyncThunk<
+    void,
+    { workspaceId: string; emails: string },
+    { rejectValue: string }
+>('workspaces/sendInvitations', async ( { workspaceId, emails }, { rejectWithValue }) => {
+    try {
+        await inviteMembers(workspaceId, emails);
+    } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : 'Failed to send invitations';
+        return rejectWithValue(msg);
+    }
+});
 
 const initialState: WorkspacesState = {
     listWorkspaces: [],
     currentWorkspaceId: readStoredWorkspaceId(),
     isLoadingWorkspaces: false,
+    isSendingInvitations: false,
     error: null,
 };
 
@@ -174,6 +187,21 @@ const workspacesSlice = createSlice({
                 state.currentWorkspaceId = next;
                 persistCurrentWorkspaceId(next);
             }
+        });
+        builder.addCase(removeWorkspace.rejected, (state, action) => {
+            state.error = action.payload || action.error.message || 'Failed to delete workspace';
+        });
+
+        builder.addCase(sendInvitations.pending, (state) => {
+            state.isSendingInvitations = true;
+            state.error = null;
+        });
+        builder.addCase(sendInvitations.fulfilled, (state) => {
+            state.isSendingInvitations = false;
+        });
+        builder.addCase(sendInvitations.rejected, (state, action) => {
+            state.isSendingInvitations = false;
+            state.error = action.payload || action.error.message || 'Failed to send invitations';
         });
     },
 });

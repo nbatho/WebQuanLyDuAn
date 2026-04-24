@@ -15,6 +15,7 @@ import AIPage from '../pages/AIPage';
 import AppLayout from "../layouts/AppLayout";
 import type { RouteConfig } from "../types/app";
 import PrivateRoute from "./PrivateRoutes";
+import InvitationPage from "@/pages/InvitationPage";
 export const routes: RouteConfig[] = [
     {
         path: '/',
@@ -80,5 +81,9 @@ export const routes: RouteConfig[] = [
                 element: <SettingsPage />
             }
         ]
+    },
+    {
+        path: '/join-workspace',
+        element: <InvitationPage />
     }
 ];
