@@ -1,7 +1,10 @@
 import express from 'express';
 import {
     getTasksBySpaceId,
+    getTasksByListId,
+    getTasksByFolderId,
     createTasks,
+    createTasksForList,
     getTaskById,
     updateTasks,
     deleteTasks,
@@ -54,6 +57,97 @@ const router = express.Router();
  */
 
 router.get('/spaces/:spaceId', getTasksBySpaceId);
+
+/**
+ * @swagger
+ * /api/v1/tasks/lists/{listId}:
+ *   get:
+ *     summary: Get all tasks in a list
+ *     tags: [Tasks]
+ *     parameters:
+ *       - in: path
+ *         name: listId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the list
+ *     responses:
+ *       200:
+ *         description: A list of tasks
+ *       400:
+ *         description: Bad request - List ID is required
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get('/lists/:listId', getTasksByListId);
+
+/**
+ * @swagger
+ * /api/v1/tasks/folders/{folderId}:
+ *   get:
+ *     summary: Get all tasks in a folder
+ *     tags: [Tasks]
+ *     parameters:
+ *       - in: path
+ *         name: folderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the folder
+ *     responses:
+ *       200:
+ *         description: List of tasks in the folder
+ *       400:
+ *         description: Bad request - Folder ID is required
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get('/folders/:folderId', getTasksByFolderId);
+
+/**
+ * @swagger
+ * /api/v1/tasks/lists/{listId}:
+ *   post:
+ *     summary: Create a new task in a list
+ *     tags: [Tasks]
+ *     parameters:
+ *       - in: path
+ *         name: listId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the list
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "Design homepage"
+ *               description:
+ *                 type: string
+ *                 example: "Create the initial homepage design"
+ *               due_date:
+ *                 type: string
+ *                 format: date-time
+ *                 example: "2026-05-01T00:00:00.000Z"
+ *     responses:
+ *       201:
+ *         description: Task created successfully
+ *       400:
+ *         description: Bad request - Name is required
+ *       500:
+ *         description: Internal server error
+ */
+
+router.post('/lists/:listId', createTasksForList);
 
 /**
  * @swagger

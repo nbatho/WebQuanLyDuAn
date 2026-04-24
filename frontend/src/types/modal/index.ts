@@ -33,6 +33,8 @@ export interface CreateTaskModalProps {
     onClose: () => void;
     onCreate: (task: NewTaskData) => void;
     defaultStatus?: string;
+    lists?: { id: number; name: string }[];
+    defaultListId?: number;
 }
 
 export interface TaskDetailModalProps {

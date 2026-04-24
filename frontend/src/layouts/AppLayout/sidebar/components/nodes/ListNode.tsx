@@ -35,7 +35,7 @@ export const ListNode = ({
     const tree = useSpaceTree();
     const [listMenu, setListMenu] = useState<{ x: number; y: number } | null>(null);
     const [listCreateMenu, setListCreateMenu] = useState<{ x: number; y: number } | null>(null);
-    const isActive = location.pathname === `/list/${list.id}`;
+    const isActive = location.pathname === `/space/${spaceId}/list/${list.id}`;
 
     const listMenuItems: MenuEntry[] = [
         { icon: <Pencil size={14} />, label: 'Rename', onClick: () => {} },
@@ -87,7 +87,7 @@ export const ListNode = ({
             className={`group relative flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.25 text-[12.5px] transition-all ${
                 isActive ? 'bg-[#e8f0fe] text-[#1a73e8] font-semibold' : 'text-[#1e1f21] hover:bg-[#f3f4f8]'
             }`}
-            onClick={() => navigate(`/list/${list.id}`)}
+            onClick={() => navigate(`/space/${spaceId}/list/${list.id}`)}
         >
             <ListTodo size={14} className="shrink-0 text-[#6b6f76]" />
             <span className="min-w-0 flex-1 truncate">{list.name}</span>

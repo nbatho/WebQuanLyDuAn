@@ -1,5 +1,7 @@
 import {
     findAllTasksBySpaceId,
+    findAllTasksByListId,
+    findAllTasksByFolderId,
     createTask,
     findTaskById,
     updateTask,
@@ -36,6 +38,34 @@ export const getTasksBySpaceId = async (req, res) => {
     }
 };
 
+export const getTasksByListId = async (req, res) => {
+    try {
+        const { listId } = req.params;
+        if (!listId) {
+            return res.status(400).json({ error: "List ID is required" });
+        }
+        const tasks = await findAllTasksByListId(listId);
+        res.status(200).json(tasks);
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+export const getTasksByFolderId = async (req, res) => {
+    try {
+        const { folderId } = req.params;
+        if (!folderId) {
+            return res.status(400).json({ error: "Folder ID is required" });
+        }
+        const tasks = await findAllTasksByFolderId(folderId);
+        res.status(200).json(tasks);
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 export const createTasks = async (req, res) => {
     try {
         const { spaceId } = req.params;
@@ -50,6 +80,34 @@ export const createTasks = async (req, res) => {
         const newTask = await createTask(name, description, spaceId, due_date);
         res.status(201).json(newTask);  
 
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+import con from '../config/connect.js';
+
+export const createTasksForList = async (req, res) => {
+    try {
+        const { listId } = req.params;
+        const { name, description, status } = req.body;
+        
+        if (!listId) return res.status(400).json({ error: "List ID is required" });
+        if (!name) return res.status(400).json({ error: "Name is required" });
+
+        const listRes = await con.query('SELECT space_id, folder_id FROM lists WHERE list_id = $1', [listId]);
+        if (listRes.rows.length === 0) {
+            return res.status(404).json({ error: "List not found" });
+        }
+        
+        const { space_id, folder_id } = listRes.rows[0];
+        const due_date = req.body.due_date ? new Date(req.body.due_date) : null;
+        
+        const query = `INSERT INTO tasks (name, description, space_id, folder_id, list_id, start_date, due_date) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+        const values = [name, description, space_id, folder_id, listId, new Date(), due_date];
+        const result = await con.query(query, values);
+        
+        res.status(201).json(result.rows[0]);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

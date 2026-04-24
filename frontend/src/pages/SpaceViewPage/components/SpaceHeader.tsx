@@ -92,12 +92,6 @@ export default function SpaceHeader({ currentSpace, activeView, onViewChange }: 
                 <button className={tabClass('overview')} onClick={() => onViewChange('overview')}>
                     <LayoutDashboard size={14} /> Overview
                 </button>
-                <button className={tabClass('list')} onClick={() => onViewChange('list')}>
-                    <LayoutList size={14} /> List
-                </button>
-                <button className={tabClass('board')} onClick={() => onViewChange('board')}>
-                    <Trello size={14} /> Board
-                </button>
                 <div className="relative" ref={pickerRef}>
                     <button
                         className="flex items-center gap-1 whitespace-nowrap rounded-t-md px-2.5 py-2 text-[13px] font-semibold text-[var(--color-text-tertiary)] transition-all duration-150 hover:bg-[var(--color-surface-subtle)] hover:text-[var(--color-text-secondary)]"

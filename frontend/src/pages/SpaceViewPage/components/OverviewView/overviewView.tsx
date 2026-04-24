@@ -10,7 +10,11 @@ const WIDGETS = [
     { id: 'whiteboards', title: 'Whiteboards', icon: PenTool, iconColor: '#27ae60', emptyEmoji: '🖌️', desc: 'Brainstorm and collaborate visually with your team.', btn: 'Add Whiteboard' },
 ];
 
-export default function OverviewView() {
+import { useNavigate } from 'react-router-dom';
+import type { SpaceTreeData } from '../../../../types/tree';
+
+export default function OverviewView({ spaceId, currentSpaceTree }: { spaceId?: string, currentSpaceTree?: SpaceTreeData[string] }) {
+    const navigate = useNavigate();
     return (
         <div className="flex-1 overflow-y-auto p-0 bg-[#f8fafc]">
             <div className="flex items-center justify-between border-b border-[#eef0f5] bg-white px-5 py-2.5 sticky top-0 z-10 shadow-sm">
@@ -53,26 +57,26 @@ export default function OverviewView() {
                     Lists and Folders
                 </h3>
                 <div className="rounded-xl border border-[#eef0f5] bg-white shadow-sm overflow-hidden">
-                    <div className="flex cursor-pointer items-center justify-between border-b border-[#f0f2f5] px-5 py-3.5 hover:bg-[#f8fafb] transition-colors">
-                        <div className="flex items-center gap-3">
-                            <FolderOpen size={16} className="text-[#5f6368]" />
-                            <span className="text-[14px] font-semibold text-[#141b2b]">Task Management</span>
+                    {currentSpaceTree?.folders.map(folder => (
+                        <div key={folder.id} onClick={() => navigate(`/folder/${folder.id}`)} className="flex cursor-pointer items-center justify-between border-b border-[#f0f2f5] px-5 py-3.5 hover:bg-[#f8fafb] transition-colors">
+                            <div className="flex items-center gap-3">
+                                <FolderOpen size={16} className="text-[#f0a220]" />
+                                <span className="text-[14px] font-semibold text-[#141b2b]">{folder.name}</span>
+                            </div>
+                            <span className="text-[12px] font-medium text-[#9aa0a6]">{folder.lists.length} lists</span>
                         </div>
-                        <span className="text-[12px] font-medium text-[#9aa0a6]">24 items</span>
-                    </div>
-                    <div className="flex cursor-pointer items-center justify-between border-b border-[#f0f2f5] px-5 py-3.5 hover:bg-[#f8fafb] transition-colors">
-                        <div className="flex items-center gap-3">
-                            <FolderOpen size={16} className="text-[#5f6368]" />
-                            <span className="text-[14px] font-semibold text-[#141b2b]">Bug Tracking</span>
+                    ))}
+                    {currentSpaceTree?.standaloneLists.map(list => (
+                        <div key={list.id} onClick={() => navigate(`/list/${list.id}`)} className="flex cursor-pointer items-center justify-between border-b border-[#f0f2f5] px-5 py-3.5 hover:bg-[#f8fafb] transition-colors">
+                            <div className="flex items-center gap-3">
+                                <span className="text-[#5f6368] pl-1">≡</span>
+                                <span className="text-[14px] font-semibold text-[#141b2b]">{list.name}</span>
+                            </div>
                         </div>
-                        <span className="text-[12px] font-medium text-[#9aa0a6]">5 items</span>
-                    </div>
-                    <div className="flex cursor-pointer items-center justify-between px-5 py-3.5 hover:bg-[#f8fafb] transition-colors">
-                        <div className="flex items-center gap-2 text-[#0058be]">
-                            <Plus size={16} />
-                            <span className="text-[14px] font-semibold">Create new List</span>
-                        </div>
-                    </div>
+                    ))}
+                    {currentSpaceTree?.folders.length === 0 && currentSpaceTree?.standaloneLists.length === 0 && (
+                        <div className="px-5 py-3.5 text-sm text-[#9aa0a6] italic">No folders or lists found in this space.</div>
+                    )}
                 </div>
             </div>
         </div>

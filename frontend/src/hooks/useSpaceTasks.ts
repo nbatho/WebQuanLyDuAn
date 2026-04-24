@@ -1,26 +1,31 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { StatusGroup, Task } from '@/types/tasks';
-import { familyTaskIds } from '@/utils/taskFamily';
 import { useAppDispatch, useAppSelector } from '@/hooks/index';
 
 import {
     fetchTasksForSpace,
+    fetchTasksForList,
+    fetchTasksForFolder,
     fetchCreateTask,
     fetchDeleteTask,
 } from '@/store/modules/tasks';
 
-export function useSpaceTasks(spaceId: string | undefined) {
+export function useTasksData({ spaceId, listId, folderId }: { spaceId?: string; listId?: string; folderId?: string }) {
     const dispatch = useAppDispatch();
     const { listTask } = useAppSelector((state) => state.tasks);
 
     const [groups, setGroups] = useState<StatusGroup[]>([]);
 
-    // ── 1. Fetch tasks khi space thay đổi ───────────────────────────
+    // ── 1. Fetch tasks dựa theo ngữ cảnh ───────────────────────────
     useEffect(() => {
-        if (spaceId) {
+        if (listId) {
+            dispatch(fetchTasksForList(Number(listId)));
+        } else if (folderId) {
+            dispatch(fetchTasksForFolder(Number(folderId)));
+        } else if (spaceId) {
             dispatch(fetchTasksForSpace(Number(spaceId)));
         }
-    }, [spaceId, dispatch]);
+    }, [spaceId, listId, folderId, dispatch]);
 
     // ── 2. Map listTask từ Redux → UI StatusGroup[] ──────────────────
     useEffect(() => {
@@ -56,6 +61,8 @@ export function useSpaceTasks(spaceId: string | undefined) {
             groupsMap[groupId].tasks.push({
                 task_id: apiTask.task_id,
                 space_id: apiTask.space_id,
+                folder_id: apiTask.folder_id,
+                list_id: apiTask.list_id,
                 parent_task_id: apiTask.parent_task_id,
                 name: apiTask.name,
                 description: apiTask.description,
@@ -96,13 +103,13 @@ export function useSpaceTasks(spaceId: string | undefined) {
             due_date: string | null;
             assignees: string[];
             description: string;
-            listName: string;
+            listId: number;
         }) => {
-            if (!spaceId) return;
+            if (!spaceId || !data.listId) return;
 
             dispatch(
                 fetchCreateTask({
-                    space_id: Number(spaceId),
+                    list_id: data.listId,
                     taskData: {
                         name: data.name,
                         description: data.description || null,
@@ -131,15 +138,15 @@ export function useSpaceTasks(spaceId: string | undefined) {
     //       groupId: id của status group (vd: 'todo', 'inprogress')
     //       name   : tên task đã trim
     const handleInlineCreate = useCallback(
-        (groupId: string, name: string) => {
-            if (!spaceId || !name) return;
+        (groupId: string, name: string, listId: number) => {
+            if (!spaceId || !name || !listId) return;
 
             // Tìm status_id tương ứng với group đang chọn
             const targetGroup = groups.find((g) => g.id === groupId);
 
             dispatch(
                 fetchCreateTask({
-                    space_id: Number(spaceId),
+                    list_id: listId,
                     taskData: {
                         name,
                         // Nếu muốn truyền status_id cụ thể, cần mapping từ group sang status_id
@@ -181,7 +188,7 @@ export function useSpaceTasks(spaceId: string | undefined) {
                     if (!spaceId) break;
                     dispatch(
                         fetchCreateTask({
-                            space_id: Number(spaceId),
+                            list_id: task.list_id,
                             taskData: {
                                 name: `${task.name} (copy)`,
                                 description: task.description,

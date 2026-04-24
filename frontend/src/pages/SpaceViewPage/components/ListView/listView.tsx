@@ -24,6 +24,8 @@ export default function ListView({
     columns,
     onContextMenu,
     onCreateTask,
+    onRequestCreateModal,
+    listId,
     spaceTitle = 'Space',
     breadcrumbContext = null,
 }: {
@@ -33,7 +35,9 @@ export default function ListView({
     showClosed: boolean;
     columns: Record<string, boolean>;
     onContextMenu: (e: React.MouseEvent, task: Task) => void;
-    onCreateTask: (groupId: string, name: string) => void;
+    onCreateTask: (groupId: string, name: string, listId?: number) => void;
+    onRequestCreateModal?: (groupId: string, name: string) => void;
+    listId?: number;
     spaceTitle?: string;
     breadcrumbContext?: string | null;
 }) {
@@ -70,7 +74,12 @@ export default function ListView({
         setInlineText('');
         setInlineGroup(null);
         if (!trimmed) return;
-        onCreateTask(groupId, trimmed);
+        
+        if (listId) {
+            onCreateTask(groupId, trimmed, listId);
+        } else if (onRequestCreateModal) {
+            onRequestCreateModal(groupId, trimmed);
+        }
     };
 
     const displayGroups = showClosed ? groups : groups.filter((g) => g.id !== 'done');

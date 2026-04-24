@@ -1,6 +1,6 @@
 -- ================================================================
 -- FLOWISE — PostgreSQL Database Schema
--- Phiên bản: 3.0 (Tích hợp Soft Delete toàn diện)
+-- Phiên bản: 3.1 (Tích hợp list_id, folder_id vào tasks)
 -- ================================================================
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
@@ -209,6 +209,8 @@ CREATE TABLE tasks (
     task_id        SERIAL       PRIMARY KEY,
     parent_task_id INT          REFERENCES tasks(task_id) ON DELETE CASCADE,
     space_id       INT          NOT NULL REFERENCES spaces(space_id) ON DELETE CASCADE,
+    folder_id      INT          REFERENCES folders(folder_id) ON DELETE CASCADE,
+    list_id        INT          REFERENCES lists(list_id) ON DELETE CASCADE,
     sprint_id      INT          REFERENCES sprints(sprint_id) ON DELETE SET NULL,
     milestone_id   INT          REFERENCES milestones(milestone_id) ON DELETE SET NULL,
     status_id      INT          REFERENCES task_status(status_id) ON DELETE SET NULL,
@@ -312,6 +314,8 @@ CREATE TABLE notifications (
 -- PARTIAL INDEXES (Tối ưu cho Soft Delete)
 -- ================================================================
 CREATE INDEX idx_tasks_space_id      ON tasks(space_id) WHERE deleted_at IS NULL;
+CREATE INDEX idx_tasks_folder_id     ON tasks(folder_id) WHERE folder_id IS NOT NULL AND deleted_at IS NULL;
+CREATE INDEX idx_tasks_list_id       ON tasks(list_id) WHERE list_id IS NOT NULL AND deleted_at IS NULL;
 CREATE INDEX idx_tasks_parent_id     ON tasks(parent_task_id) WHERE parent_task_id IS NOT NULL AND deleted_at IS NULL;
 CREATE INDEX idx_tasks_status_id     ON tasks(status_id) WHERE deleted_at IS NULL;
 CREATE INDEX idx_tasks_archived      ON tasks(is_archived) WHERE deleted_at IS NULL;
@@ -377,7 +381,7 @@ CREATE TRIGGER trg_tasks_soft_delete_cascade AFTER UPDATE OF deleted_at ON tasks
 -- ================================================================
 CREATE OR REPLACE VIEW kanban_tasks AS
 SELECT
-    t.task_id, t.parent_task_id, t.space_id, t.name, t.description, t.story_points,
+    t.task_id, t.parent_task_id, t.space_id, t.folder_id, t.list_id, t.name, t.description, t.story_points,
     t.start_date, t.due_date, t.completed_at, t.position, t.is_archived, t.created_by, t.created_at, t.updated_at,
     ts.status_name, ts.color AS status_color, ts.is_done_state, tp.priority_name, tp.color AS priority_color,
     sp.name AS sprint_name, ms.name AS milestone_name,

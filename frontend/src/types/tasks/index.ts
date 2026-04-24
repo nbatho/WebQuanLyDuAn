@@ -1,7 +1,8 @@
-/** Aligns with `tasks` table: task_id, space_id, parent_task_id, name, description (+ UI-only fields until API exposes them). */
 export interface Task {
     task_id: number;
     space_id: number;
+    folder_id: number | null;
+    list_id: number | null;
     parent_task_id: number | null;
     name: string;
     description: string | null;
@@ -22,7 +23,7 @@ export interface NewTaskData {
     due_date: string | null;
     assignees: string[];
     description: string;
-    listName: string;
+    listId: number;
 }
 
 export interface StatusGroup {

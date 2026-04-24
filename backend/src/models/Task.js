@@ -82,6 +82,166 @@ export const findAllTasksBySpaceId = async (space_id) => {
   }
 };
 
+export const findAllTasksByListId = async (list_id) => {
+  try {
+    const query = `
+      SELECT 
+        t.task_id,
+        t.parent_task_id,
+        t.space_id,
+        t.folder_id,
+        t.list_id,
+        
+        s.name AS space_name,
+        s.color AS space_color,
+        
+        t.status_id,
+        ts.status_name,
+        ts.color AS status_color,
+        
+        t.priority_id,
+        tp.priority_name,
+        tp.color AS priority_color,
+        
+        t.name, 
+        t.description, 
+        t.story_points,
+        t.start_date,
+        t.due_date,
+        t.completed_at,
+        t.position,
+        
+        COALESCE(
+          (
+            SELECT json_agg(
+              json_build_object(
+                'user_id', u.user_id,
+                'name', u.name,
+                'avatar_url', u.avatar_url
+              )
+            )
+            FROM task_assigns ta
+            JOIN users u ON ta.user_id = u.user_id
+            WHERE ta.task_id = t.task_id
+              AND ta.deleted_at IS NULL
+              AND u.deleted_at IS NULL
+          ), '[]'::json
+        ) AS assignees,
+
+        COALESCE(
+          (
+            SELECT json_agg(
+              json_build_object(
+                'tag_id', tg.tag_id,
+                'name', tg.name,
+                'color', tg.color
+              )
+            )
+            FROM task_tags tt
+            JOIN tags tg ON tt.tag_id = tg.tag_id
+            WHERE tt.task_id = t.task_id
+              AND tg.deleted_at IS NULL
+          ), '[]'::json
+        ) AS tags
+
+      FROM tasks t
+      JOIN spaces s ON t.space_id = s.space_id
+      LEFT JOIN task_status ts ON t.status_id = ts.status_id
+      LEFT JOIN task_priority tp ON t.priority_id = tp.priority_id
+      
+      WHERE t.list_id = $1 
+        AND t.deleted_at IS NULL 
+        AND s.deleted_at IS NULL
+      ORDER BY t.position ASC;
+    `;
+
+    const values = [list_id];
+    const result = await con.query(query, values);
+
+    return result.rows;
+  } catch (error) {
+    console.error("Error in findAllTasksByListId:", error);
+    throw error;
+  }
+};
+
+export const findAllTasksByFolderId = async (folder_id) => {
+  try {
+    const query = `
+      SELECT 
+        t.task_id,
+        t.parent_task_id,
+        t.space_id,
+        t.folder_id,
+        t.list_id,
+        
+        s.name AS space_name,
+        s.color AS space_color,
+        
+        t.status_id,
+        ts.status_name,
+        ts.color AS status_color,
+        
+        t.priority_id,
+        tp.priority_name,
+        tp.color AS priority_color,
+        
+        t.name, 
+        t.description, 
+        t.story_points,
+        t.start_date,
+        t.due_date,
+        t.completed_at,
+        t.position,
+        t.is_archived,
+        t.created_by,
+        t.created_at,
+        t.updated_by,
+        t.updated_at,
+        t.deleted_at,
+
+        (SELECT COUNT(*) FROM comments c WHERE c.task_id = t.task_id AND c.deleted_at IS NULL) AS comment_count,
+
+        COALESCE(
+          (
+            SELECT json_agg(json_build_object('user_id', u.user_id, 'name', u.name, 'avatar_url', u.avatar_url))
+            FROM task_assignees ta
+            JOIN users u ON ta.user_id = u.user_id
+            WHERE ta.task_id = t.task_id
+          ), '[]'::json
+        ) AS assignees,
+
+        COALESCE(
+          (
+            SELECT json_agg(json_build_object('tag_id', tg.tag_id, 'name', tg.name, 'color', tg.color))
+            FROM task_tags tt
+            JOIN tags tg ON tt.tag_id = tg.tag_id
+            WHERE tt.task_id = t.task_id
+              AND tg.deleted_at IS NULL
+          ), '[]'::json
+        ) AS tags
+
+      FROM tasks t
+      JOIN spaces s ON t.space_id = s.space_id
+      LEFT JOIN task_status ts ON t.status_id = ts.status_id
+      LEFT JOIN task_priority tp ON t.priority_id = tp.priority_id
+      
+      WHERE t.folder_id = $1 
+        AND t.deleted_at IS NULL 
+        AND s.deleted_at IS NULL
+      ORDER BY t.position ASC;
+    `;
+
+    const values = [folder_id];
+    const result = await con.query(query, values);
+
+    return result.rows;
+  } catch (error) {
+    console.error("Error in findAllTasksByFolderId:", error);
+    throw error;
+  }
+};
+
 export const createTask = async (name, description, space_id, due_date) => {
   try {
     const query = `INSERT INTO tasks (name, description, space_id, start_date, due_date) VALUES ($1, $2, $3, $4, $5) RETURNING *`;

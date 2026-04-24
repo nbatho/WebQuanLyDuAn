@@ -8,16 +8,14 @@ import { STATUS_OPTIONS, PRIORITY_OPTIONS, MEMBER_OPTIONS } from '../constants/t
 
 
 
-const LIST_OPTIONS = ['Action Items', 'Backlog', 'Ideas'];
-
-export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStatus }: CreateTaskModalProps) {
+export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStatus, lists = [], defaultListId }: CreateTaskModalProps) {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [status, setStatus] = useState(defaultStatus || 'TO DO');
     const [priority, setPriority] = useState('Normal');
     const [dueDate, setDueDate] = useState('');
     const [assignees, setAssignees] = useState<string[]>([]);
-    const [listName, setListName] = useState('Action Items');
+    const [listId, setListId] = useState<number | undefined>(defaultListId || (lists.length > 0 ? lists[0].id : undefined));
 
     // Dropdown states
     const [showStatus, setShowStatus] = useState(false);
@@ -35,10 +33,10 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
             setPriority('Normal');
             setDueDate('');
             setAssignees([]);
-            setListName('Action Items');
+            setListId(defaultListId || (lists.length > 0 ? lists[0].id : undefined));
             setTimeout(() => titleRef.current?.focus(), 100);
         }
-    }, [isOpen, defaultStatus]);
+    }, [isOpen, defaultStatus, defaultListId, lists]);
 
     if (!isOpen) return null;
 
@@ -46,7 +44,7 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
     const priorityObj = PRIORITY_OPTIONS.find(p => p.value === priority) || PRIORITY_OPTIONS[2];
 
     const handleCreate = () => {
-        if (!name.trim()) return;
+        if (!name.trim() || !listId) return;
         onCreate({
             name: name.trim(),
             status,
@@ -56,7 +54,7 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
             due_date: dueDate || null,
             assignees,
             description,
-            listName,
+            listId,
         });
         onClose();
     };
@@ -101,19 +99,21 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
                             className="flex cursor-pointer items-center gap-1 rounded-md border border-[#eef0f5] bg-transparent px-2.5 py-0.75 text-xs font-semibold text-[#141b2b] hover:border-[#dcdfe4] hover:bg-[#f8fafb]"
                             onClick={() => { closeAllDropdowns(); setShowList(!showList); }}
                         >
-                            {listName} <ChevronDown size={12} />
+                            {lists.find(l => l.id === listId)?.name || 'Select List'} <ChevronDown size={12} />
                         </button>
                         {showList && (
                             <div className="absolute left-0 top-[calc(100%+4px)] z-10 min-w-45 rounded-lg border border-[#eef0f5] bg-white p-1 shadow-[0_6px_20px_rgba(0,0,0,0.12)]">
-                                {LIST_OPTIONS.map(l => (
+                                {lists.length > 0 ? lists.map(l => (
                                     <button
-                                        key={l}
-                                        className={`flex w-full cursor-pointer items-center gap-2 rounded-md border-none px-2.5 py-1.75 text-left text-xs font-semibold ${listName === l ? 'bg-[#f0f4ff] text-[#0058be]' : 'bg-transparent text-[#141b2b] hover:bg-[#f0f4ff]'
+                                        key={l.id}
+                                        className={`flex w-full cursor-pointer items-center gap-2 rounded-md border-none px-2.5 py-1.75 text-left text-xs font-semibold ${listId === l.id ? 'bg-[#f0f4ff] text-[#0058be]' : 'bg-transparent text-[#141b2b] hover:bg-[#f0f4ff]'
                                             }`}
-                                        onClick={() => { setListName(l); setShowList(false); }}>
-                                        <FolderOpen size={13} /> {l}
+                                        onClick={() => { setListId(l.id); setShowList(false); }}>
+                                        <FolderOpen size={13} /> {l.name}
                                     </button>
-                                ))}
+                                )) : (
+                                    <div className="px-2.5 py-1.75 text-xs text-[#9aa0a6]">No lists available</div>
+                                )}
                             </div>
                         )}
                     </div>
@@ -255,7 +255,7 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
                         <button
                             className="cursor-pointer rounded-md border-none bg-[#0058be] px-4.5 py-1.5 text-[13px] font-bold text-white transition-colors hover:bg-[#004aab] disabled:cursor-not-allowed disabled:bg-[#b0c4de]"
                             onClick={handleCreate}
-                            disabled={!name.trim()}
+                            disabled={!name.trim() || !listId}
                         >
                             Create Task
                         </button>

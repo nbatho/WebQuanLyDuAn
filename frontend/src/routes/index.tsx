@@ -69,7 +69,7 @@ export const routes: RouteConfig[] = [
                 element: <FolderViewPage />
             },
             {
-                path: 'list/:listId',
+                path: 'space/:spaceId/list/:listId',
                 element: <ListViewPage />
             },
             {

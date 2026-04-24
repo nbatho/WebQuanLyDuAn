@@ -15,14 +15,19 @@ export const getTasksForList = async (list_id: number): Promise<TaskWithSpaceDat
     return beApi.get(`/tasks/lists/${list_id}`);
 };
 
+export const getTasksForFolder = async (folder_id: number): Promise<TaskWithSpaceData[]> => {
+    return beApi.get(`/tasks/folders/${folder_id}`).then((res: any) => res.data); // Adjust for JSON wrapper {status: "success", data: []}
+};
+
 export const createTaskInList = async (taskData: {
     list_id: number;
     name: string;
+    description?: string;
     status?: string;
     priority?: string;
-    due_date?: string;
+    due_date?: string | null;
 }): Promise<TaskData> => {
-    return beApi.post(`/tasks`, taskData);
+    return beApi.post(`/tasks/lists/${taskData.list_id}`, taskData);
 };
 
 export const getTaskById = async (task_id: number): Promise<TaskWithSpaceData> => {
