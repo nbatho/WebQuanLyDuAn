@@ -125,7 +125,6 @@ export default function AppSidebar() {
                             size={14}
                             className={`cursor-pointer text-[#6b6f76] transition-all hover:text-[#1a73e8] ${isRefreshing ? 'animate-spin' : ''}`}
                             onClick={handleRefreshSpaces}
-                            title="Refresh list"
                         />
                         <Plus
                             size={15}

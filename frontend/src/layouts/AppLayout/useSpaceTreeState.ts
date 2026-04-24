@@ -1,16 +1,11 @@
 import { useState, useEffect, useRef, useCallback, type MouseEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { SpaceItem } from '@/types/spaces';
+import type { SpaceTreeData } from '@/types/tree';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { fetchSpacesForWorkspace, fetchCreateSpace } from '@/store/modules/spaces';
 import { deleteSpace } from '@/api/spaces';
-import {
-    fetchTreeForSpaces,
-    createFolder,
-    removeFolder,
-    createList,
-    removeList,
-} from '@/store/modules/tree';
+import { createFolder, removeFolder, createList, removeList } from '@/store/modules/tree';
 
 export function useSpaceTreeState() {
     const navigate = useNavigate();
@@ -19,17 +14,35 @@ export function useSpaceTreeState() {
 
     const listSpaces = useAppSelector((state) => state.spaces.listSpaces);
     const currentWorkspaceId = useAppSelector((state) => state.workspaces.currentWorkspaceId);
-    const spaceTree = useAppSelector((state) => state.tree.data);
 
     const spaces: SpaceItem[] = listSpaces.map((s) => ({
-        id: String(s.space_id),
+        id: String(s.spaceId),
         name: s.name,
         color: s.color || '#0058be',
     }));
 
+    const spaceTree: SpaceTreeData = listSpaces.reduce<SpaceTreeData>((acc, s) => {
+        acc[String(s.spaceId)] = {
+            folders: (s.folders ?? []).map((f) => ({
+                id: String(f.folder_id),
+                name: f.name,
+                lists: (f.lists ?? []).map((l) => ({
+                    id: String(l.list_id),
+                    name: l.name,
+                    count: 0,
+                })),
+            })),
+            standaloneLists: (s.lists ?? []).map((l) => ({
+                id: String(l.list_id),
+                name: l.name,
+                count: 0,
+            })),
+        };
+        return acc;
+    }, {});
+
     const [isCreateSpaceOpen, setIsCreateSpaceOpen] = useState(false);
 
-    /* ── Context menu (space actions) ── */
     const [actionMenu, setActionMenu] = useState<{
         spaceId: string;
         spaceName: string;
@@ -41,10 +54,11 @@ export function useSpaceTreeState() {
     const [isWorkspaceDialogOpen, setIsWorkspaceDialogOpen] = useState(false);
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
-    /* ── Create Folder modal ── */
-    const [createFolderTarget, setCreateFolderTarget] = useState<{ spaceId: string; spaceName: string } | null>(null);
+    const [createFolderTarget, setCreateFolderTarget] = useState<{
+        spaceId: string;
+        spaceName: string;
+    } | null>(null);
 
-    /* ── Create List modal ── */
     const [createListTarget, setCreateListTarget] = useState<{
         spaceId: string;
         folderId: string | null;
@@ -57,29 +71,22 @@ export function useSpaceTreeState() {
         return () => document.removeEventListener('click', handleClick);
     }, []);
 
-    /* ── Fetch tree when spaces change ── */
-    const spaceIdKey = spaces.map((s) => s.id).join(',');
-
-    useEffect(() => {
-        if (spaces.length > 0) {
-            const numericIds = spaces.map((s) => parseInt(s.id, 10));
-            dispatch(fetchTreeForSpaces(numericIds));
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dispatch, spaceIdKey]);
 
     const handleCreateSpace = async (name: string, color: string, is_private?: boolean) => {
         if (!currentWorkspaceId) return;
         try {
-            await dispatch(fetchCreateSpace({
-                workspace_id: currentWorkspaceId,
-                name,
-                description: '',
-                color: color || '#0058be',
-                is_private: is_private || false,
-            })).unwrap();
+            await dispatch(
+                fetchCreateSpace({
+                    workspace_id: currentWorkspaceId,
+                    name,
+                    description: '',
+                    color: color || '#0058be',
+                    is_private: is_private || false,
+                }),
+            ).unwrap();
+            dispatch(fetchSpacesForWorkspace(currentWorkspaceId));
         } catch (error) {
-            console.error("Failed to create space:", error);
+            console.error('Failed to create space:', error);
         }
     };
 
@@ -99,20 +106,20 @@ export function useSpaceTreeState() {
                     navigate('/home');
                 }
             } catch (error) {
-                console.error("Failed to delete space:", error);
+                console.error('Failed to delete space:', error);
             }
         },
         [location.pathname, navigate, dispatch, currentWorkspaceId],
     );
 
-    /* ── Folder CRUD (via Redux) ── */
     const handleCreateFolder = async (name: string) => {
         if (!createFolderTarget) return;
         const { spaceId } = createFolderTarget;
         try {
             await dispatch(createFolder({ spaceId: parseInt(spaceId, 10), name })).unwrap();
+            if (currentWorkspaceId) dispatch(fetchSpacesForWorkspace(currentWorkspaceId));
         } catch (error) {
-            console.error("Failed to create folder:", error);
+            console.error('Failed to create folder:', error);
         }
         setCreateFolderTarget(null);
     };
@@ -120,23 +127,26 @@ export function useSpaceTreeState() {
     const handleDeleteFolder = async (spaceId: string, folderId: string) => {
         try {
             await dispatch(removeFolder({ spaceId, folderId })).unwrap();
+            if (currentWorkspaceId) dispatch(fetchSpacesForWorkspace(currentWorkspaceId));
         } catch (error) {
-            console.error("Failed to delete folder:", error);
+            console.error('Failed to delete folder:', error);
         }
     };
 
-    /* ── List CRUD (via Redux) ── */
     const handleCreateList = async (name: string) => {
         if (!createListTarget) return;
         const { spaceId, folderId } = createListTarget;
         try {
-            await dispatch(createList({
-                spaceId: parseInt(spaceId, 10),
-                folderId: folderId ? parseInt(folderId, 10) : null,
-                name,
-            })).unwrap();
+            await dispatch(
+                createList({
+                    spaceId: parseInt(spaceId, 10),
+                    folderId: folderId ? parseInt(folderId, 10) : null,
+                    name,
+                }),
+            ).unwrap();
+            if (currentWorkspaceId) dispatch(fetchSpacesForWorkspace(currentWorkspaceId));
         } catch (error) {
-            console.error("Failed to create list:", error);
+            console.error('Failed to create list:', error);
         }
         setCreateListTarget(null);
     };
@@ -144,8 +154,9 @@ export function useSpaceTreeState() {
     const handleDeleteList = async (spaceId: string, folderId: string | null, listId: string) => {
         try {
             await dispatch(removeList({ spaceId, folderId, listId })).unwrap();
+            if (currentWorkspaceId) dispatch(fetchSpacesForWorkspace(currentWorkspaceId));
         } catch (error) {
-            console.error("Failed to delete list:", error);
+            console.error('Failed to delete list:', error);
         }
     };
 
@@ -164,7 +175,6 @@ export function useSpaceTreeState() {
         setIsWorkspaceDialogOpen,
         isInviteModalOpen,
         setIsInviteModalOpen,
-        /* folder/list */
         createFolderTarget,
         setCreateFolderTarget,
         createListTarget,

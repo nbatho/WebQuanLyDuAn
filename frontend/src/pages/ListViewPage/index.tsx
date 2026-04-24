@@ -124,9 +124,9 @@ export default function ListViewPage() {
         }
     }, [listId]);
 
-    useEffect(() => {
-        fetchTasks();
-    }, [fetchTasks]);
+    // useEffect(() => {
+    //     fetchTasks();
+    // }, [fetchTasks]);
 
     useEffect(() => {
         if (!Number.isFinite(spaceIdNum)) return;
@@ -290,9 +290,6 @@ export default function ListViewPage() {
                     </div>
                     <div className="flex items-center gap-1.5">
                         <button className="flex cursor-pointer items-center gap-1.25 rounded-md border border-[#eef0f5] bg-transparent px-2.5 py-1 text-xs font-semibold text-[#5f6368] transition-all hover:border-[#dcdfe4] hover:bg-[#f8fafc]">
-                            <Clock size={14} /> Agents
-                        </button>
-                        <button className="flex cursor-pointer items-center gap-1.25 rounded-md border border-[#eef0f5] bg-transparent px-2.5 py-1 text-xs font-semibold text-[#5f6368] transition-all hover:border-[#dcdfe4] hover:bg-[#f8fafc]">
                             <Bot size={14} /> Ask AI
                         </button>
                         <button className="flex cursor-pointer items-center gap-1.25 rounded-md border border-[#0058be] bg-[#0058be] px-2.5 py-1 text-xs font-semibold text-white transition-all hover:bg-[#004aab]">
@@ -302,23 +299,11 @@ export default function ListViewPage() {
                 </div>
                 {/* Tabs */}
                 <div className="flex items-center gap-0.5 px-5">
-                    <button className="flex items-center gap-1.25 whitespace-nowrap rounded-t-md border-b-2 border-b-transparent px-3 py-2 text-[13px] font-medium text-[#9aa0a6] hover:bg-[#f8fafc] hover:text-[#5f6368]">
-                        Add Channel
-                    </button>
                     <button className="flex items-center gap-1.25 whitespace-nowrap rounded-t-md border-b-2 border-b-[#0058be] px-3 py-2 text-[13px] font-semibold text-[#0058be]">
                         <LayoutList size={14} /> List
                     </button>
                     <button className="flex items-center gap-1.25 whitespace-nowrap rounded-t-md border-b-2 border-b-transparent px-3 py-2 text-[13px] font-medium text-[#5f6368] hover:bg-[#f8fafc]">
                         <Trello size={14} /> Board
-                    </button>
-                    <button className="flex items-center gap-1.25 whitespace-nowrap rounded-t-md border-b-2 border-b-transparent px-3 py-2 text-[13px] font-medium text-[#5f6368] hover:bg-[#f8fafc]">
-                        <Calendar size={14} /> Calendar
-                    </button>
-                    <button className="flex items-center gap-1.25 whitespace-nowrap rounded-t-md border-b-2 border-b-transparent px-3 py-2 text-[13px] font-medium text-[#5f6368] hover:bg-[#f8fafc]">
-                        <BarChart2 size={14} /> Gantt
-                    </button>
-                    <button className="flex items-center gap-1.25 whitespace-nowrap rounded-t-md border-b-2 border-b-transparent px-3 py-2 text-[13px] font-medium text-[#5f6368] hover:bg-[#f8fafc]">
-                        <Users size={14} /> Team
                     </button>
                     <button className="flex items-center gap-1 whitespace-nowrap rounded-t-md px-2.5 py-2 text-[13px] font-medium text-[#9aa0a6] hover:bg-[#f8fafc] hover:text-[#5f6368]">
                         <Plus size={13} /> View
@@ -527,45 +512,7 @@ export default function ListViewPage() {
                             );
                         })}
 
-                        {/* + New status */}
-                        {newStatusOpen ? (
-                            <div className="mx-5 mb-2 flex items-center gap-2 rounded-lg border border-[#1e1f21] bg-white px-3 py-2 shadow-sm">
-                                <input
-                                    type="color"
-                                    className="h-7 w-7 shrink-0 cursor-pointer overflow-hidden rounded border border-[#dcdfe4] bg-white p-0"
-                                    value={newStatusColor}
-                                    onChange={(e) => setNewStatusColor(e.target.value)}
-                                    aria-label="Màu status"
-                                />
-                                <input
-                                    className="min-w-0 flex-1 border-none bg-transparent text-[13px] text-[#141b2b] outline-none placeholder:text-[#9aa0a6]"
-                                    placeholder="Status name"
-                                    value={newStatusName}
-                                    autoFocus
-                                    onChange={(e) => setNewStatusName(e.target.value)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') void handleCreateStatus();
-                                        if (e.key === 'Escape') {
-                                            setNewStatusOpen(false);
-                                            setNewStatusName('');
-                                            setNewStatusColor('#8B7355');
-                                        }
-                                    }}
-                                />
-                            </div>
-                        ) : (
-                            /* + New status (compact) */
-                            <div className="px-5 py-4">
-                                <button
-                                    type="button"
-                                    className="flex items-center gap-1.5 border-none bg-transparent p-0 text-[12px] font-medium text-[#9aa0a6] hover:text-[#1a73e8] cursor-pointer transition-colors"
-                                    onClick={() => setNewStatusOpen(true)}
-                                >
-                                    <Plus size={13} />
-                                    <span>New status</span>
-                                </button>
-                            </div>
-                        )}
+
                     </div>
                 )}
             </main>

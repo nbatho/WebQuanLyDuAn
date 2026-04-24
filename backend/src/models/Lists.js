@@ -12,6 +12,13 @@ export const findListsBySpaceId = async (space_id) => {
   return result.rows;
 };
 
+export const findListsBySpaceIds = async (space_ids) => {
+  if (!space_ids || space_ids.length === 0) return [];
+  const query = `SELECT * FROM lists WHERE space_id = ANY($1::int[]) AND deleted_at IS NULL ORDER BY position, created_at`;
+  const result = await con.query(query, [space_ids]);
+  return result.rows;
+};
+
 export const findListById = async (list_id) => {
   const query = `SELECT * FROM lists WHERE list_id = $1 AND deleted_at IS NULL`;
   const result = await con.query(query, [list_id]);

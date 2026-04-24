@@ -1,7 +1,7 @@
-import type { SpaceData } from "@/store/modules/spaces";
+import type { SpaceData, SpaceDetail } from "@/store/modules/spaces";
 import { beApi } from "../callApi";
 
-export const getSpacesForWorkspace = async (workspace_id: number) : Promise<SpaceData[]> => {
+export const getSpacesForWorkspace = async (workspace_id: number) : Promise<SpaceDetail[]> => {
     return beApi.get(`/spaces/workspaces/${workspace_id}`);
 }
 
@@ -19,4 +19,8 @@ export const deleteSpace = async (space_id: number) => {
 
 export const getSpaceMembers = async (space_id: number) => {
     return beApi.get(`/spaces/${space_id}/members`);
+}
+
+export const getSpaceDetails = async (space_id: number) : Promise<SpaceDetail> => {
+    return beApi.get(`/spaces/spacesDetails/${space_id}`);
 }

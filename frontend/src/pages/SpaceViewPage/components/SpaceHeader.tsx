@@ -79,12 +79,6 @@ export default function SpaceHeader({ currentSpace, activeView, onViewChange }: 
                 </div>
                 <div className="flex items-center gap-1.5">
                     <button className="flex cursor-pointer items-center gap-1.25 rounded-md border border-[var(--color-border-light)] bg-transparent px-2.5 py-1 text-xs font-semibold text-[var(--color-text-secondary)] transition-all duration-150 hover:border-[var(--color-border)] hover:bg-[var(--color-surface-subtle)]">
-                        <Clock size={14} /> Agents
-                    </button>
-                    <button className="flex cursor-pointer items-center gap-1.25 rounded-md border border-[var(--color-border-light)] bg-transparent px-2.5 py-1 text-xs font-semibold text-[var(--color-text-secondary)] transition-all duration-150 hover:border-[var(--color-border)] hover:bg-[var(--color-surface-subtle)]">
-                        <Zap size={14} /> Automate
-                    </button>
-                    <button className="flex cursor-pointer items-center gap-1.25 rounded-md border border-[var(--color-border-light)] bg-transparent px-2.5 py-1 text-xs font-semibold text-[var(--color-text-secondary)] transition-all duration-150 hover:border-[var(--color-border)] hover:bg-[var(--color-surface-subtle)]">
                         <Bot size={14} /> Ask AI
                     </button>
                     <button className="flex cursor-pointer items-center gap-1.25 rounded-md border border-[var(--color-primary)] bg-[var(--color-primary)] px-2.5 py-1 text-xs font-semibold text-white transition-all duration-150 hover:bg-[var(--color-primary-hover)]">
@@ -95,9 +89,6 @@ export default function SpaceHeader({ currentSpace, activeView, onViewChange }: 
 
             {/* View tabs */}
             <div className="flex items-center gap-0.5 px-5">
-                <button className="flex items-center gap-1.25 whitespace-nowrap rounded-t-md border-b-2 border-b-transparent px-3 py-2 text-[13px] font-medium text-[var(--color-text-tertiary)] transition-all duration-150 hover:bg-[var(--color-surface-subtle)] hover:text-[var(--color-text-secondary)]">
-                    Add Channel
-                </button>
                 <button className={tabClass('overview')} onClick={() => onViewChange('overview')}>
                     <LayoutDashboard size={14} /> Overview
                 </button>

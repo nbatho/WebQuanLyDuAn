@@ -93,12 +93,6 @@ export default function FolderViewPage() {
                     </div>
                     <div className="flex items-center gap-1.5">
                         <button className="flex cursor-pointer items-center gap-1.25 rounded-md border border-[#eef0f5] bg-transparent px-2.5 py-1 text-xs font-semibold text-[#5f6368] transition-all hover:border-[#dcdfe4] hover:bg-[#f8fafc]">
-                            <Clock size={14} /> Agents
-                        </button>
-                        <button className="flex cursor-pointer items-center gap-1.25 rounded-md border border-[#eef0f5] bg-transparent px-2.5 py-1 text-xs font-semibold text-[#5f6368] transition-all hover:border-[#dcdfe4] hover:bg-[#f8fafc]">
-                            <Zap size={14} /> Automate
-                        </button>
-                        <button className="flex cursor-pointer items-center gap-1.25 rounded-md border border-[#eef0f5] bg-transparent px-2.5 py-1 text-xs font-semibold text-[#5f6368] transition-all hover:border-[#dcdfe4] hover:bg-[#f8fafc]">
                             <Bot size={14} /> Ask AI
                         </button>
                         <button className="flex cursor-pointer items-center gap-1.25 rounded-md border border-[#0058be] bg-[#0058be] px-2.5 py-1 text-xs font-semibold text-white transition-all hover:bg-[#004aab]">
@@ -119,15 +113,6 @@ export default function FolderViewPage() {
                     </button>
                     <button className="flex items-center gap-1.25 whitespace-nowrap rounded-t-md border-b-2 border-b-transparent px-3 py-2 text-[13px] font-medium text-[#5f6368] hover:bg-[#f8fafc]">
                         <Trello size={14} /> Board
-                    </button>
-                    <button className="flex items-center gap-1.25 whitespace-nowrap rounded-t-md border-b-2 border-b-transparent px-3 py-2 text-[13px] font-medium text-[#5f6368] hover:bg-[#f8fafc]">
-                        <Calendar size={14} /> Calendar
-                    </button>
-                    <button className="flex items-center gap-1.25 whitespace-nowrap rounded-t-md border-b-2 border-b-transparent px-3 py-2 text-[13px] font-medium text-[#5f6368] hover:bg-[#f8fafc]">
-                        <BarChart2 size={14} /> Gantt
-                    </button>
-                    <button className="flex items-center gap-1.25 whitespace-nowrap rounded-t-md border-b-2 border-b-transparent px-3 py-2 text-[13px] font-medium text-[#5f6368] hover:bg-[#f8fafc]">
-                        <Users size={14} /> Team
                     </button>
                     <button className="flex items-center gap-1 whitespace-nowrap rounded-t-md px-2.5 py-2 text-[13px] font-medium text-[#9aa0a6] hover:bg-[#f8fafc] hover:text-[#5f6368]">
                         <Plus size={13} /> View

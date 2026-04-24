@@ -6,6 +6,7 @@ import {
   updateSpaces,
   deleteSpaces,
   getSpaceMembers,
+  getSpaceDetails,
 } from "../controllers/spaceController.js";
 const router = express.Router();
 
@@ -197,4 +198,6 @@ router.delete("/:spaceId", deleteSpaces);
 
 router.get("/:spaceId/members", getSpaceMembers);
 
+
+router.get("/spacesDetails/:spaceId", getSpaceDetails);
 export default router;

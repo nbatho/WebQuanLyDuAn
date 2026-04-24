@@ -1,15 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { SpaceTreeData, FolderItem, ListItem } from '@/types/tree';
 import {
-    getFoldersForSpace,
-    getListsForSpace,
     createFolder as apiCreateFolder,
     createList as apiCreateList,
     deleteFolder as apiDeleteFolder,
     deleteList as apiDeleteList,
-    type FolderData,
 } from '@/api/folders';
-
 /* ── State ── */
 interface TreeState {
     data: SpaceTreeData;
@@ -22,52 +18,6 @@ const initialState: TreeState = {
     loading: false,
     error: null,
 };
-
-/* ── Thunks ── */
-
-/** Fetch folders + lists for all given spaces in parallel */
-export const fetchTreeForSpaces = createAsyncThunk(
-    'tree/fetchTreeForSpaces',
-    async (spaceIds: number[]) => {
-        const newTree: SpaceTreeData = {};
-
-        await Promise.all(
-            spaceIds.map(async (spaceId) => {
-                try {
-                    const [folders, allLists] = await Promise.all([
-                        getFoldersForSpace(spaceId),
-                        getListsForSpace(spaceId),
-                    ]);
-
-                    const folderItems: FolderItem[] = folders.map((f: FolderData) => ({
-                        id: String(f.folder_id),
-                        name: f.name,
-                        lists: (f.lists || []).map((l) => ({
-                            id: String(l.list_id),
-                            name: l.name,
-                            count: 0,
-                        })),
-                    }));
-
-                    const folderIds = new Set(folders.map((f: FolderData) => f.folder_id));
-                    const standaloneLists: ListItem[] = allLists
-                        .filter((l) => !l.folder_id || !folderIds.has(l.folder_id))
-                        .map((l) => ({
-                            id: String(l.list_id),
-                            name: l.name,
-                            count: 0,
-                        }));
-
-                    newTree[String(spaceId)] = { folders: folderItems, standaloneLists };
-                } catch {
-                    newTree[String(spaceId)] = { folders: [], standaloneLists: [] };
-                }
-            }),
-        );
-
-        return newTree;
-    },
-);
 
 export const createFolder = createAsyncThunk(
     'tree/createFolder',
@@ -139,20 +89,6 @@ const treeSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
-            /* fetchTreeForSpaces */
-            .addCase(fetchTreeForSpaces.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(fetchTreeForSpaces.fulfilled, (state, action) => {
-                state.loading = false;
-                state.data = { ...state.data, ...action.payload };
-            })
-            .addCase(fetchTreeForSpaces.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message || 'Failed to fetch tree';
-            })
-
             /* createFolder */
             .addCase(createFolder.fulfilled, (state, action) => {
                 const { spaceId, folder } = action.payload;

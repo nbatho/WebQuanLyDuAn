@@ -92,7 +92,7 @@ export default function MyTasksPage() {
     const [activeSpaceId, setActiveSpaceId] = useState<number | null>(null);
     useEffect(() => {
         if (listSpaces.length > 0 && activeSpaceId == null) {
-            setActiveSpaceId(listSpaces[0]!.space_id);
+            setActiveSpaceId(listSpaces[0]!.spaceId);
         }
     }, [listSpaces, activeSpaceId]);
 
@@ -144,7 +144,7 @@ export default function MyTasksPage() {
                         >
                             {listSpaces.length === 0 ? <option value="">No space</option> : null}
                             {listSpaces.map((space) => (
-                                <option key={space.space_id} value={space.space_id}>
+                                <option key={space.spaceId} value={space.spaceId}>
                                     {space.name}
                                 </option>
                             ))}

@@ -13,10 +13,6 @@ const WIDGETS = [
 export default function OverviewView() {
     return (
         <div className="flex-1 overflow-y-auto p-0 bg-[#f8fafc]">
-            <div className="flex items-center justify-between border-b border-[#fff176] bg-[#fffde7] px-5 py-2.5 text-[13px] text-[#5f6368]">
-                <span>Get the most out of your Overview! Add, reorder, and resize cards to customize this page. <a href="#" className="font-semibold text-[#0058be] hover:underline">Get Started</a></span>
-                <button className="flex items-center text-[#9aa0a6] hover:text-[#5f6368]"><X size={14} /></button>
-            </div>
             <div className="flex items-center justify-between border-b border-[#eef0f5] bg-white px-5 py-2.5 sticky top-0 z-10 shadow-sm">
                 <button className="flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-xs font-semibold text-[#5f6368] hover:bg-[#f0f4ff] hover:text-[#0058be] transition-colors"><BarChart2 size={14} /> Filters</button>
                 <div className="flex items-center gap-3">
@@ -26,7 +22,7 @@ export default function OverviewView() {
                     <button className="cursor-pointer rounded-md border-none bg-[#7c5cfc] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#6b4ce6] transition-all shadow-sm shadow-[#7c5cfc]/30">Add card</button>
                 </div>
             </div>
-            
+
             <div className="grid grid-cols-1 gap-5 p-6 md:grid-cols-2 xl:grid-cols-2">
                 {WIDGETS.map(w => (
                     <div key={w.id} className="group overflow-hidden rounded-xl border border-[#eef0f5] bg-white shadow-sm transition-all hover:shadow-md hover:border-[#dcdfe4]">
