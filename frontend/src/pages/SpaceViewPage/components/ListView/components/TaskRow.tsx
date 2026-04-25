@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import {
     Calendar,
-    CheckCircle2,
     ChevronDown,
     ChevronRight,
     Flag,
     MessageSquare,
     MoreHorizontal,
     Plus,
+    User,
 } from 'lucide-react';
 import { Avatar, Popover } from 'antd';
 import AssigneePopover from '../../../../../components/Popovers/AssigneePopover';
@@ -52,51 +52,70 @@ export default function TaskRow({
     const [popoverField, setPopoverField] = useState<'assignee' | 'dueDate' | 'priority' | null>(null);
 
     const updateTask = (updates: Partial<Task>) => onUpdate(task.task_id, updates);
+    const statusColor = task.statusColor ?? groupColor;
 
     return (
         <div
-            className={`group relative flex min-h-9 cursor-pointer items-stretch border border-transparent border-b-[#f0f2f5] transition-colors hover:border-[#eef0f5] ${isSubtask ? 'bg-[#fafbfc] hover:bg-[#f5f7fa]' : 'bg-white hover:bg-[#f8fafb]'}`}
+            className={`group relative flex min-h-[38px] cursor-pointer items-stretch border-b border-[#f3f4f6] transition-colors hover:bg-[#f9fafb] ${isSubtask ? 'bg-[#fafafa]' : 'bg-white'}`}
             onClick={() => onSelect(task)}
             onContextMenu={(e) => onContextMenu(e, task)}
         >
-            <div className={`relative flex min-w-65 flex-1 items-center border-l-[3px] border-l-transparent px-2 py-1.5 ${isSubtask ? 'pl-3.5' : 'pl-3.5'}`}>
+            {/* Name column */}
+            <div className={`flex min-w-0 flex-1 items-center gap-2 py-[7px] pr-2 ${isSubtask ? 'pl-14' : 'pl-3'}`}>
+
+                {/* Status circle — outline only, like ClickUp */}
                 <div
-                    className="absolute bottom-0 left-0 top-0 w-0.75"
-                    style={{ backgroundColor: isSubtask ? task.statusColor : groupColor }}
+                    className="flex shrink-0 h-[14px] w-[14px] items-center justify-center rounded-full border-2 transition-colors cursor-pointer hover:opacity-70"
+                    style={{ borderColor: statusColor }}
+                    onClick={(e) => e.stopPropagation()}
+                    title={task.status}
                 />
-                <div className={`flex items-center gap-2 ${isSubtask ? 'pl-7' : 'pl-1.5'}`}>
-                    {isSubtask && <span className="text-[13px] text-[#c2c9e0]">↳</span>}
-                    <CheckCircle2
-                        size={isSubtask ? 14 : 16}
-                        className={`shrink-0 text-[#dcdfe4] ${!isSubtask && 'group-hover:text-[#b0b5c1]'}`}
-                    />
-                    <span className={`font-medium text-[#141b2b] ${isSubtask ? 'text-xs' : 'text-[13px]'}`}>
-                        {task.name}
-                    </span>
-                    {!isSubtask && hasChildren && onToggle && (
-                        <button
-                            type="button"
-                            className="p-0"
-                            onClick={onToggle}
-                        >
-                            <span className="flex items-center gap-0.5 rounded-full bg-[#f0f4ff] px-1.5 py-0.5 text-[10px] font-extrabold text-[#0058be]">
-                                {isExpanded ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
-                                {childrenCount}
-                            </span>
-                        </button>
-                    )}
-                    {!isSubtask && task.comment_count > 0 && (
-                        <span className="flex items-center gap-1 text-[11px] text-[#9aa0a6]">
-                            <MessageSquare size={11} /> {task.comment_count}
+
+                {/* Subtask indent */}
+                {isSubtask && (
+                    <span className="shrink-0 text-[11px] text-[#d1d5db]">↳</span>
+                )}
+
+                {/* Children toggle */}
+                {!isSubtask && hasChildren && onToggle && (
+                    <button type="button" className="shrink-0" onClick={onToggle}>
+                        <span className="flex items-center gap-0.5 rounded px-1 py-[1px] text-[10px] font-semibold text-[#6b7280] bg-[#f3f4f6] hover:bg-[#e5e7eb] transition-colors">
+                            {isExpanded ? <ChevronDown size={9} /> : <ChevronRight size={9} />}
+                            {childrenCount}
                         </span>
-                    )}
-                </div>
+                    </button>
+                )}
+
+                {/* Task name */}
+                <span className={`min-w-0 truncate text-[#111827] ${isSubtask ? 'text-[12px]' : 'text-[13px]'}`}>
+                    {task.name}
+                </span>
+
+                {/* Comment count */}
+                {task.comment_count > 0 && (
+                    <span className="flex shrink-0 items-center gap-0.5 text-[11px] text-[#9ca3af]">
+                        <MessageSquare size={11} />
+                        {task.comment_count}
+                    </span>
+                )}
+
+                {/* More button — appears on hover */}
+                <button
+                    type="button"
+                    className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded text-[#9ca3af] opacity-0 transition-all hover:bg-[#e5e7eb] hover:text-[#6b7280] group-hover:opacity-100"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onContextMenu(e, task);
+                    }}
+                >
+                    <MoreHorizontal size={13} />
+                </button>
             </div>
 
             {/* Assignee Column */}
-            {columns.assignee && (
+            {columns.assignee !== false && (
                 <div
-                    className="flex w-27.5 items-center px-1.5 py-1.5 hover:bg-[#f8fafc] cursor-pointer group/cell transition-colors border border-transparent hover:border-[#eef0f5]"
+                    className="flex w-[120px] shrink-0 cursor-pointer items-center justify-start px-2 py-[7px] hover:bg-[#f3f4f6] transition-colors"
                     onClick={(e) => {
                         e.stopPropagation();
                         setPopoverField('assignee');
@@ -115,18 +134,18 @@ export default function TaskRow({
                         onOpenChange={(v) => !v && setPopoverField(null)}
                         placement="bottom"
                         arrow={false}
-                        overlayInnerStyle={{ padding: 0, borderRadius: '12px' }}
+                        overlayInnerStyle={{ padding: 0, borderRadius: '8px' }}
                     >
-                        <div className="flex w-full items-center min-h-[24px]">
+                        <div className="flex min-h-[22px] items-center">
                             {task.assignees.length > 0 ? (
                                 task.assignees.map((a) => (
                                     <Avatar
                                         key={a}
-                                        size={isSubtask ? 20 : 22}
+                                        size={24}
                                         style={{
-                                            backgroundColor: avatarColors[a],
-                                            fontSize: isSubtask ? '8px' : '9px',
-                                            fontWeight: 'bold',
+                                            backgroundColor: avatarColors[a] ?? '#6b7280',
+                                            fontSize: '10px',
+                                            fontWeight: 700,
                                             marginLeft: '-4px',
                                         }}
                                     >
@@ -134,9 +153,7 @@ export default function TaskRow({
                                     </Avatar>
                                 ))
                             ) : (
-                                <div className={`flex items-center justify-center rounded-full border border-dashed border-[#b0b5c1] text-[#b0b5c1] opacity-0 group-hover/cell:opacity-100 transition-opacity ${isSubtask ? 'h-4.5 w-4.5' : 'h-5 w-5'}`}>
-                                    <Plus size={isSubtask ? 10 : 11} />
-                                </div>
+                                <User size={16} className="text-[#d1d5db] group-hover:text-[#9ca3af] transition-colors" />
                             )}
                         </div>
                     </Popover>
@@ -144,9 +161,9 @@ export default function TaskRow({
             )}
 
             {/* Due Date Column */}
-            {columns.dueDate && (
+            {columns.dueDate !== false && (
                 <div
-                    className="flex w-30 items-center px-2 py-1.5 hover:bg-[#f8fafc] cursor-pointer group/cell transition-colors border border-transparent hover:border-[#eef0f5]"
+                    className="flex w-[130px] shrink-0 cursor-pointer items-center justify-start px-2 py-[7px] hover:bg-[#f3f4f6] transition-colors"
                     onClick={(e) => {
                         e.stopPropagation();
                         setPopoverField('dueDate');
@@ -165,24 +182,16 @@ export default function TaskRow({
                         onOpenChange={(v) => !v && setPopoverField(null)}
                         placement="bottom"
                         arrow={false}
-                        overlayInnerStyle={{ padding: 0, borderRadius: '12px' }}
+                        overlayInnerStyle={{ padding: 0, borderRadius: '8px' }}
                     >
-                        <div className="flex w-full items-center min-h-[24px]">
+                        <div className="flex min-h-[22px] items-center">
                             {task.due_date ? (
-                                <span
-                                    className={`flex items-center gap-1.5 text-xs font-medium ${
-                                        ['10/31/23', '11/1/23', '10/3/23'].includes(task.due_date)
-                                            ? 'font-bold text-[#e74c3c]'
-                                            : 'text-[#5f6368]'
-                                    }`}
-                                >
-                                    <Calendar size={isSubtask ? 11 : 12} /> {task.due_date}
+                                <span className="flex items-center gap-1 text-[12px] font-medium text-[#ef4444]">
+                                    <Calendar size={13} />
+                                    {task.due_date}
                                 </span>
                             ) : (
-                                <Calendar
-                                    size={isSubtask ? 13 : 14}
-                                    className="text-[#d0d3db] group-hover/cell:text-[#9aa0a6] transition-colors"
-                                />
+                                <Calendar size={15} className="text-[#d1d5db] group-hover:text-[#9ca3af] transition-colors" />
                             )}
                         </div>
                     </Popover>
@@ -190,9 +199,9 @@ export default function TaskRow({
             )}
 
             {/* Priority Column */}
-            {columns.priority && (
+            {columns.priority !== false && (
                 <div
-                    className="flex w-27.5 items-center px-2 py-1.5 hover:bg-[#f8fafc] cursor-pointer group/cell transition-colors border border-transparent hover:border-[#eef0f5]"
+                    className="flex w-[110px] shrink-0 cursor-pointer items-center justify-start px-2 py-[7px] hover:bg-[#f3f4f6] transition-colors"
                     onClick={(e) => {
                         e.stopPropagation();
                         setPopoverField('priority');
@@ -211,40 +220,27 @@ export default function TaskRow({
                         onOpenChange={(v) => !v && setPopoverField(null)}
                         placement="bottom"
                         arrow={false}
-                        overlayInnerStyle={{ padding: 0, borderRadius: '12px' }}
+                        overlayInnerStyle={{ padding: 0, borderRadius: '8px' }}
                     >
-                        <div className="flex w-full items-center min-h-[24px]">
-                            {task.priority !== 'Normal' ? (
+                        <div className="flex min-h-[22px] items-center">
+                            {task.priority && task.priority !== 'Normal' ? (
                                 <span
-                                    className="flex items-center gap-1.5 text-xs font-semibold"
+                                    className="flex items-center gap-1.5 text-[12px] font-semibold"
                                     style={{ color: task.priorityColor }}
                                 >
-                                    <Flag size={isSubtask ? 11 : 12} fill={task.priorityColor} />{' '}
-                                    {task.priority === 'Urgent' ? <span className="text-[11px]">Urgent</span> : task.priority}
+                                    <Flag size={13} fill={task.priorityColor} />
+                                    {task.priority}
                                 </span>
                             ) : (
-                                <Flag
-                                    size={isSubtask ? 13 : 14}
-                                    className="text-[#d0d3db] group-hover/cell:text-[#9aa0a6] transition-colors"
-                                />
+                                <Flag size={15} className="text-[#d1d5db] group-hover:text-[#9ca3af] transition-colors" />
                             )}
                         </div>
                     </Popover>
                 </div>
             )}
 
-            <div className="flex w-9 items-center justify-center px-0 py-1.5">
-                <button
-                    type="button"
-                    className="cursor-pointer rounded p-0.5 text-[#9aa0a6] opacity-0 hover:bg-[#eef0f5] group-hover:opacity-100"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onContextMenu(e, task);
-                    }}
-                >
-                    <MoreHorizontal size={14} />
-                </button>
-            </div>
+            {/* Add field spacer */}
+            <div className="w-9 shrink-0" />
         </div>
     );
 }

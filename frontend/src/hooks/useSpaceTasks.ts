@@ -10,9 +10,15 @@ import {
     fetchDeleteTask,
 } from '@/store/modules/tasks';
 
+import {
+    fetchStatusesBySpace,
+    fetchCreateStatus,
+} from '@/store/modules/statuses';
+
 export function useTasksData({ spaceId, listId, folderId }: { spaceId?: string; listId?: string; folderId?: string }) {
     const dispatch = useAppDispatch();
     const { listTask } = useAppSelector((state) => state.tasks);
+    const { listStatuses } = useAppSelector((state) => state.statuses);
 
     const [groups, setGroups] = useState<StatusGroup[]>([]);
 
@@ -25,14 +31,34 @@ export function useTasksData({ spaceId, listId, folderId }: { spaceId?: string; 
         } else if (spaceId) {
             dispatch(fetchTasksForSpace(Number(spaceId)));
         }
+        
+        if (spaceId) {
+            dispatch(fetchStatusesBySpace(Number(spaceId)));
+        }
     }, [spaceId, listId, folderId, dispatch]);
 
     // ── 2. Map listTask từ Redux → UI StatusGroup[] ──────────────────
     useEffect(() => {
-        if (!listTask) return;
+        // listTask === undefined = chưa fetch xong → không làm gì
+        if (listTask === undefined || listTask === null) return;
 
         const groupsMap: Record<string, StatusGroup> = {};
 
+        // 1. Dựng sẵn các groups từ listStatuses (dù chưa có task nào)
+        if (listStatuses && listStatuses.length > 0) {
+            listStatuses.forEach((apiStatus) => {
+                const groupId = apiStatus.status_name.toLowerCase().replace(/ /g, '');
+                groupsMap[groupId] = {
+                    id: groupId,
+                    name: apiStatus.status_name,
+                    color: apiStatus.color || '#8e9196',
+                    isExpanded: true,
+                    tasks: [],
+                };
+            });
+        }
+
+        // 2. Nhồi tasks vào đúng group (tạo group mới nếu status chưa có trong listStatuses)
         listTask.forEach((apiTask) => {
             const statusName = apiTask.status_name || 'TO DO';
             const groupId = statusName.toLowerCase().replace(/ /g, '');
@@ -41,7 +67,7 @@ export function useTasksData({ spaceId, listId, folderId }: { spaceId?: string; 
                 groupsMap[groupId] = {
                     id: groupId,
                     name: statusName,
-                    color: apiTask.status_color || '#5f6368',
+                    color: apiTask.status_color || '#8e9196',
                     isExpanded: true,
                     tasks: [],
                 };
@@ -67,7 +93,7 @@ export function useTasksData({ spaceId, listId, folderId }: { spaceId?: string; 
                 name: apiTask.name,
                 description: apiTask.description,
                 status: statusName,
-                statusColor: apiTask.status_color || '#5f6368',
+                statusColor: apiTask.status_color || '#8e9196',
                 priority: apiTask.priority_name || 'Normal',
                 priorityColor: apiTask.priority_color || '#00b894',
                 due_date: apiTask.due_date
@@ -82,15 +108,19 @@ export function useTasksData({ spaceId, listId, folderId }: { spaceId?: string; 
             });
         });
 
-        // Đảm bảo luôn có các cột mặc định khi chưa có task nào
+        // List mới tạo hoặc chưa có task → hiển thị group "TO DO" mặc định (giống ClickUp)
         if (Object.keys(groupsMap).length === 0) {
-            groupsMap['todo'] = { id: 'todo', name: 'TO DO', color: '#5f6368', isExpanded: true, tasks: [] };
-            groupsMap['inprogress'] = { id: 'inprogress', name: 'IN PROGRESS', color: '#0058be', isExpanded: true, tasks: [] };
-            groupsMap['done'] = { id: 'done', name: 'COMPLETE', color: '#27ae60', isExpanded: true, tasks: [] };
+            groupsMap['todo'] = {
+                id: 'todo',
+                name: 'TO DO',
+                color: '#8e9196',
+                isExpanded: true,
+                tasks: [],
+            };
         }
 
         setGroups(Object.values(groupsMap));
-    }, [listTask]);
+    }, [listTask, listStatuses]);
 
     // ── 3. Tạo task từ modal CreateTask (đầy đủ thông tin) ──────────
     const handleCreateTask = useCallback(
@@ -138,25 +168,32 @@ export function useTasksData({ spaceId, listId, folderId }: { spaceId?: string; 
     //       groupId: id của status group (vd: 'todo', 'inprogress')
     //       name   : tên task đã trim
     const handleInlineCreate = useCallback(
-        (groupId: string, name: string, listId: number) => {
-            if (!spaceId || !name || !listId) return;
+        (groupId: string, name: string, listId: number, extras?: { assignees?: string[]; dueDate?: string | null; priority?: string }) => {
+            if (!name || !listId) return;
 
-            // Tìm status_id tương ứng với group đang chọn
-            const targetGroup = groups.find((g) => g.id === groupId);
+            // Tìm status_id tương ứng với group đang chọn (nếu backend hỗ trợ map string -> status ID thì truyền, hiện tại chưa)
+            // const targetGroup = groups.find((g) => g.id === groupId);
 
             dispatch(
                 fetchCreateTask({
                     list_id: listId,
                     taskData: {
                         name,
-                        // Nếu muốn truyền status_id cụ thể, cần mapping từ group sang status_id
-                        // Hiện tại để backend dùng default status
+                        due_date: extras?.dueDate ? new Date(extras.dueDate).toISOString() : undefined,
+                        priority_name: extras?.priority || 'Normal',
+                        assignees: extras?.assignees || [],
                     } as any,
                 })
             )
                 .unwrap()
                 .then(() => {
-                    dispatch(fetchTasksForSpace(Number(spaceId)));
+                    if (listId) {
+                        dispatch(fetchTasksForList(Number(listId)));
+                    } else if (folderId) {
+                        dispatch(fetchTasksForFolder(Number(folderId)));
+                    } else if (spaceId) {
+                        dispatch(fetchTasksForSpace(Number(spaceId)));
+                    }
                 })
                 .catch((err) => {
                     console.error('[handleInlineCreate] Failed:', err);
@@ -165,7 +202,7 @@ export function useTasksData({ spaceId, listId, folderId }: { spaceId?: string; 
             // Không thêm task vào local state — đợi re-fetch từ Redux
             void targetGroup; // tránh warning unused variable
         },
-        [spaceId, dispatch, groups]
+        [spaceId, folderId, dispatch, groups]
     );
 
     // ── 5. Xử lý context menu actions ───────────────────────────────
@@ -212,11 +249,35 @@ export function useTasksData({ spaceId, listId, folderId }: { spaceId?: string; 
         [spaceId, dispatch]
     );
 
+    // ── 6. Tạo status mới ──────────────────────────────────────────
+    const handleCreateStatus = useCallback(
+        (statusName: string, color: string) => {
+            if (!spaceId) return;
+            dispatch(
+                fetchCreateStatus({
+                    spaceId: Number(spaceId),
+                    statusName,
+                    color,
+                    isDoneState: false, // Default is not done
+                })
+            )
+                .unwrap()
+                .then(() => {
+                    dispatch(fetchStatusesBySpace(Number(spaceId)));
+                })
+                .catch((err) => {
+                    console.error('[handleCreateStatus] Failed:', err);
+                });
+        },
+        [spaceId, dispatch]
+    );
+
     return {
         groups,
         setGroups,
         handleCreateTask,
         handleInlineCreate,
         handleContextAction,
+        handleCreateStatus,
     };
 }

@@ -10,6 +10,7 @@ import { useTasksData } from '../../hooks/useSpaceTasks';
 import ContextMenu from '../../components/ContextMenu';
 import CreateTaskModal from '../../components/CreateTaskModal';
 import ListView from '../SpaceViewPage/components/ListView/listView';
+import BoardView from '../SpaceViewPage/components/BoardView/boardView';
 import type { Task } from '../../types/tasks';
 
 
@@ -39,11 +40,15 @@ export default function ListViewPage() {
         handleCreateTask,
         handleInlineCreate,
         handleContextAction,
+        handleCreateStatus,
     } = useTasksData({ listId, spaceId: parentSpace?.id || spaceId });
 
     const [, setSelectedTask] = useState<Task | null>(null);
     const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; task: Task } | null>(null);
     const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
+    const [showClosed, setShowClosed] = useState(false);
+    const [activeTab, setActiveTab] = useState<'list' | 'board'>('list');
+    const columns = { assignee: true, dueDate: true, priority: true };
 
     const onTaskContextMenu = (e: React.MouseEvent, task: Task) => {
         e.preventDefault();
@@ -72,7 +77,10 @@ export default function ListViewPage() {
                 parentFolder={parentFolder}
                 entityIcon={<ListTodo size={16} />}
                 entityName={listInfo.name}
-                tabs={LIST_TABS}
+                tabs={[
+                    { ...LIST_TABS[0], active: activeTab === 'list', onClick: () => setActiveTab('list') },
+                    { ...LIST_TABS[1], active: activeTab === 'board', onClick: () => setActiveTab('board') }
+                ]}
             />
 
             <div className="flex shrink-0 items-center justify-between border-b border-[#eef0f5] bg-white px-5 py-2">
@@ -100,7 +108,33 @@ export default function ListViewPage() {
                 </div>
             </div>
 
-            
+
+            {/* ── CONTENT VIEW ────────────────────────────────────────── */}
+            <main className="flex flex-1 flex-col overflow-hidden">
+                {activeTab === 'list' ? (
+                    <ListView
+                        groups={groups}
+                        setGroups={setGroups}
+                        setSelectedTask={setSelectedTask}
+                        showClosed={showClosed}
+                        columns={columns}
+                        onContextMenu={onTaskContextMenu}
+                        onCreateTask={(groupId, name, lId, extras) => handleInlineCreate(groupId, name, lId ?? Number(listId), extras)}
+                        onCreateStatus={handleCreateStatus}
+                        listId={Number(listId)}
+                        spaceTitle={parentSpace?.name ?? 'Space'}
+                        breadcrumbContext={listInfo?.name}
+                    />
+                ) : (
+                    <BoardView
+                        groups={groups}
+                        setGroups={setGroups}
+                        setSelectedTask={setSelectedTask}
+                        showClosed={showClosed}
+                        onContextMenu={onTaskContextMenu}
+                    />
+                )}
+            </main>
 
             <ContextMenu
                 x={ctxMenu?.x || 0} y={ctxMenu?.y || 0}

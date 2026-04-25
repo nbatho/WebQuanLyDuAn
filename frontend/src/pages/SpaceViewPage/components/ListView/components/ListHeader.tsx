@@ -1,3 +1,4 @@
+import { Plus } from 'lucide-react';
 
 interface ListHeaderProps {
     columns: Record<string, boolean>;
@@ -5,26 +6,43 @@ interface ListHeaderProps {
 
 export default function ListHeader({ columns }: ListHeaderProps) {
     return (
-        <div className="mb-0.5 flex items-center border-b border-[#eef0f5] py-1">
-            <div className="min-w-65 flex-1 pl-9 text-[11px] font-bold uppercase tracking-[0.05em] text-[#9aa0a6]">
-                Name
+        <div className="flex items-center border-b border-[#e5e7eb] py-[6px]">
+            {/* Name */}
+            <div className="flex flex-1 items-center pl-[52px] pr-3">
+                <span className="text-[11px] font-medium text-[#9ca3af]">Name</span>
             </div>
-            {columns.assignee && (
-                <div className="w-27.5 text-center text-[11px] font-bold uppercase tracking-[0.05em] text-[#9aa0a6]">
-                    Assignee
+
+            {/* Assignee */}
+            {columns.assignee !== false && (
+                <div className="w-[120px] shrink-0 px-2">
+                    <span className="text-[11px] font-medium text-[#9ca3af]">Assignee</span>
                 </div>
             )}
-            {columns.dueDate && (
-                <div className="w-30 text-[11px] font-bold uppercase tracking-[0.05em] text-[#9aa0a6]">
-                    Due date
+
+            {/* Due date */}
+            {columns.dueDate !== false && (
+                <div className="w-[130px] shrink-0 px-2">
+                    <span className="text-[11px] font-medium text-[#9ca3af]">Due date</span>
                 </div>
             )}
-            {columns.priority && (
-                <div className="w-27.5 text-[11px] font-bold uppercase tracking-[0.05em] text-[#9aa0a6]">
-                    Priority
+
+            {/* Priority */}
+            {columns.priority !== false && (
+                <div className="w-[110px] shrink-0 px-2">
+                    <span className="text-[11px] font-medium text-[#9ca3af]">Priority</span>
                 </div>
             )}
-            <div className="w-9" />
+
+            {/* Add field + circle */}
+            <div className="w-9 shrink-0 flex items-center justify-center">
+                <button
+                    type="button"
+                    className="flex h-[18px] w-[18px] items-center justify-center rounded-full border border-[#d1d5db] text-[#9ca3af] hover:border-[#9ca3af] hover:text-[#6b7280] transition-colors"
+                    title="Add field"
+                >
+                    <Plus size={10} />
+                </button>
+            </div>
         </div>
     );
 }

@@ -115,9 +115,6 @@ export default function PageHeader({
                             {tab.label}
                         </button>
                     ))}
-                    <button className="flex items-center gap-1 whitespace-nowrap rounded-t-md px-2.5 py-2 text-[13px] font-medium text-[#9aa0a6] hover:bg-[#f8fafc] hover:text-[#5f6368]">
-                        <Plus size={13} /> View
-                    </button>
                 </div>
             )}
         </header>

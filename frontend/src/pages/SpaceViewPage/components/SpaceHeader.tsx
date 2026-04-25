@@ -92,23 +92,6 @@ export default function SpaceHeader({ currentSpace, activeView, onViewChange }: 
                 <button className={tabClass('overview')} onClick={() => onViewChange('overview')}>
                     <LayoutDashboard size={14} /> Overview
                 </button>
-                <div className="relative" ref={pickerRef}>
-                    <button
-                        className="flex items-center gap-1 whitespace-nowrap rounded-t-md px-2.5 py-2 text-[13px] font-semibold text-[var(--color-text-tertiary)] transition-all duration-150 hover:bg-[var(--color-surface-subtle)] hover:text-[var(--color-text-secondary)]"
-                        onClick={() => setShowViewPicker((v) => !v)}
-                    >
-                        <Plus size={13} /> View
-                    </button>
-                    {showViewPicker && (
-                        <ViewPicker
-                            viewOptions={VIEW_OPTIONS}
-                            search={viewSearch}
-                            onSearchChange={setViewSearch}
-                            onSelect={handleViewSelect}
-                            onClose={() => setShowViewPicker(false)}
-                        />
-                    )}
-                </div>
             </div>
         </header>
     );

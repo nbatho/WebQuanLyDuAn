@@ -103,8 +103,8 @@ export const createTasksForList = async (req, res) => {
         const { space_id, folder_id } = listRes.rows[0];
         const due_date = req.body.due_date ? new Date(req.body.due_date) : null;
         
-        const query = `INSERT INTO tasks (name, description, space_id, folder_id, list_id, start_date, due_date) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
-        const values = [name, description, space_id, folder_id, listId, new Date(), due_date];
+        const query = `INSERT INTO tasks (name, description, space_id, list_id, start_date, due_date) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`;
+        const values = [name, description || '', space_id, listId, new Date(), due_date];
         const result = await con.query(query, values);
         
         res.status(201).json(result.rows[0]);
