@@ -10,10 +10,10 @@ import {
     User,
 } from 'lucide-react';
 import { Avatar, Popover } from 'antd';
-import AssigneePopover from '../../../../../components/Popovers/AssigneePopover';
-import PriorityPopover from '../../../../../components/Popovers/PriorityPopover';
-import DueDatePopover from '../../../../../components/Popovers/DueDatePopover';
-import type { Task } from '../../../../../types/tasks';
+import AssigneePopover from '@/components/Popovers/AssigneePopover';
+import DueDatePopover from '@/components/Popovers/DueDatePopover';
+import PriorityPopover from '@/components/Popovers/PriorityPopover';
+import type { Task } from '@/types/tasks';
 
 const avatarColors: Record<string, string> = {
     AR: '#4285F4',

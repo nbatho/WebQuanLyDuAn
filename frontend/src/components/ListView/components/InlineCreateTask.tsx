@@ -8,10 +8,9 @@ import {
     User,
 } from 'lucide-react';
 import { Avatar, Popover } from 'antd';
-import AssigneePopover from '../../../../../components/Popovers/AssigneePopover';
-import DueDatePopover from '../../../../../components/Popovers/DueDatePopover';
-import PriorityPopover from '../../../../../components/Popovers/PriorityPopover';
-
+import PriorityPopover from '@/components/Popovers/PriorityPopover';
+import AssigneePopover from '@/components/Popovers/AssigneePopover';
+import DueDatePopover from '@/components/Popovers/DueDatePopover';
 const avatarColors: Record<string, string> = {
     AR: '#4285F4',
     MC: '#7c5cfc',

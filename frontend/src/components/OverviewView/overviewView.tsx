@@ -1,6 +1,3 @@
-/* ═══════════════════════════════════════════════
-   OVERVIEW VIEW
-═══════════════════════════════════════════════ */
 import { BarChart2, BookMarked, FileText, FolderOpen, Maximize2, MoreHorizontal, Plus, X, Clock, PenTool } from "lucide-react";
 
 const WIDGETS = [
@@ -11,7 +8,7 @@ const WIDGETS = [
 ];
 
 import { useNavigate } from 'react-router-dom';
-import type { SpaceTreeData } from '../../../../types/tree';
+import type { SpaceTreeData } from "@/types/tree";
 
 export default function OverviewView({ spaceId, currentSpaceTree }: { spaceId?: string, currentSpaceTree?: SpaceTreeData[string] }) {
     const navigate = useNavigate();

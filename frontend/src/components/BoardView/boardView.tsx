@@ -1,12 +1,8 @@
-/* ═══════════════════════════════════════════════
-   BOARD VIEW
-═══════════════════════════════════════════════ */
 import { Calendar, Flag, MoreHorizontal, Plus } from 'lucide-react';
 import { Avatar } from 'antd';
 import { useEffect, useRef, useState, type DragEvent } from 'react';
-import type { Task, StatusGroup } from '../../../../types/tasks';
-import { familyTaskIds, rootTasks } from '../../../../utils/taskFamily';
-
+import type { Task, StatusGroup } from '@/types/tasks';
+import { familyTaskIds, rootTasks } from '@/utils/taskFamily';
 const avatarColors: Record<string, string> = {
     AR: '#4285F4',
     MC: '#7c5cfc',

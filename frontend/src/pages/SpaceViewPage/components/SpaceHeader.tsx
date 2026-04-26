@@ -6,25 +6,8 @@ import {
     Sparkles, Grid, Users,
 } from 'lucide-react';
 import type { SpaceItem } from '@/types/spaces';
-import ViewPicker from './ViewPicker';
 
-export type ViewType = 'overview' | 'list' | 'board';
-
-const VIEW_OPTIONS = [
-    { id: 'list', icon: LayoutList, label: 'List', desc: 'Track tasks, bugs, people & more', color: '#5f6368', bg: '#f0f0f0' },
-    { id: 'gantt', icon: BarChart2, label: 'Gantt', desc: 'Plan dependencies & time', color: '#fff', bg: '#e74c3c' },
-    { id: 'calendar', icon: Calendar, label: 'Calendar', desc: 'Plan, schedule, & delegate', color: '#fff', bg: '#f0a220' },
-    { id: 'doc', icon: FileText, label: 'Doc', desc: 'Collaborate & document anything', color: '#fff', bg: 'var(--color-primary)' },
-    { id: 'board', icon: Trello, label: 'Board – Kanban', desc: 'Move tasks between columns', color: '#fff', bg: 'var(--color-accent)' },
-    { id: 'form', icon: PenSquare, label: 'Form', desc: 'Collect, track, & report data', color: '#fff', bg: 'var(--color-accent)' },
-    { id: 'ai', icon: Sparkles, label: 'Create with AI', desc: 'Your perfect solution', color: '#9aa0a6', bg: '#f8f8f8' },
-    { id: 'table', icon: Grid, label: 'Table', desc: 'Structured table format', color: '#fff', bg: '#27ae60' },
-    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', desc: 'Track metrics & insights', color: '#fff', bg: 'var(--color-accent)' },
-    { id: 'timeline', icon: AlignLeft, label: 'Timeline', desc: 'See tasks by start & due date', color: '#fff', bg: '#5f6368' },
-    { id: 'activity', icon: Activity, label: 'Activity', desc: 'Real-time activity feed', color: '#fff', bg: 'var(--color-primary)' },
-    { id: 'workload', icon: Users, label: 'Workload', desc: 'Balance team capacity', color: '#fff', bg: '#27ae60' },
-];
-
+export type ViewType = 'overview';
 interface SpaceHeaderProps {
     currentSpace: SpaceItem | undefined;
     activeView: ViewType;
@@ -32,33 +15,8 @@ interface SpaceHeaderProps {
 }
 
 export default function SpaceHeader({ currentSpace, activeView, onViewChange }: SpaceHeaderProps) {
-    const [showViewPicker, setShowViewPicker] = useState(false);
-    const [viewSearch, setViewSearch] = useState('');
-    const pickerRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handler = (e: MouseEvent) => {
-            if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) setShowViewPicker(false);
-        };
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
-    }, []);
-
-    const handleViewSelect = (id: string) => {
-        if (id === 'list') onViewChange('list');
-        else if (id === 'board') onViewChange('board');
-    };
-
-    const tabClass = (view: ViewType) =>
-        `flex items-center gap-1.25 whitespace-nowrap rounded-t-md border-b-2 px-3 py-2 text-[13px] font-semibold transition-all duration-150 hover:bg-[var(--color-surface-subtle)] hover:text-[var(--color-on-surface)] ${
-            activeView === view
-                ? 'border-b-[var(--color-primary)] text-[var(--color-primary)]'
-                : 'border-b-transparent text-[var(--color-text-secondary)]'
-        }`;
-
     return (
         <header className="shrink-0 border-b border-[var(--color-border-light)] bg-white">
-            {/* Top row: title + action buttons */}
             <div className="flex items-center justify-between px-5 pb-2 pt-2.5">
                 <div className="flex items-center gap-2">
                     <div
@@ -85,13 +43,6 @@ export default function SpaceHeader({ currentSpace, activeView, onViewChange }: 
                         <Share2 size={14} /> Share
                     </button>
                 </div>
-            </div>
-
-            {/* View tabs */}
-            <div className="flex items-center gap-0.5 px-5">
-                <button className={tabClass('overview')} onClick={() => onViewChange('overview')}>
-                    <LayoutDashboard size={14} /> Overview
-                </button>
             </div>
         </header>
     );

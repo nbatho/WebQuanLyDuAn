@@ -132,7 +132,6 @@ export default function TaskDetailModal({
                         </div>
                     </div>
 
-                    {/* Sidebar */}
                     <TaskDetailSidebar
                         task={task}
                         allTasks={allTasks}

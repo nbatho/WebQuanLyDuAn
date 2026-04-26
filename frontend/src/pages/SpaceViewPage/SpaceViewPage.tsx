@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useSpaceTree } from '../../layouts/AppLayout/SpaceTreeContext';
 
 import SpaceHeader from './components/SpaceHeader';
-import OverviewView from './components/OverviewView/overviewView';
+import OverviewView from '@/components/OverviewView/overviewView';
 
 export default function SpaceViewPage() {
     const { spaceId } = useParams<{ spaceId: string }>();
@@ -19,8 +19,6 @@ export default function SpaceViewPage() {
         }
     }, [spaceId, spaces, navigate]);
 
-
-    /* ── Render ── */
     return (
         <div className="flex h-full flex-col overflow-hidden bg-white" style={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}>
             <SpaceHeader currentSpace={currentSpace} activeView={'overview'} onViewChange={() => { }} />

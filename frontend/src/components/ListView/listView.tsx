@@ -11,8 +11,8 @@ import {
 } from 'lucide-react';
 import { Dropdown, Popover } from 'antd';
 import { useState } from 'react';
-import type { Task, StatusGroup } from '../../../../types/tasks';
-import { directChildCount, directChildTasks, rootTasks } from '../../../../utils/taskFamily';
+import type { Task, StatusGroup } from '@/types/tasks';
+import { directChildCount, directChildTasks, rootTasks } from '@/utils/taskFamily';
 import ListHeader from './components/ListHeader';
 import TaskRow from './components/TaskRow';
 import InlineCreateTask from './components/InlineCreateTask';
@@ -316,7 +316,6 @@ export default function ListView({
                                             // Gọi API lưu status
                                             onCreateStatus?.(trimmed.toUpperCase(), newStatusColor);
                                             
-                                            // Tạm thời update local để UI phản hồi ngay lập tức (optimistic UI)
                                             setGroups([...groups, {
                                                 id: trimmed.toLowerCase().replace(/ /g, ''),
                                                 name: trimmed.toUpperCase(),
@@ -333,8 +332,6 @@ export default function ListView({
                                     }
                                 }}
                                 onBlur={(e) => {
-                                    // With mousedown preventDefault, blur won't fire when clicking the color picker.
-                                    // It only fires when clicking elsewhere.
                                     if (!isColorPickerOpen) {
                                         setIsAddingStatus(false);
                                         setNewStatusName('');

@@ -92,8 +92,6 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
 
                 {/* List selector */}
                 <div className="flex items-center gap-1.5 border-b border-[#f8f9fc] px-4.5 py-2.5 text-xs text-[#9aa0a6]">
-                    <FolderOpen size={14} />
-                    <span className="font-medium">in</span>
                     <div className="relative" onClick={e => e.stopPropagation()}>
                         <button
                             className="flex cursor-pointer items-center gap-1 rounded-md border border-[#eef0f5] bg-transparent px-2.5 py-0.75 text-xs font-semibold text-[#141b2b] hover:border-[#dcdfe4] hover:bg-[#f8fafb]"

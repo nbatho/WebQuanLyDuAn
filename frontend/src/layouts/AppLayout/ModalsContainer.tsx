@@ -1,7 +1,7 @@
 import { useSpaceTree } from './SpaceTreeContext';
-import CreateSpaceModal from '../../components/CreateSpaceModal';
-import CreateFolderModal from '../../components/CreateFolderModal';
-import CreateListModal from '../../components/CreateListModal';
+import CreateSpaceModal from '../../components/Modal/CreateSpaceModal';
+import CreateFolderModal from '../../components/Modal/CreateFolderModal';
+import CreateListModal from '../../components/Modal/CreateListModal';
 import InvitePeopleModal from '../../components/InvitePeopleModal';
 import CreateWorkspaceDialog from './workspace/CreateWorkspaceDialog';
 

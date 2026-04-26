@@ -9,8 +9,8 @@ import PageHeader, { LIST_TABS } from '../../components/PageHeader';
 import { useTasksData } from '../../hooks/useSpaceTasks';
 import ContextMenu from '../../components/ContextMenu';
 import CreateTaskModal from '../../components/CreateTaskModal';
-import ListView from '../SpaceViewPage/components/ListView/listView';
-import BoardView from '../SpaceViewPage/components/BoardView/boardView';
+import BoardView from '@/components/BoardView/boardView';
+import ListView from '@/components/ListView/listView';
 import type { Task } from '../../types/tasks';
 
 
@@ -109,7 +109,6 @@ export default function ListViewPage() {
             </div>
 
 
-            {/* ── CONTENT VIEW ────────────────────────────────────────── */}
             <main className="flex flex-1 flex-col overflow-hidden">
                 {activeTab === 'list' ? (
                     <ListView
