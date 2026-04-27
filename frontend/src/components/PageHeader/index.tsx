@@ -66,7 +66,6 @@ export default function PageHeader({
                             <FolderClosed size={14} className="text-[#5f6368]" />
                             <span
                                 className="cursor-pointer text-[13px] font-medium text-[#5f6368] hover:text-[#1a73e8]"
-                                onClick={() => navigate(`/folder/${parentFolder.id}`)}
                             >
                                 {parentFolder.name}
                             </span>

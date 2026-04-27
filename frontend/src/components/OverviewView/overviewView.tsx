@@ -55,7 +55,7 @@ export default function OverviewView({ currentSpaceTree }: { spaceId?: string, c
                 </h3>
                 <div className="rounded-xl border border-[#eef0f5] bg-white shadow-sm overflow-hidden">
                     {currentSpaceTree?.folders.map(folder => (
-                        <div key={folder.id} onClick={() => navigate(`/folder/${folder.id}`)} className="flex cursor-pointer items-center justify-between border-b border-[#f0f2f5] px-5 py-3.5 hover:bg-[#f8fafb] transition-colors">
+                        <div key={folder.id} className="flex cursor-pointer items-center justify-between border-b border-[#f0f2f5] px-5 py-3.5 hover:bg-[#f8fafb] transition-colors">
                             <div className="flex items-center gap-3">
                                 <FolderOpen size={16} className="text-[#f0a220]" />
                                 <span className="text-[14px] font-semibold text-[#141b2b]">{folder.name}</span>

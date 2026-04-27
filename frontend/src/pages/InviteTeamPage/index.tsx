@@ -34,7 +34,6 @@ export default function InviteTeamPage() {
     };
 
     const handleSendInvites = () => {
-        const validInvites = invites.filter((r) => r.email.trim());
         navigate('/home');
     };
 

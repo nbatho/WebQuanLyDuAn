@@ -9,7 +9,7 @@ import TaskDetailModal from '../../components/TaskDetailModal';
 import groupByDate from './component/groupByDate';
 import type { AppDispatch, RootState } from '@/store/configureStore';
 import type { TaskWithSpaceData } from '@/store/modules/tasks';
-import type { Task, Assignee } from '@/types/tasks';
+import type { Task } from '@/types/tasks';
 
 // Giả sử bạn có action cập nhật task từ store
 // import { fetchUpdateTask } from '@/store/modules/tasks';

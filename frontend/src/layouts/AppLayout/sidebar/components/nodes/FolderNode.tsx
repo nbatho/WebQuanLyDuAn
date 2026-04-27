@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
     ChevronDown,
     ChevronRight,
@@ -20,7 +20,6 @@ import type { MenuEntry } from '../../types';
 import type { FolderItem } from '@/types/tree';
 
 export const FolderNode = ({ folder, spaceId, spaceName }: { folder: FolderItem; spaceId: string; spaceName: string }) => {
-    const navigate = useNavigate();
     const location = useLocation();
     const [expanded, setExpanded] = useState(true);
     const tree = useSpaceTree();
@@ -113,7 +112,6 @@ export const FolderNode = ({ folder, spaceId, spaceName }: { folder: FolderItem;
                 </span>
                 <div
                     className="flex min-w-0 flex-1 cursor-pointer items-center gap-1.5"
-                    onClick={() => navigate(`/folder/${folder.id}`)}
                 >
                     <FolderClosed size={14} className={`shrink-0 ${isFolderActive ? 'text-[#1a73e8]' : 'text-[#6b6f76]'}`} />
                     <span className={`truncate ${isFolderActive ? 'font-semibold' : 'font-medium'}`}>{folder.name}</span>

@@ -1,4 +1,3 @@
-/* ── Space Tree Types (folder/list hierarchy) ── */
 
 export interface ListItem {
     id: string;

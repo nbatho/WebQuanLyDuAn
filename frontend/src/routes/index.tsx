@@ -6,7 +6,6 @@ import InviteTeamPage from "../pages/InviteTeamPage";
 import InboxPage from "../pages/InboxPage";
 import MyTasksPage from "../pages/MyTasksPage";
 import SpaceViewPage from '../pages/SpaceViewPage';
-import FolderViewPage from '../pages/FolderViewPage';
 import ListViewPage from '../pages/ListViewPage';
 import TimeTrackingPage from '../pages/TimeTrackingPage';
 import SettingsPage from '../pages/SettingsPage';
@@ -58,10 +57,6 @@ export const routes: RouteConfig[] = [
             {
                 path: 'space/:spaceId',
                 element: <SpaceViewPage />
-            },
-            {
-                path: 'folder/:folderId',
-                element: <FolderViewPage />
             },
             {
                 path: 'space/:spaceId/list/:listId',
