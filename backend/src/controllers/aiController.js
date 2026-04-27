@@ -6,50 +6,50 @@ dotenv.config();
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const tools = [
-  {
-    type: "function",
-    function: {
-      name: "create_task",
-      description: "Tạo một nhiệm vụ (task) mới vào một Space cụ thể.",
-      parameters: {
-        type: "object",
-        properties: {
-          title: { type: "string", description: "Tiêu đề của nhiệm vụ." },
-          space_name: { type: "string", description: "Tên của Space muốn tạo task vào." },
-          due_date: { type: "string", description: "Ngày hết hạn (YYYY-MM-DD)." },
-          priority: { type: "string", enum: ["High", "Medium", "Low"], description: "Mức độ ưu tiên." },
+    {
+        type: "function",
+        function: {
+            name: "create_task",
+            description: "Tạo một nhiệm vụ (task) mới vào một Space cụ thể.",
+            parameters: {
+                type: "object",
+                properties: {
+                    title: { type: "string", description: "Tiêu đề của nhiệm vụ." },
+                    space_name: { type: "string", description: "Tên của Space muốn tạo task vào." },
+                    due_date: { type: "string", description: "Ngày hết hạn (YYYY-MM-DD)." },
+                    priority: { type: "string", enum: ["High", "Medium", "Low"], description: "Mức độ ưu tiên." },
+                },
+                required: ["title", "space_name"],
+            },
         },
-        required: ["title", "space_name"],
-      },
     },
-  },
-  {
-    type: "function",
-    function: {
-      name: "create_space",
-      description: "Tạo một không gian làm việc (Space) mới.",
-      parameters: {
-        type: "object",
-        properties: {
-          name: { type: "string", description: "Tên của Space mới." },
-          description: { type: "string", description: "Mô tả mục đích." },
+    {
+        type: "function",
+        function: {
+            name: "create_space",
+            description: "Tạo một không gian làm việc (Space) mới.",
+            parameters: {
+                type: "object",
+                properties: {
+                    name: { type: "string", description: "Tên của Space mới." },
+                    description: { type: "string", description: "Mô tả mục đích." },
+                },
+                required: ["name"],
+            },
         },
-        required: ["name"],
-      },
     },
-  },
 ];
 
 export const chatWithAI = async (req, res) => {
     try {
         const { message, history } = req.body;
         const userId = req.user.user_id;
-        
+
         if (!message) return res.status(400).json({ message: "Message is required" });
 
         // Lấy danh sách Space thật
         const spaceResult = await con.query(
-            "SELECT s.space_id, s.name FROM spaces s JOIN space_members sm ON s.space_id = sm.space_id WHERE sm.user_id = $1",
+            "SELECT s.space_id, s.name FROM spaces s JOIN space_members sm ON s.space_id = sm.space_id WHERE sm.user_id = $1 AND s.deleted_at IS NULL AND sm.deleted_at IS NULL",
             [userId]
         );
         const realSpaces = spaceResult.rows;
@@ -101,10 +101,10 @@ export const chatWithAI = async (req, res) => {
             if (functionName === "create_space") {
                 // 1. Lấy Workspace ID đầu tiên của user
                 const wsResult = await con.query(
-                    "SELECT workspace_id FROM workspace_members WHERE user_id = $1 LIMIT 1",
+                    "SELECT workspace_id FROM workspace_members WHERE user_id = $1 AND deleted_at IS NULL LIMIT 1",
                     [userId]
                 );
-                
+
                 if (wsResult.rows.length === 0) {
                     return res.status(200).json({ response: "Bạn chưa thuộc về Workspace nào để tạo Space.", suggestions: [] });
                 }
@@ -119,12 +119,12 @@ export const chatWithAI = async (req, res) => {
                     );
                     const newSpaceId = spaceInsert.rows[0].space_id;
                     await dbClient.query(
-                        "INSERT INTO space_members (space_id, user_id) VALUES ($1, $2)",
+                        "INSERT INTO space_members (space_id, user_id) VALUES ($1, $2) ON CONFLICT (space_id, user_id) DO UPDATE SET deleted_at = NULL",
                         [newSpaceId, userId]
                     );
                     await dbClient.query('COMMIT');
 
-                    return res.status(200).json({ 
+                    return res.status(200).json({
                         response: `✅ **Đã tạo Space "${functionArgs.name}" thành công!**\\nHệ thống đã đồng bộ không gian mới này vào tài khoản của bạn. Bạn có muốn tạo task đầu tiên cho nó không?`,
                         suggestions: ["Tạo task mới", "Xem danh sách Space"],
                         suggestedTitle: history.length === 0 ? `Tạo: ${functionArgs.name}` : null
@@ -136,10 +136,10 @@ export const chatWithAI = async (req, res) => {
                     dbClient.release();
                 }
             }
-            
+
             // LOGIC TẠO TASK
             if (functionName === "create_task") {
-                 return res.status(200).json({ 
+                return res.status(200).json({
                     response: `✅ **Đã ghi nhận nhiệm vụ: ${functionArgs.title}**\\nVào Space: **${functionArgs.space_name}**`,
                     suggestions: ["Mở danh sách task"]
                 });
@@ -154,22 +154,22 @@ export const chatWithAI = async (req, res) => {
         // Tìm kiếm khối GỢI Ý nếu có
         const suggestIndex = content.lastIndexOf("GỢI Ý:");
         if (suggestIndex !== -1) {
-             finalResponse = content.substring(0, suggestIndex).trim();
-             const suggestBlock = content.substring(suggestIndex + 6);
-             const lines = suggestBlock.split(/\r?\n/);
-             lines.forEach(line => {
-                  line = line.trim();
-                  if (line.startsWith('-')) {
-                      finalSuggestions.push(line.replace(/^-/, '').trim());
-                  } else if (line.startsWith('*')) {
-                      finalSuggestions.push(line.replace(/^\*/, '').trim());
-                  }
-             });
+            finalResponse = content.substring(0, suggestIndex).trim();
+            const suggestBlock = content.substring(suggestIndex + 6);
+            const lines = suggestBlock.split(/\r?\n/);
+            lines.forEach(line => {
+                line = line.trim();
+                if (line.startsWith('-')) {
+                    finalSuggestions.push(line.replace(/^-/, '').trim());
+                } else if (line.startsWith('*')) {
+                    finalSuggestions.push(line.replace(/^\*/, '').trim());
+                }
+            });
         }
 
-        return res.status(200).json({ 
-            response: finalResponse || content, 
-            suggestions: finalSuggestions 
+        return res.status(200).json({
+            response: finalResponse || content,
+            suggestions: finalSuggestions
         });
 
     } catch (error) {

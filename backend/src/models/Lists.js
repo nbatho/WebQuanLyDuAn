@@ -38,7 +38,7 @@ export const updateList = async (list_id, name) => {
 };
 
 export const deleteList = async (list_id) => {
-  const query = `UPDATE lists SET deleted_at = CURRENT_TIMESTAMP WHERE list_id = $1 RETURNING *`;
+  const query = `UPDATE lists SET deleted_at = CURRENT_TIMESTAMP WHERE list_id = $1 AND deleted_at IS NULL RETURNING *`;
   const result = await con.query(query, [list_id]);
   return result.rows[0];
 };

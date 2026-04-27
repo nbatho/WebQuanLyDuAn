@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import {
-    getTasksForList,
-    getTaskById,
+    getTasksByListIds,
     createTaskInList,
     updateTask,
     deleteTask,
@@ -12,11 +11,18 @@ import {
     addAssignee,
     removeAssignee,
 } from "@/api/tasks";
+import type { StatusGroup } from "@/types/tasks";
 
-// ─────────────────────────────────────────────
-// Interfaces / Types
-// ─────────────────────────────────────────────
 
+export interface CreateTaskData {
+    list_id: number;
+    name: string;
+    description?: string | null;
+    status_id?: number;
+    priority_id?: number | null;
+    due_date?: string | null;
+    assignee_ids?: number[];
+}
 export interface TaskData {
     task_id: number;
     parent_task_id: number | null;
@@ -61,37 +67,38 @@ export interface TaskAttachment {
 }
 
 export interface TaskWithSpaceData extends TaskData {
-    space_name: string;
-    space_color: string;
+    task_id: number; 
+    
+    space_name?: string;
+    space_color?: string;
     space_deleted_at?: string | null;
 
-    status_name: string | null;
-    status_color: string | null;
+    status_name?: string | null;
+    status_color?: string | null;
 
-    priority_name: string | null;
-    priority_color: string | null;
+    priority_name?: string | null;
+    priority_color?: string | null;
 
-    assignees: TaskAssignee[];
-    tags: TaskTag[];
+    assignees?: TaskAssignee[]; 
+    tags?: TaskTag[];
+    
+    subtask_count?: number;
+    comment_count?: number;
 }
 
 export interface TasksState {
-    // Task list
-    listTask: TaskWithSpaceData[];
+    listTask: StatusGroup[];
     isLoadingTasks: boolean;
     errorTasks: string | null;
 
-    // Selected task detail
     selectedTask: TaskWithSpaceData | null;
     isLoadingTaskDetail: boolean;
     errorTaskDetail: string | null;
 
-    // Subtasks
     subTasks: TaskWithSpaceData[];
     isLoadingSubTasks: boolean;
     errorSubTasks: string | null;
 
-    // Attachments
     attachments: TaskAttachment[];
     isLoadingAttachments: boolean;
     errorAttachments: string | null;
@@ -100,7 +107,6 @@ export interface TasksState {
     isDeletingAttachment: boolean;
     errorDeleteAttachment: string | null;
 
-    // Create / Update / Delete task
     isCreatingTask: boolean;
     errorCreateTask: string | null;
     isUpdatingTask: boolean;
@@ -108,7 +114,6 @@ export interface TasksState {
     isDeletingTask: boolean;
     errorDeleteTask: string | null;
 
-    // Assignees
     isAddingAssignee: boolean;
     errorAddAssignee: string | null;
     isRemovingAssignee: boolean;
@@ -116,11 +121,11 @@ export interface TasksState {
 }
 
 
-export const fetchTasksForList = createAsyncThunk<TaskWithSpaceData[], number>(
+export const fetchTasksForList = createAsyncThunk<StatusGroup[], number>(
     'tasks/fetchTasksForList',
     async (list_id, { rejectWithValue }) => {
         try {
-            const response = await getTasksForList(list_id);
+            const response = await getTasksByListIds(list_id);
             return response;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch tasks for list');
@@ -128,35 +133,30 @@ export const fetchTasksForList = createAsyncThunk<TaskWithSpaceData[], number>(
     }
 );
 
-
-export const fetchTaskById = createAsyncThunk<TaskWithSpaceData, number>(
-    'tasks/fetchTaskById',
-    async (task_id, { rejectWithValue }) => {
-        try {
-            const response = await getTaskById(task_id);
-            return response;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch task');
-        }
-    }
-);
-
 export const fetchCreateTask = createAsyncThunk<
     TaskWithSpaceData,
-    { list_id: number; taskData: Partial<TaskData> }
+    { list_id: number; taskData: CreateTaskData }
 >(
     'tasks/createTask',
     async ({ list_id, taskData }, { rejectWithValue }) => {
         try {
             const response = await createTaskInList({
                 list_id,
-                name: taskData.name || '',
-                description: taskData.description || undefined,
-                due_date: taskData.due_date || undefined
+                name: taskData.name || 'Untitled Task', 
+                description: taskData.description,
+                status_id: taskData.status_id,
+                priority_id: taskData.priority_id,
+                due_date: taskData.due_date,
+                assignee_ids: taskData.assignee_ids
             });
+            
             return response as unknown as TaskWithSpaceData;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to create task');
+            return rejectWithValue(
+                error.response?.data?.error || 
+                error.response?.data?.message || 
+                'Failed to create task'
+            );
         }
     }
 );
@@ -339,167 +339,45 @@ export const tasksSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        builder
-            .addCase(fetchTaskById.pending, (state) => {
-                state.isLoadingTaskDetail = true;
-                state.errorTaskDetail = null;
-            })
-            .addCase(fetchTaskById.fulfilled, (state, action) => {
-                state.isLoadingTaskDetail = false;
-                state.selectedTask = action.payload;
-            })
-            .addCase(fetchTaskById.rejected, (state, action) => {
-                state.isLoadingTaskDetail = false;
-                state.errorTaskDetail = action.payload as string;
-            });
+        builder.addCase(fetchTasksForList.pending, (state) => {
+            state.isLoadingTasks = true;
+            state.errorTasks = null;
+        });
+        builder.addCase(fetchTasksForList.fulfilled, (state, action) => {
+            state.isLoadingTasks = false;
+            state.listTask = action.payload;
+        });
+        builder.addCase(fetchTasksForList.rejected, (state, action) => {
+            state.isLoadingTasks = false;
+            state.errorTasks = action.payload as string;
+        });
 
-        // ── fetchCreateTask ─────────────────────────
-        builder
-            .addCase(fetchCreateTask.pending, (state) => {
-                state.isCreatingTask = true;
-                state.errorCreateTask = null;
-            })
-            .addCase(fetchCreateTask.fulfilled, (state, action) => {
+        builder.addCase(fetchCreateTask.pending, (state) => {
+            state.isCreatingTask = true;
+            state.errorCreateTask = null;
+        });
+        builder.addCase(fetchCreateTask.fulfilled, (state, action) => {
                 state.isCreatingTask = false;
-                state.listTask.push(action.payload);
-            })
-            .addCase(fetchCreateTask.rejected, (state, action) => {
-                state.isCreatingTask = false;
-                state.errorCreateTask = action.payload as string;
-            });
-
-        // ── fetchUpdateTask ─────────────────────────
-        builder
-            .addCase(fetchUpdateTask.pending, (state) => {
-                state.isUpdatingTask = true;
-                state.errorUpdateTask = null;
-            })
-            .addCase(fetchUpdateTask.fulfilled, (state, action) => {
-                state.isUpdatingTask = false;
-                const index = state.listTask.findIndex(t => t.task_id === action.payload.task_id);
-                if (index !== -1) {
-                    state.listTask[index] = { ...state.listTask[index], ...action.payload };
+                
+                const newTask = action.payload; 
+                
+                const statusGroup = state.listTask.find(group => group.id === newTask.status_id);
+                if (statusGroup) {
+                    statusGroup.tasks.unshift(newTask);
+                } else {
+                    state.listTask.push({
+                        id: newTask.status_id || 0,
+                        name: newTask.status_name || 'No Status',
+                        color: newTask.status_color || '#000000',
+                        isExpanded: true,
+                        tasks: [newTask],
+                    });
                 }
-                if (state.selectedTask?.task_id === action.payload.task_id) {
-                    state.selectedTask = { ...state.selectedTask, ...action.payload };
-                }
-            })
-            .addCase(fetchUpdateTask.rejected, (state, action) => {
-                state.isUpdatingTask = false;
-                state.errorUpdateTask = action.payload as string;
             });
-
-        // ── fetchDeleteTask ─────────────────────────
-        builder
-            .addCase(fetchDeleteTask.pending, (state) => {
-                state.isDeletingTask = true;
-                state.errorDeleteTask = null;
-            })
-            .addCase(fetchDeleteTask.fulfilled, (state, action) => {
-                state.isDeletingTask = false;
-                state.listTask = state.listTask.filter(t => t.task_id !== action.payload);
-                if (state.selectedTask?.task_id === action.payload) {
-                    state.selectedTask = null;
-                }
-            })
-            .addCase(fetchDeleteTask.rejected, (state, action) => {
-                state.isDeletingTask = false;
-                state.errorDeleteTask = action.payload as string;
-            });
-
-        // ── fetchSubTasks ───────────────────────────
-        builder
-            .addCase(fetchSubTasks.pending, (state) => {
-                state.isLoadingSubTasks = true;
-                state.errorSubTasks = null;
-            })
-            .addCase(fetchSubTasks.fulfilled, (state, action) => {
-                state.isLoadingSubTasks = false;
-                state.subTasks = action.payload;
-            })
-            .addCase(fetchSubTasks.rejected, (state, action) => {
-                state.isLoadingSubTasks = false;
-                state.errorSubTasks = action.payload as string;
-            });
-
-        // ── fetchAttachmentsByTask ──────────────────
-        builder
-            .addCase(fetchAttachmentsByTask.pending, (state) => {
-                state.isLoadingAttachments = true;
-                state.errorAttachments = null;
-            })
-            .addCase(fetchAttachmentsByTask.fulfilled, (state, action) => {
-                state.isLoadingAttachments = false;
-                state.attachments = action.payload;
-            })
-            .addCase(fetchAttachmentsByTask.rejected, (state, action) => {
-                state.isLoadingAttachments = false;
-                state.errorAttachments = action.payload as string;
-            });
-
-        // ── fetchCreateAttachment ───────────────────
-        builder
-            .addCase(fetchCreateAttachment.pending, (state) => {
-                state.isCreatingAttachment = true;
-                state.errorCreateAttachment = null;
-            })
-            .addCase(fetchCreateAttachment.fulfilled, (state, action) => {
-                state.isCreatingAttachment = false;
-                state.attachments.push(action.payload);
-            })
-            .addCase(fetchCreateAttachment.rejected, (state, action) => {
-                state.isCreatingAttachment = false;
-                state.errorCreateAttachment = action.payload as string;
-            });
-
-        // ── fetchDeleteAttachment ───────────────────
-        builder
-            .addCase(fetchDeleteAttachment.pending, (state) => {
-                state.isDeletingAttachment = true;
-                state.errorDeleteAttachment = null;
-            })
-            .addCase(fetchDeleteAttachment.fulfilled, (state, action) => {
-                state.isDeletingAttachment = false;
-                state.attachments = state.attachments.filter(a => a.attachment_id !== action.payload);
-            })
-            .addCase(fetchDeleteAttachment.rejected, (state, action) => {
-                state.isDeletingAttachment = false;
-                state.errorDeleteAttachment = action.payload as string;
-            });
-
-        // ── fetchAddAssignee ────────────────────────
-        builder
-            .addCase(fetchAddAssignee.pending, (state) => {
-                state.isAddingAssignee = true;
-                state.errorAddAssignee = null;
-            })
-            .addCase(fetchAddAssignee.fulfilled, (state) => {
-                state.isAddingAssignee = false;
-            })
-            .addCase(fetchAddAssignee.rejected, (state, action) => {
-                state.isAddingAssignee = false;
-                state.errorAddAssignee = action.payload as string;
-            });
-
-        // ── fetchRemoveAssignee ─────────────────────
-        builder
-            .addCase(fetchRemoveAssignee.pending, (state) => {
-                state.isRemovingAssignee = true;
-                state.errorRemoveAssignee = null;
-            })
-            .addCase(fetchRemoveAssignee.fulfilled, (state, action) => {
-                state.isRemovingAssignee = false;
-                // Cập nhật assignees trong selectedTask nếu đang mở
-                if (state.selectedTask) {
-                    state.selectedTask.assignees = state.selectedTask.assignees.filter(
-                        a => String(a.user_id) !== action.payload.userId
-                    );
-                }
-            })
-            .addCase(fetchRemoveAssignee.rejected, (state, action) => {
-                state.isRemovingAssignee = false;
-                state.errorRemoveAssignee = action.payload as string;
-            });
+        builder.addCase(fetchCreateTask.rejected, (state, action) => {
+            state.isCreatingTask = false;
+            state.errorCreateTask = action.payload as string;
+        });
     },
 });
 

@@ -1,7 +1,7 @@
 import con from "../config/connect.js";
 export const getProfile = async (user_id) => {
     try {
-        const query = 'SELECT user_id, username, name, email, avatar_url, sdt FROM users WHERE user_id = $1';
+        const query = 'SELECT user_id, username, name, email, avatar_url, sdt FROM users WHERE user_id = $1 AND deleted_at IS NULL';
         const values = [user_id];
         const result = await con.query(query, values);
         return result.rows[0];
@@ -12,12 +12,12 @@ export const getProfile = async (user_id) => {
 
 export const updateProfile = async (user_id, updateData) => {
     try {
-        const { name, avatar_url, sdt } = updateData; 
-        
+        const { name, avatar_url, sdt } = updateData;
+
         let query = 'UPDATE users SET ';
         const values = [user_id];
         const updates = ['updated_at = CURRENT_TIMESTAMP'];
-        let count = 2; 
+        let count = 2;
 
         if (name !== undefined) {
             updates.push(`name = $${count++}`);
@@ -32,9 +32,9 @@ export const updateProfile = async (user_id, updateData) => {
             values.push(sdt);
         }
 
-        if (updates.length === 1) return; 
+        if (updates.length === 1) return;
 
-        query += updates.join(', ') + ' WHERE user_id = $1';
+        query += updates.join(', ') + ' WHERE user_id = $1 AND deleted_at IS NULL';
         await con.query(query, values);
     } catch (error) {
         throw error;
@@ -43,7 +43,7 @@ export const updateProfile = async (user_id, updateData) => {
 
 
 export const findUserByUsername = async (username) => {
-    const query = 'SELECT * FROM users WHERE username = $1';
+    const query = 'SELECT * FROM users WHERE username = $1 AND deleted_at IS NULL';
     const values = [username];
     try {
         const result = await con.query(query, values);
@@ -54,7 +54,7 @@ export const findUserByUsername = async (username) => {
 }
 
 export const findUserByEmail = async (email) => {
-    const query = 'SELECT * FROM users WHERE email = $1';
+    const query = 'SELECT * FROM users WHERE email = $1 AND deleted_at IS NULL';
     const values = [email];
     try {
         const result = await con.query(query, values);
@@ -64,7 +64,7 @@ export const findUserByEmail = async (email) => {
     }
 }
 export const findUserById = async (user_id) => {
-    const query = 'SELECT * FROM users WHERE user_id = $1';
+    const query = 'SELECT * FROM users WHERE user_id = $1 AND deleted_at IS NULL';
     const values = [user_id];
     try {
         const result = await con.query(query, values);

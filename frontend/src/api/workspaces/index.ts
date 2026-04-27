@@ -32,3 +32,10 @@ export const inviteMembers = async (workspaceId: string, emails: string) => {
         workspace_id : workspaceId
     });
 }
+
+export const respondToInvitation = async (token: string, action: 'accept' | 'reject') => {
+    return beApi.post(`/members/respond-to-invitation`, {
+        token: token,
+        action: action
+    });
+}

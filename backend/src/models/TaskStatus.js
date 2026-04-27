@@ -1,16 +1,24 @@
 import con from '../config/connect.js';
 
-export const findStatusesBySpaceId = async (space_id) => {
+export const findStatusesByListId = async (list_id) => {
     try {
-        const query = `SELECT * FROM task_status WHERE space_id = $1 ORDER BY position ASC`;
-        const values = [space_id];
+        const query = `
+            SELECT ts.* FROM task_status ts
+            JOIN lists l ON ts.space_id = l.space_id
+            WHERE l.list_id = $1 AND l.deleted_at IS NULL
+            ORDER BY ts.position ASC;
+        `;
+
+        const values = [list_id];
+
         const result = await con.query(query, values);
+
         return result.rows;
+
     } catch (error) {
         throw error;
     }
 };
-
 export const findStatusById = async (status_id) => {
     try {
         const query = `SELECT * FROM task_status WHERE status_id = $1`;

@@ -1,9 +1,5 @@
-import { useRef, useEffect, useState } from 'react';
 import {
-    ChevronDown, Plus, Star, Hash, Clock, Zap, Bot, Share2,
-    LayoutList, Trello, LayoutDashboard,
-    Calendar, FileText, BarChart2, AlignLeft, Activity, PenSquare,
-    Sparkles, Grid, Users,
+    ChevronDown, Star, Hash, Bot, Share2,
 } from 'lucide-react';
 import type { SpaceItem } from '@/types/spaces';
 

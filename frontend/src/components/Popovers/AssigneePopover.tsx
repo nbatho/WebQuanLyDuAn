@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
 import { Avatar } from 'antd';
 import type { Assignee } from '@/types/tasks';
@@ -9,11 +9,6 @@ export interface AssigneePopoverProps {
     onClose: () => void;
 }
 
-const MOCK_PEOPLE: Assignee[] = [
-    { user_id: 1, name: 'Nguyễn Văn A', avatar_url: null },
-    { user_id: 2, name: 'Trần Thị B', avatar_url: null },
-    { user_id: 3, name: 'Lê Văn C', avatar_url: null },
-];
 
 export default function AssigneePopover({ assignees, onSave }: AssigneePopoverProps) {
     const [search, setSearch] = useState('');
@@ -26,8 +21,7 @@ export default function AssigneePopover({ assignees, onSave }: AssigneePopoverPr
             onSave([...assignees, person]);
         }
     };
-
-    const filtered = MOCK_PEOPLE.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+    const filtered = assignees.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
 
     const getInitials = (name: string) => {
         const parts = name.split(' ');

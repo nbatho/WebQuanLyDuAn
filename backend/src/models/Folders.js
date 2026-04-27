@@ -32,7 +32,7 @@ export const updateFolder = async (folder_id, name) => {
 };
 
 export const deleteFolder = async (folder_id) => {
-  const query = `UPDATE folders SET deleted_at = CURRENT_TIMESTAMP WHERE folder_id = $1 RETURNING *`;
+  const query = `UPDATE folders SET deleted_at = CURRENT_TIMESTAMP WHERE folder_id = $1 AND deleted_at IS NULL RETURNING *`;
   const result = await con.query(query, [folder_id]);
   return result.rows[0];
 };

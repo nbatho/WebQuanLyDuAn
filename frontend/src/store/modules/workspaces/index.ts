@@ -6,7 +6,8 @@ import {
     deleteWorkspace,
     getWorkspaceById,
     getWorkspaceMembers,
-    inviteMembers
+    inviteMembers,
+    respondToInvitation
 } from '../../../api/workspaces';
 import type { WorkspacesData, WorkspaceMemberData, WorkspacesState } from '../../../types/workspaces';
 import {
@@ -114,13 +115,28 @@ export const sendInvitations = createAsyncThunk<
         return rejectWithValue(msg);
     }
 });
-
+export const respondToInvitations = createAsyncThunk<
+    void,
+    { token: string; action: 'accept' | 'reject' },
+    { rejectValue: string }
+>('workspaces/respondToInvitations', async ( { token, action }, { rejectWithValue }) => {
+    try {
+        await respondToInvitation(token, action);
+    } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : 'Failed to respond to invitation';
+        return rejectWithValue(msg);
+    }
+});
 const initialState: WorkspacesState = {
     listWorkspaces: [],
     currentWorkspaceId: readStoredWorkspaceId(),
     isLoadingWorkspaces: false,
     isSendingInvitations: false,
+    isRespondingInvitation: false,
     error: null,
+    listWorkspaceMembers: [],
+    isLoadingWorkspaceMembers: false,
+    workspaceMembersError: null,
 };
 
 const workspacesSlice = createSlice({
@@ -202,6 +218,30 @@ const workspacesSlice = createSlice({
         builder.addCase(sendInvitations.rejected, (state, action) => {
             state.isSendingInvitations = false;
             state.error = action.payload || action.error.message || 'Failed to send invitations';
+        });
+
+        builder.addCase(respondToInvitations.pending, (state) => {
+            state.isRespondingInvitation = true;
+            state.error = null;
+        });
+        builder.addCase(respondToInvitations.fulfilled, (state) => {
+            state.isRespondingInvitation = false;
+        });
+        builder.addCase(respondToInvitations.rejected, (state, action) => {
+            state.isRespondingInvitation = false;
+            state.error = action.payload || action.error.message || 'Failed to respond to invitation';
+        });
+        builder.addCase(fetchWorkspaceMembers.pending, (state) => {
+            state.isLoadingWorkspaceMembers = true;
+            state.workspaceMembersError = null;
+        });
+        builder.addCase(fetchWorkspaceMembers.fulfilled, (state, action) => {
+            state.isLoadingWorkspaceMembers = false;
+            state.listWorkspaceMembers = action.payload;
+        });
+        builder.addCase(fetchWorkspaceMembers.rejected, (state, action) => {
+            state.isLoadingWorkspaceMembers = false;
+            state.workspaceMembersError = action.payload || action.error.message || 'Failed to fetch workspace members';
         });
     },
 });

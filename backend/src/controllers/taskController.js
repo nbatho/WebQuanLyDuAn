@@ -1,8 +1,7 @@
 import {
-    findAllTasksBySpaceId,
     findAllTasksByListId,
-    findAllTasksByFolderId,
     createTask,
+    createTaskForList,
     findTaskById,
     updateTask,
     deleteTask,
@@ -21,18 +20,45 @@ import {
     unassignUserFromTask,
     getAssignedUsersByTaskId,
 } from '../models/Task.js';
+import { findStatusesByListId } from '../models/TaskStatus.js';
 
 
 export const getTasksByListId = async (req, res) => {
     try {
         const { listId } = req.params;
+
         if (!listId) {
             return res.status(400).json({ error: "List ID is required" });
         }
-        const tasks = await findAllTasksByListId(listId);
-        res.status(200).json(tasks);
+
+        const statuses = await findStatusesByListId(listId);
+
+        const rawTasks = await findAllTasksByListId(listId);
+
+        const groupedData = statuses.map((status) => {
+            const tasksInStatus = rawTasks
+                .filter(task => task.status_id === status.status_id)
+                .map(task => ({
+                    ...task,
+                    assignees: task.assignees || [],
+                    subtask_count: Number(task.subtask_count) || 0,
+                    subtask_done_count: Number(task.subtask_done_count) || 0,
+                    comment_count: Number(task.comment_count) || 0,
+                    attachment_count: Number(task.attachment_count) || 0,
+                }));
+            return {
+                id: status.status_id,
+                name: status.status_name,
+                color: status.color || '#d3d3d3',
+                isExpanded: true,
+                tasks: tasksInStatus
+            };
+        });
+
+        res.status(200).json(groupedData);
 
     } catch (error) {
+        console.error("[getTasksByListId] Error:", error);
         res.status(500).json({ error: error.message });
     }
 };
@@ -49,7 +75,7 @@ export const createTasks = async (req, res) => {
         }
         const due_date = req.body.due_date ? new Date(req.body.due_date) : null;
         const newTask = await createTask(name, description, spaceId, due_date);
-        res.status(201).json(newTask);  
+        res.status(201).json(newTask);
 
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -58,29 +84,37 @@ export const createTasks = async (req, res) => {
 export const createTasksForList = async (req, res) => {
     try {
         const { listId } = req.params;
-        const { name, description, status } = req.body;
-        
+
+        const { name, description, priority_id, assignee_ids, due_date, status_id } = req.body;
+
         if (!listId) return res.status(400).json({ error: "List ID is required" });
         if (!name) return res.status(400).json({ error: "Name is required" });
 
-        const listRes = await con.query('SELECT space_id, folder_id FROM lists WHERE list_id = $1', [listId]);
-        if (listRes.rows.length === 0) {
-            return res.status(404).json({ error: "List not found" });
-        }
-        
-        const { space_id, folder_id } = listRes.rows[0];
-        const due_date = req.body.due_date ? new Date(req.body.due_date) : null;
-        
-        const query = `INSERT INTO tasks (name, description, space_id, list_id, start_date, due_date) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`;
-        const values = [name, description || '', space_id, listId, new Date(), due_date];
-        const result = await con.query(query, values);
-        
-        res.status(201).json(result.rows[0]);
+        const newTask = await createTaskForList({
+            listId,
+            name,
+            description,
+            priority_id,
+            assignee_ids,
+            due_date,
+            status_id
+        });
+
+        res.status(201).json({
+            ...newTask,
+            assignees: [],
+            comment_count: 0,
+            subtask_count: 0
+        });
+
     } catch (error) {
+        console.error("Error creating task:", error);
+        if (error.statusCode) {
+            return res.status(error.statusCode).json({ error: error.message });
+        }
         res.status(500).json({ error: error.message });
     }
 };
-
 export const updateTasks = async (req, res) => {
     try {
         const { taskId } = req.params;
@@ -98,12 +132,22 @@ export const updateTasks = async (req, res) => {
 export const deleteTasks = async (req, res) => {
     try {
         const { taskId } = req.params;
+
         if (!taskId) {
             return res.status(400).json({ error: "Task ID is required" });
         }
+
         await deleteTask(taskId);
+
         res.status(200).json({ message: "Task deleted successfully" });
+
     } catch (error) {
+        console.error("[deleteTasks] Error:", error);
+
+        if (error.statusCode) {
+            return res.status(error.statusCode).json({ error: error.message });
+        }
+
         res.status(500).json({ error: error.message });
     }
 };
@@ -195,7 +239,7 @@ export const getCommentsByTaskIds = async (req, res) => {
     }
 };
 
-export const createComments = async (req, res) => {  
+export const createComments = async (req, res) => {
     try {
         const { taskId } = req.params;
         const { content } = req.body;
@@ -210,7 +254,7 @@ export const createComments = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-};  
+};
 
 export const getAttachmentsByTaskIds = async (req, res) => {
     try {
@@ -240,7 +284,7 @@ export const createAttachments = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-};  
+};
 
 export const deleteAttachments = async (req, res) => {
     try {
@@ -255,7 +299,7 @@ export const deleteAttachments = async (req, res) => {
     }
 };
 
-export const addAssigneeToTasks = async (req, res) => {  
+export const addAssigneeToTasks = async (req, res) => {
     try {
         const { taskId } = req.params;
         const { userId } = req.body;
@@ -272,7 +316,7 @@ export const addAssigneeToTasks = async (req, res) => {
     }
 };
 
-export const removeAssigneeFromTasks = async (req, res) => {  
+export const removeAssigneeFromTasks = async (req, res) => {
     try {
         const { taskId } = req.params;
         const { userId } = req.body;

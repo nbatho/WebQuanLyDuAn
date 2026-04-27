@@ -9,10 +9,10 @@ export const findSprintsBySpaceId = async (space_id) => {
              COALESCE(SUM(t.story_points), 0) AS total_story_points,
              COALESCE(SUM(t.story_points) FILTER (WHERE ts.is_done_state = TRUE), 0) AS completed_story_points
       FROM sprints s
-      LEFT JOIN users u ON u.user_id = s.created_by
-      LEFT JOIN tasks t ON t.sprint_id = s.sprint_id AND t.is_archived = FALSE
+      LEFT JOIN users u ON u.user_id = s.created_by AND u.deleted_at IS NULL
+      LEFT JOIN tasks t ON t.sprint_id = s.sprint_id AND t.is_archived = FALSE AND t.deleted_at IS NULL
       LEFT JOIN task_status ts ON ts.status_id = t.status_id
-      WHERE s.space_id = $1
+      WHERE s.space_id = $1 AND s.deleted_at IS NULL
       GROUP BY s.sprint_id, u.username
       ORDER BY s.start_date DESC NULLS LAST, s.created_at DESC
     `;
@@ -32,10 +32,10 @@ export const findSprintById = async (sprint_id) => {
              COALESCE(SUM(t.story_points), 0) AS total_story_points,
              COALESCE(SUM(t.story_points) FILTER (WHERE ts.is_done_state = TRUE), 0) AS completed_story_points
       FROM sprints s
-      LEFT JOIN users u ON u.user_id = s.created_by
-      LEFT JOIN tasks t ON t.sprint_id = s.sprint_id AND t.is_archived = FALSE
+      LEFT JOIN users u ON u.user_id = s.created_by AND u.deleted_at IS NULL
+      LEFT JOIN tasks t ON t.sprint_id = s.sprint_id AND t.is_archived = FALSE AND t.deleted_at IS NULL
       LEFT JOIN task_status ts ON ts.status_id = t.status_id
-      WHERE s.sprint_id = $1
+      WHERE s.sprint_id = $1 AND s.deleted_at IS NULL
       GROUP BY s.sprint_id, u.username
     `;
     const result = await con.query(query, [sprint_id]);
@@ -80,7 +80,7 @@ export const updateSprintById = async (sprint_id, name, description, goal, statu
           velocity = COALESCE($5, velocity),
           start_date = COALESCE($6, start_date),
           end_date = COALESCE($7, end_date)
-      WHERE sprint_id = $8
+        WHERE sprint_id = $8 AND deleted_at IS NULL
       RETURNING *
     `;
     const values = [name, description, goal, status, velocity, start_date, end_date, sprint_id];
@@ -93,7 +93,7 @@ export const updateSprintById = async (sprint_id, name, description, goal, statu
 
 export const deleteSprintById = async (sprint_id) => {
   try {
-    const query = `DELETE FROM sprints WHERE sprint_id = $1 RETURNING *`;
+    const query = `UPDATE sprints SET deleted_at = CURRENT_TIMESTAMP WHERE sprint_id = $1 AND deleted_at IS NULL RETURNING *`;
     const result = await con.query(query, [sprint_id]);
     return result.rows[0];
   } catch (error) {

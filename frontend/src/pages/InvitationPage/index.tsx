@@ -1,18 +1,32 @@
 
-import { useSearchParams } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import './InvitationPage.css';
-
+import type { AppDispatch } from '@/store/configureStore';
+import { useAppDispatch } from '@/hooks';
+import { respondToInvitation } from '@/api/workspaces';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store/configureStore';
 export default function InvitationPage() {
     const projectName = 'WebQuanLyDuAn';
     const inviterEmail = 'owner@example.com';
     const [searchParams] = useSearchParams();
     const token = searchParams.get('token');
-    const handleAccept = () => {
-        console.log('Invitation accepted', token);
+    const dispatch = useAppDispatch<AppDispatch>();
+    const isRespondingInvitation = useSelector((state : RootState) => state.workspaces.isRespondingInvitation);
+    const navigate = useNavigate();
+    const handleAccept = async () => {
+        console.log('Invitation accepted', token);  
+        dispatch(respondToInvitation(token || '', 'accept') as any);
+        if (isRespondingInvitation) {
+            navigate('/workspaces');
+        }
     };
-
-    const handleReject = () => {
+    const handleReject = async () => {
         console.log('Invitation rejected');
+        dispatch(respondToInvitation(token || '', 'reject') as any);
+        if (isRespondingInvitation) {
+            navigate('/workspaces');
+        }
     };
     
 
