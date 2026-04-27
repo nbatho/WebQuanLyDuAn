@@ -4,9 +4,7 @@ import {
     Calendar, Flag, CheckCircle2, ArrowUpDown, User, Tag
 } from 'lucide-react';
 
-/* ═══════════════════════════════════════════
-   GROUP BY DROPDOWN
-═══════════════════════════════════════════ */
+
 export interface GroupByDropdownProps {
     value: string;
     onChange: (val: string) => void;

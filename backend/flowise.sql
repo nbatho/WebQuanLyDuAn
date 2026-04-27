@@ -1,6 +1,6 @@
 -- ================================================================
 -- FLOWISE — PostgreSQL Database Schema
--- Phiên bản: 3.2 (Đã fix Soft Delete, Precision Date & Data Integrity)
+-- Phiên bản: 3.3 (Cập nhật: Bỏ bảng task_priority, fix cứng Priority)
 -- ================================================================
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
@@ -152,15 +152,6 @@ CREATE TABLE task_status (
     UNIQUE (space_id, status_name)
 );
 
-CREATE TABLE task_priority (
-    priority_id   SERIAL       PRIMARY KEY,
-    space_id      INT          NOT NULL REFERENCES spaces(space_id) ON DELETE RESTRICT,
-    priority_name VARCHAR(100) NOT NULL,
-    color         VARCHAR(7)   NOT NULL DEFAULT '#6C63FF',
-    position      INT          NOT NULL DEFAULT 0,
-    UNIQUE (space_id, priority_name)
-);
-
 CREATE TABLE milestones (
     milestone_id SERIAL       PRIMARY KEY,
     space_id     INT          NOT NULL REFERENCES spaces(space_id) ON DELETE RESTRICT,
@@ -214,7 +205,10 @@ CREATE TABLE tasks (
     sprint_id      INT          REFERENCES sprints(sprint_id) ON DELETE SET NULL,
     milestone_id   INT          REFERENCES milestones(milestone_id) ON DELETE SET NULL,
     status_id      INT          REFERENCES task_status(status_id) ON DELETE SET NULL,
-    priority_id    INT          REFERENCES task_priority(priority_id) ON DELETE SET NULL,
+    
+    -- Priority đã được chuyển thành VARCHAR cố định
+    priority       VARCHAR(20)  NOT NULL DEFAULT 'Normal' CHECK (priority IN ('Urgent', 'High', 'Normal', 'Low', 'Clear')),
+    
     name           VARCHAR(255) NOT NULL,
     description    TEXT,
     story_points   SMALLINT     CHECK (story_points >= 0 AND story_points <= 100),
@@ -230,7 +224,7 @@ CREATE TABLE tasks (
 );
 
 CREATE TABLE task_assigns (
-    task_id     INT NOT NULL REFERENCES tasks(task_id) ON DELETE RESTRICT, -- Bảo vệ Task đã có assignee
+    task_id     INT NOT NULL REFERENCES tasks(task_id) ON DELETE RESTRICT,
     user_id     INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     assigned_by INT REFERENCES users(user_id) ON DELETE SET NULL,
     assigned_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -310,6 +304,9 @@ CREATE TABLE notifications (
     deleted_at      TIMESTAMP    DEFAULT NULL
 );
 
+-- ================================================================
+-- 7. INDEXES
+-- ================================================================
 CREATE INDEX idx_tasks_space_id      ON tasks(space_id) WHERE deleted_at IS NULL;
 CREATE INDEX idx_tasks_folder_id     ON tasks(folder_id) WHERE folder_id IS NOT NULL AND deleted_at IS NULL;
 CREATE INDEX idx_tasks_list_id       ON tasks(list_id) WHERE list_id IS NOT NULL AND deleted_at IS NULL;
@@ -328,6 +325,9 @@ CREATE INDEX idx_lists_space_id   ON lists(space_id)   WHERE deleted_at IS NULL;
 CREATE INDEX idx_spaces_workspace_id ON spaces(workspace_id) WHERE deleted_at IS NULL;
 
 
+-- ================================================================
+-- 8. TRIGGERS
+-- ================================================================
 CREATE OR REPLACE FUNCTION set_updated_at() RETURNS TRIGGER LANGUAGE plpgsql AS $$
 BEGIN NEW.updated_at = CURRENT_TIMESTAMP; RETURN NEW; END; $$;
 
@@ -390,18 +390,30 @@ BEGIN
 END; $$;
 CREATE TRIGGER trg_tasks_soft_delete_cascade AFTER UPDATE OF deleted_at ON tasks FOR EACH ROW EXECUTE FUNCTION soft_delete_task_cascade();
 
-
+-- ================================================================
+-- 9. VIEWS
+-- ================================================================
 CREATE OR REPLACE VIEW kanban_tasks AS
 SELECT
     t.task_id, t.parent_task_id, t.space_id, t.folder_id, t.list_id, t.name, t.description, t.story_points,
     t.start_date, t.due_date, t.completed_at, t.position, t.is_archived, t.created_by, t.created_at, t.updated_at,
-    ts.status_name, ts.color AS status_color, ts.is_done_state, tp.priority_name, tp.color AS priority_color,
+    ts.status_name, ts.color AS status_color, ts.is_done_state, 
+    
+    t.priority AS priority_name, 
+    CASE t.priority
+        WHEN 'Urgent' THEN '#ef4444' 
+        WHEN 'High'   THEN '#f59e0b' 
+        WHEN 'Normal' THEN '#3b82f6' 
+        WHEN 'Low'    THEN '#8b5cf6' 
+        WHEN 'Clear'  THEN '#9ca3af' 
+        ELSE 'transparent'
+    END AS priority_color,
+    
     sp.name AS sprint_name, ms.name AS milestone_name,
     COALESCE(sub.total, 0) AS subtask_count, COALESCE(sub.done, 0) AS subtask_done_count,
     COALESCE(cmt.cnt, 0) AS comment_count, COALESCE(att.cnt, 0) AS attachment_count, COALESCE(tl.total_secs, 0) AS time_logged_secs
 FROM tasks t
 LEFT JOIN task_status ts ON ts.status_id = t.status_id
-LEFT JOIN task_priority tp ON tp.priority_id = t.priority_id
 LEFT JOIN sprints sp ON sp.sprint_id = t.sprint_id
 LEFT JOIN milestones ms ON ms.milestone_id = t.milestone_id
 LEFT JOIN LATERAL (

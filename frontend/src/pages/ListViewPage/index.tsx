@@ -9,17 +9,24 @@ import { useSpaceTree } from '../../layouts/AppLayout/SpaceTreeContext';
 import PageHeader, { LIST_TABS } from '../../components/PageHeader';
 import ContextMenu from '../../components/ContextMenu';
 import CreateTaskModal from '../../components/CreateTaskModal/CreateTaskModal';
-// import BoardView from '@/components/BoardView/boardView';
+import BoardView from './components/BoardView';
 import ListView from './components/ListView';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '@/store/configureStore';
-import { fetchTasksForList,fetchCreateTask } from '@/store/modules/tasks';
+import { fetchTasksForList, fetchCreateTask } from '@/store/modules/tasks';
 // import { useAppDispatch, useAppSelector } from '@/hooks/index'; 
 
 export interface Assignee {
     user_id: number;
     name: string;
     avatar_url: string | null;
+}
+export interface StatusGroup {
+    id: number;
+    name: string;
+    color: string;
+    isExpanded: boolean;
+    tasks: Task[];
 }
 
 export interface Task {
@@ -33,9 +40,11 @@ export interface Task {
     status_id: number;
     status_name: string;
     status_color: string;
-    priority_id: number | null;
+
+    // ĐÃ BỎ priority_id
     priority_name: string | null;
     priority_color: string | null;
+
     due_date: string | null;
     position: number;
     subtask_count: number;
@@ -45,21 +54,16 @@ export interface Task {
     assignees: Assignee[];
 }
 
-export interface StatusGroup {
-    id: number;
-    name: string;
-    color: string;
-    isExpanded: boolean;
-    tasks: Task[];
-}
-
 export interface NewTaskData {
     name: string;
     description?: string | null;
     list_id: number;
     parent_task_id?: number | null;
     status_id?: number;
-    priority_id?: number | null;
+
+    // SỬA: Dùng priority kiểu chuỗi
+    priority?: string;
+
     due_date?: string | null;
     assignee_ids?: number[];
 }
@@ -116,7 +120,6 @@ export default function ListViewPage() {
         if (listInfo) break;
     }
 
-    // -- Update Task (Nhảy nhóm khi đổi Status) --
     const updateTask = useCallback((taskId: number, updates: Partial<Task>) => {
         setGroups((prevGroups) => {
             let taskToMove: Task | null = null;
@@ -152,14 +155,14 @@ export default function ListViewPage() {
             name,
             list_id: Number(listId),
             status_id: groupId,
-            priority_id: extras?.priority_id || null,
+            // SỬA: Lấy priority từ extras, nếu không có thì mặc định là 'Normal'
+            priority: extras?.priority || 'Normal',
             due_date: extras?.due_date || null,
             assignee_ids: extras?.assignees?.map((a: Assignee) => a.user_id) || []
         };
 
         console.log("Gửi API:", payload);
 
-        // Optimistic UI: Hiển thị ngay lên màn hình
         const tempId = Math.floor(Math.random() * 100000);
         const newTask: Task = {
             task_id: tempId,
@@ -172,9 +175,10 @@ export default function ListViewPage() {
             status_id: groupId,
             status_name: groups.find(g => g.id === groupId)?.name || '',
             status_color: groups.find(g => g.id === groupId)?.color || '#ccc',
-            priority_id: payload.priority_id || null,
-            priority_name: extras?.priority_name || 'Normal',
-            priority_color: extras?.priority_color || '#9ca3af',
+
+            priority_name: payload.priority || 'Normal',
+            priority_color: extras?.priority_color || '#3b82f6',
+
             due_date: payload.due_date || null,
             position: 0,
             subtask_count: 0,
@@ -186,21 +190,23 @@ export default function ListViewPage() {
 
         setGroups(prev => prev.map(g => g.id === groupId ? { ...g, tasks: [...g.tasks, newTask] } : g));
 
-        // TODO: dispatch(fetchCreateTask(payload)).then(...) -> Cập nhật lại ID thật khi có phản hồi
-    }, [listId, spaceId, parentFolder, groups]);
+        dispatch(fetchCreateTask({
+            list_id: payload.list_id,
+            taskData: payload
+        }));
+    }, [listId, spaceId, parentFolder, groups, dispatch]);
 
-    // -- Modal Create Task (Optimistic UI) --
     const handleCreateTask = useCallback((payload: NewTaskData) => {
         console.log("Modal Create Payload gửi đi:", payload);
 
         dispatch(fetchCreateTask({
             list_id: payload.list_id,
-            taskData: payload 
+            taskData: payload
         }));
 
         setIsCreateTaskOpen(false);
 
-    }, [dispatch]); 
+    }, [dispatch]);
     const handleCreateStatus = useCallback((name: string, color: string) => {
         console.log("Create Status:", { name, color });
         // TODO: Gọi API tạo status
@@ -287,10 +293,7 @@ export default function ListViewPage() {
                     {activeTab === 'list' ?
                         <ListView />
                         :
-                        <>
-
-                            {/* <BoardView />} */}
-                        </>
+                        <BoardView showClosed={true} />
                     }
                 </main>
 
@@ -303,8 +306,10 @@ export default function ListViewPage() {
                 <CreateTaskModal
                     isOpen={isCreateTaskOpen}
                     onClose={() => setIsCreateTaskOpen(false)}
-                    onCreate={handleCreateTask as any}
-                    defaultStatusId={1}
+                    onCreate={handleCreateTask}
+
+                    groups={groups.map(g => ({ id: g.id, name: g.name, color: g.color }))}
+
                     lists={[{ id: Number(listInfo.id), name: listInfo.name }]}
                     defaultListId={Number(listInfo.id)}
                 />

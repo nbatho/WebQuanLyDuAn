@@ -4,7 +4,6 @@ import workspacesRoutes from './workspacesRoutes.js';
 import spaceRoutes from './spaceRoutes.js';
 import taskRoutes from './taskRoutes.js';
 import taskStatusRoutes from './taskStatusRoutes.js';
-import taskPriorityRoutes from './taskPriorityRoutes.js';
 import milestoneRoutes from './milestonesRoutes.js';
 import sprintRoutes from './sprintRoutes.js';
 import notificationRoutes from './notificationsRoutes.js';
@@ -25,7 +24,6 @@ export {
     spaceRoutes,
     taskRoutes,
     taskStatusRoutes,
-    taskPriorityRoutes,
     milestoneRoutes,
     sprintRoutes,
     notificationRoutes,

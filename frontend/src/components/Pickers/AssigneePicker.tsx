@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { User, ChevronDown } from 'lucide-react';
-import { MEMBER_OPTIONS } from '../constants/taskOptions';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store/configureStore';
 
 export interface AssigneePickerProps {
     value: string[];
@@ -10,7 +11,7 @@ export interface AssigneePickerProps {
 export default function AssigneePicker({ value, onChange }: AssigneePickerProps) {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
-
+    const listMembers = useSelector((state: RootState) => state.workspaces.listWorkspaceMembers);
     useEffect(() => {
         const handler = (e: MouseEvent) => {
             if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
@@ -38,24 +39,23 @@ export default function AssigneePicker({ value, onChange }: AssigneePickerProps)
 
             {open && (
                 <div className="absolute left-0 top-[calc(100%+4px) z-20 min-w-55 rounded-lg border border-(--color-border-light) bg-white p-1 shadow-[0_6px_20px_rgba(0,0,0,0.12)">
-                    {MEMBER_OPTIONS.map((m) => (
+                    {listMembers.map((m) => (
                         <button
-                            key={m.id}
+                            key={m.user_id}
                             className={`flex w-full cursor-pointer items-center gap-2 rounded-md border-none px-2.5 py-1.75 text-left text-xs font-semibold ${
-                                value.includes(m.id)
+                                value.includes(m.user_id.toString())
                                     ? 'bg-(--color-primary-bg) text-(--color-primary)'
                                     : 'bg-transparent text-(--color-on-surface) hover:bg-(--color-primary-bg)'
                             }`}
-                            onClick={() => toggle(m.id)}
+                            onClick={() => toggle(m.user_id.toString())}
                         >
                             <span
                                 className="flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white"
-                                style={{ backgroundColor: m.color }}
-                            >
-                                {m.id}
+                                >
+                                {m.user_id.toString() === '1' ? 'AD' : m.username.substring(0, 2).toUpperCase()}
                             </span>
-                            {m.name}
-                            {value.includes(m.id) && (
+                            {m.username}
+                            {value.includes(m.user_id.toString()) && (
                                 <span className="ml-auto text-sm text-(--color-primary)">✓</span>
                             )}
                         </button>

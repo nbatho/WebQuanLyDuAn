@@ -10,7 +10,6 @@ import {
   spaceRoutes,
   taskRoutes,
   taskStatusRoutes,
-  taskPriorityRoutes,
   milestoneRoutes,
   sprintRoutes,
   notificationRoutes,
@@ -106,7 +105,6 @@ app.use("/api/v1/workspaces", workspacesRoutes);
 app.use("/api/v1/spaces", spaceRoutes);
 app.use("/api/v1/tasks", taskRoutes);
 app.use("/api/v1/statuses", taskStatusRoutes);
-app.use("/api/v1/priorities", taskPriorityRoutes);
 app.use("/api/v1/milestones", milestoneRoutes);
 app.use("/api/v1/sprints", sprintRoutes);
 app.use("/api/v1/notifications", notificationRoutes);

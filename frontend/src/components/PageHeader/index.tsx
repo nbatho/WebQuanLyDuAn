@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import {
-    ChevronDown, Star, FolderClosed, Bot, Share2, Plus,
+    ChevronDown, Star, FolderClosed, Bot, Share2,
     LayoutDashboard, LayoutList, Trello,
 } from 'lucide-react';
 

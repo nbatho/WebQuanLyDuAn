@@ -32,20 +32,25 @@ export const getTasksByListId = async (req, res) => {
         }
 
         const statuses = await findStatusesByListId(listId);
-
         const rawTasks = await findAllTasksByListId(listId);
+
+        const groupedTaskIds = new Set();
 
         const groupedData = statuses.map((status) => {
             const tasksInStatus = rawTasks
-                .filter(task => task.status_id === status.status_id)
-                .map(task => ({
-                    ...task,
-                    assignees: task.assignees || [],
-                    subtask_count: Number(task.subtask_count) || 0,
-                    subtask_done_count: Number(task.subtask_done_count) || 0,
-                    comment_count: Number(task.comment_count) || 0,
-                    attachment_count: Number(task.attachment_count) || 0,
-                }));
+                .filter(task => Number(task.status_id) === Number(status.status_id))
+                .map(task => {
+                    groupedTaskIds.add(task.task_id); // Đánh dấu task này đã có nhà
+                    return {
+                        ...task,
+                        assignees: task.assignees || [],
+                        subtask_count: Number(task.subtask_count) || 0,
+                        subtask_done_count: Number(task.subtask_done_count) || 0,
+                        comment_count: Number(task.comment_count) || 0,
+                        attachment_count: Number(task.attachment_count) || 0,
+                    };
+                });
+
             return {
                 id: status.status_id,
                 name: status.status_name,
@@ -55,6 +60,28 @@ export const getTasksByListId = async (req, res) => {
             };
         });
 
+        const orphanedTasks = rawTasks
+            .filter(task => !groupedTaskIds.has(task.task_id))
+            .map(task => ({
+                ...task,
+                assignees: task.assignees || [],
+                subtask_count: Number(task.subtask_count) || 0,
+                subtask_done_count: Number(task.subtask_done_count) || 0,
+                comment_count: Number(task.comment_count) || 0,
+                attachment_count: Number(task.attachment_count) || 0,
+            }));
+
+        if (orphanedTasks.length > 0) {
+            groupedData.push({
+                id: 0, 
+                name: 'No Status',
+                color: '#9ca3af',
+                isExpanded: true,
+                tasks: orphanedTasks
+            });
+        }
+
+        // Trả dữ liệu về cho Frontend
         res.status(200).json(groupedData);
 
     } catch (error) {
@@ -85,19 +112,13 @@ export const createTasksForList = async (req, res) => {
     try {
         const { listId } = req.params;
 
-        const { name, description, priority_id, assignee_ids, due_date, status_id } = req.body;
+        const { name, description, priority, assignee_ids, due_date, status_id } = req.body;
 
         if (!listId) return res.status(400).json({ error: "List ID is required" });
         if (!name) return res.status(400).json({ error: "Name is required" });
 
         const newTask = await createTaskForList({
-            listId,
-            name,
-            description,
-            priority_id,
-            assignee_ids,
-            due_date,
-            status_id
+            listId, name, description, priority, assignee_ids, due_date, status_id
         });
 
         res.status(201).json({
@@ -118,13 +139,25 @@ export const createTasksForList = async (req, res) => {
 export const updateTasks = async (req, res) => {
     try {
         const { taskId } = req.params;
-        const { name, description, due_date } = req.body;
+        const updateData = req.body;
         if (!taskId) {
             return res.status(400).json({ error: "Task ID is required" });
         }
-        await updateTask(taskId, name, description, due_date);
-        res.status(200).json({ message: "Task updated successfully" });
+        const updatedTask = await updateTask(taskId, updateData);
+
+        if (!updatedTask) {
+            return res.status(400).json({ error: "Không có dữ liệu hợp lệ để cập nhật" });
+        }
+
+        res.status(200).json(updatedTask);
+
     } catch (error) {
+        console.error("Error updating task:", error);
+
+        if (error.statusCode) {
+            return res.status(error.statusCode).json({ error: error.message });
+        }
+
         res.status(500).json({ error: error.message });
     }
 };

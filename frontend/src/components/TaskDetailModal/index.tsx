@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Paperclip, MessageSquare, Activity, Save } from 'lucide-react';
 import { Button, Input, Avatar } from 'antd';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store/configureStore';
 import type { Task } from '@/types/tasks';
 import TaskDetailHeader from './TaskDetailHeader';
 import TaskDetailSidebar from './TaskDetailSidebar';
@@ -16,11 +18,15 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
     const [isMaximized, setIsMaximized] = useState(false);
     const [activeTab, setActiveTab] = useState<'comments' | 'activity'>('comments');
 
-    // State cục bộ để gõ mượt mà, không giật lag
     const [taskTitle, setTaskTitle] = useState('');
     const [taskDesc, setTaskDesc] = useState('');
 
-    // Khởi tạo dữ liệu khi mở Modal
+    // LẤY DANH SÁCH STATUS ĐỘNG TỪ REDUX
+    const groups = useSelector((state: RootState) => state.tasks.listTask);
+    const statusOptions = useMemo(() => {
+        return groups.map(g => ({ id: g.id, name: g.name, color: g.color }));
+    }, [groups]);
+
     useEffect(() => {
         if (task) {
             setTaskTitle(task.name || '');
@@ -28,7 +34,6 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
         }
     }, [task]);
 
-    // KIỂM TRA THAY ĐỔI: So sánh dữ liệu đang gõ với dữ liệu gốc
     const isChanged = useMemo(() => {
         if (!task) return false;
         return taskTitle !== task.name || taskDesc !== (task.description || '');
@@ -36,7 +41,6 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
 
     if (!isOpen || !task) return null;
 
-    // HÀM LƯU DỮ LIỆU
     const handleUpdate = () => {
         if (!isChanged) return;
         updateTask(task.task_id, {
@@ -45,7 +49,6 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
         });
     };
 
-    // Hàm tạo class động cho Tab
     const tabClass = (tab: 'comments' | 'activity') =>
         `flex cursor-pointer items-center gap-1.5 pb-2 text-[13px] font-semibold transition-all ${activeTab === tab
             ? 'border-b-2 border-[#7c68ee] text-[#7c68ee]'
@@ -56,34 +59,27 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
         <div className="fixed inset-0 z-1500 flex items-center justify-center bg-[rgba(20,27,43,0.5)]" onClick={onClose}>
             <div
                 className={`${isMaximized
-                        ? 'h-screen max-h-screen w-screen max-w-screen rounded-none'
-                        : 'max-h-[88vh] w-220 max-w-[95vw] rounded-[14px]'
+                    ? 'h-screen max-h-screen w-screen max-w-screen rounded-none'
+                    : 'max-h-[88vh] w-220 max-w-[95vw] rounded-[14px]'
                     } flex flex-col overflow-hidden bg-white shadow-2xl transition-all duration-300`}
                 onClick={(e) => e.stopPropagation()}
             >
+                {/* TRUYỀN PROPS CHUẨN XÁC CHO HEADER */}
                 <TaskDetailHeader
                     task={task}
                     updateTask={updateTask}
+                    statusOptions={statusOptions}
                     isMaximized={isMaximized}
                     onToggleMaximize={() => setIsMaximized(!isMaximized)}
                     onClose={onClose}
                 />
 
                 <div className="flex flex-1 overflow-hidden">
-                    {/* KHU VỰC NỘI DUNG CHÍNH (BÊN TRÁI) */}
                     <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-5">
-
-                        {/* THANH THÔNG BÁO UPDATE KHI CÓ THAY ĐỔI */}
                         {isChanged && (
                             <div className="flex items-center justify-between rounded-lg bg-[#f0f4ff] p-3 border border-[#d6e4ff]">
                                 <span className="text-[13px] font-medium text-[#0058be]">Bạn có thay đổi chưa lưu</span>
-                                <Button
-                                    type="primary"
-                                    size="small"
-                                    icon={<Save size={14} />}
-                                    onClick={handleUpdate}
-                                    className="bg-[#7c68ee] hover:bg-[#6b56db] border-none"
-                                >
+                                <Button type="primary" size="small" icon={<Save size={14} />} onClick={handleUpdate} className="bg-[#7c68ee] hover:bg-[#6b56db] border-none">
                                     Update
                                 </Button>
                             </div>
@@ -96,7 +92,6 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
                             placeholder="Task name"
                         />
 
-                        {/* Description */}
                         <div className="mt-1">
                             <h3 className="mb-2 text-[13px] font-bold uppercase tracking-[0.04em] text-[#6b7280]">Description</h3>
                             <textarea
@@ -171,7 +166,6 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
                         </div>
                     </div>
 
-                    {/* KHU VỰC SIDEBAR (BÊN PHẢI) */}
                     <TaskDetailSidebar
                         task={task}
                         updateTask={updateTask}

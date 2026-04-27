@@ -5,7 +5,6 @@ import spacesReducer from './modules/spaces/index.ts';
 import tasksReducer from './modules/tasks/index.ts';
 import treeReducer from './modules/tree/index.ts';
 import statusesReducer from './modules/statuses/index.ts';
-import prioritiesReducer from './modules/priorities/index.ts';
 import tagsReducer from './modules/tags/index.ts';
 import commentsReducer from './modules/comments/index.ts';
 import timeLogsReducer from './modules/timelogs/index.ts';
@@ -21,7 +20,6 @@ const rootReducer = {
     tasks: tasksReducer,
     tree: treeReducer,
     statuses: statusesReducer,
-    priorities: prioritiesReducer,
     tags: tagsReducer,
     comments: commentsReducer,
     timelogs: timeLogsReducer,

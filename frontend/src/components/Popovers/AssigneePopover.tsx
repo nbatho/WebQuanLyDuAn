@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import {useState } from 'react';
 import { Search } from 'lucide-react';
 import { Avatar } from 'antd';
 import type { Assignee } from '@/types/tasks';

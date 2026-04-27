@@ -1,4 +1,4 @@
-import { BarChart2, BookMarked, FileText, FolderOpen, Maximize2, MoreHorizontal, Plus, X, Clock, PenTool } from "lucide-react";
+import { BarChart2, BookMarked, FileText, FolderOpen, Maximize2, MoreHorizontal, Plus, Clock, PenTool } from "lucide-react";
 
 const WIDGETS = [
     { id: 'recent', title: 'Recent', icon: Clock, iconColor: '#E5A93B', emptyEmoji: '🕒', desc: 'Your recently accessed tasks and items will appear here.', btn: 'Browse items' },
@@ -10,7 +10,7 @@ const WIDGETS = [
 import { useNavigate } from 'react-router-dom';
 import type { SpaceTreeData } from "@/types/tree";
 
-export default function OverviewView({ spaceId, currentSpaceTree }: { spaceId?: string, currentSpaceTree?: SpaceTreeData[string] }) {
+export default function OverviewView({ currentSpaceTree }: { spaceId?: string, currentSpaceTree?: SpaceTreeData[string] }) {
     const navigate = useNavigate();
     return (
         <div className="flex-1 overflow-y-auto p-0 bg-[#f8fafc]">

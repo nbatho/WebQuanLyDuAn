@@ -24,7 +24,7 @@ export default function TaskDetailSidebar({ task, updateTask }: TaskDetailSideba
                     <span className="text-[11px] font-bold uppercase tracking-[0.04em] text-[#9ca3af]">Assignee</span>
                     <Popover content={<AssigneePopover assignees={task.assignees} onSave={(a) => updateTask(task.task_id, { assignees: a })} onClose={() => setOpenPopover(null)} />} trigger="click" open={openPopover === 'assignee'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }} getPopupContainer={(trigger) => trigger.parentElement!}>
                         <div className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 transition-colors hover:bg-[#e5e7eb]" onClick={() => setOpenPopover('assignee')}>
-                            {task.assignees.length > 0 ? (
+                            {task.assignees && task.assignees.length > 0 ? (
                                 <div className="flex -space-x-1">
                                     {task.assignees.map((a) => (
                                         <Avatar key={a.user_id} size={24} src={a.avatar_url} style={{ backgroundColor: '#7c68ee', fontSize: '10px', fontWeight: 'bold', border: '2px solid white' }}>{!a.avatar_url && getInitials(a.name)}</Avatar>
@@ -47,9 +47,9 @@ export default function TaskDetailSidebar({ task, updateTask }: TaskDetailSideba
 
                 <div className="flex flex-col gap-1">
                     <span className="text-[11px] font-bold uppercase tracking-[0.04em] text-[#9ca3af]">Priority</span>
-                    <Popover content={<PriorityPopover priority_id={task.priority_id} onSave={(id, name, color) => updateTask(task.task_id, { priority_id: id, priority_name: name, priority_color: color })} onClose={() => setOpenPopover(null)} />} trigger="click" open={openPopover === 'priority'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }} getPopupContainer={(trigger) => trigger.parentElement!}>
+                    <Popover content={<PriorityPopover value={task.priority_name || 'Normal'} onSave={(val) => updateTask(task.task_id, { priority: val })} onClose={() => setOpenPopover(null)} />} trigger="click" open={openPopover === 'priority'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }} getPopupContainer={(trigger) => trigger.parentElement!}>
                         <div className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 transition-colors hover:bg-[#e5e7eb]" onClick={() => setOpenPopover('priority')}>
-                            <Flag size={14} fill={task.priority_color ?? 'transparent'} color={task.priority_color ?? '#9ca3af'} />
+                            <Flag size={14} fill={task.priority_name !== 'Clear' ? (task.priority_color ?? 'transparent') : 'none'} color={task.priority_color ?? '#9ca3af'} />
                             <span className="text-[13px] font-medium" style={{ color: task.priority_color ?? '#6b7280' }}>{task.priority_name || 'Normal'}</span>
                         </div>
                     </Popover>

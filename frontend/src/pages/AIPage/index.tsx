@@ -10,7 +10,6 @@ import {
     Copy, 
     CheckSquare, 
     FileText,
-    MessageSquarePlus,
     History,
     Blocks,
     UserCircle,
@@ -22,7 +21,6 @@ import {
     Lightbulb,
     PanelLeftClose,
     PanelLeftOpen,
-    MoreHorizontal,
     Trash2
 } from 'lucide-react';
 
@@ -45,12 +43,10 @@ interface ChatSession {
 export default function AIPage() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     
-    // Quản lý nhiều phiên chat
     const [sessions, setSessions] = useState<ChatSession[]>(() => {
         const saved = localStorage.getItem('flowise_ai_sessions');
         if (saved) return JSON.parse(saved);
         
-        // Mặc định tạo 1 session nếu chưa có gì
         return [{
             id: 'default',
             title: 'Cuộc trò chuyện mới',
@@ -75,7 +71,6 @@ export default function AIPage() {
     const [isGenerating, setIsGenerating] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // Session hiện tại đang được chọn
     const activeSession = sessions.find(s => s.id === activeSessionId) || sessions[0];
     const messages = activeSession?.messages || [];
 
@@ -83,7 +78,6 @@ export default function AIPage() {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    // Đồng bộ session vào localStorage
     useEffect(() => {
         localStorage.setItem('flowise_ai_sessions', JSON.stringify(sessions));
         localStorage.setItem('flowise_ai_active_session', activeSessionId);
@@ -128,7 +122,6 @@ export default function AIPage() {
 
         const userMessage: AIChatMessage = { id: Date.now().toString(), role: 'user', content: text };
         
-        // Cập nhật tin nhắn và đổi tên tiêu đề nếu là tin nhắn đầu tiên
         setSessions(prev => prev.map(s => {
             if (s.id === activeSessionId) {
                 const newTitle = s.messages.length === 0 
@@ -144,7 +137,6 @@ export default function AIPage() {
 
         const aiMessageId = (Date.now() + 1).toString();
         
-        // Thêm tin nhắn AI với trạng thái Searching
         setSessions(prev => prev.map(s => 
             s.id === activeSessionId 
                 ? { ...s, messages: [...s.messages, { id: aiMessageId, role: 'ai', content: '', isSearching: true, isStreaming: true }] } 
@@ -166,7 +158,6 @@ export default function AIPage() {
             const words = fullResponse.split(' ');
             let currentText = '';
 
-            // Tắt Searching
             setSessions(prev => prev.map(s => 
                 s.id === activeSessionId 
                     ? { ...s, messages: s.messages.map(m => m.id === aiMessageId ? { ...m, isSearching: false, isStreaming: true } : m) } 
@@ -215,7 +206,6 @@ export default function AIPage() {
     return (
         <div className="relative flex h-screen w-full bg-[#f6f7f9] font-['Plus_Jakarta_Sans',sans-serif]">
             
-            {/* AI Secondary Sidebar */}
             <div 
                 className={`flex shrink-0 flex-col bg-[#fafbfc] transition-all duration-300 ease-in-out z-30 ${
                     isSidebarOpen ? 'w-60 border-r border-[#eef0f5] opacity-100' : 'w-0 border-none opacity-0 overflow-hidden'
@@ -370,7 +360,6 @@ export default function AIPage() {
                                     />
                                     
                                     <div className="mt-3 flex items-center justify-between">
-                                        {/* Left Side Tools */}
                                         <div className="flex items-center gap-2">
                                             <button className="flex h-7 w-7 items-center justify-center rounded bg-[#f6f7f9] text-[#5f6368] transition-colors hover:bg-[#eef0f5]">
                                                 <Plus size={14} />
@@ -382,7 +371,6 @@ export default function AIPage() {
                                             </div>
                                         </div>
 
-                                        {/* Right Side Tools */}
                                         <div className="flex items-center gap-2">
                                             <button className="flex items-center gap-1.5 px-2 py-1.5 rounded text-[#9aa0a6] hover:text-[#5f6368] transition-colors">
                                                 <Globe size={14} />
@@ -404,7 +392,6 @@ export default function AIPage() {
                                 </div>
                             </div>
 
-                            {/* Action Cards under the Composer */}
                             <div className="mt-6 flex w-full gap-3 justify-center text-left">
                                 <button className="flex flex-1 flex-col justify-start rounded-xl border border-[#eef0f5] bg-white p-3 shadow-sm hover:border-[#dcdfe4] hover:-translate-y-0.5 transition-all" onClick={() => handleSendMessage("Create Task")}>
                                     <Sun size={14} className="mb-2 text-[#5f6368]" />
@@ -430,11 +417,7 @@ export default function AIPage() {
                         </div>
                     </div>
                 ) : (
-                    // ==========================================
-                    // ACTIVE CHAT STATE
-                    // ==========================================
                     <>
-                        {/* Glow Background Elements simulating ClickUp's soft atmospheric lighting */}
                         <div className="absolute top-0 left-0 right-0 h-64 bg-linear-to-b from-[#e84393]/3 via-[#7c5cfc]/3 to-transparent pointer-events-none" />
 
                         <div className="flex-1 w-full overflow-y-auto px-10 pb-40 pt-10 scrollbar-hide z-10 flex flex-col items-center">

@@ -15,9 +15,10 @@ export interface Task {
     status_id: number;
     status_name: string;
     status_color: string;
-    priority_id: number | null;
-    priority_name: string | null;
+    
+    priority_name: string | null; 
     priority_color: string | null;
+    
     due_date: string | null;
     position: number;
     subtask_count: number;
@@ -41,7 +42,10 @@ export interface NewTaskData {
     list_id: number;
     parent_task_id?: number | null;
     status_id?: number;
-    priority_id?: number | null;
+    
+    // ĐỔI priority_id THÀNH priority (Kiểu string)
+    priority?: string; 
+    
     due_date?: string | null;
     assignee_ids?: number[];
 }

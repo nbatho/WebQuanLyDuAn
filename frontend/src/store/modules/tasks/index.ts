@@ -19,10 +19,13 @@ export interface CreateTaskData {
     name: string;
     description?: string | null;
     status_id?: number;
-    priority_id?: number | null;
+    
+    priority?: string; 
+    
     due_date?: string | null;
     assignee_ids?: number[];
 }
+
 export interface TaskData {
     task_id: number;
     parent_task_id: number | null;
@@ -30,7 +33,9 @@ export interface TaskData {
     sprint_id: number | null;
     milestone_id: number | null;
     status_id: number | null;
-    priority_id: number | null;
+    
+    priority?: string; 
+    
     name: string;
     description: string | null;
     story_points: number | null;
@@ -76,6 +81,7 @@ export interface TaskWithSpaceData extends TaskData {
     status_name?: string | null;
     status_color?: string | null;
 
+    // Giữ nguyên 2 trường này vì DB View trả về để hiển thị UI
     priority_name?: string | null;
     priority_color?: string | null;
 
@@ -140,12 +146,13 @@ export const fetchCreateTask = createAsyncThunk<
     'tasks/createTask',
     async ({ list_id, taskData }, { rejectWithValue }) => {
         try {
+            console.log("Thunk Create Payload nhận vào:", { list_id, taskData });
             const response = await createTaskInList({
                 list_id,
                 name: taskData.name || 'Untitled Task', 
                 description: taskData.description,
-                status_id: taskData.status_id,
-                priority_id: taskData.priority_id,
+                status_id: taskData.status_id,                
+                priority: taskData.priority, 
                 due_date: taskData.due_date,
                 assignee_ids: taskData.assignee_ids
             });
@@ -357,23 +364,43 @@ export const tasksSlice = createSlice({
             state.errorCreateTask = null;
         });
         builder.addCase(fetchCreateTask.fulfilled, (state, action) => {
-                state.isCreatingTask = false;
-                
-                const newTask = action.payload; 
-                
-                const statusGroup = state.listTask.find(group => group.id === newTask.status_id);
-                if (statusGroup) {
-                    statusGroup.tasks.unshift(newTask);
-                } else {
-                    state.listTask.push({
-                        id: newTask.status_id || 0,
-                        name: newTask.status_name || 'No Status',
-                        color: newTask.status_color || '#000000',
-                        isExpanded: true,
-                        tasks: [newTask],
-                    });
-                }
+            state.isCreatingTask = false;
+            
+            const newTask = action.payload; 
+            
+            const statusGroup = state.listTask.find(group => (group.id) == (newTask.status_id));
+            console.log("Thêm task mới vào nhóm:", {
+                newTask,
+                statusGroup
             });
+            if (statusGroup) {
+                newTask.status_name = statusGroup.name;
+                newTask.status_color = statusGroup.color;
+                
+                newTask.priority_name = newTask.priority || 'Normal';
+                const pColors: Record<string, string> = {
+                    'Urgent': '#ef4444', 
+                    'High': '#f59e0b', 
+                    'Normal': '#3b82f6', 
+                    'Low': '#8b5cf6', 
+                    'Clear': '#9ca3af'
+                };
+                newTask.priority_color = pColors[newTask.priority_name] || 'transparent';
+                
+                newTask.assignees = newTask.assignees || [];
+                newTask.tags = newTask.tags || [];
+
+                statusGroup.tasks.unshift(newTask);
+            } else {
+                state.listTask.push({
+                    id: Number(newTask.status_id) || 0,
+                    name: newTask.status_name || 'No Status',
+                    color: newTask.status_color || '#000000',
+                    isExpanded: true,
+                    tasks: [newTask],
+                });
+            }
+        });
         builder.addCase(fetchCreateTask.rejected, (state, action) => {
             state.isCreatingTask = false;
             state.errorCreateTask = action.payload as string;

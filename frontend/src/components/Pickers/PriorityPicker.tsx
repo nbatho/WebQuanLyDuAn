@@ -1,6 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { Flag, ChevronDown } from 'lucide-react';
-import { PRIORITY_OPTIONS } from '../constants/taskOptions';
+export const PRIORITY_OPTIONS = [
+    { value: 'Low', label: 'Low', color: '#6ee7b7' },
+    { value: 'Normal', label: 'Normal', color: '#d1d5db' },
+    { value: 'High', label: 'High', color: '#fbbf24' },
+    { value: 'Urgent', label: 'Urgent', color: '#ef4444' },
+];
 
 export interface PriorityPickerProps {
     value: string;

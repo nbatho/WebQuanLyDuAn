@@ -31,7 +31,6 @@ export default function ContextMenu({ x, y, isOpen, onClose, onAction, taskTitle
         return () => document.removeEventListener('mousedown', handler);
     }, [isOpen, onClose]);
 
-    // Adjust position to fit viewport
     useEffect(() => {
         if (!isOpen || !menuRef.current) return;
         const rect = menuRef.current.getBoundingClientRect();
