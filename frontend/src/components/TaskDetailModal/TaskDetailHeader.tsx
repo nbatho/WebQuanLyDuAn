@@ -19,10 +19,10 @@ export default function TaskDetailHeader({
     onClose,
 }: TaskDetailHeaderProps) {
     return (
-        <div className="shrink-0 border-b border-[var(--color-border-light)] px-4.5 py-3">
+        <div className="shrink-0 border-b border-(--color-border-light) px-4.5 py-3">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                    <div className="flex items-center gap-1 text-xs text-[var(--color-text-tertiary)]">
+                    <div className="flex items-center gap-1 text-xs text-(--color-text-tertiary)">
                         <span>Main Space</span>
                         <ChevronRight size={12} />
                         <span>Task Management</span>
@@ -32,19 +32,19 @@ export default function TaskDetailHeader({
                 <div className="flex items-center gap-1">
                     <Tooltip title={isMaximized ? 'Minimize' : 'Maximize'}>
                         <button
-                            className="flex cursor-pointer items-center rounded-md border-none bg-transparent p-1 text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-secondary)]"
+                            className="flex cursor-pointer items-center rounded-md border-none bg-transparent p-1 text-(--color-text-tertiary) hover:bg-(--color-surface-hover) hover:text-(--color-text-secondary)"
                             onClick={onToggleMaximize}
                         >
                             {isMaximized ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
                         </button>
                     </Tooltip>
                     <Tooltip title="Options">
-                        <button className="flex cursor-pointer items-center rounded-md border-none bg-transparent p-1 text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-secondary)]">
+                        <button className="flex cursor-pointer items-center rounded-md border-none bg-transparent p-1 text-(--color-text-tertiary) hover:bg-(--color-surface-hover) hover:text-(--color-text-secondary)">
                             <MoreHorizontal size={16} />
                         </button>
                     </Tooltip>
                     <button
-                        className="flex cursor-pointer items-center rounded-md border-none bg-transparent p-1 text-[var(--color-text-tertiary)] hover:bg-[#fff5f5] hover:text-[var(--color-error)]"
+                        className="flex cursor-pointer items-center rounded-md border-none bg-transparent p-1 text-(--color-text-tertiary) hover:bg-[#fff5f5] hover:text-(--color-error)"
                         onClick={onClose}
                     >
                         <X size={18} />

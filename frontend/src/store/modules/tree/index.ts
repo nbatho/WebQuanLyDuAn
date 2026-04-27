@@ -5,7 +5,9 @@ import {
     createList as apiCreateList,
     deleteFolder as apiDeleteFolder,
     deleteList as apiDeleteList,
-} from '@/api/folders';
+} from '@/api/spaces';
+
+
 /* ── State ── */
 interface TreeState {
     data: SpaceTreeData;

@@ -10,7 +10,6 @@ export function useTaskFilters(groups: StatusGroup[]) {
     });
 
     const filteredGroups = useMemo(() => {
-        // If there are no filters, avoid running the expensive loop
         const hasFilters = filters.status.length > 0 || filters.priority.length > 0 || filters.assignee.length > 0;
         if (!hasFilters) return groups;
 

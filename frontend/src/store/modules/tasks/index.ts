@@ -1,8 +1,6 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import {
-    getTasksForSpace,
     getTasksForList,
-    getTasksForFolder,
     getTaskById,
     createTaskInList,
     updateTask,
@@ -117,21 +115,6 @@ export interface TasksState {
     errorRemoveAssignee: string | null;
 }
 
-// ─────────────────────────────────────────────
-// Async Thunks — Task CRUD
-// ─────────────────────────────────────────────
-
-export const fetchTasksForSpace = createAsyncThunk<TaskWithSpaceData[], number>(
-    'tasks/fetchTasksForSpace',
-    async (space_id, { rejectWithValue }) => {
-        try {
-            const response = await getTasksForSpace(space_id);
-            return response;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch tasks');
-        }
-    }
-);
 
 export const fetchTasksForList = createAsyncThunk<TaskWithSpaceData[], number>(
     'tasks/fetchTasksForList',
@@ -145,17 +128,6 @@ export const fetchTasksForList = createAsyncThunk<TaskWithSpaceData[], number>(
     }
 );
 
-export const fetchTasksForFolder = createAsyncThunk<TaskWithSpaceData[], number>(
-    'tasks/fetchTasksForFolder',
-    async (folder_id, { rejectWithValue }) => {
-        try {
-            const response = await getTasksForFolder(folder_id);
-            return response;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch tasks for folder');
-        }
-    }
-);
 
 export const fetchTaskById = createAsyncThunk<TaskWithSpaceData, number>(
     'tasks/fetchTaskById',
@@ -347,10 +319,6 @@ const initialState: TasksState = {
     errorRemoveAssignee: null,
 };
 
-// ─────────────────────────────────────────────
-// Slice
-// ─────────────────────────────────────────────
-
 export const tasksSlice = createSlice({
     name: 'tasks',
     initialState,
@@ -371,34 +339,6 @@ export const tasksSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        // ── fetchTasksForSpace, List, Folder ──────────────────────
-        const handlePending = (state: any) => {
-            state.isLoadingTasks = true;
-            state.errorTasks = null;
-        };
-        const handleFulfilled = (state: any, action: any) => {
-            state.isLoadingTasks = false;
-            state.listTask = action.payload;
-        };
-        const handleRejected = (state: any, action: any) => {
-            state.isLoadingTasks = false;
-            state.errorTasks = action.payload as string;
-        };
-
-        builder
-            .addCase(fetchTasksForSpace.pending, handlePending)
-            .addCase(fetchTasksForSpace.fulfilled, handleFulfilled)
-            .addCase(fetchTasksForSpace.rejected, handleRejected)
-            
-            .addCase(fetchTasksForList.pending, handlePending)
-            .addCase(fetchTasksForList.fulfilled, handleFulfilled)
-            .addCase(fetchTasksForList.rejected, handleRejected)
-
-            .addCase(fetchTasksForFolder.pending, handlePending)
-            .addCase(fetchTasksForFolder.fulfilled, handleFulfilled)
-            .addCase(fetchTasksForFolder.rejected, handleRejected);
-
-        // ── fetchTaskById ───────────────────────────
         builder
             .addCase(fetchTaskById.pending, (state) => {
                 state.isLoadingTaskDetail = true;

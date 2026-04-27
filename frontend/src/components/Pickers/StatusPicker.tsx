@@ -35,7 +35,7 @@ export default function StatusPicker({ value, onChange, variant = 'pill' }: Stat
                 </button>
             ) : (
                 <button
-                    className="flex cursor-pointer items-center gap-1.25 whitespace-nowrap rounded-md border border-[var(--color-border-light)] bg-transparent px-2.5 py-1.25 text-xs font-semibold text-[var(--color-text-secondary)] transition-all hover:border-[var(--color-border)] hover:bg-[var(--color-surface-subtle)]"
+                    className="flex cursor-pointer items-center gap-1.25 whitespace-nowrap rounded-md border border-(--color-border-light) bg-transparent px-2.5 py-1.25 text-xs font-semibold text-(--color-text-secondary) transition-all hover:border-(--color-border) hover:bg-(--color-surface-subtle)"
                     onClick={() => setOpen(!open)}
                 >
                     <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: current.color }} />
@@ -44,14 +44,14 @@ export default function StatusPicker({ value, onChange, variant = 'pill' }: Stat
             )}
 
             {open && (
-                <div className="absolute left-0 top-[calc(100%+4px)] z-20 min-w-45 rounded-lg border border-[var(--color-border-light)] bg-white p-1 shadow-[0_6px_20px_rgba(0,0,0,0.12)]">
+                <div className="absolute left-0 top-[calc(100%+4px) z-20 min-w-45 rounded-lg border border-(--color-border-light) bg-white p-1 shadow-[0_6px_20px_rgba(0,0,0,0.12)">
                     {STATUS_OPTIONS.map((s) => (
                         <button
                             key={s.value}
                             className={`flex w-full cursor-pointer items-center gap-2 rounded-md border-none px-2.5 py-1.5 text-left text-xs font-semibold ${
                                 value === s.value
-                                    ? 'bg-[var(--color-primary-bg)] text-[var(--color-primary)]'
-                                    : 'bg-transparent text-[var(--color-on-surface)] hover:bg-[var(--color-primary-bg)]'
+                                    ? 'bg-(--color-primary-bg) text-(--color-primary)'
+                                    : 'bg-transparent text-(--color-on-surface) hover:bg-(--color-primary-bg)'
                             }`}
                             onClick={() => {
                                 onChange(s.value, s.color);

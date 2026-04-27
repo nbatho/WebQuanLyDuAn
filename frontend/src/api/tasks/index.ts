@@ -3,21 +3,10 @@ import { beApi } from "../callApi";
 
 export type { TaskData, TaskWithSpaceData, TaskAttachment };
 
-// ─────────────────────────────────────────────
-// Task CRUD
-// ─────────────────────────────────────────────
-
-export const getTasksForSpace = async (space_id: number): Promise<TaskWithSpaceData[]> => {
-    return beApi.get(`/tasks/spaces/${space_id}`);
-};
-
 export const getTasksForList = async (list_id: number): Promise<TaskWithSpaceData[]> => {
     return beApi.get(`/tasks/lists/${list_id}`);
 };
 
-export const getTasksForFolder = async (folder_id: number): Promise<TaskWithSpaceData[]> => {
-    return beApi.get(`/tasks/folders/${folder_id}`).then((res: any) => res.data); // Adjust for JSON wrapper {status: "success", data: []}
-};
 
 export const createTaskInList = async (taskData: {
     list_id: number;
@@ -52,17 +41,10 @@ export const deleteTask = async (task_id: number): Promise<void> => {
     return beApi.delete(`/tasks/${task_id}`);
 };
 
-// ─────────────────────────────────────────────
-// Subtasks
-// ─────────────────────────────────────────────
-
 export const getSubTasks = async (task_id: number): Promise<TaskWithSpaceData[]> => {
     return beApi.get(`/tasks/${task_id}/subtasks`);
 };
 
-// ─────────────────────────────────────────────
-// Attachments
-// ─────────────────────────────────────────────
 
 export const getAttachmentsByTask = async (task_id: number): Promise<TaskAttachment[]> => {
     return beApi.get(`/tasks/${task_id}/attachments`);
@@ -80,9 +62,6 @@ export const deleteAttachment = async (attachment_id: number): Promise<void> => 
     return beApi.delete(`/tasks/attachments/${attachment_id}`);
 };
 
-// ─────────────────────────────────────────────
-// Assignees
-// ─────────────────────────────────────────────
 
 export const addAssignee = async (task_id: number, userId: string): Promise<void> => {
     return beApi.post(`/tasks/${task_id}/assignees`, { userId });

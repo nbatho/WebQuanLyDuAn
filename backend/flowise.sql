@@ -1,6 +1,6 @@
 -- ================================================================
 -- FLOWISE — PostgreSQL Database Schema
--- Phiên bản: 3.1 (Tích hợp list_id, folder_id vào tasks)
+-- Phiên bản: 3.2 (Đã fix Soft Delete, Precision Date & Data Integrity)
 -- ================================================================
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
@@ -67,7 +67,7 @@ CREATE TABLE workspaces (
 );
 
 CREATE TABLE workspace_members (
-    workspace_id INT NOT NULL REFERENCES workspaces(workspace_id) ON DELETE CASCADE,
+    workspace_id INT NOT NULL REFERENCES workspaces(workspace_id) ON DELETE RESTRICT,
     user_id      INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     role_id      INT REFERENCES roles(role_id) ON DELETE SET NULL,
     joined_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -77,7 +77,7 @@ CREATE TABLE workspace_members (
 
 CREATE TABLE workspace_invitations (
     invitation_id SERIAL       PRIMARY KEY,
-    workspace_id  INT          NOT NULL REFERENCES workspaces(workspace_id) ON DELETE CASCADE,
+    workspace_id  INT          NOT NULL REFERENCES workspaces(workspace_id) ON DELETE RESTRICT,
     email         VARCHAR(255) NOT NULL,
     role_id       INT          REFERENCES roles(role_id) ON DELETE SET NULL,
     token         TEXT         NOT NULL UNIQUE DEFAULT encode(gen_random_bytes(32), 'hex'),
@@ -94,7 +94,7 @@ CREATE TABLE workspace_invitations (
 -- ================================================================
 CREATE TABLE spaces (
     space_id     SERIAL       PRIMARY KEY,
-    workspace_id INT          NOT NULL REFERENCES workspaces(workspace_id) ON DELETE CASCADE,
+    workspace_id INT          NOT NULL REFERENCES workspaces(workspace_id) ON DELETE RESTRICT,
     name         VARCHAR(255) NOT NULL,
     description  TEXT,
     color        VARCHAR(7)   NOT NULL DEFAULT '#6C63FF',
@@ -107,7 +107,7 @@ CREATE TABLE spaces (
 );
 
 CREATE TABLE space_members (
-    space_id   INT NOT NULL REFERENCES spaces(space_id) ON DELETE CASCADE,
+    space_id   INT NOT NULL REFERENCES spaces(space_id) ON DELETE RESTRICT,
     user_id    INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     role_id    INT REFERENCES roles(role_id) ON DELETE SET NULL,
     joined_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -117,7 +117,7 @@ CREATE TABLE space_members (
 
 CREATE TABLE folders (
     folder_id    SERIAL       PRIMARY KEY,
-    space_id     INT          NOT NULL REFERENCES spaces(space_id) ON DELETE CASCADE,
+    space_id     INT          NOT NULL REFERENCES spaces(space_id) ON DELETE RESTRICT,
     name         VARCHAR(255) NOT NULL,
     position     INT          NOT NULL DEFAULT 0,
     created_by   INT          REFERENCES users(user_id) ON DELETE SET NULL,
@@ -128,8 +128,8 @@ CREATE TABLE folders (
 
 CREATE TABLE lists (
     list_id      SERIAL       PRIMARY KEY,
-    folder_id    INT          REFERENCES folders(folder_id) ON DELETE CASCADE,
-    space_id     INT          NOT NULL REFERENCES spaces(space_id) ON DELETE CASCADE,
+    folder_id    INT          REFERENCES folders(folder_id) ON DELETE RESTRICT,
+    space_id     INT          NOT NULL REFERENCES spaces(space_id) ON DELETE RESTRICT,
     name         VARCHAR(255) NOT NULL,
     position     INT          NOT NULL DEFAULT 0,
     created_by   INT          REFERENCES users(user_id) ON DELETE SET NULL,
@@ -143,7 +143,7 @@ CREATE TABLE lists (
 -- ================================================================
 CREATE TABLE task_status (
     status_id     SERIAL       PRIMARY KEY,
-    space_id      INT          NOT NULL REFERENCES spaces(space_id) ON DELETE CASCADE,
+    space_id      INT          NOT NULL REFERENCES spaces(space_id) ON DELETE RESTRICT,
     status_name   VARCHAR(100) NOT NULL,
     color         VARCHAR(7)   NOT NULL DEFAULT '#9CA3AF',
     position      INT          NOT NULL DEFAULT 0,
@@ -154,7 +154,7 @@ CREATE TABLE task_status (
 
 CREATE TABLE task_priority (
     priority_id   SERIAL       PRIMARY KEY,
-    space_id      INT          NOT NULL REFERENCES spaces(space_id) ON DELETE CASCADE,
+    space_id      INT          NOT NULL REFERENCES spaces(space_id) ON DELETE RESTRICT,
     priority_name VARCHAR(100) NOT NULL,
     color         VARCHAR(7)   NOT NULL DEFAULT '#6C63FF',
     position      INT          NOT NULL DEFAULT 0,
@@ -163,12 +163,12 @@ CREATE TABLE task_priority (
 
 CREATE TABLE milestones (
     milestone_id SERIAL       PRIMARY KEY,
-    space_id     INT          NOT NULL REFERENCES spaces(space_id) ON DELETE CASCADE,
+    space_id     INT          NOT NULL REFERENCES spaces(space_id) ON DELETE RESTRICT,
     name         VARCHAR(255) NOT NULL,
     description  TEXT,
     status       VARCHAR(20)  NOT NULL DEFAULT 'on_track' CHECK (status IN ('on_track','at_risk','completed','cancelled')),
     color        VARCHAR(7)   DEFAULT '#00D4AA',
-    due_date     DATE,
+    due_date     TIMESTAMP,   
     created_by   INT          REFERENCES users(user_id) ON DELETE SET NULL,
     created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -177,14 +177,14 @@ CREATE TABLE milestones (
 
 CREATE TABLE sprints (
     sprint_id   SERIAL       PRIMARY KEY,
-    space_id    INT          NOT NULL REFERENCES spaces(space_id) ON DELETE CASCADE,
+    space_id    INT          NOT NULL REFERENCES spaces(space_id) ON DELETE RESTRICT,
     name        VARCHAR(255) NOT NULL,
     description TEXT,
     goal        TEXT,
     status      VARCHAR(20)  NOT NULL DEFAULT 'planning' CHECK (status IN ('planning','active','completed','cancelled')),
     velocity    SMALLINT,
-    start_date  DATE,
-    end_date    DATE,
+    start_date  TIMESTAMP,   
+    end_date    TIMESTAMP,   
     created_by  INT          REFERENCES users(user_id) ON DELETE SET NULL,
     created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -193,7 +193,7 @@ CREATE TABLE sprints (
 
 CREATE TABLE tags (
     tag_id     SERIAL       PRIMARY KEY,
-    space_id   INT          NOT NULL REFERENCES spaces(space_id) ON DELETE CASCADE,
+    space_id   INT          NOT NULL REFERENCES spaces(space_id) ON DELETE RESTRICT,
     name       VARCHAR(100) NOT NULL,
     color      VARCHAR(7)   DEFAULT '#6C63FF',
     created_by INT          REFERENCES users(user_id) ON DELETE SET NULL,
@@ -207,10 +207,10 @@ CREATE TABLE tags (
 -- ================================================================
 CREATE TABLE tasks (
     task_id        SERIAL       PRIMARY KEY,
-    parent_task_id INT          REFERENCES tasks(task_id) ON DELETE CASCADE,
-    space_id       INT          NOT NULL REFERENCES spaces(space_id) ON DELETE CASCADE,
-    folder_id      INT          REFERENCES folders(folder_id) ON DELETE CASCADE,
-    list_id        INT          REFERENCES lists(list_id) ON DELETE CASCADE,
+    parent_task_id INT          REFERENCES tasks(task_id) ON DELETE RESTRICT, 
+    space_id       INT          NOT NULL REFERENCES spaces(space_id) ON DELETE RESTRICT, 
+    folder_id      INT          REFERENCES folders(folder_id) ON DELETE RESTRICT, 
+    list_id        INT          REFERENCES lists(list_id) ON DELETE RESTRICT, 
     sprint_id      INT          REFERENCES sprints(sprint_id) ON DELETE SET NULL,
     milestone_id   INT          REFERENCES milestones(milestone_id) ON DELETE SET NULL,
     status_id      INT          REFERENCES task_status(status_id) ON DELETE SET NULL,
@@ -218,8 +218,8 @@ CREATE TABLE tasks (
     name           VARCHAR(255) NOT NULL,
     description    TEXT,
     story_points   SMALLINT     CHECK (story_points >= 0 AND story_points <= 100),
-    start_date     DATE,
-    due_date       DATE,
+    start_date     TIMESTAMP,   
+    due_date       TIMESTAMP,   
     completed_at   TIMESTAMP,
     position       INT          NOT NULL DEFAULT 0,
     is_archived    BOOLEAN      NOT NULL DEFAULT FALSE,
@@ -230,7 +230,7 @@ CREATE TABLE tasks (
 );
 
 CREATE TABLE task_assigns (
-    task_id     INT NOT NULL REFERENCES tasks(task_id) ON DELETE CASCADE,
+    task_id     INT NOT NULL REFERENCES tasks(task_id) ON DELETE RESTRICT, -- Bảo vệ Task đã có assignee
     user_id     INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     assigned_by INT REFERENCES users(user_id) ON DELETE SET NULL,
     assigned_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -239,14 +239,14 @@ CREATE TABLE task_assigns (
 );
 
 CREATE TABLE task_tags (
-    task_id INT NOT NULL REFERENCES tasks(task_id) ON DELETE CASCADE,
-    tag_id  INT NOT NULL REFERENCES tags(tag_id) ON DELETE CASCADE,
+    task_id INT NOT NULL REFERENCES tasks(task_id) ON DELETE RESTRICT,
+    tag_id  INT NOT NULL REFERENCES tags(tag_id) ON DELETE RESTRICT,
     PRIMARY KEY (task_id, tag_id)
 );
 
 CREATE TABLE time_logs (
     time_log_id   SERIAL    PRIMARY KEY,
-    task_id       INT       NOT NULL REFERENCES tasks(task_id) ON DELETE CASCADE,
+    task_id       INT       NOT NULL REFERENCES tasks(task_id) ON DELETE RESTRICT,
     user_id       INT       NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     started_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     stopped_at    TIMESTAMP,
@@ -262,7 +262,7 @@ CREATE TABLE time_logs (
 -- ================================================================
 CREATE TABLE activity_logs (
     activity_id SERIAL PRIMARY KEY,
-    task_id     INT NOT NULL REFERENCES tasks(task_id) ON DELETE CASCADE,
+    task_id     INT NOT NULL REFERENCES tasks(task_id) ON DELETE RESTRICT,
     user_id     INT REFERENCES users(user_id) ON DELETE SET NULL,
     action      VARCHAR(50) NOT NULL,
     old_value   JSONB,
@@ -272,8 +272,8 @@ CREATE TABLE activity_logs (
 
 CREATE TABLE comments (
     comment_id SERIAL    PRIMARY KEY,
-    task_id    INT       NOT NULL REFERENCES tasks(task_id) ON DELETE CASCADE,
-    parent_id  INT       REFERENCES comments(comment_id) ON DELETE CASCADE,
+    task_id    INT       NOT NULL REFERENCES tasks(task_id) ON DELETE RESTRICT,
+    parent_id  INT       REFERENCES comments(comment_id) ON DELETE RESTRICT,
     user_id    INT       NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     content    TEXT      NOT NULL,
     is_edited  BOOLEAN   NOT NULL DEFAULT FALSE,
@@ -285,7 +285,7 @@ CREATE TABLE comments (
 
 CREATE TABLE attachments (
     attachment_id SERIAL       PRIMARY KEY,
-    task_id       INT          NOT NULL REFERENCES tasks(task_id) ON DELETE CASCADE,
+    task_id       INT          NOT NULL REFERENCES tasks(task_id) ON DELETE RESTRICT,
     comment_id    INT          REFERENCES comments(comment_id) ON DELETE SET NULL,
     file_name     VARCHAR(255) NOT NULL,
     file_url      TEXT         NOT NULL,
@@ -310,9 +310,6 @@ CREATE TABLE notifications (
     deleted_at      TIMESTAMP    DEFAULT NULL
 );
 
--- ================================================================
--- PARTIAL INDEXES (Tối ưu cho Soft Delete)
--- ================================================================
 CREATE INDEX idx_tasks_space_id      ON tasks(space_id) WHERE deleted_at IS NULL;
 CREATE INDEX idx_tasks_folder_id     ON tasks(folder_id) WHERE folder_id IS NOT NULL AND deleted_at IS NULL;
 CREATE INDEX idx_tasks_list_id       ON tasks(list_id) WHERE list_id IS NOT NULL AND deleted_at IS NULL;
@@ -330,14 +327,11 @@ CREATE INDEX idx_lists_space_id   ON lists(space_id)   WHERE deleted_at IS NULL;
 
 CREATE INDEX idx_spaces_workspace_id ON spaces(workspace_id) WHERE deleted_at IS NULL;
 
--- ================================================================
--- BASIC TRIGGERS (Updated_at, Read_at, Completed_at)
--- ================================================================
+
 CREATE OR REPLACE FUNCTION set_updated_at() RETURNS TRIGGER LANGUAGE plpgsql AS $$
 BEGIN NEW.updated_at = CURRENT_TIMESTAMP; RETURN NEW; END; $$;
 
 CREATE TRIGGER trg_tasks_updated BEFORE UPDATE ON tasks FOR EACH ROW EXECUTE FUNCTION set_updated_at();
--- (Lặp lại trigger set_updated_at cho các bảng users, workspaces, spaces, comments...)
 
 CREATE OR REPLACE FUNCTION set_task_completed_at() RETURNS TRIGGER LANGUAGE plpgsql AS $$
 DECLARE v_is_done BOOLEAN;
@@ -349,10 +343,31 @@ BEGIN
 END; $$;
 CREATE TRIGGER trg_task_completed_at BEFORE UPDATE OF status_id ON tasks FOR EACH ROW EXECUTE FUNCTION set_task_completed_at();
 
--- ================================================================
--- CASCADING TRIGGERS CHO SOFT DELETE
--- ================================================================
--- Khi xóa Space -> Xóa mềm toàn bộ Tasks trong Space
+
+CREATE OR REPLACE FUNCTION validate_task_hierarchy() RETURNS TRIGGER LANGUAGE plpgsql AS $$
+DECLARE
+    v_folder_id INT;
+    v_space_id INT;
+BEGIN
+    IF NEW.list_id IS NOT NULL THEN
+        SELECT folder_id, space_id INTO v_folder_id, v_space_id FROM lists WHERE list_id = NEW.list_id;
+        
+        IF NEW.folder_id IS DISTINCT FROM v_folder_id THEN
+            RAISE EXCEPTION 'Data Integrity Error: folder_id (%) does not match the folder of list_id (%)', NEW.folder_id, NEW.list_id;
+        END IF;
+        
+        IF NEW.space_id IS DISTINCT FROM v_space_id THEN
+            RAISE EXCEPTION 'Data Integrity Error: space_id (%) does not match the space of list_id (%)', NEW.space_id, NEW.list_id;
+        END IF;
+    END IF;
+    RETURN NEW;
+END; $$;
+
+CREATE TRIGGER trg_validate_task_hierarchy 
+BEFORE INSERT OR UPDATE OF list_id, folder_id, space_id ON tasks 
+FOR EACH ROW EXECUTE FUNCTION validate_task_hierarchy();
+
+
 CREATE OR REPLACE FUNCTION soft_delete_space_cascade() RETURNS TRIGGER LANGUAGE plpgsql AS $$
 BEGIN
     IF NEW.deleted_at IS NOT NULL AND OLD.deleted_at IS NULL THEN
@@ -363,7 +378,6 @@ BEGIN
 END; $$;
 CREATE TRIGGER trg_spaces_soft_delete_cascade AFTER UPDATE OF deleted_at ON spaces FOR EACH ROW EXECUTE FUNCTION soft_delete_space_cascade();
 
--- Khi xóa Task -> Xóa mềm toàn bộ Subtasks và Comments của Task đó
 CREATE OR REPLACE FUNCTION soft_delete_task_cascade() RETURNS TRIGGER LANGUAGE plpgsql AS $$
 BEGIN
     IF NEW.deleted_at IS NOT NULL AND OLD.deleted_at IS NULL THEN
@@ -376,9 +390,7 @@ BEGIN
 END; $$;
 CREATE TRIGGER trg_tasks_soft_delete_cascade AFTER UPDATE OF deleted_at ON tasks FOR EACH ROW EXECUTE FUNCTION soft_delete_task_cascade();
 
--- ================================================================
--- VIEWS (Đã lọc deleted_at)
--- ================================================================
+
 CREATE OR REPLACE VIEW kanban_tasks AS
 SELECT
     t.task_id, t.parent_task_id, t.space_id, t.folder_id, t.list_id, t.name, t.description, t.story_points,
@@ -407,7 +419,7 @@ SELECT
     ta.user_id, t.space_id,
     COUNT(*) AS total_tasks,
     COUNT(*) FILTER (WHERE ts.is_done_state = TRUE) AS done_tasks,
-    COUNT(*) FILTER (WHERE t.due_date < CURRENT_DATE AND ts.is_done_state = FALSE) AS overdue_tasks,
+    COUNT(*) FILTER (WHERE t.due_date < CURRENT_TIMESTAMP AND ts.is_done_state = FALSE) AS overdue_tasks,
     COALESCE(SUM(tl.total_secs), 0) AS total_time_secs
 FROM task_assigns ta
 JOIN tasks t ON t.task_id = ta.task_id

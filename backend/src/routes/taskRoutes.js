@@ -1,8 +1,6 @@
 import express from 'express';
 import {
-    getTasksBySpaceId,
     getTasksByListId,
-    getTasksByFolderId,
     createTasks,
     createTasksForList,
     getTaskById,
@@ -34,29 +32,7 @@ const router = express.Router();
  *     description: Task assignee endpoints
  */
 
-/**
- * @swagger
- * /api/v1/tasks/spaces/{spaceId}:
- *   get:
- *     summary: Get all tasks in a space
- *     tags: [Tasks]
- *     parameters:
- *       - in: path
- *         name: spaceId
- *         required: true
- *         schema:
- *           type: string
- *         description: The ID of the space
- *     responses:
- *       200:
- *         description: A list of tasks
- *       400:
- *         description: Bad request - Space ID is required
- *       500:
- *         description: Internal server error
- */
 
-router.get('/spaces/:spaceId', getTasksBySpaceId);
 
 /**
  * @swagger
@@ -82,29 +58,7 @@ router.get('/spaces/:spaceId', getTasksBySpaceId);
 
 router.get('/lists/:listId', getTasksByListId);
 
-/**
- * @swagger
- * /api/v1/tasks/folders/{folderId}:
- *   get:
- *     summary: Get all tasks in a folder
- *     tags: [Tasks]
- *     parameters:
- *       - in: path
- *         name: folderId
- *         required: true
- *         schema:
- *           type: string
- *         description: The ID of the folder
- *     responses:
- *       200:
- *         description: List of tasks in the folder
- *       400:
- *         description: Bad request - Folder ID is required
- *       500:
- *         description: Internal server error
- */
 
-router.get('/folders/:folderId', getTasksByFolderId);
 
 /**
  * @swagger

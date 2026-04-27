@@ -24,7 +24,7 @@ export default function PriorityPicker({ value, onChange }: PriorityPickerProps)
     return (
         <div className="relative" ref={ref} onClick={(e) => e.stopPropagation()}>
             <button
-                className="flex cursor-pointer items-center gap-1.25 whitespace-nowrap rounded-md border border-[var(--color-border-light)] bg-transparent px-2.5 py-1.25 text-xs font-semibold transition-all hover:border-[var(--color-border)] hover:bg-[var(--color-surface-subtle)]"
+                className="flex cursor-pointer items-center gap-1.25 whitespace-nowrap rounded-md border border-(--color-border-light) bg-transparent px-2.5 py-1.25 text-xs font-semibold transition-all hover:border-(--color-border) hover:bg-(--color-surface-subtle)"
                 onClick={() => setOpen(!open)}
                 style={{ color: current.color }}
             >
@@ -33,14 +33,14 @@ export default function PriorityPicker({ value, onChange }: PriorityPickerProps)
             </button>
 
             {open && (
-                <div className="absolute left-0 top-[calc(100%+4px)] z-20 min-w-45 rounded-lg border border-[var(--color-border-light)] bg-white p-1 shadow-[0_6px_20px_rgba(0,0,0,0.12)]">
+                <div className="absolute left-0 top-[calc(100%+4px) z-20 min-w-45 rounded-lg border border-(--color-border-light) bg-white p-1 shadow-[0_6px_20px_rgba(0,0,0,0.12)">
                     {PRIORITY_OPTIONS.map((p) => (
                         <button
                             key={p.value}
                             className={`flex w-full cursor-pointer items-center gap-2 rounded-md border-none px-2.5 py-1.5 text-left text-xs font-semibold ${
                                 value === p.value
-                                    ? 'bg-[var(--color-primary-bg)] text-[var(--color-primary)]'
-                                    : 'bg-transparent text-[var(--color-on-surface)] hover:bg-[var(--color-primary-bg)]'
+                                    ? 'bg-(--color-primary-bg) text-(--color-primary)'
+                                    : 'bg-transparent text-(--color-on-surface) hover:bg-(--color-primary-bg)'
                             }`}
                             onClick={() => {
                                 onChange(p.value, p.color);

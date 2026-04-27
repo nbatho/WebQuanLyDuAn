@@ -7,7 +7,6 @@ import {
 import { useSpaceTree } from '../../layouts/AppLayout/SpaceTreeContext';
 import PageHeader, { FOLDER_TABS } from '../../components/PageHeader';
 import ListContextMenu from '../../components/ListContextMenu';
-import { useTasksData } from '../../hooks/useSpaceTasks';
 import type { StatusGroup } from '../../types/tasks';
 export default function FolderViewPage() {
     const { folderId } = useParams<{ folderId: string }>();
@@ -33,7 +32,6 @@ export default function FolderViewPage() {
 
     const spaceId = parentSpace.id;
 
-    const { groups } = useTasksData({ folderId });
 
     const listGroups = useMemo(() => {
         if (!folder) return [];
@@ -43,35 +41,6 @@ export default function FolderViewPage() {
             listMap[Number(l.id)] = { listId: Number(l.id), listName: l.name, statusGroups: [] };
         });
 
-        const taskByListAndStatus: Record<number, Record<string, StatusGroup>> = {};
-
-        groups.forEach((group) => {
-            group.tasks.forEach((task) => {
-                const listId = (task as any).list_id;
-                if (!listId || !listMap[listId]) return;
-
-                if (!taskByListAndStatus[listId]) taskByListAndStatus[listId] = {};
-                const statusMap = taskByListAndStatus[listId];
-
-                const statusName = task.status || 'TO DO';
-                const statusId = statusName.toLowerCase().replace(/ /g, '');
-
-                if (!statusMap[statusId]) {
-                    statusMap[statusId] = {
-                        id: statusId,
-                        name: statusName,
-                        color: task.statusColor || '#5f6368',
-                        isExpanded: true,
-                        tasks: []
-                    };
-                    listMap[listId].statusGroups.push(statusMap[statusId]);
-                }
-
-                statusMap[statusId].tasks.push(task);
-            });
-        });
-
-        // Ensure every list at least has a TO DO group if empty
         return Object.values(listMap).map(list => {
             if (list.statusGroups.length === 0) {
                 list.statusGroups.push({
@@ -84,7 +53,7 @@ export default function FolderViewPage() {
             }
             return list;
         });
-    }, [groups, folder]);
+    }, [folder]);
 
     const handleDeleteListItem = async (listId: string) => {
         await handleDeleteList(spaceId, folder!.id, listId);

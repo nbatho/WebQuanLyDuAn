@@ -26,7 +26,7 @@ export default function AssigneePicker({ value, onChange }: AssigneePickerProps)
     return (
         <div className="relative" ref={ref} onClick={(e) => e.stopPropagation()}>
             <button
-                className="flex cursor-pointer items-center gap-1.25 whitespace-nowrap rounded-md border border-[var(--color-border-light)] bg-transparent px-2.5 py-1.25 text-xs font-semibold text-[var(--color-text-secondary)] transition-all hover:border-[var(--color-border)] hover:bg-[var(--color-surface-subtle)]"
+                className="flex cursor-pointer items-center gap-1.25 whitespace-nowrap rounded-md border border-(--color-border-light) bg-transparent px-2.5 py-1.25 text-xs font-semibold text-(--color-text-secondary) transition-all hover:border-(--color-border) hover:bg-(--color-surface-subtle)"
                 onClick={() => setOpen(!open)}
             >
                 <User size={13} />
@@ -37,14 +37,14 @@ export default function AssigneePicker({ value, onChange }: AssigneePickerProps)
             </button>
 
             {open && (
-                <div className="absolute left-0 top-[calc(100%+4px)] z-20 min-w-55 rounded-lg border border-[var(--color-border-light)] bg-white p-1 shadow-[0_6px_20px_rgba(0,0,0,0.12)]">
+                <div className="absolute left-0 top-[calc(100%+4px) z-20 min-w-55 rounded-lg border border-(--color-border-light) bg-white p-1 shadow-[0_6px_20px_rgba(0,0,0,0.12)">
                     {MEMBER_OPTIONS.map((m) => (
                         <button
                             key={m.id}
                             className={`flex w-full cursor-pointer items-center gap-2 rounded-md border-none px-2.5 py-1.75 text-left text-xs font-semibold ${
                                 value.includes(m.id)
-                                    ? 'bg-[var(--color-primary-bg)] text-[var(--color-primary)]'
-                                    : 'bg-transparent text-[var(--color-on-surface)] hover:bg-[var(--color-primary-bg)]'
+                                    ? 'bg-(--color-primary-bg) text-(--color-primary)'
+                                    : 'bg-transparent text-(--color-on-surface) hover:bg-(--color-primary-bg)'
                             }`}
                             onClick={() => toggle(m.id)}
                         >
@@ -56,7 +56,7 @@ export default function AssigneePicker({ value, onChange }: AssigneePickerProps)
                             </span>
                             {m.name}
                             {value.includes(m.id) && (
-                                <span className="ml-auto text-sm text-[var(--color-primary)]">✓</span>
+                                <span className="ml-auto text-sm text-(--color-primary)">✓</span>
                             )}
                         </button>
                     ))}

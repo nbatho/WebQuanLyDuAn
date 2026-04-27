@@ -23,21 +23,6 @@ import {
 } from '../models/Task.js';
 
 
-
-export const getTasksBySpaceId = async (req, res) => {
-    try {
-        const { spaceId } = req.params;
-        if (!spaceId) {
-            return res.status(400).json({ error: "Space ID is required" });
-        }
-        const tasks = await findAllTasksBySpaceId(spaceId);
-        res.status(200).json(tasks);
-
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
 export const getTasksByListId = async (req, res) => {
     try {
         const { listId } = req.params;
@@ -45,20 +30,6 @@ export const getTasksByListId = async (req, res) => {
             return res.status(400).json({ error: "List ID is required" });
         }
         const tasks = await findAllTasksByListId(listId);
-        res.status(200).json(tasks);
-
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-export const getTasksByFolderId = async (req, res) => {
-    try {
-        const { folderId } = req.params;
-        if (!folderId) {
-            return res.status(400).json({ error: "Folder ID is required" });
-        }
-        const tasks = await findAllTasksByFolderId(folderId);
         res.status(200).json(tasks);
 
     } catch (error) {
@@ -84,9 +55,6 @@ export const createTasks = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
-import con from '../config/connect.js';
-
 export const createTasksForList = async (req, res) => {
     try {
         const { listId } = req.params;

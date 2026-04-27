@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import TaskDetailModal from '../../components/TaskDetailModal';
 import groupByDate from './component/groupByDate';
 import type { AppDispatch, RootState } from '@/store/configureStore';
-import { fetchTasksForSpace } from '@/store/modules/tasks';
 import type { TaskWithSpaceData } from '@/store/modules/tasks';
 import type { Task } from '@/types/tasks';
 type TabType = 'assigned' | 'mentions' | 'created';
@@ -96,11 +95,6 @@ export default function MyTasksPage() {
         }
     }, [listSpaces, activeSpaceId]);
 
-    useEffect(() => {
-        if (activeSpaceId != null) {
-            void dispatch(fetchTasksForSpace(activeSpaceId));
-        }
-    }, [activeSpaceId, dispatch]);
 
     const allTasks = useMemo<TaskWithSpaceData[]>(() => listTask, [listTask]);
 
