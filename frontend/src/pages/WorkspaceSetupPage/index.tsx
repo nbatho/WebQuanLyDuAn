@@ -1,40 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Input, Select, message } from 'antd';
-import { ArrowLeft, ArrowRight, Camera } from 'lucide-react';
+import { Button, Input,message } from 'antd';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import type { AppDispatch } from '@/store/configureStore';
 import { addWorkspace } from '@/store/modules/workspaces';
 
-const orgSizeOptions = [
-    { value: '1-10', label: '1–10 employees' },
-    { value: '11-50', label: '11–50 employees' },
-    { value: '51-200', label: '51–200 employees' },
-    { value: '201-500', label: '201–500 employees' },
-    { value: '501+', label: '501+ employees' },
-];
-
-const industryOptions = [
-    { value: 'technology', label: 'Technology' },
-    { value: 'finance', label: 'Finance' },
-    { value: 'healthcare', label: 'Healthcare' },
-    { value: 'education', label: 'Education' },
-    { value: 'marketing', label: 'Marketing' },
-    { value: 'ecommerce', label: 'E-Commerce' },
-    { value: 'consulting', label: 'Consulting' },
-    { value: 'other', label: 'Other' },
-];
 
 export default function WorkspaceSetupPage() {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
     const [name, setName] = useState('');
     const [slug, setSlug] = useState('');
-    const [orgSize, setOrgSize] = useState('1-10');
-    const [industry, setIndustry] = useState('technology');
     const [isCreating, setIsCreating] = useState(false);
-
-    /* auto-generate slug from name */
     const handleNameChange = (val: string) => {
         setName(val);
         const autoSlug = val
@@ -58,7 +36,7 @@ export default function WorkspaceSetupPage() {
                 addWorkspace({
                     name: name.trim(),
                     slug: slug || name.trim().toLowerCase().replace(/\s+/g, '-'),
-                    description: `${orgSize} | ${industry}`,
+                    description: '',
                 }),
             ).unwrap();
             message.success('Workspace đã được tạo thành công!');
@@ -86,20 +64,6 @@ export default function WorkspaceSetupPage() {
                         This is where your team works and collaborates.
                     </p>
 
-                    {/* Logo Upload */}
-                    <div className="mb-7 flex items-center gap-4">
-                        <button
-                            type="button"
-                            className="flex h-18 w-18 cursor-pointer items-center justify-center rounded-[14px] border-2 border-dashed border-[#c2c9e0] bg-[#f0f4ff] transition-colors hover:border-[#0058be] hover:bg-[#e8edff]"
-                        >
-                            <Camera size={24} className="text-[#8b95b0]" />
-                        </button>
-                        <div className="flex flex-col gap-1">
-                            <span className="text-[12px] font-extrabold tracking-[0.08em] text-[#141b2b] uppercase">WORKSPACE LOGO</span>
-                            <span className="text-[13px] font-medium text-[#9aa0a6]">Recommended 400x400px</span>
-                        </div>
-                    </div>
-
                     {/* Workspace Name */}
                     <div className="mb-5">
                         <label className="mb-2 block text-[11px] font-extrabold tracking-[0.08em] text-[#141b2b] uppercase">WORKSPACE NAME</label>
@@ -123,32 +87,6 @@ export default function WorkspaceSetupPage() {
                                 onChange={(e) => setSlug(e.target.value)}
                                 placeholder="acme-hq"
                                 className="!h-11.5 !rounded-none !border-none !text-[15px] !font-medium !text-[#141b2b] hover:!border-none focus:!border-none"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Org Size & Industry */}
-                    <div className="mb-5 flex flex-col gap-4 sm:flex-row">
-                        <div className="min-w-0 flex-1">
-                            <label className="mb-2 block text-[11px] font-extrabold tracking-[0.08em] text-[#141b2b] uppercase">ORGANIZATION SIZE</label>
-                            <Select
-                                size="large"
-                                value={orgSize}
-                                onChange={setOrgSize}
-                                options={orgSizeOptions}
-                                className="w-full [&_.ant-select-selector]:!h-11.5 [&_.ant-select-selector]:!rounded-[10px] [&_.ant-select-selector]:!border-2 [&_.ant-select-selector]:!border-[#e2e6f0] [&_.ant-select-selector]:!px-3 [&_.ant-select-selector]:!text-[14px] [&_.ant-select-selector]:!font-semibold hover:[&_.ant-select-selector]:!border-[#0058be] [&.ant-select-focused_.ant-select-selector]:!border-[#0058be]"
-                                popupMatchSelectWidth
-                            />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                            <label className="mb-2 block text-[11px] font-extrabold tracking-[0.08em] text-[#141b2b] uppercase">INDUSTRY</label>
-                            <Select
-                                size="large"
-                                value={industry}
-                                onChange={setIndustry}
-                                options={industryOptions}
-                                className="w-full [&_.ant-select-selector]:!h-11.5 [&_.ant-select-selector]:!rounded-[10px] [&_.ant-select-selector]:!border-2 [&_.ant-select-selector]:!border-[#e2e6f0] [&_.ant-select-selector]:!px-3 [&_.ant-select-selector]:!text-[14px] [&_.ant-select-selector]:!font-semibold hover:[&_.ant-select-selector]:!border-[#0058be] [&.ant-select-focused_.ant-select-selector]:!border-[#0058be]"
-                                popupMatchSelectWidth
                             />
                         </div>
                     </div>

@@ -16,7 +16,7 @@ export interface Task {
     status_name: string;
     status_color: string;
     
-    priority_name: string | null; 
+    priority_name: string; 
     priority_color: string | null;
     
     due_date: string | null;

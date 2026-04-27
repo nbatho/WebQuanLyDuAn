@@ -170,7 +170,7 @@ export default function AuthPage() {
 
                 {/* Footer copyright */}
                 <div className="relative z-10">
-                    <p className="text-white/50 text-sm font-medium uppercase tracking-widest">© 2025 Flowise</p>
+                    <p className="text-white/50 text-sm font-medium uppercase tracking-widest">© 2026 Flowise</p>
                 </div>
             </section>
 
@@ -409,13 +409,6 @@ export default function AuthPage() {
                             </div>
                         </div>
                     </div>
-                </div>
-
-                {/* Footer */}
-                <div className="mt-auto pt-3 text-center">
-                    <p className="text-[#424754]/40 text-[10px] uppercase font-bold tracking-[0.2em]">
-                        Enterprise ready • SOC2 Compliant • 256-bit Encryption
-                    </p>
                 </div>
             </main>
         </div>

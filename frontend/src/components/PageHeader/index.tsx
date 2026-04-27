@@ -4,13 +4,10 @@ import {
     LayoutDashboard, LayoutList, Trello,
 } from 'lucide-react';
 
-// ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface PageTab {
-    /** Icon shown to the left of the label */
     icon?: React.ReactNode;
     label: string;
-    /** Whether this tab is currently active (highlighted) */
     active?: boolean;
     onClick?: () => void;
 }

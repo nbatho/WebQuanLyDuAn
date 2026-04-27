@@ -24,7 +24,7 @@ function GoogleBrandPanel() {
                     One secure sign-in. No extra password to remember for your Flowise workspace.
                 </p>
             </div>
-            <p className="relative z-10 text-sm font-medium uppercase tracking-widest text-white/50">© 2025 Flowise</p>
+            <p className="relative z-10 text-sm font-medium uppercase tracking-widest text-white/50">© 2026 Flowise</p>
         </section>
     );
 }
@@ -60,7 +60,7 @@ function GoogleLoginContent() {
         <div className="flex min-h-screen flex-col bg-[#eceff3] md:flex-row">
             <GoogleBrandPanel />
             <main className="flex w-full flex-1 flex-col justify-center px-5 py-10 md:w-[48%] md:px-12 md:py-8">
-                <div className="mx-auto w-full max-w-[420px]">
+                <div className="mx-auto w-full max-w-105">
                     <button
                         type="button"
                         onClick={() => navigate('/login')}

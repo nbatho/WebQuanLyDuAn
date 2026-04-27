@@ -28,7 +28,7 @@ const PRIORITY_OPTIONS = [
 
 export default function CreateTaskModal({
     isOpen, onClose, onCreate,
-    groups = [], // Lấy groups từ props
+    groups = [], 
     lists = [],
     defaultListId
 }: CreateTaskModalProps) {
@@ -36,7 +36,6 @@ export default function CreateTaskModal({
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
 
-    // Khởi tạo statusId mặc định là ID của nhóm đầu tiên trong mảng
     const [statusId, setStatusId] = useState<number>(0);
 
     const [priority, setPriority] = useState<string>('Normal');
@@ -53,7 +52,6 @@ export default function CreateTaskModal({
         if (isOpen) {
             setName('');
             setDescription('');
-            // Gán statusId = id của cột đầu tiên (TO DO) lấy từ Database
             setStatusId(groups.length > 0 ? groups[0].id : 0);
             setPriority('Normal');
             setDueDate(null);
@@ -65,7 +63,6 @@ export default function CreateTaskModal({
 
     if (!isOpen) return null;
 
-    // Lấy thông tin status hiện tại từ mảng động
     const currentStatus = groups.find(s => s.id === statusId) || groups[0] || { id: 0, name: 'No Status', color: '#ccc' };
     const currentPriority = PRIORITY_OPTIONS.find(p => p.value === priority) || PRIORITY_OPTIONS[2];
 
@@ -76,7 +73,7 @@ export default function CreateTaskModal({
             name: name.trim(),
             description: description.trim() || null,
             list_id: listId,
-            status_id: statusId, // Gửi đúng ID động xuống API
+            status_id: statusId,
             priority: priority,
             due_date: dueDate ? new Date(dueDate).toISOString() : null,
             assignee_ids: assigneeIds,
@@ -92,7 +89,6 @@ export default function CreateTaskModal({
     return (
         <div className="fixed inset-0 z-2000 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
             <div className="flex w-145 max-w-[95vw] flex-col rounded-xl bg-white shadow-2xl" onClick={e => { e.stopPropagation(); setActiveDropdown(null); }}>
-                {/* Header */}
                 <div className="flex items-center justify-between border-b border-[#eef0f5] px-5 py-4">
                     <div className="flex items-center gap-2">
                         <div className="flex h-6 w-6 items-center justify-center rounded bg-[#f0f4ff] text-[#0058be]">
@@ -103,7 +99,6 @@ export default function CreateTaskModal({
                     <button onClick={onClose} className="text-[#9aa0a6] hover:text-[#5f6368] cursor-pointer"><X size={20} /></button>
                 </div>
 
-                {/* List Selector Bar */}
                 <div className="flex items-center gap-2 border-b border-[#f8f9fc] bg-[#fcfdfe] px-5 py-2.5">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-[#9aa0a6]">Danh mục:</span>
                     <div className="relative" onClick={e => e.stopPropagation()}>
@@ -133,7 +128,6 @@ export default function CreateTaskModal({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 border-t border-[#f8f9fc] px-6 py-3">
-                    {/* STATUS DROPDOWN (Sử dụng dữ liệu động từ DB) */}
                     <div className="relative" onClick={e => e.stopPropagation()}>
                         <button className="flex items-center gap-1.5 rounded-full border border-[#eef0f5] px-3 py-1.5 text-xs font-semibold text-[#5f6368] hover:bg-[#f8fafb]" onClick={() => setActiveDropdown('status')}>
                             <div className="h-2 w-2 rounded-full" style={{ backgroundColor: currentStatus.color }} />

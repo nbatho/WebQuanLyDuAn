@@ -9,6 +9,8 @@ import AssigneePopover from '@/components/Popovers/AssigneePopover';
 import DueDatePopover from '@/components/Popovers/DueDatePopover';
 import PriorityPopover from '@/components/Popovers/PriorityPopover';
 import TaskDetailModal from '@/components/TaskDetailModal';
+import type { RootState } from '@/store/configureStore';
+import { useSelector } from 'react-redux';
 
 const getInitials = (name: string) => name.substring(0, 2).toUpperCase();
 const formatDate = (dateString: string | null) => dateString ? new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : null;
@@ -20,9 +22,8 @@ export default function ListView() {
     const [activePopover, setActivePopover] = useState<{ taskId: number, field: string } | null>(null);
     const [inlineGroup, setInlineGroup] = useState<number | null>(null);
     const [inlineText, setInlineText] = useState('');
-
+    const listMembers = useSelector((state: RootState) => state.workspaces.listWorkspaceMembers);
     const toggleGroup = (groupId: number) => setGroups(prev => prev.map(g => g.id === groupId ? { ...g, isExpanded: !g.isExpanded } : g));
-
     return (
         <div className="flex flex-1 flex-col overflow-hidden bg-white font-sans">
             <div className="flex-1 overflow-y-auto p-6">
@@ -55,7 +56,7 @@ export default function ListView() {
 
                                         {columns.assignee && (
                                             <div className="w-30 shrink-0 pl-2">
-                                                <Popover content={<AssigneePopover assignees={task.assignees} onSave={(a) => updateTask(task.task_id, { assignees: a })} onClose={() => setActivePopover(null)} />} trigger="click" open={activePopover?.taskId === task.task_id && activePopover?.field === 'assignee'} onOpenChange={(v) => !v && setActivePopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }}>
+                                                <Popover content={<AssigneePopover allMembers= {listMembers} assignees={task.assignees} onSave={(a) => updateTask(task.task_id, { assignees: a })} onClose={() => setActivePopover(null)} />} trigger="click" open={activePopover?.taskId === task.task_id && activePopover?.field === 'assignee'} onOpenChange={(v) => !v && setActivePopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }}>
                                                     <div className="flex min-h-6 items-center px-1 hover:bg-[#f3f4f6]" onClick={(e) => { e.stopPropagation(); setActivePopover({ taskId: task.task_id, field: 'assignee' }); }}>
                                                         {task.assignees.length > 0 ? <div className="flex -space-x-1">{task.assignees.map((a) => <Avatar key={a.user_id} size={24} src={a.avatar_url} style={{ backgroundColor: '#1e1f21', fontSize: '10px' }}>{!a.avatar_url && getInitials(a.name)}</Avatar>)}</div> : <User size={12} className="text-[#9ca3af]" />}
                                                     </div>
@@ -75,9 +76,9 @@ export default function ListView() {
 
                                         {columns.priority && (
                                             <div className="w-27.5 shrink-0 pl-2">
-                                                <Popover content={<PriorityPopover priority_id={task.priority_id} onSave={(id, name, color) => updateTask(task.task_id, { priority_id: id, priority_name: name, priority_color: color })} onClose={() => setActivePopover(null)} />} trigger="click" open={activePopover?.taskId === task.task_id && activePopover?.field === 'priority'} onOpenChange={(v) => !v && setActivePopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }}>
+                                                <Popover content={<PriorityPopover priority_name={task.priority_name} onSave={(name, color) => updateTask(task.task_id, { priority_name: name, priority_color: color })} onClose={() => setActivePopover(null)} />} trigger="click" open={activePopover?.taskId === task.task_id && activePopover?.field === 'priority'} onOpenChange={(v) => !v && setActivePopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }}>
                                                     <div className="flex min-h-6 items-center px-1 hover:bg-[#f3f4f6]" onClick={(e) => { e.stopPropagation(); setActivePopover({ taskId: task.task_id, field: 'priority' }); }}>
-                                                        {task.priority_id ? <Flag size={14} color={task.priority_color ?? '#9ca3af'} fill={task.priority_color ?? 'transparent'} /> : <Flag size={14} className="text-[#d1d5db]" />}
+                                                        {task.priority_name ? <Flag size={14} color={task.priority_color ?? '#9ca3af'} fill={task.priority_color ?? 'transparent'} /> : <Flag size={14} className="text-[#d1d5db]" />}
                                                     </div>
                                                 </Popover>
                                             </div>

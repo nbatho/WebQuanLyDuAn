@@ -274,15 +274,15 @@ export const getCommentsByTaskIds = async (req, res) => {
 
 export const createComments = async (req, res) => {
     try {
-        const { taskId } = req.params;
-        const { content } = req.body;
+        const { taskId, content } = req.body;
+        const userId = req.user?.user_id; 
         if (!taskId) {
             return res.status(400).json({ error: "Task ID is required" });
         }
         if (!content) {
             return res.status(400).json({ error: "Comment content is required" });
         }
-        const newComment = await createComment(taskId, content);
+        const newComment = await createComment(taskId, content, userId);
         res.status(201).json(newComment);
     } catch (error) {
         res.status(500).json({ error: error.message });

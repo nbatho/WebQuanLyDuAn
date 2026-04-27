@@ -31,7 +31,6 @@ export default function TaskDetailHeader({
                         <span>Task Management</span>
                     </div>
 
-                    {/* STATUS PICKER HOẠT ĐỘNG VỚI DATA ĐỘNG */}
                     <StatusPicker
                         variant="badge"
                         value={task.status_id}

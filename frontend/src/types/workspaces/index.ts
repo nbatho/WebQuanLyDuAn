@@ -1,8 +1,8 @@
 export interface WorkspaceMemberData {
     user_id: number;
     username: string;
+    name : string; 
     email: string;
-    role: string;
     avatar_url: string;
     role_name: string;
 }

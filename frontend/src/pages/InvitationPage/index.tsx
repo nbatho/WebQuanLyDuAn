@@ -15,14 +15,12 @@ export default function InvitationPage() {
     const isRespondingInvitation = useSelector((state : RootState) => state.workspaces.isRespondingInvitation);
     const navigate = useNavigate();
     const handleAccept = async () => {
-        console.log('Invitation accepted', token);  
         dispatch(respondToInvitation(token || '', 'accept') as any);
         if (isRespondingInvitation) {
             navigate('/workspaces');
         }
     };
     const handleReject = async () => {
-        console.log('Invitation rejected');
         dispatch(respondToInvitation(token || '', 'reject') as any);
         if (isRespondingInvitation) {
             navigate('/workspaces');

@@ -34,7 +34,7 @@ export const fetchCommentsByTask = createAsyncThunk<CommentData[], number>(
 
 export const fetchCreateComment = createAsyncThunk<
     CommentData,
-    { taskId: number; content: string }
+    { taskId: number; content: string; }
 >(
     'comments/createComment',
     async ({ taskId, content }, { rejectWithValue }) => {

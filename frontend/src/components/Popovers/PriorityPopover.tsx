@@ -1,7 +1,7 @@
 import { Flag, X } from 'lucide-react';
 
 export interface PriorityPopoverProps {
-    priority_id: number | null;
+    priority_name: string | null;
     onSave: (id: number | null, name: string | null, color: string | null) => void;
     onClose: () => void;
 }
@@ -13,7 +13,7 @@ const PRIORITIES = [
     { id: 3, label: 'Low', color: '#d1d5db' },
 ];
 
-export default function PriorityPopover({ priority_id, onSave, onClose }: PriorityPopoverProps) {
+export default function PriorityPopover({ priority_name, onSave, onClose }: PriorityPopoverProps) {
     const handleSelect = (id: number | null, label: string | null, color: string | null) => {
         onSave(id, label, color); onClose();
     };
@@ -23,7 +23,7 @@ export default function PriorityPopover({ priority_id, onSave, onClose }: Priori
             <div className="mb-1 px-3 pt-1 text-[11px] font-semibold text-[#9ca3af] uppercase tracking-wide">Priority</div>
             <div className="flex flex-col">
                 {PRIORITIES.map((p) => {
-                    const isActive = priority_id === p.id;
+                    const isActive = priority_name === p.label;
                     return (
                         <button key={p.label} className={`flex items-center gap-2.5 px-3 py-1.75 text-left text-[13px] hover:bg-[#f5f6f8] ${isActive ? 'bg-[#f5f6f8] font-semibold' : ''}`} onClick={() => handleSelect(p.id, p.label, p.color)}>
                             <Flag size={14} fill={p.label === 'Low' ? 'transparent' : p.color} color={p.color} />

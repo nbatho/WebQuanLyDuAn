@@ -5,6 +5,8 @@ import type { Task } from '@/types/tasks';
 import AssigneePopover from '../Popovers/AssigneePopover';
 import DueDatePopover from '../Popovers/DueDatePopover';
 import PriorityPopover from '../Popovers/PriorityPopover';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store/configureStore';
 
 interface TaskDetailSidebarProps {
     task: Task;
@@ -15,6 +17,8 @@ export default function TaskDetailSidebar({ task, updateTask }: TaskDetailSideba
     const [openPopover, setOpenPopover] = useState<'assignee' | 'dueDate' | 'priority' | null>(null);
     const getInitials = (name: string) => name.substring(0, 2).toUpperCase();
     const formatDate = (date: string | null) => date ? new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Set date';
+    const listMembers = useSelector((state: RootState) => state.workspaces.listWorkspaceMembers);
+
 
     return (
         <div className="flex w-65 shrink-0 flex-col gap-4 overflow-y-auto border-l border-[#e5e7eb] p-4 bg-[#f9fafb]">
@@ -22,7 +26,14 @@ export default function TaskDetailSidebar({ task, updateTask }: TaskDetailSideba
 
                 <div className="flex flex-col gap-1">
                     <span className="text-[11px] font-bold uppercase tracking-[0.04em] text-[#9ca3af]">Assignee</span>
-                    <Popover content={<AssigneePopover assignees={task.assignees} onSave={(a) => updateTask(task.task_id, { assignees: a })} onClose={() => setOpenPopover(null)} />} trigger="click" open={openPopover === 'assignee'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }} getPopupContainer={(trigger) => trigger.parentElement!}>
+                    <Popover content={
+                        <AssigneePopover
+                            allMembers={listMembers || []}
+                            assignees={task.assignees || []}
+                            onSave={(a) => updateTask(task.task_id, { assignees: a })}
+                            onClose={() => setOpenPopover(null)}
+                        />
+                    } trigger="click" open={openPopover === 'assignee'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }} getPopupContainer={(trigger) => trigger.parentElement!}>
                         <div className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 transition-colors hover:bg-[#e5e7eb]" onClick={() => setOpenPopover('assignee')}>
                             {task.assignees && task.assignees.length > 0 ? (
                                 <div className="flex -space-x-1">
@@ -47,14 +58,18 @@ export default function TaskDetailSidebar({ task, updateTask }: TaskDetailSideba
 
                 <div className="flex flex-col gap-1">
                     <span className="text-[11px] font-bold uppercase tracking-[0.04em] text-[#9ca3af]">Priority</span>
-                    <Popover content={<PriorityPopover value={task.priority_name || 'Normal'} onSave={(val) => updateTask(task.task_id, { priority: val })} onClose={() => setOpenPopover(null)} />} trigger="click" open={openPopover === 'priority'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }} getPopupContainer={(trigger) => trigger.parentElement!}>
+                    <Popover content={<PriorityPopover
+                        priority_name={task.priority_name || 'Normal'} 
+                        onSave={() => updateTask(task.task_id, {})}
+                        onClose={() => setOpenPopover(null)}
+                    />} trigger="click" open={openPopover === 'priority'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }} getPopupContainer={(trigger) => trigger.parentElement!}>
                         <div className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 transition-colors hover:bg-[#e5e7eb]" onClick={() => setOpenPopover('priority')}>
                             <Flag size={14} fill={task.priority_name !== 'Clear' ? (task.priority_color ?? 'transparent') : 'none'} color={task.priority_color ?? '#9ca3af'} />
                             <span className="text-[13px] font-medium" style={{ color: task.priority_color ?? '#6b7280' }}>{task.priority_name || 'Normal'}</span>
                         </div>
                     </Popover>
                 </div>
-
+                        
             </div>
         </div>
     );

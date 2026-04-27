@@ -19,7 +19,10 @@ export default function DueDatePopover({ date, onSave, onClose }: DueDatePopover
 
     const startDow = currentMonth.startOf('month').day();
     const daysInMonth = currentMonth.daysInMonth();
-    const calendarDays: (Dayjs | null)[] = Array.from({ length: startDow }, () => null).concat(Array.from({ length: daysInMonth }, (_, i) => currentMonth.date(i + 1)));
+    const calendarDays: (Dayjs | null)[] = [
+        ...Array.from({ length: startDow }, () => null),
+        ...Array.from({ length: daysInMonth }, (_, i) => currentMonth.date(i + 1))
+    ];
 
     return (
         <div className="flex w-65 flex-col overflow-hidden rounded-xl bg-white p-3 shadow-[0_8px_32px_rgba(0,0,0,0.15)]">

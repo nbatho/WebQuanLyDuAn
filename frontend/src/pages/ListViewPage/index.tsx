@@ -41,7 +41,6 @@ export interface Task {
     status_name: string;
     status_color: string;
 
-    // ĐÃ BỎ priority_id
     priority_name: string | null;
     priority_color: string | null;
 
@@ -61,7 +60,6 @@ export interface NewTaskData {
     parent_task_id?: number | null;
     status_id?: number;
 
-    // SỬA: Dùng priority kiểu chuỗi
     priority?: string;
 
     due_date?: string | null;
@@ -149,19 +147,16 @@ export default function ListViewPage() {
         // TODO: dispatch(fetchUpdateTask(...))
     }, []);
 
-    // -- Inline Create Task (Optimistic UI) --
     const handleInlineCreate = useCallback((groupId: number, name: string, extras?: any) => {
         const payload: NewTaskData = {
             name,
             list_id: Number(listId),
             status_id: groupId,
-            // SỬA: Lấy priority từ extras, nếu không có thì mặc định là 'Normal'
             priority: extras?.priority || 'Normal',
             due_date: extras?.due_date || null,
             assignee_ids: extras?.assignees?.map((a: Assignee) => a.user_id) || []
         };
 
-        console.log("Gửi API:", payload);
 
         const tempId = Math.floor(Math.random() * 100000);
         const newTask: Task = {
@@ -197,7 +192,6 @@ export default function ListViewPage() {
     }, [listId, spaceId, parentFolder, groups, dispatch]);
 
     const handleCreateTask = useCallback((payload: NewTaskData) => {
-        console.log("Modal Create Payload gửi đi:", payload);
 
         dispatch(fetchCreateTask({
             list_id: payload.list_id,

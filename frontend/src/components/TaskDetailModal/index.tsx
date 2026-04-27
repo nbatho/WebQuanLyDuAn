@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Paperclip, MessageSquare, Activity, Save } from 'lucide-react';
 import { Button, Input, Avatar } from 'antd';
-import { useSelector } from 'react-redux';
-import type { RootState } from '@/store/configureStore';
+import { useDispatch, useSelector } from 'react-redux';
+import type { AppDispatch, RootState } from '@/store/configureStore';
 import type { Task } from '@/types/tasks';
 import TaskDetailHeader from './TaskDetailHeader';
 import TaskDetailSidebar from './TaskDetailSidebar';
-
+import { fetchCommentsByTask, fetchCreateComment } from '@/store/modules/comments';
 export interface TaskDetailModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -15,14 +15,15 @@ export interface TaskDetailModalProps {
 }
 
 export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: TaskDetailModalProps) {
+    const dispatch = useDispatch<AppDispatch>();
     const [isMaximized, setIsMaximized] = useState(false);
     const [activeTab, setActiveTab] = useState<'comments' | 'activity'>('comments');
-
     const [taskTitle, setTaskTitle] = useState('');
     const [taskDesc, setTaskDesc] = useState('');
+    const [commentContent, setCommentContent] = useState('');
 
-    // LẤY DANH SÁCH STATUS ĐỘNG TỪ REDUX
     const groups = useSelector((state: RootState) => state.tasks.listTask);
+    const listComments = useSelector((state: RootState) => state.comments.listComments);
     const statusOptions = useMemo(() => {
         return groups.map(g => ({ id: g.id, name: g.name, color: g.color }));
     }, [groups]);
@@ -39,6 +40,12 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
         return taskTitle !== task.name || taskDesc !== (task.description || '');
     }, [taskTitle, taskDesc, task]);
 
+    useEffect(() => {
+        if (task?.task_id) {
+            dispatch(fetchCommentsByTask(task.task_id));
+        }
+    }, [task?.task_id, dispatch]);
+
     if (!isOpen || !task) return null;
 
     const handleUpdate = () => {
@@ -48,13 +55,14 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
             description: taskDesc,
         });
     };
-
-    const tabClass = (tab: 'comments' | 'activity') =>
-        `flex cursor-pointer items-center gap-1.5 pb-2 text-[13px] font-semibold transition-all ${activeTab === tab
-            ? 'border-b-2 border-[#7c68ee] text-[#7c68ee]'
-            : 'border-b-2 border-transparent text-[#9ca3af] hover:text-[#374151]'
-        }`;
-
+    const handleCommentSubmit = async () => {
+        if (!commentContent.trim() || !task?.task_id) return;
+        await dispatch(fetchCreateComment({
+            taskId: task.task_id,
+            content: commentContent
+        }));
+        setCommentContent('');
+    };
     return (
         <div className="fixed inset-0 z-1500 flex items-center justify-center bg-[rgba(20,27,43,0.5)]" onClick={onClose}>
             <div
@@ -64,7 +72,6 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
                     } flex flex-col overflow-hidden bg-white shadow-2xl transition-all duration-300`}
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* TRUYỀN PROPS CHUẨN XÁC CHO HEADER */}
                 <TaskDetailHeader
                     task={task}
                     updateTask={updateTask}
@@ -111,13 +118,13 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
                             </div>
                         </div>
 
-                        {/* Comments / Activity tabs */}
+
                         <div className="mt-2">
                             <div className="mb-3 flex gap-4 border-b border-[#e5e7eb]">
-                                <button className={tabClass('comments')} onClick={() => setActiveTab('comments')}>
+                                <button onClick={() => setActiveTab('comments')}>
                                     <MessageSquare size={14} /> Comments
                                 </button>
-                                <button className={tabClass('activity')} onClick={() => setActiveTab('activity')}>
+                                <button onClick={() => setActiveTab('activity')}>
                                     <Activity size={14} /> Activity
                                 </button>
                             </div>
@@ -125,16 +132,22 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
                             <div className="min-h-15">
                                 {activeTab === 'comments' ? (
                                     <div className="flex flex-col gap-3">
-                                        <div className="flex gap-2.5">
-                                            <Avatar src="https://i.pravatar.cc/150?u=a042581f4e29026024d" />
-                                            <div className="flex-1">
-                                                <div className="mb-1 flex items-center gap-2">
-                                                    <strong className="text-[13px] text-[#292d34]">Alex Rivera</strong>
-                                                    <span className="text-xs text-[#9ca3af]">2 hours ago</span>
+                                        {listComments && listComments.length > 0 ? (
+                                            listComments.map((comment) => (
+                                                <div key={comment.comment_id} className="flex gap-2.5">
+                                                    <Avatar src={comment.author_avatar} />
+                                                    <div className="flex-1">
+                                                        <div className="mb-1 flex items-center gap-2">
+                                                            <strong className="text-[13px] text-[#292d34]">{comment.author_name}</strong>
+                                                            <span className="text-xs text-[#9ca3af]">{comment.created_at}</span>
+                                                        </div>
+                                                        <p className="m-0 text-[13px] leading-6 text-[#374151]">{comment.content}</p>
+                                                    </div>
                                                 </div>
-                                                <p className="m-0 text-[13px] leading-6 text-[#374151]">I have started working on the initial drafts. Will upload soon.</p>
-                                            </div>
-                                        </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-400 text-sm">Chưa có bình luận nào.</p>
+                                        )}
                                     </div>
                                 ) : (
                                     <div className="flex flex-col gap-3">
@@ -149,7 +162,6 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
                                 )}
                             </div>
 
-                            {/* Ô nhập Comment */}
                             <div className="mt-3.5 flex gap-2.5 border-t border-[#e5e7eb] pt-3.5">
                                 <Avatar src="https://i.pravatar.cc/150?u=fake@pravatar.com" />
                                 <div className="flex flex-1 flex-col gap-1.5">
@@ -157,9 +169,13 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
                                         placeholder="Write a comment..."
                                         autoSize={{ minRows: 2, maxRows: 6 }}
                                         className="text-[13px] focus:border-[#7c68ee] hover:border-[#a798ff]"
+                                        value={commentContent}
+                                        onChange={(e) => setCommentContent(e.target.value)}
                                     />
                                     <div className="flex justify-end">
-                                        <Button type="primary" size="small" className="bg-[#7c68ee] hover:bg-[#6b56db] border-none text-[12px]">Comment</Button>
+                                        <Button type="primary" size="small" className="bg-[#7c68ee] hover:bg-[#6b56db] border-none text-[12px]"
+                                            onClick={handleCommentSubmit}
+                                        >Comment</Button>
                                     </div>
                                 </div>
                             </div>

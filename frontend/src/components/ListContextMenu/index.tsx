@@ -3,7 +3,6 @@ import {
     Pencil, Link2, Palette, Columns3, Copy, Archive, Trash2,
 } from 'lucide-react';
 
-// ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface ListContextMenuProps {
     listId: string;
@@ -12,7 +11,6 @@ export interface ListContextMenuProps {
     onDelete: (listId: string) => Promise<void>;
 }
 
-// ─── Component ───────────────────────────────────────────────────────────────
 
 export default function ListContextMenu({
     listId,
@@ -22,7 +20,6 @@ export default function ListContextMenu({
 }: ListContextMenuProps) {
     const menuRef = useRef<HTMLDivElement>(null);
 
-    /* Close on Escape */
     useEffect(() => {
         const onKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') onClose();
@@ -31,7 +28,6 @@ export default function ListContextMenu({
         return () => document.removeEventListener('keydown', onKeyDown);
     }, [onClose]);
 
-    /* Close on outside click */
     useEffect(() => {
         const onMouseDown = (e: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(e.target as Node)) {

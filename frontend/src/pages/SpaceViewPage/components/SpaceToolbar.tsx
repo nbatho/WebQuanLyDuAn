@@ -24,7 +24,6 @@ interface SpaceToolbarProps {
 }
 
 export default function SpaceToolbar({
-    activeView,
     groupBy,
     setGroupBy,
     subtaskMode,
@@ -41,7 +40,7 @@ export default function SpaceToolbar({
     const toggleDropdown = (id: string) => setActiveDropdown((prev) => (prev === id ? null : id));
 
     return (
-        <div className="flex shrink-0 items-center justify-between border-b border-[var(--color-border-light)] bg-white px-5 py-2">
+        <div className="flex shrink-0 items-center justify-between border-b border-(--color-border-light) bg-white px-5 py-2">
             <div className="flex items-center gap-1.5">
                 <GroupByDropdown
                     value={groupBy}
@@ -57,11 +56,7 @@ export default function SpaceToolbar({
                 />
             </div>
             <div className="flex items-center gap-1.5">
-                {activeView === 'board' && (
-                    <button className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-transparent px-2 py-1 text-xs font-semibold whitespace-nowrap text-[var(--color-text-secondary)] hover:bg-[var(--color-primary-bg)] hover:text-[var(--color-primary)]">
-                        Sort
-                    </button>
-                )}
+                
                 <FilterPanel
                     isOpen={activeDropdown === 'filter'}
                     onToggle={() => toggleDropdown('filter')}
@@ -69,17 +64,17 @@ export default function SpaceToolbar({
                     onFiltersChange={setFilters}
                 />
                 <button
-                    className={`flex cursor-pointer items-center gap-1 rounded-md border-none bg-transparent px-2 py-1 text-xs font-semibold whitespace-nowrap hover:bg-[var(--color-primary-bg)] hover:text-[var(--color-primary)] ${
-                        showClosed ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-secondary)]'
+                    className={`flex cursor-pointer items-center gap-1 rounded-md border-none bg-transparent px-2 py-1 text-xs font-semibold whitespace-nowrap hover:bg-(--color-primary-bg) hover:text-(--color-primary) ${
+                        showClosed ? 'text-(--color-primary)' : 'text-(--color-text-secondary)'
                     }`}
                     onClick={() => setShowClosed((v) => !v)}
                 >
                     {showClosed ? <CheckCircle2 size={13} /> : null} Closed
                 </button>
-                <button className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-transparent px-2 py-1 text-xs font-semibold whitespace-nowrap text-[var(--color-text-secondary)] hover:bg-[var(--color-primary-bg)] hover:text-[var(--color-primary)]">
+                <button className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-transparent px-2 py-1 text-xs font-semibold whitespace-nowrap text-(--color-text-secondary) hover:bg-(--color-primary-bg) hover:text-(--color-primary)">
                     <Users size={13} /> Assignee
                 </button>
-                <button className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-transparent px-2 py-1 text-xs font-semibold whitespace-nowrap text-[var(--color-text-secondary)] hover:bg-[var(--color-primary-bg)] hover:text-[var(--color-primary)]">
+                <button className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-transparent px-2 py-1 text-xs font-semibold whitespace-nowrap text-(--color-text-secondary) hover:bg-(--color-primary-bg) hover:text-(--color-primary)">
                     <Search size={13} />
                 </button>
                 <CustomizePanel
@@ -89,7 +84,7 @@ export default function SpaceToolbar({
                     onColumnsChange={setColumns}
                 />
                 <button
-                    className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-[var(--color-primary)] px-3 py-1.25 text-xs font-bold text-white transition-colors duration-150 hover:bg-[var(--color-primary-hover)]"
+                    className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-(--color-primary) px-3 py-1.25 text-xs font-bold text-white transition-colors duration-150 hover:bg-(--color-primary-hover)"
                     onClick={onCreateTask}
                 >
                     <Plus size={14} /> Add Task <ChevronDown size={12} />

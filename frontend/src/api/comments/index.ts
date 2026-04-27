@@ -7,7 +7,10 @@ export const getCommentsByTask = async (taskId: number): Promise<CommentData[]> 
 
 export const createComment = async (
     taskId: number,
-    content: string,
+    content: string
 ): Promise<CommentData> => {
-    return beApi.post(`/tasks/${taskId}/comments`, { content });
+    return beApi.post(`/tasks/${taskId}/comments`, {
+        taskId: taskId,
+        content: content,
+    });
 };

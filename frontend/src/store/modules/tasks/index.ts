@@ -13,7 +13,6 @@ import {
 } from "@/api/tasks";
 import type { StatusGroup } from "@/types/tasks";
 
-
 export interface CreateTaskData {
     list_id: number;
     name: string;
@@ -81,7 +80,6 @@ export interface TaskWithSpaceData extends TaskData {
     status_name?: string | null;
     status_color?: string | null;
 
-    // Giữ nguyên 2 trường này vì DB View trả về để hiển thị UI
     priority_name?: string | null;
     priority_color?: string | null;
 
@@ -146,7 +144,6 @@ export const fetchCreateTask = createAsyncThunk<
     'tasks/createTask',
     async ({ list_id, taskData }, { rejectWithValue }) => {
         try {
-            console.log("Thunk Create Payload nhận vào:", { list_id, taskData });
             const response = await createTaskInList({
                 list_id,
                 name: taskData.name || 'Untitled Task', 
@@ -369,10 +366,6 @@ export const tasksSlice = createSlice({
             const newTask = action.payload; 
             
             const statusGroup = state.listTask.find(group => (group.id) == (newTask.status_id));
-            console.log("Thêm task mới vào nhóm:", {
-                newTask,
-                statusGroup
-            });
             if (statusGroup) {
                 newTask.status_name = statusGroup.name;
                 newTask.status_color = statusGroup.color;

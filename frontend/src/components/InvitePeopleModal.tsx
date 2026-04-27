@@ -52,7 +52,6 @@ export default function InvitePeopleModal({ open, onOpenChange }: InvitePeopleMo
     );
     const currentWorkspaceId = useSelector((state: { workspaces: WorkspacesState }) => state.workspaces.currentWorkspaceId);
     const handleSendInvite = async () => {
-        console.log('Send invite to', emails, 'with role', role);
 
         if (!emails.trim()) {
             return;
@@ -90,18 +89,18 @@ export default function InvitePeopleModal({ open, onOpenChange }: InvitePeopleMo
             <div className="relative px-5 pb-4 pt-5">
                 <button
                     type="button"
-                    className="absolute right-5 top-5 flex h-7 w-7 items-center justify-center rounded-full border-0 bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] cursor-pointer transition-colors hover:bg-[var(--color-border)]"
+                    className="absolute right-5 top-5 flex h-7 w-7 items-center justify-center rounded-full border-0 bg-(--color-surface-hover) text-(--color-text-secondary) cursor-pointer transition-colors hover:bg-(--color-border)"
                     onClick={() => onOpenChange(false)}
                 >
                     <X size={15} />
                 </button>
 
-                <h2 className="mb-3 text-[24px] font-black tracking-[-0.02em] text-[var(--color-on-surface)]">
+                <h2 className="mb-3 text-[24px] font-black tracking-[-0.02em] text-(--color-on-surface)">
                     Invite people
                 </h2>
 
                 <div className="mb-3">
-                    <div className="mb-1.5 text-[12px] font-bold text-[var(--color-text-secondary)]">Invite by email</div>
+                    <div className="mb-1.5 text-[12px] font-bold text-(--color-text-secondary)">Invite by email</div>
                     <Input
                         value={emails}
                         onChange={(e) => setEmails(e.target.value)}
@@ -111,28 +110,28 @@ export default function InvitePeopleModal({ open, onOpenChange }: InvitePeopleMo
                 </div>
 
                 <div className="relative">
-                    <div className="mb-1.5 text-[12px] font-bold text-[var(--color-text-secondary)]">Invite as</div>
+                    <div className="mb-1.5 text-[12px] font-bold text-(--color-text-secondary)">Invite as</div>
                     <button
                         type="button"
-                        className="flex w-full items-center gap-2.5 rounded-xl border-0 bg-[var(--color-surface-hover)] px-2.5 py-2 text-left cursor-pointer"
+                        className="flex w-full items-center gap-2.5 rounded-xl border-0 bg-(--color-surface-hover) px-2.5 py-2 text-left cursor-pointer"
                         onClick={() => setShowRolePicker((v) => !v)}
                     >
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-border)] text-[var(--color-text-secondary)]">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-(--color-border) text-(--color-text-secondary)">
                             <UserRound size={16} />
                         </div>
                         <div className="min-w-0 flex-1">
-                            <div className="mb-0.5 flex items-center gap-1.5 text-[13px] font-semibold text-[var(--color-on-surface)]">
+                            <div className="mb-0.5 flex items-center gap-1.5 text-[13px] font-semibold text-(--color-on-surface)">
                                 {roleValue.label}
                                 {showRolePicker ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                             </div>
-                            <div className="text-[11px] leading-[1.3] text-[var(--color-text-tertiary)]">
+                            <div className="text-[11px] leading-[1.3] text-(--color-text-tertiary)">
                                 {roleValue.description}
                             </div>
                         </div>
                     </button>
 
                     <div
-                        className={`absolute left-0 top-[calc(100%+8px)] z-20 w-85 origin-top rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-subtle)] p-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-180 ease-out ${showRolePicker
+                        className={`absolute left-0 top-[calc(100%+8px) z-20 w-85 origin-top rounded-2xl border border-(--color-border) bg-(--color-surface-subtle) p-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.12) transition-all duration-180 ease-out ${showRolePicker
                                 ? 'translate-y-0 scale-100 opacity-100'
                                 : 'pointer-events-none -translate-y-1 scale-[0.98] opacity-0'
                             }`}
@@ -142,16 +141,16 @@ export default function InvitePeopleModal({ open, onOpenChange }: InvitePeopleMo
                                 <button
                                     key={opt.id}
                                     type="button"
-                                    className="mb-1 w-full rounded-xl border-0 bg-transparent px-2 py-1.5 text-left cursor-pointer hover:bg-[var(--color-surface-hover)]"
+                                    className="mb-1 w-full rounded-xl border-0 bg-transparent px-2 py-1.5 text-left cursor-pointer hover:bg-(--color-surface-hover)"
                                     onClick={() => {
                                         setRole(opt.id);
                                         setShowRolePicker(false);
                                     }}
                                 >
-                                    <div className="mb-1 flex items-center gap-1.5 text-[12px] font-medium text-[var(--color-on-surface)]">
+                                    <div className="mb-1 flex items-center gap-1.5 text-[12px] font-medium text-(--color-on-surface)">
                                         {opt.label}
                                         {opt.badge ? (
-                                            <span className="rounded-xl bg-[var(--color-primary-fixed)] px-2 py-0.5 text-[9px] font-semibold text-[var(--color-accent)]">
+                                            <span className="rounded-xl bg-(--color-primary-fixed) px-2 py-0.5 text-[9px] font-semibold text-(--color-accent)">
                                                 {opt.badge}
                                             </span>
                                         ) : null}
@@ -159,13 +158,13 @@ export default function InvitePeopleModal({ open, onOpenChange }: InvitePeopleMo
                                             <span className="ml-auto text-xs">✓</span>
                                         ) : null}
                                     </div>
-                                    <p className="m-0 text-[10px] leading-[1.35] text-[var(--color-text-tertiary)]">
+                                    <p className="m-0 text-[10px] leading-[1.35] text-(--color-text-tertiary)">
                                         {opt.description}
                                     </p>
                                 </button>
                             ))}
                         </div>
-                        <div className="mt-2 border-t border-[var(--color-border)] pt-2 text-[12px] font-semibold text-[var(--color-text-secondary)]">
+                        <div className="mt-2 border-t border-(--color-border) pt-2 text-[12px] font-semibold text-(--color-text-secondary)">
                             + Add custom role
                         </div>
                     </div>
@@ -174,14 +173,14 @@ export default function InvitePeopleModal({ open, onOpenChange }: InvitePeopleMo
                 <div className="mt-5 flex items-center justify-end gap-3">
                     <button
                         type="button"
-                        className="border-0 bg-transparent text-[13px] font-semibold text-[var(--color-text-secondary)] cursor-pointer"
+                        className="border-0 bg-transparent text-[13px] font-semibold text-(--color-text-secondary) cursor-pointer"
                         onClick={() => onOpenChange(false)}
                     >
                         Cancel
                     </button>
                     <button
                         type="button"
-                        className="rounded-xl border-0 bg-[var(--color-inverse-surface)] px-5 py-2 text-[13px] font-bold text-white cursor-pointer"
+                        className="rounded-xl border-0 bg-(--color-inverse-surface) px-5 py-2 text-[13px] font-bold text-white cursor-pointer"
                         onClick={handleSendInvite}
                     >
                         Send invite

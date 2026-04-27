@@ -2,7 +2,6 @@ import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/AuthPage/LoginPage";
 import GoogleLoginPage from "../pages/AuthPage/GoogleLoginPage";
 import WorkspaceSetupPage from "../pages/WorkspaceSetupPage";
-import WorkspaceBrandingPage from "../pages/WorkspaceBrandingPage";
 import InviteTeamPage from "../pages/InviteTeamPage";
 import InboxPage from "../pages/InboxPage";
 import MyTasksPage from "../pages/MyTasksPage";
@@ -36,10 +35,6 @@ export const routes: RouteConfig[] = [
     {
         path: '/workspace-setup',
         element: <WorkspaceSetupPage />
-    },
-    {
-        path: '/workspace-branding',
-        element: <WorkspaceBrandingPage />
     },
     {
         path: '/invite-team',

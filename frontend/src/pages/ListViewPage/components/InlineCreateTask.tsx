@@ -5,6 +5,8 @@ import PriorityPopover from '@/components/Popovers/PriorityPopover';
 import AssigneePopover from '@/components/Popovers/AssigneePopover';
 import DueDatePopover from '@/components/Popovers/DueDatePopover';
 import type { Assignee } from '@/types/tasks';
+import type { RootState } from '@/store/configureStore';
+import { useSelector } from 'react-redux';
 
 interface InlineCreateTaskProps {
     isActive: boolean; text: string; onChangeText: (val: string) => void;
@@ -20,7 +22,7 @@ export default function InlineCreateTask({ isActive, text, onChangeText, onActiv
     const [priorityName, setPriorityName] = useState<string | null>('Normal');
     const [priorityColor, setPriorityColor] = useState<string | null>('#9ca3af');
     const [openPopover, setOpenPopover] = useState<'assignee' | 'dueDate' | 'priority' | null>(null);
-
+    const listMembers = useSelector((state: RootState) => state.workspaces.listWorkspaceMembers);
     useEffect(() => {
         if (isActive) setTimeout(() => inlineRef.current?.focus(), 50);
         else { setAssignees([]); setDueDate(null); setPriorityId(null); setPriorityName('Normal'); setPriorityColor('#9ca3af'); setOpenPopover(null); }
@@ -40,23 +42,23 @@ export default function InlineCreateTask({ isActive, text, onChangeText, onActiv
                 </div>
                 <div className="flex shrink-0 items-center">
                     <div className="flex w-30 shrink-0 items-center justify-start px-2">
-                        <Popover content={<AssigneePopover assignees={assignees} onSave={setAssignees} onClose={() => setOpenPopover(null)} />} trigger="click" open={openPopover === 'assignee'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }}>
+                        <Popover content={<AssigneePopover allMembers= {listMembers} assignees={assignees} onSave={setAssignees} onClose={() => setOpenPopover(null)} />} trigger="click" open={openPopover === 'assignee'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false} >
                             <button type="button" className="flex h-6.5 min-w-6.5 items-center justify-center rounded px-1 text-[#9ca3af] hover:bg-[#f3f4f6]" onClick={(e) => { e.stopPropagation(); setOpenPopover('assignee'); }}>
                                 {assignees.length > 0 ? <div className="flex -space-x-1">{assignees.map((a) => <Avatar key={a.user_id} size={20} src={a.avatar_url} style={{ backgroundColor: '#1e1f21', fontSize: '9px', fontWeight: 700 }}>{!a.avatar_url && getInitials(a.name)}</Avatar>)}</div> : <User size={14} />}
                             </button>
                         </Popover>
                     </div>
                     <div className="flex w-32 shrink-0 items-center justify-start px-2">
-                        <Popover content={<DueDatePopover date={dueDate} onSave={setDueDate} onClose={() => setOpenPopover(null)} />} trigger="click" open={openPopover === 'dueDate'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }}>
+                        <Popover content={<DueDatePopover date={dueDate} onSave={setDueDate} onClose={() => setOpenPopover(null)} />} trigger="click" open={openPopover === 'dueDate'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false} >
                             <button type="button" className="flex h-6.5 min-w-6.5 items-center justify-center rounded px-1.5 text-[#9ca3af] hover:bg-[#f3f4f6]" onClick={(e) => { e.stopPropagation(); setOpenPopover('dueDate'); }}>
                                 {dueDate ? <span className="text-[12px] font-medium text-[#ef4444]">Selected</span> : <Calendar size={14} />}
                             </button>
                         </Popover>
                     </div>
                     <div className="flex w-30 shrink-0 items-center justify-start px-2">
-                        <Popover content={<PriorityPopover priority_id={priorityId} onSave={(id, name, color) => { setPriorityId(id); setPriorityName(name); setPriorityColor(color); }} onClose={() => setOpenPopover(null)} />} trigger="click" open={openPopover === 'priority'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }}>
+                        <Popover content={<PriorityPopover priority_name={priorityName} onSave={(id, name, color) => { setPriorityId(id); setPriorityName(name); setPriorityColor(color); }} onClose={() => setOpenPopover(null)} />} trigger="click" open={openPopover === 'priority'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false} >
                             <button type="button" className="flex h-6.5 w-6.5 items-center justify-center rounded text-[#9ca3af] hover:bg-[#f3f4f6]" onClick={(e) => { e.stopPropagation(); setOpenPopover('priority'); }}>
-                                {priorityId ? <Flag size={13} fill={priorityColor ?? 'transparent'} color={priorityColor ?? '#9ca3af'} /> : <Flag size={14} />}
+                                {priorityName ? <Flag size={13} fill={priorityColor ?? 'transparent'} color={priorityColor ?? '#9ca3af'} /> : <Flag size={14} />}
                             </button>
                         </Popover>
                     </div>

@@ -40,7 +40,7 @@ export const SpaceNode = ({ space }: { space: SpaceItem }) => {
     const [expanded, setExpanded] = useState(isSpaceActive);
     const treeNode = tree.spaceTree[space.id] || { folders: [], standaloneLists: [] };
     const { folders, standaloneLists } = treeNode;
-    const initial = space.name.charAt(0).toUpperCase();
+    const initial = space?.name ? space.name.charAt(0).toUpperCase() : '?';
 
     const [settingsMenu, setSettingsMenu] = useState<{ x: number; y: number } | null>(null);
     const [createMenuPos, setCreateMenuPos] = useState<{ x: number; y: number } | null>(null);
@@ -147,7 +147,7 @@ export const SpaceNode = ({ space }: { space: SpaceItem }) => {
                     className="flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-md text-[11px] font-bold text-white"
                     style={{ backgroundColor: space.color }}
                 >
-                    {initial}
+                    {initial ? initial : <FileText size={12} color="#fff" />}
                 </span>
 
                 <span className="flex-1 truncate">{space.name}</span>

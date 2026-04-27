@@ -44,7 +44,7 @@ export default function FolderViewPage() {
         return Object.values(listMap).map(list => {
             if (list.statusGroups.length === 0) {
                 list.statusGroups.push({
-                    id: 'todo',
+                    id: '1',
                     name: 'TO DO',
                     color: '#5f6368',
                     isExpanded: true,
