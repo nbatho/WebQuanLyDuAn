@@ -2,7 +2,7 @@ import con from '../config/connect.js';
 
 export const findTagsBySpaceId = async (space_id) => {
     try {
-        const query = `SELECT * FROM tags WHERE space_id = $1 ORDER BY created_at DESC`;
+        const query = `SELECT * FROM tags WHERE space_id = $1 AND deleted_at IS NULL ORDER BY created_at DESC`;
         const values = [space_id];
         const result = await con.query(query, values);
         return result.rows;
@@ -13,7 +13,7 @@ export const findTagsBySpaceId = async (space_id) => {
 
 export const findTagById = async (tag_id) => {
     try {
-        const query = `SELECT * FROM tags WHERE tag_id = $1`;
+        const query = `SELECT * FROM tags WHERE tag_id = $1 AND deleted_at IS NULL`;
         const values = [tag_id];
         const result = await con.query(query, values);
         return result.rows[0];
@@ -46,7 +46,7 @@ export const updateTagById = async (tag_id, name, color) => {
         if (fields.length === 0) return null;
 
         values.push(tag_id);
-        const query = `UPDATE tags SET ${fields.join(', ')} WHERE tag_id = $${count} RETURNING *`;
+        const query = `UPDATE tags SET ${fields.join(', ')} WHERE tag_id = $${count} AND deleted_at IS NULL RETURNING *`;
         const result = await con.query(query, values);
         return result.rows[0];
     } catch (error) {
@@ -56,7 +56,7 @@ export const updateTagById = async (tag_id, name, color) => {
 
 export const deleteTagById = async (tag_id) => {
     try {
-        const query = `DELETE FROM tags WHERE tag_id = $1 RETURNING *`;
+        const query = `UPDATE tags SET deleted_at = CURRENT_TIMESTAMP WHERE tag_id = $1 AND deleted_at IS NULL RETURNING *`;
         const values = [tag_id];
         const result = await con.query(query, values);
         return result.rows[0];
@@ -92,7 +92,7 @@ export const findTagsByTaskId = async (task_id) => {
     try {
         const query = `SELECT t.* FROM tags t 
                        JOIN task_tags tt ON t.tag_id = tt.tag_id 
-                       WHERE tt.task_id = $1`;
+                       WHERE tt.task_id = $1 AND t.deleted_at IS NULL`;
         const values = [task_id];
         const result = await con.query(query, values);
         return result.rows;

@@ -1,21 +1,16 @@
 import type { TaskData, TaskWithSpaceData, TaskAttachment } from "@/store/modules/tasks";
 import { beApi } from "../callApi";
-
+import type { StatusGroup, Task } from "@/types/tasks";
 export type { TaskData, TaskWithSpaceData, TaskAttachment };
+import type { CreateTaskData } from "@/store/modules/tasks";
 
-export const getTasksForList = async (list_id: number): Promise<TaskWithSpaceData[]> => {
-    return beApi.get(`/tasks/lists/${list_id}`);
+
+export const getTasksByListIds = async (list_ids: number): Promise<StatusGroup[]> => {
+    return beApi.get(`/tasks/lists/${list_ids}`);
 };
 
 
-export const createTaskInList = async (taskData: {
-    list_id: number;
-    name: string;
-    description?: string;
-    status?: string;
-    priority?: string;
-    due_date?: string | null;
-}): Promise<TaskData> => {
+export const createTaskInList = async (taskData: CreateTaskData): Promise<Task> => {
     return beApi.post(`/tasks/lists/${taskData.list_id}`, taskData);
 };
 
@@ -70,3 +65,4 @@ export const addAssignee = async (task_id: number, userId: string): Promise<void
 export const removeAssignee = async (task_id: number, userId: string): Promise<void> => {
     return beApi.delete(`/tasks/${task_id}/assignees/${userId}`);
 };
+

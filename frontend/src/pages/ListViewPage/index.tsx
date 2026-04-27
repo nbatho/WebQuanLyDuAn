@@ -1,4 +1,4 @@
-import React, { useState, createContext, useContext, useCallback } from 'react';
+import React, { useState, createContext, useContext, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import {
     Plus, ListTodo, Search,
@@ -8,16 +8,14 @@ import {
 import { useSpaceTree } from '../../layouts/AppLayout/SpaceTreeContext';
 import PageHeader, { LIST_TABS } from '../../components/PageHeader';
 import ContextMenu from '../../components/ContextMenu';
-import CreateTaskModal from '../../components/CreateTaskModal';
-import BoardView from '@/components/BoardView/boardView';
+import CreateTaskModal from '../../components/CreateTaskModal/CreateTaskModal';
+// import BoardView from '@/components/BoardView/boardView';
 import ListView from './components/ListView';
-
+import { useDispatch, useSelector } from 'react-redux';
+import type { AppDispatch, RootState } from '@/store/configureStore';
+import { fetchTasksForList,fetchCreateTask } from '@/store/modules/tasks';
 // import { useAppDispatch, useAppSelector } from '@/hooks/index'; 
-// import { fetchTasksForList, fetchCreateTask, fetchDeleteTask } from '@/store/modules/tasks';
 
-// ==========================================
-// 1. TYPES & INTERFACES (Chuẩn v3.2)
-// ==========================================
 export interface Assignee {
     user_id: number;
     name: string;
@@ -66,49 +64,7 @@ export interface NewTaskData {
     assignee_ids?: number[];
 }
 
-// ==========================================
-// 2. MOCK DATA
-// ==========================================
-export const mockDataGroups: StatusGroup[] = [
-    {
-        id: 1,
-        name: "TO DO",
-        color: "#d3d3d3",
-        isExpanded: true,
-        tasks: [
-            {
-                task_id: 101, parent_task_id: null, list_id: 9, space_id: 3, folder_id: 2,
-                name: "Thiết kế API Database v3.2", description: "Lên cấu trúc các bảng...",
-                status_id: 1, status_name: "TO DO", status_color: "#d3d3d3",
-                priority_id: 1, priority_name: "High", priority_color: "#ffcc00",
-                due_date: "2026-04-30T17:00:00.000Z", position: 0,
-                subtask_count: 2, subtask_done_count: 0, comment_count: 3, attachment_count: 1,
-                assignees: [{ user_id: 1, name: "Nguyễn Văn A", avatar_url: null }]
-            }
-        ]
-    },
-    {
-        id: 2,
-        name: "IN PROGRESS",
-        color: "#2563eb",
-        isExpanded: true,
-        tasks: [
-            {
-                task_id: 201, parent_task_id: null, list_id: 9, space_id: 3, folder_id: 2,
-                name: "Refactor ListView Component", description: null,
-                status_id: 2, status_name: "IN PROGRESS", status_color: "#2563eb",
-                priority_id: 2, priority_name: "Urgent", priority_color: "#f50000",
-                due_date: "2026-04-27T23:59:59.000Z", position: 0,
-                subtask_count: 0, subtask_done_count: 0, comment_count: 12, attachment_count: 4,
-                assignees: [{ user_id: 2, name: "Trần Thị B", avatar_url: null }]
-            }
-        ]
-    }
-];
 
-// ==========================================
-// 3. CONTEXT API 
-// ==========================================
 interface TaskViewContextType {
     groups: StatusGroup[];
     setGroups: React.Dispatch<React.SetStateAction<StatusGroup[]>>;
@@ -130,14 +86,12 @@ export const useTaskView = () => {
     return context;
 };
 
-// ==========================================
-// 4. MAIN COMPONENT (ListViewPage)
-// ==========================================
 export default function ListViewPage() {
     const { listId, spaceId } = useParams<{ listId: string; spaceId: string }>();
     const { spaces, spaceTree } = useSpaceTree();
-
-    const [groups, setGroups] = useState<StatusGroup[]>(mockDataGroups);
+    const dispatch = useDispatch<AppDispatch>();
+    const listTasks = useSelector((state: RootState) => state.tasks.listTask);
+    const [groups, setGroups] = useState<StatusGroup[]>([]);
     const [, setSelectedTask] = useState<Task | null>(null);
     const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; task: Task } | null>(null);
     const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
@@ -237,40 +191,16 @@ export default function ListViewPage() {
 
     // -- Modal Create Task (Optimistic UI) --
     const handleCreateTask = useCallback((payload: NewTaskData) => {
-        console.log("Modal Create Payload:", payload);
+        console.log("Modal Create Payload gửi đi:", payload);
 
-        const tempId = Math.floor(Math.random() * 100000);
-        const targetGroupId = payload.status_id || 1;
-
-        const newTask: Task = {
-            task_id: tempId,
-            parent_task_id: null,
+        dispatch(fetchCreateTask({
             list_id: payload.list_id,
-            space_id: Number(spaceId) || 0,
-            folder_id: parentFolder ? Number(parentFolder.id) : null,
-            name: payload.name,
-            description: payload.description || null,
-            status_id: targetGroupId,
-            status_name: groups.find(g => g.id === targetGroupId)?.name || 'TO DO',
-            status_color: groups.find(g => g.id === targetGroupId)?.color || '#ccc',
-            priority_id: payload.priority_id || null,
-            priority_name: 'Normal', // Fallback
-            priority_color: '#9ca3af', // Fallback
-            due_date: payload.due_date || null,
-            position: 0,
-            subtask_count: 0,
-            subtask_done_count: 0,
-            comment_count: 0,
-            attachment_count: 0,
-            assignees: [] // Cần lấy list assignees từ DB nếu có assignee_ids
-        };
+            taskData: payload 
+        }));
 
-        setGroups(prev => prev.map(g => g.id === targetGroupId ? { ...g, tasks: [...g.tasks, newTask] } : g));
         setIsCreateTaskOpen(false);
 
-        // TODO: dispatch(fetchCreateTask(payload))
-    }, [spaceId, parentFolder, groups]);
-
+    }, [dispatch]); 
     const handleCreateStatus = useCallback((name: string, color: string) => {
         console.log("Create Status:", { name, color });
         // TODO: Gọi API tạo status
@@ -283,13 +213,23 @@ export default function ListViewPage() {
 
     const onContextActionSelect = (action: string) => {
         if (!ctxMenu) return;
-        // Xóa tạm trên UI
         if (action === 'delete') {
             setGroups(prev => prev.map(g => ({ ...g, tasks: g.tasks.filter(t => t.task_id !== ctxMenu.task.task_id) })));
         }
         setCtxMenu(null);
-        // TODO: dispatch
     };
+
+    useEffect(() => {
+        dispatch(fetchTasksForList(Number(listId)));
+    }, [dispatch, listId]);
+
+    useEffect(() => {
+        if (listTasks.length > 0) {
+            setGroups(listTasks);
+        } else {
+            setGroups([]);
+        }
+    }, [listTasks]);
 
     if (!parentSpace || !listInfo) {
         return <div className="flex h-full items-center justify-center text-[#5f6368]"><p>List not found</p></div>;
@@ -345,9 +285,7 @@ export default function ListViewPage() {
 
                 <main className="flex flex-1 flex-col overflow-hidden">
                     {activeTab === 'list' ?
-                        <ListView
-                            data={groups}
-                        />
+                        <ListView />
                         :
                         <>
 
@@ -366,7 +304,7 @@ export default function ListViewPage() {
                     isOpen={isCreateTaskOpen}
                     onClose={() => setIsCreateTaskOpen(false)}
                     onCreate={handleCreateTask as any}
-                    defaultStatus={1} // SỬA: Chuyển string "TO DO" thành ID = 1
+                    defaultStatusId={1}
                     lists={[{ id: Number(listInfo.id), name: listInfo.name }]}
                     defaultListId={Number(listInfo.id)}
                 />

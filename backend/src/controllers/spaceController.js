@@ -1,6 +1,8 @@
 import { findAllSpacesByWorkspaceId, createSpaces, findSpaceById, updateSpace, deleteSpace, findSpaceMembers, removeSpaceMember, addSpaceMember } from "../models/Spaces.js";
 import { findFoldersBySpaceId, findFoldersBySpaceIds } from "../models/Folders.js";
 import { findListsBySpaceId, findListsBySpaceIds } from "../models/Lists.js";
+
+
 export const getSpacesByWorkspaceId = async (req, res) => {
   try {
     const { workspaceId } = req.params;
@@ -10,20 +12,20 @@ export const getSpacesByWorkspaceId = async (req, res) => {
     }
 
     const spaces = await findAllSpacesByWorkspaceId(workspaceId);
-    
+
     if (!spaces || spaces.length === 0) {
       return res.status(200).json({ status: "success", data: [] });
     }
 
-    const spaceIds = spaces.map(space => space.space_id); 
+    const spaceIds = spaces.map(space => space.space_id);
 
     const [folders, allLists] = await Promise.all([
-      findFoldersBySpaceIds(spaceIds), 
+      findFoldersBySpaceIds(spaceIds),
       findListsBySpaceIds(spaceIds)
     ]);
 
-    const listsByFolder = {};   
-    const directListsBySpace = {}; 
+    const listsByFolder = {};
+    const directListsBySpace = {};
 
     allLists.forEach(list => {
       if (list.folder_id) {
@@ -35,7 +37,7 @@ export const getSpacesByWorkspaceId = async (req, res) => {
       }
     });
 
-    const foldersBySpace = {}; 
+    const foldersBySpace = {};
     folders.forEach(folder => {
       const formattedFolder = {
         ...folder,
@@ -71,23 +73,36 @@ export const createSpace = async (req, res) => {
   try {
     const { workspaceId } = req.params;
     const { name, description, isPrivate } = req.body;
+
     if (!workspaceId) {
-      return res.status(400).json({ error: "Workspace ID is required" });
+      return res.status(400).json({ error: "Workspace ID là bắt buộc." });
     }
+    if (!name || name.trim() === "") {
+      return res.status(400).json({ error: "Tên Space không được để trống." });
+    }
+
     const normalizedIsPrivate = isPrivate ?? false;
-    if (!name) {
-      return res.status(400).json({ error: "Space name is required" });
-    }
+
     const newSpace = await createSpaces(
-      name,
+      name.trim(),
       description,
       workspaceId,
       normalizedIsPrivate,
     );
-    res.status(201).json(newSpace);
+
+    res.status(201).json({
+      message: "Tạo Space và các trạng thái mặc định thành công.",
+      data: newSpace
+    });
+
   } catch (error) {
-    console.error("Failed to create space:", error.message);
-    res.status(500).json({ error: "Failed to create space" });
+    console.error(" [Controller createSpace] Error:", error.message);
+
+    if (error.code === '23505') {
+      return res.status(409).json({ error: "Tên Space đã tồn tại trong Workspace này." });
+    }
+
+    res.status(500).json({ error: "Không thể tạo Space. Vui lòng thử lại sau." });
   }
 };
 export const getSpaceById = async (req, res) => {

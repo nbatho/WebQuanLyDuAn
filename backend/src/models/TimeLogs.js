@@ -4,8 +4,9 @@ export const findTimeLogsByTaskId = async (task_id) => {
     try {
         const query = `SELECT tl.*, u.username, u.name as user_name 
                        FROM time_logs tl 
-                       JOIN users u ON tl.user_id = u.user_id 
-                       WHERE tl.task_id = $1 
+                       JOIN users u ON tl.user_id = u.user_id AND u.deleted_at IS NULL
+                       JOIN tasks t ON tl.task_id = t.task_id
+                       WHERE tl.task_id = $1 AND t.deleted_at IS NULL 
                        ORDER BY tl.started_at DESC`;
         const values = [task_id];
         const result = await con.query(query, values);
@@ -20,7 +21,7 @@ export const findTimeLogsByUserId = async (user_id) => {
         const query = `SELECT tl.*, t.name as task_name 
                        FROM time_logs tl 
                        JOIN tasks t ON tl.task_id = t.task_id 
-                       WHERE tl.user_id = $1 
+                       WHERE tl.user_id = $1 AND t.deleted_at IS NULL 
                        ORDER BY tl.started_at DESC`;
         const values = [user_id];
         const result = await con.query(query, values);
@@ -35,7 +36,7 @@ export const findRunningTimer = async (user_id) => {
         const query = `SELECT tl.*, t.name as task_name 
                        FROM time_logs tl 
                        JOIN tasks t ON tl.task_id = t.task_id 
-                       WHERE tl.user_id = $1 AND tl.stopped_at IS NULL`;
+                       WHERE tl.user_id = $1 AND tl.stopped_at IS NULL AND t.deleted_at IS NULL`;
         const values = [user_id];
         const result = await con.query(query, values);
         return result.rows[0];
@@ -83,8 +84,9 @@ export const deleteTimeLog = async (time_log_id) => {
 export const getTotalTimeByTaskId = async (task_id) => {
     try {
         const query = `SELECT COALESCE(SUM(duration_secs), 0) as total_seconds 
-                       FROM time_logs 
-                       WHERE task_id = $1 AND stopped_at IS NOT NULL`;
+                       FROM time_logs tl
+                       JOIN tasks t ON tl.task_id = t.task_id
+                       WHERE tl.task_id = $1 AND tl.stopped_at IS NOT NULL AND t.deleted_at IS NULL`;
         const values = [task_id];
         const result = await con.query(query, values);
         return result.rows[0];

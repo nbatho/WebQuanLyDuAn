@@ -24,5 +24,9 @@ export interface WorkspacesState {
     currentWorkspaceId: number | null;
     isLoadingWorkspaces: boolean;
     isSendingInvitations: boolean;
+    isRespondingInvitation: boolean;
     error: string | null;
+    listWorkspaceMembers: WorkspaceMemberData[];    
+    isLoadingWorkspaceMembers: boolean;
+    workspaceMembersError: string | null;
 }

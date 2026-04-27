@@ -9,7 +9,7 @@ import { useSpaceTree } from '../SpaceTreeContext';
 import { SpaceNode } from './components/nodes/SpaceNode';
 import { fetchSpacesForWorkspace } from '@/store/modules/spaces';
 import { fetchWorkspaces } from '@/store/modules/workspaces';
-
+import { fetchWorkspaceMembers } from '@/store/modules/workspaces';
 export default function AppSidebar() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -19,7 +19,6 @@ export default function AppSidebar() {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const currentWorkspaceId = useSelector((s: RootState) => s.workspaces.currentWorkspaceId);
     const access_token = useSelector((s: RootState) => s.auth.access_token);
-
     const handleRefreshSpaces = async () => {
         if (currentWorkspaceId != null) {
             setIsRefreshing(true);
@@ -68,6 +67,7 @@ export default function AppSidebar() {
     useEffect(() => {
         if (currentWorkspaceId != null) {
             dispatch(fetchSpacesForWorkspace(currentWorkspaceId));
+            dispatch(fetchWorkspaceMembers(currentWorkspaceId));
         }
     }, [currentWorkspaceId, dispatch]);
 

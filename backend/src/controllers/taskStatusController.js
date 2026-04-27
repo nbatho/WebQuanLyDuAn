@@ -1,5 +1,5 @@
 import {
-  findStatusesBySpaceId,
+  findStatusesByListId,
   findStatusById,
   createStatus,
   updateStatusById,
@@ -7,13 +7,13 @@ import {
   reorderStatuses,
 } from "../models/TaskStatus.js";
 
-export const getStatusesBySpaceId = async (req, res) => {
+export const getStatusesByListId = async (req, res) => {
   try {
-    const { spaceId } = req.params;
-    if (!spaceId) {
-      return res.status(400).json({ error: "Space ID is required" });
+    const { listId } = req.params;
+    if (!listId) {
+      return res.status(400).json({ error: "List ID is required" });
     }
-    const statuses = await findStatusesBySpaceId(spaceId);
+    const statuses = await findStatusesByListId(listId);
     res.status(200).json(statuses);
   } catch (error) {
     console.error("Failed to retrieve statuses:", error.message);

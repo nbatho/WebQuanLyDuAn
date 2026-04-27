@@ -4,8 +4,8 @@ export const findNotificationsByUserId = async (user_id, limit = 50, offset = 0)
     try {
         const query = `SELECT n.*, u.username as actor_username, u.name as actor_name, u.avatar_url as actor_avatar
                        FROM notifications n 
-                       LEFT JOIN users u ON n.actor_id = u.user_id 
-                       WHERE n.user_id = $1 
+                       LEFT JOIN users u ON n.actor_id = u.user_id AND u.deleted_at IS NULL
+                       WHERE n.user_id = $1 AND n.deleted_at IS NULL
                        ORDER BY n.created_at DESC 
                        LIMIT $2 OFFSET $3`;
         const values = [user_id, limit, offset];
@@ -18,7 +18,7 @@ export const findNotificationsByUserId = async (user_id, limit = 50, offset = 0)
 
 export const countUnreadNotifications = async (user_id) => {
     try {
-        const query = `SELECT COUNT(*) as count FROM notifications WHERE user_id = $1 AND is_read = FALSE`;
+        const query = `SELECT COUNT(*) as count FROM notifications WHERE user_id = $1 AND is_read = FALSE AND deleted_at IS NULL`;
         const values = [user_id];
         const result = await con.query(query, values);
         return parseInt(result.rows[0].count);
@@ -30,7 +30,7 @@ export const countUnreadNotifications = async (user_id) => {
 export const markAsRead = async (notification_id, user_id) => {
     try {
         const query = `UPDATE notifications SET is_read = TRUE 
-                       WHERE notification_id = $1 AND user_id = $2 RETURNING *`;
+                       WHERE notification_id = $1 AND user_id = $2 AND deleted_at IS NULL RETURNING *`;
         const values = [notification_id, user_id];
         const result = await con.query(query, values);
         return result.rows[0];
@@ -42,7 +42,7 @@ export const markAsRead = async (notification_id, user_id) => {
 export const markAllAsRead = async (user_id) => {
     try {
         const query = `UPDATE notifications SET is_read = TRUE 
-                       WHERE user_id = $1 AND is_read = FALSE RETURNING *`;
+                       WHERE user_id = $1 AND is_read = FALSE AND deleted_at IS NULL RETURNING *`;
         const values = [user_id];
         const result = await con.query(query, values);
         return result.rows;
@@ -53,7 +53,7 @@ export const markAllAsRead = async (user_id) => {
 
 export const deleteNotificationById = async (notification_id, user_id) => {
     try {
-        const query = `DELETE FROM notifications WHERE notification_id = $1 AND user_id = $2 RETURNING *`;
+        const query = `UPDATE notifications SET deleted_at = CURRENT_TIMESTAMP WHERE notification_id = $1 AND user_id = $2 AND deleted_at IS NULL RETURNING *`;
         const values = [notification_id, user_id];
         const result = await con.query(query, values);
         return result.rows[0];

@@ -43,6 +43,8 @@ export const addMemberToWorkspace = async (workspace_id, user_id) => {
         const query = `
             INSERT INTO workspace_members (workspace_id, user_id) 
             VALUES ($1, $2) 
+            ON CONFLICT (workspace_id, user_id)
+            DO UPDATE SET deleted_at = NULL
             RETURNING *;
         `;
         const result = await con.query(query, [workspace_id, user_id]);

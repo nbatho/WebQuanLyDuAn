@@ -4,7 +4,9 @@ export const findAllWorkspacesByUserId = async (user_id) => {
     try {
         const query = `SELECT w.* FROM workspaces w
         JOIN workspace_members wm ON w.workspace_id = wm.workspace_id
-        WHERE wm.user_id = $1`;
+                WHERE wm.user_id = $1
+                    AND w.deleted_at IS NULL
+                    AND wm.deleted_at IS NULL`;
         const values = [user_id];
         const result = await con.query(query, values);
         return result.rows;
@@ -14,10 +16,10 @@ export const findAllWorkspacesByUserId = async (user_id) => {
 }
 
 export const createWorkspace = async (name, description, slug, owner_id) => {
-    const client = await con.connect(); 
+    const client = await con.connect();
 
     try {
-        await client.query('BEGIN'); 
+        await client.query('BEGIN');
 
         const query = `INSERT INTO workspaces (name, description, slug, created_by) VALUES ($1, $2, $3, $4) RETURNING *`;
         const values = [name, description, slug, owner_id];
@@ -27,24 +29,26 @@ export const createWorkspace = async (name, description, slug, owner_id) => {
         const insertMemberQuery = `
             INSERT INTO workspace_members (workspace_id, user_id, role_id) 
             VALUES ($1, $2, (SELECT role_id FROM roles WHERE role_name = 'admin'))
+            ON CONFLICT (workspace_id, user_id)
+            DO UPDATE SET role_id = EXCLUDED.role_id, deleted_at = NULL
         `;
         const memberValues = [newWorkspace.workspace_id, owner_id];
         await client.query(insertMemberQuery, memberValues);
-        
-        await client.query('COMMIT'); 
-        
+
+        await client.query('COMMIT');
+
         return newWorkspace;
     } catch (error) {
-        await client.query('ROLLBACK'); 
+        await client.query('ROLLBACK');
         throw error;
     } finally {
-        client.release(); 
+        client.release();
     }
 }
 
 export const findWorkspaceById = async (workspace_id) => {
     try {
-        const query = `SELECT * FROM workspaces WHERE workspace_id = $1`;
+        const query = `SELECT * FROM workspaces WHERE workspace_id = $1 AND deleted_at IS NULL`;
         const values = [workspace_id];
         const result = await con.query(query, values);
         return result.rows[0];
@@ -55,7 +59,7 @@ export const findWorkspaceById = async (workspace_id) => {
 
 export const updateWorkspace = async (workspace_id, name, description) => {
     try {
-        const query = `UPDATE workspaces SET name = $1, description = $2 WHERE workspace_id = $3 RETURNING *`;
+        const query = `UPDATE workspaces SET name = $1, description = $2 WHERE workspace_id = $3 AND deleted_at IS NULL RETURNING *`;
         const values = [name, description, workspace_id];
         const result = await con.query(query, values);
         return result.rows[0];
@@ -66,9 +70,10 @@ export const updateWorkspace = async (workspace_id, name, description) => {
 
 export const deleteWorkspace = async (workspace_id, owner_id) => {
     try {
-        const query = `DELETE FROM workspaces WHERE workspace_id = $1 AND created_by = $2`;
+        const query = `UPDATE workspaces SET deleted_at = CURRENT_TIMESTAMP WHERE workspace_id = $1 AND created_by = $2 AND deleted_at IS NULL RETURNING *`;
         const values = [workspace_id, owner_id];
-        await con.query(query, values);
+        const result = await con.query(query, values);
+        return result.rows[0];
     } catch (error) {
         throw error;
     }
@@ -87,7 +92,9 @@ export const findWorkspaceMembers = async (workspace_id) => {
             FROM users u
             JOIN workspace_members wm ON u.user_id = wm.user_id
             LEFT JOIN roles r ON wm.role_id = r.role_id
-            WHERE wm.workspace_id = $1
+                        WHERE wm.workspace_id = $1
+                            AND wm.deleted_at IS NULL
+                            AND u.deleted_at IS NULL
         `;
         const values = [workspace_id];
         const result = await con.query(query, values);
@@ -101,7 +108,7 @@ export const findWorkspaceInvitations = async (workspace_id) => {
     try {
         const query = `SELECT wi.*, u.username as invited_by_username, u.name as invited_by_name
                        FROM workspace_invitations wi 
-                       LEFT JOIN users u ON wi.invited_by = u.user_id 
+                       LEFT JOIN users u ON wi.invited_by = u.user_id AND u.deleted_at IS NULL
                        WHERE wi.workspace_id = $1 
                        ORDER BY wi.created_at DESC`;
         const values = [workspace_id];
@@ -151,12 +158,14 @@ export const acceptWorkspaceInvitation = async (invitation_id) => {
         const inv = invitation.rows[0];
 
         // Find user by email and add to workspace
-        const userQuery = `SELECT user_id FROM users WHERE email = $1`;
+        const userQuery = `SELECT user_id FROM users WHERE email = $1 AND deleted_at IS NULL`;
         const userResult = await client.query(userQuery, [inv.email]);
 
         if (userResult.rows.length > 0) {
             const insertMemberQuery = `INSERT INTO workspace_members (workspace_id, user_id, role_id) 
-                                      VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`;
+                                      VALUES ($1, $2, $3)
+                                      ON CONFLICT (workspace_id, user_id)
+                                      DO UPDATE SET role_id = EXCLUDED.role_id, deleted_at = NULL`;
             await client.query(insertMemberQuery, [inv.workspace_id, userResult.rows[0].user_id, inv.role_id]);
         }
 
@@ -185,7 +194,10 @@ export const rejectWorkspaceInvitation = async (invitation_id) => {
 export const addWorkspaceMember = async (workspace_id, user_id, role_id) => {
     try {
         const query = `INSERT INTO workspace_members (workspace_id, user_id, role_id) 
-                       VALUES ($1, $2, $3) RETURNING *`;
+                       VALUES ($1, $2, $3)
+                       ON CONFLICT (workspace_id, user_id)
+                       DO UPDATE SET role_id = EXCLUDED.role_id, deleted_at = NULL
+                       RETURNING *`;
         const values = [workspace_id, user_id, role_id];
         const result = await con.query(query, values);
         return result.rows[0];
@@ -196,7 +208,7 @@ export const addWorkspaceMember = async (workspace_id, user_id, role_id) => {
 
 export const removeWorkspaceMember = async (workspace_id, user_id) => {
     try {
-        const query = `DELETE FROM workspace_members WHERE workspace_id = $1 AND user_id = $2 RETURNING *`;
+        const query = `UPDATE workspace_members SET deleted_at = CURRENT_TIMESTAMP WHERE workspace_id = $1 AND user_id = $2 AND deleted_at IS NULL RETURNING *`;
         const values = [workspace_id, user_id];
         const result = await con.query(query, values);
         return result.rows[0];
@@ -208,7 +220,7 @@ export const removeWorkspaceMember = async (workspace_id, user_id) => {
 export const updateMemberRole = async (workspace_id, user_id, role_id) => {
     try {
         const query = `UPDATE workspace_members SET role_id = $1 
-                       WHERE workspace_id = $2 AND user_id = $3 RETURNING *`;
+                       WHERE workspace_id = $2 AND user_id = $3 AND deleted_at IS NULL RETURNING *`;
         const values = [role_id, workspace_id, user_id];
         const result = await con.query(query, values);
         return result.rows[0];

@@ -1,6 +1,6 @@
 import express from 'express';
 import {
-  getStatusesBySpaceId,
+  getStatusesByListId,
   createTaskStatus,
   getStatusById,
   updateTaskStatus,
@@ -12,13 +12,13 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/v1/statuses/spaces/{spaceId}:
+ * /api/v1/statuses/{listId}:
  *   get:
- *     summary: Lấy danh sách status theo Space
+ *     summary: Lấy danh sách status theo List ID
  *     tags: [Task Status]
  *     parameters:
  *       - in: path
- *         name: spaceId
+ *         name: listId
  *         required: true
  *         schema:
  *           type: integer
@@ -26,7 +26,7 @@ const router = express.Router();
  *       200:
  *         description: Danh sách status
  */
-router.get('/spaces/:spaceId', getStatusesBySpaceId);
+router.get('/:listId', getStatusesByListId);
 
 /**
  * @swagger
