@@ -1,5 +1,5 @@
 import express from "express";
-import { chatWithAI } from "../controllers/aiController.js";
+import { chatWithAI, generateDescription, suggestPriority } from "../controllers/aiController.js";
 
 const router = express.Router();
 
@@ -10,5 +10,7 @@ const router = express.Router();
  */
 
 router.post("/chat", chatWithAI);
+router.post("/generate-description", generateDescription);
+router.post("/suggest-priority", suggestPriority);
 
 export default router;

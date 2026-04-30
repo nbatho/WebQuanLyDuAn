@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import {
     X, ChevronDown, Calendar, Flag, User, AlignLeft,
-    Paperclip, FolderOpen, Hash
+    Paperclip, FolderOpen, Hash, Sparkles, Loader2
 } from 'lucide-react';
 import type { CreateTaskModalProps } from '@/types/modal';
 import { STATUS_OPTIONS, PRIORITY_OPTIONS, MEMBER_OPTIONS } from '../constants/taskOptions';
+import { beApi } from '../../api/callApi';
 
 
 
@@ -23,6 +24,11 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
     const [showAssignee, setShowAssignee] = useState(false);
     const [showList, setShowList] = useState(false);
 
+    // AI assist states
+    const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
+    const [isSuggestingPriority, setIsSuggestingPriority] = useState(false);
+    const [aiPrioritySuggestion, setAiPrioritySuggestion] = useState<{ priority: string; reason: string } | null>(null);
+
     const titleRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -34,6 +40,7 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
             setDueDate('');
             setAssignees([]);
             setListId(defaultListId || (lists.length > 0 ? lists[0].id : undefined));
+            setAiPrioritySuggestion(null);
             setTimeout(() => titleRef.current?.focus(), 100);
         }
     }, [isOpen, defaultStatus, defaultListId, lists]);
@@ -68,6 +75,49 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
         setShowPriority(false);
         setShowAssignee(false);
         setShowList(false);
+    };
+
+    // ── AI: Generate Description ─────────────────────────────────
+    const handleAIGenerateDescription = async () => {
+        if (!name.trim() || isGeneratingDesc) return;
+        setIsGeneratingDesc(true);
+        try {
+            const response: any = await beApi.post('ai/generate-description', { taskName: name.trim() });
+            if (response.description) {
+                setDescription(response.description);
+            }
+        } catch (err) {
+            console.error('AI generate description failed:', err);
+        } finally {
+            setIsGeneratingDesc(false);
+        }
+    };
+
+    // ── AI: Suggest Priority ─────────────────────────────────────
+    const handleAISuggestPriority = async () => {
+        if (!name.trim() || isSuggestingPriority) return;
+        setIsSuggestingPriority(true);
+        setAiPrioritySuggestion(null);
+        try {
+            const response: any = await beApi.post('ai/suggest-priority', {
+                taskName: name.trim(),
+                description: description || undefined
+            });
+            if (response.priority) {
+                setAiPrioritySuggestion({ priority: response.priority, reason: response.reason || '' });
+            }
+        } catch (err) {
+            console.error('AI suggest priority failed:', err);
+        } finally {
+            setIsSuggestingPriority(false);
+        }
+    };
+
+    const applyAIPriority = () => {
+        if (aiPrioritySuggestion) {
+            setPriority(aiPrioritySuggestion.priority);
+            setAiPrioritySuggestion(null);
+        }
     };
 
     return (
@@ -131,16 +181,37 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
                     />
                 </div>
 
-                {/* Description */}
+                {/* Description with AI button */}
                 <div className="flex items-start gap-2 px-4.5 pb-3 pt-1">
                     <AlignLeft size={14} className="mt-1.5 shrink-0 text-[#c2c9e0]" />
-                    <textarea
-                        className="min-h-10 flex-1 resize-y border-none text-[13px] leading-6 text-[#5f6368] outline-none"
-                        value={description}
-                        onChange={e => setDescription(e.target.value)}
-                        placeholder="Add description..."
-                        rows={3}
-                    />
+                    <div className="relative flex-1">
+                        <textarea
+                            className="min-h-10 w-full resize-y border-none text-[13px] leading-6 text-[#5f6368] outline-none"
+                            value={description}
+                            onChange={e => setDescription(e.target.value)}
+                            placeholder="Add description..."
+                            rows={3}
+                        />
+                        {/* AI Generate Description Button */}
+                        <button
+                            type="button"
+                            className={`absolute right-0 top-0 flex cursor-pointer items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-semibold transition-all ${
+                                !name.trim() || isGeneratingDesc
+                                    ? 'border-[#eef0f5] bg-[#f8f9fc] text-[#c2c9e0] cursor-not-allowed'
+                                    : 'border-[#e8d5f5] bg-[#faf5ff] text-[#9333ea] hover:bg-[#f3e8ff] hover:border-[#d8b4fe]'
+                            }`}
+                            onClick={handleAIGenerateDescription}
+                            disabled={!name.trim() || isGeneratingDesc}
+                            title={name.trim() ? 'AI tự động viết mô tả' : 'Nhập tên task trước'}
+                        >
+                            {isGeneratingDesc ? (
+                                <Loader2 size={12} className="animate-spin" />
+                            ) : (
+                                <Sparkles size={12} />
+                            )}
+                            {isGeneratingDesc ? 'Đang viết...' : 'AI viết'}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Fields row */}
@@ -236,7 +307,55 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
                             </div>
                         )}
                     </div>
+
+                    {/* AI Suggest Priority Button */}
+                    <button
+                        type="button"
+                        className={`flex cursor-pointer items-center gap-1 rounded-md border px-2 py-1.25 text-[11px] font-semibold transition-all ${
+                            !name.trim() || isSuggestingPriority
+                                ? 'border-[#eef0f5] bg-[#f8f9fc] text-[#c2c9e0] cursor-not-allowed'
+                                : 'border-[#fde68a] bg-[#fffbeb] text-[#d97706] hover:bg-[#fef3c7] hover:border-[#fcd34d]'
+                        }`}
+                        onClick={(e) => { e.stopPropagation(); handleAISuggestPriority(); }}
+                        disabled={!name.trim() || isSuggestingPriority}
+                        title={name.trim() ? 'AI gợi ý mức ưu tiên' : 'Nhập tên task trước'}
+                    >
+                        {isSuggestingPriority ? (
+                            <Loader2 size={12} className="animate-spin" />
+                        ) : (
+                            <Sparkles size={12} />
+                        )}
+                        {isSuggestingPriority ? '...' : 'AI Priority'}
+                    </button>
                 </div>
+
+                {/* AI Priority Suggestion Banner */}
+                {aiPrioritySuggestion && (
+                    <div className="mx-4.5 mb-2 flex items-center gap-2 rounded-lg border border-[#fde68a] bg-[#fffbeb] px-3 py-2 text-[12px]">
+                        <Sparkles size={14} className="shrink-0 text-[#d97706]" />
+                        <div className="flex-1">
+                            <span className="font-bold text-[#92400e]">AI gợi ý: </span>
+                            <span className="font-semibold text-[#d97706]">{aiPrioritySuggestion.priority}</span>
+                            {aiPrioritySuggestion.reason && (
+                                <span className="text-[#a16207]"> — {aiPrioritySuggestion.reason}</span>
+                            )}
+                        </div>
+                        <button
+                            type="button"
+                            className="cursor-pointer rounded-md border border-[#d97706] bg-[#d97706] px-2.5 py-0.75 text-[11px] font-bold text-white transition-colors hover:bg-[#b45309]"
+                            onClick={applyAIPriority}
+                        >
+                            Áp dụng
+                        </button>
+                        <button
+                            type="button"
+                            className="cursor-pointer rounded-md border-none bg-transparent p-0.5 text-[#a16207] hover:text-[#78350f]"
+                            onClick={() => setAiPrioritySuggestion(null)}
+                        >
+                            <X size={14} />
+                        </button>
+                    </div>
+                )}
 
                 {/* Footer */}
                 <div className="flex items-center justify-between border-t border-[#eef0f5] px-4.5 py-3">
