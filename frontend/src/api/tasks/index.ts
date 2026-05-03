@@ -34,12 +34,9 @@ export const getTaskById = async (task_id: number): Promise<TaskWithSpaceData> =
     return beApi.get(`/tasks/${task_id}`);
 };
 
-export const createTask = async (
-    space_id: number,
-    taskData: Partial<TaskData>
-): Promise<TaskData> => {
-    return beApi.post(`/tasks/spaces/${space_id}`, taskData);
-};
+// NOTE: createTask for space-level (POST /tasks/spaces/:spaceId) was removed
+// because it duplicated createTaskInList. Tasks should always be created via a list.
+
 
 export const updateTask = async (
     task_id: number,
