@@ -10,13 +10,7 @@ const benefits = [
 export default function HeroSection() {
     return (
         <section className="relative px-10 pt-24 pb-32 max-w-7xl mx-auto">
-            {/* Center-aligned hero like ClickUp */}
             <div className="text-center max-w-3xl mx-auto mb-16">
-                {/* Trust badge */}
-                <div className="inline-flex items-center gap-2 bg-[#d8e2ff] text-[#0058be] font-bold text-xs uppercase tracking-widest px-4 py-2 rounded-full mb-8">
-                    <span className="w-2 h-2 bg-[#006c49] rounded-full animate-pulse" />
-                    Được tin dùng bởi các đội nhóm hàng đầu
-                </div>
 
                 <h1 className="text-5xl md:text-[68px] leading-[1.05] font-extrabold tracking-tight text-[#141b2b] mb-6">
                     <span className="whitespace-nowrap">Một không gian duy nhất.</span>

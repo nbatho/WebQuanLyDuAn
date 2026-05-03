@@ -87,6 +87,95 @@ export const findAllTasksByListId = async (list_id) => {
     throw error;
   }
 };
+
+export const findAllTasksBySprintId = async (sprint_id) => {
+  try {
+    const query = `
+      SELECT 
+        t.task_id,
+        t.parent_task_id,
+        t.space_id,
+        t.folder_id,
+        t.list_id,
+        t.sprint_id,
+        
+        s.name AS space_name,
+        s.color AS space_color,
+        
+        t.status_id,
+        ts.status_name,
+        ts.color AS status_color,
+        
+        t.priority AS priority_name,
+        CASE t.priority
+            WHEN 'Urgent' THEN '#ef4444'
+            WHEN 'High'   THEN '#f59e0b'
+            WHEN 'Normal' THEN '#3b82f6'
+            WHEN 'Low'    THEN '#8b5cf6'
+            WHEN 'Clear'  THEN '#9ca3af'
+            ELSE 'transparent'
+        END AS priority_color,
+        
+        t.name, 
+        t.description, 
+        t.story_points,
+        t.start_date,
+        t.due_date,
+        t.completed_at,
+        t.position,
+        
+        COALESCE(
+          (
+            SELECT json_agg(
+              json_build_object(
+                'user_id', u.user_id,
+                'name', u.name,
+                'avatar_url', u.avatar_url
+              )
+            )
+            FROM task_assigns ta
+            JOIN users u ON ta.user_id = u.user_id
+            WHERE ta.task_id = t.task_id
+              AND ta.deleted_at IS NULL
+              AND u.deleted_at IS NULL
+          ), '[]'::json
+        ) AS assignees,
+
+        COALESCE(
+          (
+            SELECT json_agg(
+              json_build_object(
+                'tag_id', tg.tag_id,
+                'name', tg.name,
+                'color', tg.color
+              )
+            )
+            FROM task_tags tt
+            JOIN tags tg ON tt.tag_id = tg.tag_id
+            WHERE tt.task_id = t.task_id
+              AND tg.deleted_at IS NULL
+          ), '[]'::json
+        ) AS tags
+
+      FROM tasks t
+      JOIN spaces s ON t.space_id = s.space_id
+      LEFT JOIN task_status ts ON t.status_id = ts.status_id
+      
+      WHERE t.sprint_id = $1 
+        AND t.deleted_at IS NULL 
+        AND s.deleted_at IS NULL
+      ORDER BY t.position ASC;
+    `;
+
+    const values = [sprint_id];
+    const result = await con.query(query, values);
+
+    return result.rows;
+  } catch (error) {
+    console.error("Error in findAllTasksBySprintId:", error);
+    throw error;
+  }
+};
 export const findAllTasksByUserId = async (user_id) => {
   try {
     const query = `
@@ -302,6 +391,7 @@ export const updateTask = async (task_id, updateData) => {
       'position',
       'list_id',
       'folder_id',
+      'sprint_id',
       'is_archived'
     ];
 

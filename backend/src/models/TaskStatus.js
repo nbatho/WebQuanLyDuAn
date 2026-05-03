@@ -19,6 +19,21 @@ export const findStatusesByListId = async (list_id) => {
         throw error;
     }
 };
+export const findStatusesBySprintId = async (sprint_id) => {
+    try {
+        const query = `
+            SELECT ts.* FROM task_status ts
+            JOIN sprints s ON ts.space_id = s.space_id
+            WHERE s.sprint_id = $1 AND s.deleted_at IS NULL
+            ORDER BY ts.position ASC;
+        `;
+        const values = [sprint_id];
+        const result = await con.query(query, values);
+        return result.rows;
+    } catch (error) {
+        throw error;
+    }
+};
 export const findStatusById = async (status_id) => {
     try {
         const query = `SELECT * FROM task_status WHERE status_id = $1`;

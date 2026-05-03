@@ -8,6 +8,9 @@ import type { CreateTaskData } from "@/store/modules/tasks";
 export const getTasksByListIds = async (list_ids: number): Promise<StatusGroup[]> => {
     return beApi.get(`/tasks/lists/${list_ids}`);
 };
+export const getTasksBySprintId = async (spaceId: number, sprintId: number): Promise<StatusGroup[]> => {
+    return beApi.get(`/tasks/spaces/${spaceId}/sprints/${sprintId}`);
+};
 export const getTasksByUserId = async (): Promise<StatusGroup[]> => {
     return beApi.get(`/tasks/my-tasks`);
 }

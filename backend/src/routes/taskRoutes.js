@@ -14,7 +14,8 @@ import {
     deleteAttachments,
     addAssigneeToTasks,
     removeAssigneeFromTasks,
-    getTasksByUserId
+    getTasksByUserId,
+    getTasksBySprintId
 } from '../controllers/taskController.js';
 const router = express.Router();
 
@@ -58,6 +59,35 @@ const router = express.Router();
  */
 
 router.get('/lists/:listId', getTasksByListId);
+
+/**
+ * @swagger
+ * /api/v1/tasks/spaces/{spaceId}/sprints/{sprintId}:
+ *   get:
+ *     summary: Get all tasks in a sprint
+ *     tags: [Tasks]
+ *     parameters:
+ *       - in: path
+ *         name: spaceId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the space
+ *       - in: path
+ *         name: sprintId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the sprint
+ *     responses:
+ *       200:
+ *         description: A list of tasks grouped by status
+ *       400:
+ *         description: Bad request - Space ID or Sprint ID missing
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/spaces/:spaceId/sprints/:sprintId', getTasksBySprintId);
 
 router.get('/my-tasks', getTasksByUserId);
 

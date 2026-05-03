@@ -10,6 +10,7 @@ import ListViewPage from '../pages/ListViewPage';
 import TimeTrackingPage from '../pages/TimeTrackingPage';
 import SettingsPage from '../pages/SettingsPage';
 import AIPage from '../pages/AIPage';
+import SprintViewPage from '../pages/SprintViewPage';
 import AppLayout from "../layouts/AppLayout";
 import type { RouteConfig } from "../types/app";
 import PrivateRoute from "./PrivateRoutes";
@@ -61,6 +62,10 @@ export const routes: RouteConfig[] = [
             {
                 path: 'space/:spaceId/list/:listId',
                 element: <ListViewPage />
+            },
+            {
+                path: 'space/:spaceId/sprint/:sprintId',
+                element: <SprintViewPage />
             },
             {
                 path: '/time-tracking',

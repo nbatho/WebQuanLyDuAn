@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks';
 import { fetchSpacesForWorkspace, fetchCreateSpace } from '@/store/modules/spaces';
 import { deleteSpace } from '@/api/spaces';
 import { createFolder, removeFolder, createList, removeList } from '@/store/modules/tree';
+import { fetchCreateSprint, fetchDeleteSprint, fetchSprintsBySpace } from '@/store/modules/sprints';
 
 export function useSpaceTreeState() {
     const navigate = useNavigate();
@@ -63,6 +64,11 @@ export function useSpaceTreeState() {
         spaceId: string;
         folderId: string | null;
         folderName: string;
+    } | null>(null);
+
+    const [createSprintTarget, setCreateSprintTarget] = useState<{
+        spaceId: string;
+        spaceName: string;
     } | null>(null);
 
     useEffect(() => {
@@ -160,6 +166,25 @@ export function useSpaceTreeState() {
         }
     };
 
+    const handleCreateSprint = async (data: { name: string; description?: string; goal?: string; startDate?: string; endDate?: string }) => {
+        if (!createSprintTarget) return;
+        const { spaceId } = createSprintTarget;
+        try {
+            await dispatch(fetchCreateSprint({ spaceId: parseInt(spaceId, 10), ...data })).unwrap();
+        } catch (error) {
+            console.error('Failed to create sprint:', error);
+        }
+        setCreateSprintTarget(null);
+    };
+
+    const handleDeleteSprint = async (sprintId: number) => {
+        try {
+            await dispatch(fetchDeleteSprint(sprintId)).unwrap();
+        } catch (error) {
+            console.error('Failed to delete sprint:', error);
+        }
+    };
+
     return {
         spaces,
         spaceTree,
@@ -183,5 +208,10 @@ export function useSpaceTreeState() {
         handleCreateList,
         handleDeleteFolder,
         handleDeleteList,
+        createSprintTarget,
+        setCreateSprintTarget,
+        handleCreateSprint,
+        handleDeleteSprint,
+        fetchSprintsBySpace,
     };
 }

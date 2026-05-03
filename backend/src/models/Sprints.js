@@ -1,6 +1,6 @@
 import con from "../config/connect.js";
 
-export const findSprintsBySpaceId = async (space_id) => {
+export const findSprintsBySpaceIds = async (spaceIds) => {
   try {
     const query = `
       SELECT s.*, u.username AS creator_name,
@@ -12,11 +12,11 @@ export const findSprintsBySpaceId = async (space_id) => {
       LEFT JOIN users u ON u.user_id = s.created_by AND u.deleted_at IS NULL
       LEFT JOIN tasks t ON t.sprint_id = s.sprint_id AND t.is_archived = FALSE AND t.deleted_at IS NULL
       LEFT JOIN task_status ts ON ts.status_id = t.status_id
-      WHERE s.space_id = $1 AND s.deleted_at IS NULL
+      WHERE s.space_id = ANY($1) AND s.deleted_at IS NULL
       GROUP BY s.sprint_id, u.username
       ORDER BY s.start_date DESC NULLS LAST, s.created_at DESC
     `;
-    const result = await con.query(query, [space_id]);
+    const result = await con.query(query, [spaceIds]);
     return result.rows;
   } catch (error) {
     throw error;

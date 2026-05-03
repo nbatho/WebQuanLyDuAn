@@ -1,5 +1,5 @@
 import {
-  findSprintsBySpaceId,
+  findSprintsBySpaceIds,
   findSprintById,
   createSprintInSpace,
   updateSprintById,
@@ -12,7 +12,7 @@ export const getSprintsBySpaceId = async (req, res) => {
     if (!spaceId) {
       return res.status(400).json({ error: "Space ID is required" });
     }
-    const sprints = await findSprintsBySpaceId(spaceId);
+    const sprints = await findSprintsBySpaceIds([spaceId]);
     res.status(200).json(sprints);
   } catch (error) {
     console.error("Failed to retrieve sprints:", error.message);

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Bổ sung import useEffect
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
     ChevronDown,
@@ -29,15 +29,26 @@ import { ContextMenu } from '../ContextMenu';
 import { CreateMenu } from '../CreateMenu';
 import { FolderNode } from './FolderNode';
 import { ListNode } from './ListNode';
+import { SprintNode } from './SprintNode';
 import type { SpaceItem } from '@/types/spaces';
 import type { MenuEntry } from '../../types';
+import { useAppDispatch, useAppSelector } from '@/hooks';
+import { fetchSprintsBySpace } from '@/store/modules/sprints';
 
 export const SpaceNode = ({ space }: { space: SpaceItem }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const tree = useSpaceTree();
+    const dispatch = useAppDispatch();
+
+    // Lọc lấy danh sách Sprint thuộc Space hiện tại (Ép kiểu đồng nhất để tránh lỗi)
+    const sprints = useAppSelector(s => s.sprints.listSprints).filter(
+        sp => Number(sp.space_id) === Number(space.id)
+    );
+
     const isSpaceActive = location.pathname.startsWith(`/space/${space.id}`);
     const [expanded, setExpanded] = useState(isSpaceActive);
+
     const treeNode = tree.spaceTree[space.id] || { folders: [], standaloneLists: [] };
     const { folders, standaloneLists } = treeNode;
     const initial = space?.name ? space.name.charAt(0).toUpperCase() : '?';
@@ -45,16 +56,23 @@ export const SpaceNode = ({ space }: { space: SpaceItem }) => {
     const [settingsMenu, setSettingsMenu] = useState<{ x: number; y: number } | null>(null);
     const [createMenuPos, setCreateMenuPos] = useState<{ x: number; y: number } | null>(null);
 
+    // XỬ LÝ SỰ KIỆN: Tự động tải danh sách Sprints khi Space được mở rộng (expanded)
+    useEffect(() => {
+        if (expanded) {
+            dispatch(fetchSprintsBySpace(Number(space.id)));
+        }
+    }, [expanded, space.id, dispatch]);
+
     const settingsItems: MenuEntry[] = [
         {
             icon: <Star size={15} />,
             label: 'Favorite',
             hasSubmenu: true,
             submenuItems: [],
-            onClick: () => {},
+            onClick: () => { },
         },
-        { icon: <Pencil size={15} />, label: 'Rename', onClick: () => {} },
-        { icon: <Link2 size={15} />, label: 'Copy link', onClick: () => {} },
+        { icon: <Pencil size={15} />, label: 'Rename', onClick: () => { } },
+        { icon: <Link2 size={15} />, label: 'Copy link', onClick: () => { } },
         'divider',
         {
             icon: <Plus size={15} />,
@@ -77,10 +95,16 @@ export const SpaceNode = ({ space }: { space: SpaceItem }) => {
                         tree.setCreateFolderTarget({ spaceId: space.id, spaceName: space.name });
                     },
                 },
-                { icon: <FileText size={15} />, label: 'Doc', onClick: () => {} },
-                { icon: <LayoutDashboard size={15} />, label: 'Dashboard', onClick: () => {} },
-                { icon: <PenTool size={15} />, label: 'Whiteboard', onClick: () => {} },
-                { icon: <FileSpreadsheet size={15} />, label: 'Form', onClick: () => {} },
+                { icon: <FileText size={15} />, label: 'Doc', onClick: () => { } },
+                {
+                    icon: <Zap size={15} />, label: 'Sprint', sublabel: 'Scrum sprint planning',
+                    onClick: () => {
+                        tree.setCreateSprintTarget({ spaceId: space.id, spaceName: space.name });
+                    },
+                },
+                { icon: <LayoutDashboard size={15} />, label: 'Dashboard', onClick: () => { } },
+                { icon: <PenTool size={15} />, label: 'Whiteboard', onClick: () => { } },
+                { icon: <FileSpreadsheet size={15} />, label: 'Form', onClick: () => { } },
             ],
         },
         {
@@ -88,27 +112,27 @@ export const SpaceNode = ({ space }: { space: SpaceItem }) => {
             label: 'Color & Icon',
             hasSubmenu: true,
             submenuItems: [],
-            onClick: () => {},
+            onClick: () => { },
         },
-        { icon: <Zap size={15} />, label: 'Automations', onClick: () => {} },
-        { icon: <Columns3 size={15} />, label: 'Custom Fields', onClick: () => {} },
+        { icon: <Zap size={15} />, label: 'Automations', onClick: () => { } },
+        { icon: <Columns3 size={15} />, label: 'Custom Fields', onClick: () => { } },
         {
             icon: <MoreHorizontalIcon size={15} />,
             label: 'More',
             hasSubmenu: true,
             submenuItems: [],
-            onClick: () => {},
+            onClick: () => { },
         },
         'divider',
         {
             icon: <EyeOff size={15} />,
             label: 'Hide Space',
             sublabel: "You'll retain access to this Space, but it won't show in your sidebar",
-            onClick: () => {},
+            onClick: () => { },
         },
         'divider',
-        { icon: <Copy size={15} />, label: 'Duplicate', onClick: () => {} },
-        { icon: <Archive size={15} />, label: 'Archive', onClick: () => {} },
+        { icon: <Copy size={15} />, label: 'Duplicate', onClick: () => { } },
+        { icon: <Archive size={15} />, label: 'Archive', onClick: () => { } },
         {
             icon: <Trash2 size={15} />,
             label: 'Delete',
@@ -120,21 +144,22 @@ export const SpaceNode = ({ space }: { space: SpaceItem }) => {
     return (
         <div className="mb-0.5">
             <div
-                className={`group flex cursor-pointer select-none items-center gap-2 rounded-md px-2 py-1.5 text-[13px] font-semibold transition-all ${
-                    isSpaceActive
+                className={`group flex cursor-pointer select-none items-center gap-2 rounded-md px-2 py-1.5 text-[13px] font-semibold transition-all ${isSpaceActive
                         ? 'bg-[#e8f0fe] text-[#1a73e8]'
                         : 'text-[#1e1f21] hover:bg-[#f3f4f8]'
-                }`}
+                    }`}
                 onClick={() => {
                     navigate(`/space/${space.id}`);
-                    if (!expanded) setExpanded(true);
+                    if (!expanded) {
+                        setExpanded(true); // Đã chuyển logic gọi API vào useEffect
+                    }
                 }}
             >
                 <span
                     className="flex shrink-0 cursor-pointer items-center justify-center"
                     onClick={(e) => {
                         e.stopPropagation();
-                        setExpanded(!expanded);
+                        setExpanded(!expanded); // Effect sẽ bắt sự kiện này để gọi API
                     }}
                 >
                     {expanded ? (
@@ -191,6 +216,23 @@ export const SpaceNode = ({ space }: { space: SpaceItem }) => {
                             folderNameForList={space.name}
                         />
                     ))}
+
+                    {/* Sprints Section */}
+                    {sprints.length > 0 && (
+                        <>
+                            <div className="mt-1.5 mb-0.5 px-2 text-[10px] font-bold uppercase tracking-wider text-[#9aa0a6]">
+                                Sprints
+                            </div>
+                            {sprints.map((sprint) => (
+                                <SprintNode
+                                    key={sprint.sprint_id}
+                                    sprint={sprint}
+                                    spaceId={space.id}
+                                    onDelete={tree.handleDeleteSprint}
+                                />
+                            ))}
+                        </>
+                    )}
                 </div>
             )}
 

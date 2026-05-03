@@ -1,7 +1,7 @@
 import { findAllSpacesByWorkspaceId, createSpaces, findSpaceById, updateSpace, deleteSpace, findSpaceMembers, removeSpaceMember, addSpaceMember } from "../models/Spaces.js";
 import { findFoldersBySpaceId, findFoldersBySpaceIds } from "../models/Folders.js";
 import { findListsBySpaceId, findListsBySpaceIds } from "../models/Lists.js";
-
+import { findSprintsBySpaceIds } from "../models/Sprints.js";
 
 export const getSpacesByWorkspaceId = async (req, res) => {
   try {
@@ -19,15 +19,18 @@ export const getSpacesByWorkspaceId = async (req, res) => {
 
     const spaceIds = spaces.map(space => space.space_id);
 
-    const [folders, allLists] = await Promise.all([
+    const [folders, allLists, allSprints] = await Promise.all([
       findFoldersBySpaceIds(spaceIds),
-      findListsBySpaceIds(spaceIds)
+      findListsBySpaceIds(spaceIds),
+      findSprintsBySpaceIds(spaceIds)
     ]);
 
     const listsByFolder = {};
     const directListsBySpace = {};
+    const sprintsByFolder = {};
+    const directSprintsBySpace = {};
 
-    allLists.forEach(list => {
+    (allLists || []).forEach(list => {
       if (list.folder_id) {
         if (!listsByFolder[list.folder_id]) listsByFolder[list.folder_id] = [];
         listsByFolder[list.folder_id].push(list);
@@ -37,11 +40,22 @@ export const getSpacesByWorkspaceId = async (req, res) => {
       }
     });
 
+    (allSprints || []).forEach(sprint => {
+      if (sprint.folder_id) {
+        if (!sprintsByFolder[sprint.folder_id]) sprintsByFolder[sprint.folder_id] = [];
+        sprintsByFolder[sprint.folder_id].push(sprint);
+      } else {
+        if (!directSprintsBySpace[sprint.space_id]) directSprintsBySpace[sprint.space_id] = [];
+        directSprintsBySpace[sprint.space_id].push(sprint);
+      }
+    });
+
     const foldersBySpace = {};
-    folders.forEach(folder => {
+    (folders || []).forEach(folder => {
       const formattedFolder = {
         ...folder,
-        lists: listsByFolder[folder.folder_id] || []
+        lists: listsByFolder[folder.folder_id] || [],
+        sprints: sprintsByFolder[folder.folder_id] || [] 
       };
 
       if (!foldersBySpace[folder.space_id]) foldersBySpace[folder.space_id] = [];
@@ -56,7 +70,8 @@ export const getSpacesByWorkspaceId = async (req, res) => {
       icon: space.icon,
       isPrivate: space.is_private,
       folders: foldersBySpace[space.space_id] || [],
-      lists: directListsBySpace[space.space_id] || []
+      lists: directListsBySpace[space.space_id] || [],
+      sprints: directSprintsBySpace[space.space_id] || [] 
     }));
 
     return res.status(200).json({

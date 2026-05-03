@@ -1,5 +1,6 @@
 import {
     findAllTasksByListId,
+    findAllTasksBySprintId,
     createTask,
     createTaskForList,
     findTaskById,
@@ -21,8 +22,7 @@ import {
     getAssignedUsersByTaskId,
     findAllTasksByUserId
 } from '../models/Task.js';
-import { findStatusesByListId } from '../models/TaskStatus.js';
-
+import { findStatusById, findStatusesByListId, findStatusesBySprintId } from '../models/TaskStatus.js';
 
 export const getTasksByListId = async (req, res) => {
     try {
@@ -86,6 +86,75 @@ export const getTasksByListId = async (req, res) => {
 
     } catch (error) {
         console.error("[getTasksByListId] Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+export const getTasksBySprintId = async (req, res) => {
+    try {
+        const { sprintId, spaceId } = req.params;
+
+        if (!sprintId || !spaceId) {
+            return res.status(400).json({ error: "Sprint ID and Space ID are required" });
+        }
+
+        const statuses = await findStatusesBySprintId(sprintId);
+        const rawTasks = await findAllTasksBySprintId(sprintId);
+
+        const groupedTaskIds = new Set();
+
+        const groupedData = statuses.map((status) => {
+            const tasksInStatus = rawTasks
+                .filter(task => Number(task.status_id) === Number(status.status_id))
+                .map(task => {
+                    groupedTaskIds.add(task.task_id);
+                    return {
+                        ...task,
+                        assignees: task.assignees || [],
+                        tags: task.tags || [], 
+                        subtask_count: Number(task.subtask_count) || 0,
+                        subtask_done_count: Number(task.subtask_done_count) || 0,
+                        comment_count: Number(task.comment_count) || 0,
+                        attachment_count: Number(task.attachment_count) || 0,
+                    };
+                });
+
+            return {
+                id: status.status_id,
+                name: status.status_name,
+                color: status.color || '#d3d3d3',
+                isExpanded: true,
+                tasks: tasksInStatus
+            };
+        });
+
+        const orphanedTasks = rawTasks
+            .filter(task => !groupedTaskIds.has(task.task_id))
+            .map(task => ({
+                ...task,
+                assignees: task.assignees || [],
+                tags: task.tags || [],
+                subtask_count: Number(task.subtask_count) || 0,
+                subtask_done_count: Number(task.subtask_done_count) || 0,
+                comment_count: Number(task.comment_count) || 0,
+                attachment_count: Number(task.attachment_count) || 0,
+            }));
+
+        if (orphanedTasks.length > 0) {
+            groupedData.push({
+                id: 0,
+                name: 'No Status',
+                color: '#9ca3af',
+                isExpanded: true,
+                tasks: orphanedTasks
+            });
+        }
+
+        // Trả về JSON giống hệt getTasksByListId
+        res.status(200).json(groupedData);
+
+    } catch (error) {
+        console.error("[getTasksBySprintId] Error:", error);
         res.status(500).json({ error: error.message });
     }
 };

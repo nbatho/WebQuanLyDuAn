@@ -60,7 +60,14 @@ export const CreateMenu = ({ position, onClose, spaceId, spaceName }: CreateMenu
 
     const extraItems = [
         { icon: <FileText size={16} />, label: 'Doc' },
-        { icon: <LayoutDashboard size={16} />, label: 'Dashboard' },
+        {
+            icon: <LayoutDashboard size={16} />,
+            label: 'Sprint',
+            onClick: () => {
+                tree.setCreateSprintTarget({ spaceId, spaceName });
+                onClose();
+            },
+        },
         { icon: <PenTool size={16} />, label: 'Whiteboard' },
         { icon: <FileSpreadsheet size={16} />, label: 'Form' },
     ];
@@ -102,7 +109,7 @@ export const CreateMenu = ({ position, onClose, spaceId, spaceName }: CreateMenu
                     key={i}
                     type="button"
                     className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[#1e1f21] transition-all hover:bg-[#f3f4f8]"
-                    onClick={() => {}}
+                    onClick={item.onClick || (() => {})}
                 >
                     <span className="shrink-0 text-[#6b6f76]">{item.icon}</span>
                     <span className="font-medium">{item.label}</span>

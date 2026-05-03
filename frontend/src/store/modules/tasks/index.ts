@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import {
     getTasksByListIds,
+    getTasksBySprintId,
     createTaskInList,
     updateTask,
     deleteTask,
@@ -138,6 +139,18 @@ export const fetchTasksForList = createAsyncThunk<StatusGroup[], number>(
             return response;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch tasks for list');
+        }
+    }
+);
+
+export const fetchTasksForSprint = createAsyncThunk<StatusGroup[], { spaceId: number; sprintId: number }>(
+    'tasks/fetchTasksForSprint',
+    async ({ spaceId, sprintId }, { rejectWithValue }) => {
+        try {
+            const response = await getTasksBySprintId(spaceId, sprintId);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch tasks for sprint');
         }
     }
 );
@@ -371,6 +384,19 @@ export const tasksSlice = createSlice({
             state.listTask = action.payload;
         });
         builder.addCase(fetchTasksForList.rejected, (state, action) => {
+            state.isLoadingTasks = false;
+            state.errorTasks = action.payload as string;
+        });
+
+        builder.addCase(fetchTasksForSprint.pending, (state) => {
+            state.isLoadingTasks = true;
+            state.errorTasks = null;
+        });
+        builder.addCase(fetchTasksForSprint.fulfilled, (state, action) => {
+            state.isLoadingTasks = false;
+            state.listTask = action.payload;
+        });
+        builder.addCase(fetchTasksForSprint.rejected, (state, action) => {
             state.isLoadingTasks = false;
             state.errorTasks = action.payload as string;
         });

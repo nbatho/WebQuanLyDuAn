@@ -31,8 +31,26 @@ export interface ListData {
     updated_at: string;
     deleted_at: string | null;
 }
-
-/** Shape trả về bởi GET /spaces/workspaces/:id (mỗi phần tử trong mảng data[]) */
+export interface SprintData {
+    sprint_id: number;
+    space_id: number;
+    name: string;
+    description: string;
+    goal: string;
+    status: string;
+    velocity: number | null;
+    start_date: string;
+    end_date: string;
+    created_by: number;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+    creator_name: string;
+    total_tasks: string; 
+    done_tasks: string;  
+    total_story_points: string; 
+    completed_story_points: string; 
+}
 export interface SpaceDetail {
     spaceId: number;
     name: string;
@@ -42,6 +60,7 @@ export interface SpaceDetail {
     isPrivate: boolean;
     folders: FolderData[];
     lists: ListData[];
+    sprints: SprintData[]; 
 }
 
 /** Shape trả về bởi GET /spaces/spacesDetails/:id */
@@ -171,7 +190,6 @@ export const spacesSlice = createSlice({
             })
             .addCase(fetchCreateSpace.fulfilled, (state, action) => {
                 state.isCreatingSpaces = false;
-                // Thêm space mới vào listSpaces dưới dạng SpaceDetail tối giản
                 const raw = action.payload;
                 state.listSpaces.push({
                     spaceId: raw.space_id,
@@ -182,6 +200,7 @@ export const spacesSlice = createSlice({
                     isPrivate: raw.is_private,
                     folders: [],
                     lists: [],
+                    sprints: [],
                 });
             })
             .addCase(fetchCreateSpace.rejected, (state, action) => {
