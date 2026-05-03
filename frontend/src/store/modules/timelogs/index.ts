@@ -13,11 +13,15 @@ export interface TimeLogData {
     time_log_id: number;
     task_id: number;
     user_id: number;
-    start_time: string;
-    end_time: string | null;
-    duration_seconds: number | null;
+    started_at: string;
+    stopped_at: string | null;
+    duration_secs: number | null;
     note: string | null;
     created_at: string;
+    // Joined fields from backend queries
+    task_name?: string;
+    username?: string;
+    user_name?: string;
 }
 
 export interface TimeLogsState {
