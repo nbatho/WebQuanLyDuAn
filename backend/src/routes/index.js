@@ -16,6 +16,7 @@ import folderRoutes from './folderRoutes.js';
 import listRoutes from './listRoutes.js';
 import memberRoutes from './memberRoutes.js';
 import aiRoutes from './aiRoutes.js';
+import messageRoutes from './messageRoutes.js';
 
 export {
     authRoutes,
@@ -36,4 +37,5 @@ export {
     listRoutes,
     memberRoutes,
     aiRoutes,
+    messageRoutes,
 }

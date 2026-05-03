@@ -22,8 +22,10 @@ import {
   listRoutes,
   memberRoutes,
   aiRoutes,
+  messageRoutes,
 } from "./routes/index.js";
 import { protectedRoute } from "./middlewares/authMiddlewares.js";
+import { ensureMessagingTables } from "./models/Messages.js";
 
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
@@ -116,6 +118,7 @@ app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/folders", folderRoutes);
 app.use("/api/v1/lists", listRoutes);
 app.use('/api/v1/members', memberRoutes);
+app.use('/api/v1/messages', messageRoutes);
 
 //error handling middleware
 app.use((err, req, res, _next) => {
@@ -128,4 +131,5 @@ app.use((err, req, res, _next) => {
 
 app.listen(PORT, HOST, () => {
   console.log(`Server is running on ${HOST}:${PORT}`);
+  ensureMessagingTables();
 });
