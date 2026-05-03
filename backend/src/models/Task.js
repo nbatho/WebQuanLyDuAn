@@ -87,12 +87,106 @@ export const findAllTasksByListId = async (list_id) => {
     throw error;
   }
 };
-
-
-export const createTask = async (name, description, space_id, due_date) => {
+export const findAllTasksByUserId = async (user_id) => {
   try {
-    const query = `INSERT INTO tasks (name, description, space_id, start_date, due_date) VALUES ($1, $2, $3, $4, $5) RETURNING *`;
-    const values = [name, description, space_id, new Date(), due_date];
+    const query = `
+      SELECT 
+        t.task_id,
+        t.parent_task_id,
+        t.space_id,
+        t.folder_id,
+        t.list_id,
+        
+        s.name AS space_name,
+        s.color AS space_color,
+        
+        t.status_id,
+        ts.status_name,
+        ts.color AS status_color,
+        
+        t.priority AS priority_name,
+        CASE t.priority
+            WHEN 'Urgent' THEN '#ef4444'
+            WHEN 'High'   THEN '#f59e0b'
+            WHEN 'Normal' THEN '#3b82f6'
+            WHEN 'Low'    THEN '#8b5cf6'
+            WHEN 'Clear'  THEN '#9ca3af'
+            ELSE 'transparent'
+        END AS priority_color,
+        
+        t.name, 
+        t.description, 
+        t.story_points,
+        t.start_date,
+        t.due_date,
+        t.completed_at,
+        t.position,
+        
+        COALESCE(
+          (
+            SELECT json_agg(
+              json_build_object(
+                'user_id', u.user_id,
+                'name', u.name,
+                'avatar_url', u.avatar_url
+              )
+            )
+            FROM task_assigns ta
+            JOIN users u ON ta.user_id = u.user_id
+            WHERE ta.task_id = t.task_id
+              AND ta.deleted_at IS NULL
+              AND u.deleted_at IS NULL
+          ), '[]'::json
+        ) AS assignees,
+
+        COALESCE(
+          (
+            SELECT json_agg(
+              json_build_object(
+                'tag_id', tg.tag_id,
+                'name', tg.name,
+                'color', tg.color
+              )
+            )
+            FROM task_tags tt
+            JOIN tags tg ON tt.tag_id = tg.tag_id
+            WHERE tt.task_id = t.task_id
+              AND tg.deleted_at IS NULL
+          ), '[]'::json
+        ) AS tags
+
+      FROM tasks t
+      JOIN spaces s ON t.space_id = s.space_id
+      LEFT JOIN task_status ts ON t.status_id = ts.status_id
+      
+      WHERE t.deleted_at IS NULL 
+        AND s.deleted_at IS NULL
+        AND (
+            t.created_by = $1 
+            OR EXISTS (
+                SELECT 1 FROM task_assigns ta 
+                WHERE ta.task_id = t.task_id 
+                  AND ta.user_id = $1 
+                  AND ta.deleted_at IS NULL
+            )
+        )
+      ORDER BY t.position ASC;
+    `;
+
+    const values = [user_id];
+    const result = await con.query(query, values);
+
+    return result.rows;
+  } catch (error) {
+    console.error("Error in findAllTasksByUserId:", error);
+    throw error;
+  }
+};
+
+export const createTask = async (name, description, space_id, due_date, created_by = null) => {
+  try {
+    const query = `INSERT INTO tasks (name, description, space_id, start_date, due_date, created_by) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`;
+    const values = [name, description, space_id, new Date(), due_date, created_by];
     const result = await con.query(query, values);
     return result.rows[0];
   } catch (error) {
@@ -107,7 +201,8 @@ export const createTaskForList = async ({
   priority,
   assignee_ids,
   due_date,
-  status_id
+  status_id,
+  created_by
 }) => {
   const client = await con.connect();
 
@@ -138,8 +233,8 @@ export const createTaskForList = async ({
     const taskQuery = `
                     INSERT INTO tasks (
                         name, description, space_id, folder_id, list_id, 
-                        status_id, priority, due_date, start_date
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING *`;
+                        status_id, priority, due_date, start_date, created_by
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), $9) RETURNING *`;
 
     const taskValues = [
       name,
@@ -148,8 +243,9 @@ export const createTaskForList = async ({
       folder_id,
       listId,
       final_status_id,
-      priority || 'Normal', 
-      due_date || null
+      priority || 'Normal',
+      due_date || null,
+      created_by || null
     ];
 
     const taskResult = await client.query(taskQuery, taskValues);
@@ -277,10 +373,22 @@ export const getSubtasksByTaskId = async (task_id) => {
   }
 };
 
-export const createSubtask = async (name, description, task_id) => {
+export const createSubtask = async (name, description, parent_task_id) => {
   try {
+    // Get space_id from parent task to satisfy NOT NULL constraint
+    const parentResult = await con.query(
+      'SELECT space_id FROM tasks WHERE task_id = $1 AND deleted_at IS NULL',
+      [parent_task_id]
+    );
+    if (parentResult.rows.length === 0) {
+      const error = new Error("Parent task không tồn tại hoặc đã bị xóa");
+      error.statusCode = 404;
+      throw error;
+    }
+    const space_id = parentResult.rows[0].space_id;
+
     const query = `INSERT INTO tasks (name, description, parent_task_id, space_id) VALUES ($1, $2, $3, $4) RETURNING *`;
-    const values = [name, description, task_id, null];
+    const values = [name, description, parent_task_id, space_id];
     const result = await con.query(query, values);
     return result.rows[0];
   } catch (error) {
@@ -350,13 +458,13 @@ export const deleteSubtask = async (task_id, parent_task_id) => {
     const query = `UPDATE tasks SET deleted_at = NOW() WHERE task_id = $1 AND parent_task_id = $2 AND deleted_at IS NULL RETURNING *`;
     const values = [task_id, parent_task_id];
     const result = await con.query(query, values);
-    
+
     if (result.rows.length === 0) {
       const error = new Error("Subtask không tồn tại hoặc đã bị xóa");
       error.statusCode = 404;
       throw error;
     }
-    
+
     return result.rows[0];
   } catch (error) {
     throw error;

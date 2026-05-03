@@ -15,8 +15,8 @@ export function useTaskFilters(groups: StatusGroup[]) {
 
         return groups.map((g) => {
             const matches = (t: Task) => {
-                if (filters.status.length > 0 && !filters.status.includes(t.status_name)) return false;
-                if (filters.priority.length > 0 && !filters.priority.includes(t.priority_name)) return false;
+                if (filters.status.length > 0 && !filters.status.includes(t.status_name || '')) return false;
+                if (filters.priority.length > 0 && !filters.priority.includes(t.priority_name || '')) return false;
                 if (filters.assignee.length > 0 && !t.assignees.some((a) => filters.assignee.includes(a.name))) return false;
                 return true;
             };

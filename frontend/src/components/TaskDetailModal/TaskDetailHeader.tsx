@@ -33,7 +33,7 @@ export default function TaskDetailHeader({
 
                     <StatusPicker
                         variant="badge"
-                        value={task.status_id}
+                        value={task.status_id ?? 0}
                         options={statusOptions}
                         onChange={(newId) => {
                             updateTask(task.task_id, { status_id: newId });

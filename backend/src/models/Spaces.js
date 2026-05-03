@@ -62,10 +62,10 @@ export const findSpaceById = async (space_id) => {
     throw error;
   }
 };
-export const updateSpace = async (space_id, name, description) => {
+export const updateSpace = async (space_id, name, description, is_private = false) => {
   try {
-    const query = `UPDATE spaces SET name = $1, description = $2 WHERE space_id = $3 AND deleted_at IS NULL RETURNING *`;
-    const values = [name, description, space_id];
+    const query = `UPDATE spaces SET name = $1, description = $2, is_private = $3 WHERE space_id = $4 AND deleted_at IS NULL RETURNING *`;
+    const values = [name, description, is_private, space_id];
     const result = await con.query(query, values);
     return result.rows[0];
   } catch (error) {

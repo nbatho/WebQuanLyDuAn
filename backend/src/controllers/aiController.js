@@ -99,15 +99,13 @@ const tools = [
 async function handleListTasks(userId, args) {
   let query = `
     SELECT t.task_id, t.name, t.due_date, t.completed_at,
-           ts.status_name AS status, tp.priority_name AS priority,
+           ts.status_name AS status, t.priority,
            s.name AS space_name
     FROM tasks t
-    JOIN lists l ON t.list_id = l.list_id
-    JOIN spaces s ON l.space_id = s.space_id
+    JOIN spaces s ON t.space_id = s.space_id
     JOIN space_members sm ON s.space_id = sm.space_id AND sm.user_id = $1
-    LEFT JOIN task_statuses ts ON t.status_id = ts.status_id
-    LEFT JOIN task_priorities tp ON t.priority_id = tp.priority_id
-    WHERE t.deleted_at IS NULL
+    LEFT JOIN task_status ts ON t.status_id = ts.status_id
+    WHERE t.deleted_at IS NULL AND s.deleted_at IS NULL AND sm.deleted_at IS NULL
   `;
   const params = [userId];
   let idx = 2;
@@ -123,7 +121,7 @@ async function handleListTasks(userId, args) {
     idx++;
   }
   if (args.priority) {
-    query += ` AND LOWER(tp.priority_name) = LOWER($${idx})`;
+    query += ` AND LOWER(t.priority) = LOWER($${idx})`;
     params.push(args.priority);
     idx++;
   }
@@ -139,11 +137,10 @@ async function handleCountByStatus(userId, args) {
   let query = `
     SELECT COALESCE(ts.status_name, 'Không có trạng thái') AS status, COUNT(*)::int AS count
     FROM tasks t
-    JOIN lists l ON t.list_id = l.list_id
-    JOIN spaces s ON l.space_id = s.space_id
+    JOIN spaces s ON t.space_id = s.space_id
     JOIN space_members sm ON s.space_id = sm.space_id AND sm.user_id = $1
-    LEFT JOIN task_statuses ts ON t.status_id = ts.status_id
-    WHERE t.deleted_at IS NULL
+    LEFT JOIN task_status ts ON t.status_id = ts.status_id
+    WHERE t.deleted_at IS NULL AND s.deleted_at IS NULL AND sm.deleted_at IS NULL
   `;
   const params = [userId];
   let idx = 2;
@@ -162,15 +159,13 @@ async function handleCountByStatus(userId, args) {
 async function handleFindOverdue(userId, args) {
   let query = `
     SELECT t.task_id, t.name, t.due_date,
-           ts.status_name AS status, tp.priority_name AS priority,
+           ts.status_name AS status, t.priority,
            s.name AS space_name
     FROM tasks t
-    JOIN lists l ON t.list_id = l.list_id
-    JOIN spaces s ON l.space_id = s.space_id
+    JOIN spaces s ON t.space_id = s.space_id
     JOIN space_members sm ON s.space_id = sm.space_id AND sm.user_id = $1
-    LEFT JOIN task_statuses ts ON t.status_id = ts.status_id
-    LEFT JOIN task_priorities tp ON t.priority_id = tp.priority_id
-    WHERE t.deleted_at IS NULL
+    LEFT JOIN task_status ts ON t.status_id = ts.status_id
+    WHERE t.deleted_at IS NULL AND s.deleted_at IS NULL AND sm.deleted_at IS NULL
       AND t.completed_at IS NULL
       AND t.due_date < NOW()
   `;
@@ -291,11 +286,37 @@ export const chatWithAI = async (req, res) => {
                 }
             }
             
-            // ── HANDLER: create_task ──────────────────────────────
+            // ── HANDLER: create_task ──────────────────────────────────────────
             if (functionName === "create_task") {
+                // Find space by name
+                const spaceMatch = realSpaces.find(
+                    s => s.name.toLowerCase() === functionArgs.space_name.toLowerCase()
+                );
+                if (!spaceMatch) {
+                    return res.status(200).json({
+                        response: `⚠️ Space "${functionArgs.space_name}" không tồn tại. Vui lòng tạo Space trước.`,
+                        suggestions: ["Tạo Space mới", "Xem danh sách Space"]
+                    });
+                }
+
+                // Actually INSERT the task into database
+                const taskInsert = await con.query(
+                    `INSERT INTO tasks (name, space_id, priority, due_date, start_date, created_by)
+                     VALUES ($1, $2, $3, $4, NOW(), $5) RETURNING task_id, name`,
+                    [
+                        functionArgs.title,
+                        spaceMatch.space_id,
+                        functionArgs.priority || 'Normal',
+                        functionArgs.due_date || null,
+                        userId
+                    ]
+                );
+
+                const newTask = taskInsert.rows[0];
                 return res.status(200).json({
-                    response: `✅ **Đã ghi nhận nhiệm vụ: ${functionArgs.title}**\\nVào Space: **${functionArgs.space_name}**`,
-                    suggestions: ["Mở danh sách task"]
+                    response: `✅ **Đã tạo nhiệm vụ: ${newTask.name}** (ID: ${newTask.task_id})\\nVào Space: **${functionArgs.space_name}**`,
+                    suggestions: ["Mở danh sách task", "Tạo thêm task"],
+                    suggestedTitle: history.length === 0 ? `Task: ${functionArgs.title}` : null
                 });
             }
 

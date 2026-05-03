@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
     Play, Square, Clock, Calendar, Search,
-    BarChart2, Timer, Trash2, ChevronDown, ChevronRight
+    Timer, Trash2, ChevronRight
 } from 'lucide-react';
 import { Avatar, message } from 'antd';
 import './time-tracking.css';
@@ -16,7 +16,6 @@ import {
     fetchStopTimer,
     fetchDeleteTimeLog,
 } from '../../store/modules/timelogs';
-import { fetchTasksForSpace } from '../../store/modules/tasks';
 import type { TaskWithSpaceData } from '../../store/modules/tasks';
 
 // ── helpers ──────────────────────────────────────────────────────
@@ -58,7 +57,7 @@ export default function TimeTrackingPage() {
     const dispatch = useAppDispatch();
     const { myTimeLogs, runningTimer, isLoadingTimeLogs } = useAppSelector(s => s.timelogs);
     const { listTask } = useAppSelector(s => s.tasks);
-    const spaces = useAppSelector(s => s.spaces.listSpace);
+    const spaces = useAppSelector(s => s.spaces.listSpaces);
 
     const [liveSeconds, setLiveSeconds] = useState(0);
     const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -70,11 +69,6 @@ export default function TimeTrackingPage() {
     useEffect(() => {
         dispatch(fetchMyTimeLogs());
         dispatch(fetchRunningTimer());
-        if (spaces && spaces.length > 0) {
-            spaces.forEach((sp: any) => {
-                dispatch(fetchTasksForSpace(sp.space_id));
-            });
-        }
     }, [dispatch, spaces]);
 
     // ── Live timer tick ──
@@ -93,7 +87,9 @@ export default function TimeTrackingPage() {
 
     // ── Group tasks by space ──
     const tasksBySpace: Record<string, { spaceId: number; spaceName: string; spaceColor: string; tasks: TaskWithSpaceData[] }> = {};
-    (listTask || []).forEach(t => {
+    // Flatten StatusGroup[] → Task[]
+    const allTasks: TaskWithSpaceData[] = (listTask || []).flatMap(group => group.tasks || []) as unknown as TaskWithSpaceData[];
+    allTasks.forEach(t => {
         const key = t.space_name || `Space #${t.space_id}`;
         if (!tasksBySpace[key]) {
             tasksBySpace[key] = {

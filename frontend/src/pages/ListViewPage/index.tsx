@@ -14,57 +14,8 @@ import ListView from './components/ListView';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '@/store/configureStore';
 import { fetchTasksForList, fetchCreateTask } from '@/store/modules/tasks';
-// import { useAppDispatch, useAppSelector } from '@/hooks/index'; 
-
-export interface Assignee {
-    user_id: number;
-    name: string;
-    avatar_url: string | null;
-}
-export interface StatusGroup {
-    id: number;
-    name: string;
-    color: string;
-    isExpanded: boolean;
-    tasks: Task[];
-}
-
-export interface Task {
-    task_id: number;
-    parent_task_id: number | null;
-    list_id: number;
-    space_id: number;
-    folder_id: number | null;
-    name: string;
-    description: string | null;
-    status_id: number;
-    status_name: string;
-    status_color: string;
-
-    priority_name: string | null;
-    priority_color: string | null;
-
-    due_date: string | null;
-    position: number;
-    subtask_count: number;
-    subtask_done_count: number;
-    comment_count: number;
-    attachment_count: number;
-    assignees: Assignee[];
-}
-
-export interface NewTaskData {
-    name: string;
-    description?: string | null;
-    list_id: number;
-    parent_task_id?: number | null;
-    status_id?: number;
-
-    priority?: string;
-
-    due_date?: string | null;
-    assignee_ids?: number[];
-}
+import type { Task, StatusGroup, NewTaskData, Assignee } from '@/types/tasks';
+export type { Task, StatusGroup, NewTaskData, Assignee };
 
 
 interface TaskViewContextType {
@@ -97,7 +48,7 @@ export default function ListViewPage() {
     const [, setSelectedTask] = useState<Task | null>(null);
     const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; task: Task } | null>(null);
     const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
-    const [showClosed, setShowClosed] = useState(false);
+    const [showClosed] = useState(false);
     const [activeTab, setActiveTab] = useState<'list' | 'board'>('list');
 
     const columns = { assignee: true, dueDate: true, priority: true };

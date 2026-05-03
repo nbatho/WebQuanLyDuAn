@@ -10,8 +10,9 @@ import {
     deleteAttachment,
     addAssignee,
     removeAssignee,
+    getTasksByUserId,
 } from "@/api/tasks";
-import type { StatusGroup } from "@/types/tasks";
+import type { StatusGroup, Task } from "@/types/tasks";
 
 export interface CreateTaskData {
     list_id: number;
@@ -122,6 +123,10 @@ export interface TasksState {
     errorAddAssignee: string | null;
     isRemovingAssignee: boolean;
     errorRemoveAssignee: string | null;
+
+    listTaskByUserId: StatusGroup[];
+    isTasksByUserIdLoading: boolean;
+    errorTasksByUserId: string | null;
 }
 
 
@@ -136,7 +141,17 @@ export const fetchTasksForList = createAsyncThunk<StatusGroup[], number>(
         }
     }
 );
-
+export const fetchTasksForUser = createAsyncThunk<StatusGroup[], void>(
+    'tasks/fetchTasksForUser',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await getTasksByUserId();
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch tasks for user');
+        }
+    }
+);
 export const fetchCreateTask = createAsyncThunk<
     TaskWithSpaceData,
     { list_id: number; taskData: CreateTaskData }
@@ -321,6 +336,10 @@ const initialState: TasksState = {
     errorAddAssignee: null,
     isRemovingAssignee: false,
     errorRemoveAssignee: null,
+
+    listTaskByUserId: [],
+    isTasksByUserIdLoading: false,
+    errorTasksByUserId: null,
 };
 
 export const tasksSlice = createSlice({
@@ -363,14 +382,36 @@ export const tasksSlice = createSlice({
         builder.addCase(fetchCreateTask.fulfilled, (state, action) => {
             state.isCreatingTask = false;
             
-            const newTask = action.payload; 
+            const raw = action.payload;
+
+            // Build a properly typed Task from the API response
+            const newTask: Task = {
+                task_id: raw.task_id,
+                parent_task_id: raw.parent_task_id,
+                list_id: (raw as any).list_id ?? null,
+                space_id: raw.space_id,
+                folder_id: (raw as any).folder_id ?? null,
+                name: raw.name,
+                description: raw.description,
+                status_id: raw.status_id ?? null,
+                status_name: raw.status_name ?? null,
+                status_color: raw.status_color ?? null,
+                priority_name: raw.priority_name ?? raw.priority ?? 'Normal',
+                priority_color: raw.priority_color ?? null,
+                due_date: raw.due_date,
+                position: raw.position,
+                subtask_count: raw.subtask_count ?? 0,
+                subtask_done_count: (raw as any).subtask_done_count ?? 0,
+                comment_count: raw.comment_count ?? 0,
+                attachment_count: (raw as any).attachment_count ?? 0,
+                assignees: raw.assignees || [],
+            };
             
             const statusGroup = state.listTask.find(group => (group.id) == (newTask.status_id));
             if (statusGroup) {
                 newTask.status_name = statusGroup.name;
                 newTask.status_color = statusGroup.color;
                 
-                newTask.priority_name = newTask.priority || 'Normal';
                 const pColors: Record<string, string> = {
                     'Urgent': '#ef4444', 
                     'High': '#f59e0b', 
@@ -378,10 +419,7 @@ export const tasksSlice = createSlice({
                     'Low': '#8b5cf6', 
                     'Clear': '#9ca3af'
                 };
-                newTask.priority_color = pColors[newTask.priority_name] || 'transparent';
-                
-                newTask.assignees = newTask.assignees || [];
-                newTask.tags = newTask.tags || [];
+                newTask.priority_color = pColors[newTask.priority_name || 'Normal'] || 'transparent';
 
                 statusGroup.tasks.unshift(newTask);
             } else {
@@ -397,6 +435,145 @@ export const tasksSlice = createSlice({
         builder.addCase(fetchCreateTask.rejected, (state, action) => {
             state.isCreatingTask = false;
             state.errorCreateTask = action.payload as string;
+        });
+        builder.addCase(fetchTasksForUser.pending, (state) => {
+            state.isTasksByUserIdLoading = true;
+            state.errorTasksByUserId = null;
+        });
+        builder.addCase(fetchTasksForUser.fulfilled, (state, action) => {
+            state.isTasksByUserIdLoading = false;
+            state.listTaskByUserId = action.payload;
+        });
+        builder.addCase(fetchTasksForUser.rejected, (state, action) => {
+            state.isTasksByUserIdLoading = false;
+            state.errorTasksByUserId = action.payload as string;
+        });
+
+        // ── Update Task ──
+        builder.addCase(fetchUpdateTask.pending, (state) => {
+            state.isUpdatingTask = true;
+            state.errorUpdateTask = null;
+        });
+        builder.addCase(fetchUpdateTask.fulfilled, (state, action) => {
+            state.isUpdatingTask = false;
+            const updatedTask = action.payload;
+            // Update task in listTask groups
+            for (const group of state.listTask) {
+                const idx = group.tasks.findIndex(t => t.task_id === updatedTask.task_id);
+                if (idx !== -1) {
+                    group.tasks[idx] = { ...group.tasks[idx], ...updatedTask };
+                    break;
+                }
+            }
+            // Update selectedTask if it's the same
+            if (state.selectedTask && state.selectedTask.task_id === updatedTask.task_id) {
+                state.selectedTask = { ...state.selectedTask, ...updatedTask };
+            }
+        });
+        builder.addCase(fetchUpdateTask.rejected, (state, action) => {
+            state.isUpdatingTask = false;
+            state.errorUpdateTask = action.payload as string;
+        });
+
+        // ── Delete Task ──
+        builder.addCase(fetchDeleteTask.pending, (state) => {
+            state.isDeletingTask = true;
+            state.errorDeleteTask = null;
+        });
+        builder.addCase(fetchDeleteTask.fulfilled, (state, action) => {
+            state.isDeletingTask = false;
+            const deletedTaskId = action.payload;
+            // Remove task from all groups
+            for (const group of state.listTask) {
+                group.tasks = group.tasks.filter(t => t.task_id !== deletedTaskId);
+            }
+            // Clear selectedTask if deleted
+            if (state.selectedTask && state.selectedTask.task_id === deletedTaskId) {
+                state.selectedTask = null;
+            }
+        });
+        builder.addCase(fetchDeleteTask.rejected, (state, action) => {
+            state.isDeletingTask = false;
+            state.errorDeleteTask = action.payload as string;
+        });
+
+        // ── SubTasks ──
+        builder.addCase(fetchSubTasks.pending, (state) => {
+            state.isLoadingSubTasks = true;
+            state.errorSubTasks = null;
+        });
+        builder.addCase(fetchSubTasks.fulfilled, (state, action) => {
+            state.isLoadingSubTasks = false;
+            state.subTasks = action.payload;
+        });
+        builder.addCase(fetchSubTasks.rejected, (state, action) => {
+            state.isLoadingSubTasks = false;
+            state.errorSubTasks = action.payload as string;
+        });
+
+        // ── Attachments ──
+        builder.addCase(fetchAttachmentsByTask.pending, (state) => {
+            state.isLoadingAttachments = true;
+            state.errorAttachments = null;
+        });
+        builder.addCase(fetchAttachmentsByTask.fulfilled, (state, action) => {
+            state.isLoadingAttachments = false;
+            state.attachments = action.payload;
+        });
+        builder.addCase(fetchAttachmentsByTask.rejected, (state, action) => {
+            state.isLoadingAttachments = false;
+            state.errorAttachments = action.payload as string;
+        });
+
+        builder.addCase(fetchCreateAttachment.pending, (state) => {
+            state.isCreatingAttachment = true;
+            state.errorCreateAttachment = null;
+        });
+        builder.addCase(fetchCreateAttachment.fulfilled, (state, action) => {
+            state.isCreatingAttachment = false;
+            state.attachments.push(action.payload);
+        });
+        builder.addCase(fetchCreateAttachment.rejected, (state, action) => {
+            state.isCreatingAttachment = false;
+            state.errorCreateAttachment = action.payload as string;
+        });
+
+        builder.addCase(fetchDeleteAttachment.pending, (state) => {
+            state.isDeletingAttachment = true;
+            state.errorDeleteAttachment = null;
+        });
+        builder.addCase(fetchDeleteAttachment.fulfilled, (state, action) => {
+            state.isDeletingAttachment = false;
+            state.attachments = state.attachments.filter(a => a.attachment_id !== action.payload);
+        });
+        builder.addCase(fetchDeleteAttachment.rejected, (state, action) => {
+            state.isDeletingAttachment = false;
+            state.errorDeleteAttachment = action.payload as string;
+        });
+
+        // ── Assignees ──
+        builder.addCase(fetchAddAssignee.pending, (state) => {
+            state.isAddingAssignee = true;
+            state.errorAddAssignee = null;
+        });
+        builder.addCase(fetchAddAssignee.fulfilled, (state) => {
+            state.isAddingAssignee = false;
+        });
+        builder.addCase(fetchAddAssignee.rejected, (state, action) => {
+            state.isAddingAssignee = false;
+            state.errorAddAssignee = action.payload as string;
+        });
+
+        builder.addCase(fetchRemoveAssignee.pending, (state) => {
+            state.isRemovingAssignee = true;
+            state.errorRemoveAssignee = null;
+        });
+        builder.addCase(fetchRemoveAssignee.fulfilled, (state) => {
+            state.isRemovingAssignee = false;
+        });
+        builder.addCase(fetchRemoveAssignee.rejected, (state, action) => {
+            state.isRemovingAssignee = false;
+            state.errorRemoveAssignee = action.payload as string;
         });
     },
 });

@@ -7,18 +7,18 @@ export interface Assignee {
 export interface Task {
     task_id: number;
     parent_task_id: number | null;
-    list_id: number;
+    list_id: number | null;
     space_id: number;
     folder_id: number | null;
     name: string;
     description: string | null;
-    status_id: number;
-    status_name: string;
-    status_color: string;
-    
-    priority_name: string; 
+    status_id: number | null;
+    status_name: string | null;
+    status_color: string | null;
+
+    priority_name: string | null;
     priority_color: string | null;
-    
+
     due_date: string | null;
     position: number;
     subtask_count: number;
@@ -26,6 +26,13 @@ export interface Task {
     comment_count: number;
     attachment_count: number;
     assignees: Assignee[];
+
+    // Extended fields from API (optional)
+    space_name?: string;
+    space_color?: string | null;
+    completed_at?: string | null;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export interface StatusGroup {
@@ -42,10 +49,12 @@ export interface NewTaskData {
     list_id: number;
     parent_task_id?: number | null;
     status_id?: number;
-    
-    // ĐỔI priority_id THÀNH priority (Kiểu string)
-    priority?: string; 
-    
+    status?: string;
+    statusColor?: string;
+    priority?: string;
+    priorityColor?: string;
     due_date?: string | null;
     assignee_ids?: number[];
+    assignees?: string[];
+    listId?: number;
 }

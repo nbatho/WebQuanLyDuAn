@@ -47,7 +47,19 @@ export default function PrivateRoute({ children }: { children: JSX.Element }) {
     }, [dispatch, effectiveToken]);
 
     if (!hasCheckedRefresh || isRefreshing) {
-        return null;
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <div style={{ textAlign: 'center', color: '#5f6368' }}>
+                    <div style={{
+                        width: 32, height: 32, border: '3px solid #eef0f5',
+                        borderTop: '3px solid #0058be', borderRadius: '50%',
+                        animation: 'spin 0.8s linear infinite', margin: '0 auto 12px'
+                    }} />
+                    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                    <p>Đang kiểm tra phiên đăng nhập...</p>
+                </div>
+            </div>
+        );
     }
 
     if (!effectiveToken || isTokenExpired()) {

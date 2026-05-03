@@ -13,7 +13,8 @@ import {
     createAttachments,
     deleteAttachments,
     addAssigneeToTasks,
-    removeAssigneeFromTasks
+    removeAssigneeFromTasks,
+    getTasksByUserId
 } from '../controllers/taskController.js';
 const router = express.Router();
 
@@ -58,7 +59,7 @@ const router = express.Router();
 
 router.get('/lists/:listId', getTasksByListId);
 
-
+router.get('/my-tasks', getTasksByUserId);
 
 /**
  * @swagger

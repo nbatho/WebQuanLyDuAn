@@ -54,6 +54,7 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate, defaultStat
         if (!name.trim() || !listId) return;
         onCreate({
             name: name.trim(),
+            list_id: listId,
             status,
             statusColor: statusObj.color,
             priority,

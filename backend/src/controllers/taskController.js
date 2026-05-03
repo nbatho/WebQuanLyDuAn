@@ -19,6 +19,7 @@ import {
     assignUserToTask,
     unassignUserFromTask,
     getAssignedUsersByTaskId,
+    findAllTasksByUserId
 } from '../models/Task.js';
 import { findStatusesByListId } from '../models/TaskStatus.js';
 
@@ -40,7 +41,7 @@ export const getTasksByListId = async (req, res) => {
             const tasksInStatus = rawTasks
                 .filter(task => Number(task.status_id) === Number(status.status_id))
                 .map(task => {
-                    groupedTaskIds.add(task.task_id); // Đánh dấu task này đã có nhà
+                    groupedTaskIds.add(task.task_id);
                     return {
                         ...task,
                         assignees: task.assignees || [],
@@ -73,7 +74,7 @@ export const getTasksByListId = async (req, res) => {
 
         if (orphanedTasks.length > 0) {
             groupedData.push({
-                id: 0, 
+                id: 0,
                 name: 'No Status',
                 color: '#9ca3af',
                 isExpanded: true,
@@ -81,11 +82,67 @@ export const getTasksByListId = async (req, res) => {
             });
         }
 
-        // Trả dữ liệu về cho Frontend
         res.status(200).json(groupedData);
 
     } catch (error) {
         console.error("[getTasksByListId] Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+};
+export const getTasksByUserId = async (req, res) => {
+    try {
+        const userId = req.user?.user_id;
+
+        if (!userId) {
+            return res.status(400).json({ error: "User ID is required" });
+        }
+
+        const rawTasks = await findAllTasksByUserId(userId);
+
+        const statusMap = new Map();
+        const orphanedTasks = [];
+
+        rawTasks.forEach((task) => {
+            const formattedTask = {
+                ...task,
+                assignees: task.assignees || [],
+                subtask_count: Number(task.subtask_count) || 0,
+                subtask_done_count: Number(task.subtask_done_count) || 0,
+                comment_count: Number(task.comment_count) || 0,
+                attachment_count: Number(task.attachment_count) || 0,
+            };
+            if (task.status_id) {
+                if (!statusMap.has(task.status_id)) {
+                    statusMap.set(task.status_id, {
+                        id: task.status_id,
+                        name: task.status_name || `Status ${task.status_id}`,
+                        color: task.color || '#d3d3d3',
+                        isExpanded: true,
+                        tasks: []
+                    });
+                }
+                statusMap.get(task.status_id).tasks.push(formattedTask);
+            } else {
+                orphanedTasks.push(formattedTask);
+            }
+        });
+
+        const groupedData = Array.from(statusMap.values());
+
+        if (orphanedTasks.length > 0) {
+            groupedData.push({
+                id: 0,
+                name: 'No Status',
+                color: '#9ca3af',
+                isExpanded: true,
+                tasks: orphanedTasks
+            });
+        }
+
+        res.status(200).json(groupedData);
+
+    } catch (error) {
+        console.error("[getTasksByUserId] Error:", error);
         res.status(500).json({ error: error.message });
     }
 };
@@ -117,8 +174,10 @@ export const createTasksForList = async (req, res) => {
         if (!listId) return res.status(400).json({ error: "List ID is required" });
         if (!name) return res.status(400).json({ error: "Name is required" });
 
+        const created_by = req.user?.user_id || null;
+
         const newTask = await createTaskForList({
-            listId, name, description, priority, assignee_ids, due_date, status_id
+            listId, name, description, priority, assignee_ids, due_date, status_id, created_by
         });
 
         res.status(201).json({
@@ -221,10 +280,10 @@ export const createSubTasks = async (req, res) => {
         if (!taskId) {
             return res.status(400).json({ error: "Task ID is required" });
         }
-        if (!name || !description) {
-            return res.status(400).json({ error: "Name and description are required" });
+        if (!name) {
+            return res.status(400).json({ error: "Name is required" });
         }
-        const newSubtask = await createSubtask(name, description, taskId);
+        const newSubtask = await createSubtask(name, description || null, taskId);
         res.status(201).json(newSubtask);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -233,28 +292,41 @@ export const createSubTasks = async (req, res) => {
 export const updateSubTasks = async (req, res) => {
     try {
         const { subtaskId } = req.params;
-        const { name, description } = req.body;
+        const updateData = req.body;
         if (!subtaskId) {
             return res.status(400).json({ error: "Subtask ID is required" });
         }
-        if (!name || !description) {
-            return res.status(400).json({ error: "Name and description are required" });
+        if (!updateData.parent_task_id) {
+            return res.status(400).json({ error: "Parent Task ID is required" });
         }
-        await updateSubtask(subtaskId, name, description);
-        res.status(200).json({ message: "Subtask updated successfully" });
+        const updated = await updateSubtask(subtaskId, updateData.parent_task_id, updateData);
+        if (!updated) {
+            return res.status(400).json({ error: "Không có dữ liệu hợp lệ để cập nhật" });
+        }
+        res.status(200).json(updated);
     } catch (error) {
+        if (error.statusCode) {
+            return res.status(error.statusCode).json({ error: error.message });
+        }
         res.status(500).json({ error: error.message });
     }
 };
 export const deleteSubTasks = async (req, res) => {
     try {
         const { subtaskId } = req.params;
+        const { parent_task_id } = req.body;
         if (!subtaskId) {
             return res.status(400).json({ error: "Subtask ID is required" });
         }
-        await deleteSubtask(subtaskId);
+        if (!parent_task_id) {
+            return res.status(400).json({ error: "Parent Task ID is required" });
+        }
+        await deleteSubtask(subtaskId, parent_task_id);
         res.status(200).json({ message: "Subtask deleted successfully" });
     } catch (error) {
+        if (error.statusCode) {
+            return res.status(error.statusCode).json({ error: error.message });
+        }
         res.status(500).json({ error: error.message });
     }
 };
@@ -275,14 +347,15 @@ export const getCommentsByTaskIds = async (req, res) => {
 export const createComments = async (req, res) => {
     try {
         const { taskId, content } = req.body;
-        const userId = req.user?.user_id; 
+        const userId = req.user?.user_id;
         if (!taskId) {
             return res.status(400).json({ error: "Task ID is required" });
         }
         if (!content) {
             return res.status(400).json({ error: "Comment content is required" });
         }
-        const newComment = await createComment(taskId, content, userId);
+        // Model signature: createComment(content, task_id, user_id)
+        const newComment = await createComment(content, taskId, userId);
         res.status(201).json(newComment);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -305,14 +378,18 @@ export const getAttachmentsByTaskIds = async (req, res) => {
 export const createAttachments = async (req, res) => {
     try {
         const { taskId } = req.params;
-        const { url, description } = req.body;
+        const { file_name, file_url, file_size, mime_type } = req.body;
+        const uploaded_by = req.user?.user_id;
         if (!taskId) {
             return res.status(400).json({ error: "Task ID is required" });
         }
-        if (!url) {
-            return res.status(400).json({ error: "Attachment URL is required" });
+        if (!file_name || !file_url) {
+            return res.status(400).json({ error: "file_name and file_url are required" });
         }
-        const newAttachment = await createAttachment(taskId, url, description);
+        // Model signature: createAttachment(task_id, file_name, file_url, file_size, mime_type, uploaded_by, comment_id)
+        const newAttachment = await createAttachment(
+            taskId, file_name, file_url, file_size || null, mime_type || null, uploaded_by, null
+        );
         res.status(201).json(newAttachment);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -342,7 +419,8 @@ export const addAssigneeToTasks = async (req, res) => {
         if (!userId) {
             return res.status(400).json({ error: "User ID is required" });
         }
-        await addAssigneeToTask(taskId, userId);
+        // Use correct imported function name: assignUserToTask
+        await assignUserToTask(taskId, userId);
         res.status(200).json({ message: "Assignee added successfully" });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -359,7 +437,8 @@ export const removeAssigneeFromTasks = async (req, res) => {
         if (!userId) {
             return res.status(400).json({ error: "User ID is required" });
         }
-        await removeAssigneeFromTask(taskId, userId);
+        // Use correct imported function name: unassignUserFromTask
+        await unassignUserFromTask(taskId, userId);
         res.status(200).json({ message: "Assignee removed successfully" });
     } catch (error) {
         res.status(500).json({ error: error.message });

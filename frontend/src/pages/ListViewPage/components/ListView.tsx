@@ -50,7 +50,7 @@ export default function ListView() {
                                 {group.tasks.map((task) => (
                                     <div key={task.task_id} className="group/row flex items-center border-b border-[#f3f4f6] py-1.5 pl-8 pr-4 hover:bg-[#fafbfc] transition-colors cursor-pointer" onClick={() => setSelectedTask(task)} onContextMenu={(e) => onContextMenu(e, task)}>
                                         <div className="flex-1 flex items-center gap-3 pr-4">
-                                            <div className="h-3.5 w-3.5 shrink-0 rounded-full border-[1.5px] border-dashed" style={{ borderColor: task.status_color }} />
+                                            <div className="h-3.5 w-3.5 shrink-0 rounded-full border-[1.5px] border-dashed" style={{ borderColor: task.status_color ?? undefined }} />
                                             <span className="text-[13px] font-medium text-[#292d34] truncate hover:text-[#7c68ee]">{task.name}</span>
                                         </div>
 
@@ -76,7 +76,7 @@ export default function ListView() {
 
                                         {columns.priority && (
                                             <div className="w-27.5 shrink-0 pl-2">
-                                                <Popover content={<PriorityPopover priority_name={task.priority_name} onSave={(name, color) => updateTask(task.task_id, { priority_name: name, priority_color: color })} onClose={() => setActivePopover(null)} />} trigger="click" open={activePopover?.taskId === task.task_id && activePopover?.field === 'priority'} onOpenChange={(v) => !v && setActivePopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }}>
+                                                <Popover content={<PriorityPopover priority_name={task.priority_name} onSave={(_id, name, color) => updateTask(task.task_id, { priority_name: name, priority_color: color })} onClose={() => setActivePopover(null)} />} trigger="click" open={activePopover?.taskId === task.task_id && activePopover?.field === 'priority'} onOpenChange={(v) => !v && setActivePopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }}>
                                                     <div className="flex min-h-6 items-center px-1 hover:bg-[#f3f4f6]" onClick={(e) => { e.stopPropagation(); setActivePopover({ taskId: task.task_id, field: 'priority' }); }}>
                                                         {task.priority_name ? <Flag size={14} color={task.priority_color ?? '#9ca3af'} fill={task.priority_color ?? 'transparent'} /> : <Flag size={14} className="text-[#d1d5db]" />}
                                                     </div>
