@@ -22,6 +22,9 @@ export interface MessageData {
     sender_name: string;
     sender_username: string;
     sender_avatar: string | null;
+    file_url?: string;
+    file_name?: string;
+    file_type?: string;
 }
 
 export const getConversations = (workspaceId: number): Promise<ConversationData[]> =>
@@ -39,8 +42,31 @@ export const getOrCreateSpaceChat = (workspaceId: number, spaceId: number, space
 export const getMessages = (conversationId: number, limit = 50): Promise<MessageData[]> =>
     beApi.get(`/messages/${conversationId}?limit=${limit}`);
 
-export const sendMessage = (conversationId: number, content: string): Promise<MessageData> =>
-    beApi.post(`/messages/${conversationId}`, { content });
+export const sendMessage = (
+    conversationId: number, 
+    content: string, 
+    file?: File | null,
+    driveFile?: { url: string; name: string; mimeType: string } | null
+): Promise<MessageData> => {
+    if (file) {
+        const formData = new FormData();
+        formData.append('content', content);
+        formData.append('file', file);
+        return beApi.post(`/messages/${conversationId}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+    }
+    
+    const body: any = { content };
+    if (driveFile) {
+        body.fileUrl = driveFile.url;
+        body.fileName = driveFile.name;
+        body.fileType = driveFile.mimeType;
+    }
+    return beApi.post(`/messages/${conversationId}`, body);
+};
 
 export const addMember = (conversationId: number, userId: number): Promise<any> =>
     beApi.post(`/messages/conversations/${conversationId}/members`, { user_id: userId });

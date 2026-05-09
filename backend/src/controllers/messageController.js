@@ -119,15 +119,28 @@ export const getConversationMessages = async (req, res) => {
     }
 };
 
-/** POST /api/v1/messages/:conversationId   body: { content } */
+/** POST /api/v1/messages/:conversationId   body: { content, fileUrl, fileName, fileType }, file: [attachment] */
 export const postMessage = async (req, res) => {
     try {
         const userId = req.user.user_id;
         const { conversationId } = req.params;
-        const { content } = req.body;
-        if (!content?.trim()) return res.status(400).json({ error: 'content required' });
+        const { content, fileUrl: bodyFileUrl, fileName: bodyFileName, fileType: bodyFileType } = req.body;
+        
+        let fileUrl = bodyFileUrl || null;
+        let fileName = bodyFileName || null;
+        let fileType = bodyFileType || null;
 
-        const msg = await sendMessage(conversationId, userId, content.trim());
+        if (req.file) {
+            fileUrl = `/uploads/messages/${req.file.filename}`;
+            fileName = req.file.originalname;
+            fileType = req.file.mimetype;
+        }
+
+        if (!content?.trim() && !req.file && !fileUrl) {
+            return res.status(400).json({ error: 'content or file required' });
+        }
+
+        const msg = await sendMessage(conversationId, userId, content?.trim() || '', fileUrl, fileName, fileType);
         res.status(201).json(msg);
     } catch (err) {
         console.error('postMessage error:', err);

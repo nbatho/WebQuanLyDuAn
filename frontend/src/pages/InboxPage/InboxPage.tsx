@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Hash, Plus, Send, MessageSquare, X } from 'lucide-react';
+import { Hash, Plus, Send, MessageSquare, X, Paperclip, FileText, Cloud } from 'lucide-react';
+import useDrivePicker from 'react-google-drive-picker';
 import { message } from 'antd';
 import { useAppSelector } from '../../hooks';
 import * as msgApi from '../../api/messages';
@@ -34,6 +35,10 @@ export default function InboxPage() {
     const [activeId, setActiveId] = useState<number | null>(null);
     const [messages, setMessages] = useState<MessageData[]>([]);
     const [input, setInput] = useState('');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [driveFile, setDriveFile] = useState<{url: string, name: string, mimeType: string} | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [openPicker] = useDrivePicker();
 
     // Modals
     const [showNewDM, setShowNewDM] = useState(false);
@@ -82,13 +87,39 @@ export default function InboxPage() {
 
     // Send message
     const handleSend = async () => {
-        if (!input.trim() || !activeId) return;
+        if ((!input.trim() && !selectedFile && !driveFile) || !activeId) return;
         try {
-            const msg = await msgApi.sendMessage(activeId, input.trim());
+            const msg = await msgApi.sendMessage(activeId, input.trim(), selectedFile, driveFile);
             setMessages(prev => [...prev, msg]);
             setInput('');
+            setSelectedFile(null);
+            setDriveFile(null);
             loadConvos(); // refresh sidebar last_message
         } catch { message.error('Gửi thất bại'); }
+    };
+
+    // Google Drive Picker
+    const handleOpenDrive = () => {
+        openPicker({
+            clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+            developerKey: import.meta.env.VITE_GOOGLE_API_KEY,
+            viewId: 'DOCS',
+            showUploadView: true,
+            showUploadFolders: true,
+            supportDrives: true,
+            multiselect: false,
+            callbackFunction: (data) => {
+                if (data.action === 'picked' && data.docs.length > 0) {
+                    const doc = data.docs[0];
+                    setDriveFile({
+                        url: doc.url,
+                        name: doc.name,
+                        mimeType: doc.mimeType
+                    });
+                    setSelectedFile(null); // Clear local file if any
+                }
+            },
+        });
     };
 
     // Start DM
@@ -259,7 +290,27 @@ export default function InboxPage() {
                                                     <span className="text-[11px] font-semibold text-[#9aa0a6]">{timeAgo(msg.created_at)}</span>
                                                 </div>
                                             )}
-                                            <div className="text-[14px] font-medium leading-relaxed text-[#3a3f47] whitespace-pre-wrap">{msg.content}</div>
+                                            {msg.content && <div className="text-[14px] font-medium leading-relaxed text-[#3a3f47] whitespace-pre-wrap">{msg.content}</div>}
+                                            {msg.file_url && (
+                                                <div className="mt-2">
+                                                    {(() => {
+                                                        const isExternal = msg.file_url.startsWith('http');
+                                                        const fileUrl = isExternal ? msg.file_url : `http://localhost:5001${msg.file_url}`;
+                                                        const isImage = msg.file_type?.startsWith('image/') && !isExternal; // Drive files are usually documents even if image
+                                                        
+                                                        return isImage ? (
+                                                            <a href={fileUrl} target="_blank" rel="noreferrer">
+                                                                <img src={fileUrl} alt={msg.file_name || 'image'} className="max-w-[300px] max-h-[250px] object-cover rounded-lg border border-[#eef0f5]" />
+                                                            </a>
+                                                        ) : (
+                                                            <a href={fileUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 w-max rounded-lg border border-[#eef0f5] bg-[#fafbfc] px-3 py-2 text-[#0058be] hover:bg-[#f0f4ff] no-underline">
+                                                                {isExternal ? <Cloud size={18} /> : <FileText size={18} />}
+                                                                <span className="text-[13px] font-semibold max-w-[200px] truncate">{msg.file_name}</span>
+                                                            </a>
+                                                        );
+                                                    })()}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 );
@@ -278,9 +329,52 @@ export default function InboxPage() {
                                     className="w-full resize-none bg-transparent px-4 py-3 text-[14px] font-medium text-[#141b2b] outline-none min-h-[44px]"
                                     rows={1}
                                 />
-                                <div className="flex items-center justify-end rounded-b-xl bg-[#fafbfc] px-3 py-2 border-t border-[#eef0f5]">
+                                <div className="flex items-center justify-between rounded-b-xl bg-[#fafbfc] px-3 py-2 border-t border-[#eef0f5]">
+                                    <div className="flex items-center gap-2">
+                                        <input 
+                                            type="file" 
+                                            ref={fileInputRef} 
+                                            style={{ display: 'none' }} 
+                                            onChange={(e) => {
+                                                if (e.target.files && e.target.files[0]) {
+                                                    setSelectedFile(e.target.files[0]);
+                                                }
+                                                // Reset value so same file can be selected again
+                                                e.target.value = '';
+                                            }}
+                                        />
+                                        <button 
+                                            className="cursor-pointer border-none bg-transparent p-1.5 text-[#5f6368] hover:bg-[#e2e6f0] hover:text-[#141b2b] rounded-md transition-colors"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            title="Tải file lên"
+                                        >
+                                            <Paperclip size={18} />
+                                        </button>
+                                        <button 
+                                            className="cursor-pointer border-none bg-transparent p-1.5 text-[#5f6368] hover:bg-[#e2e6f0] hover:text-[#0058be] rounded-md transition-colors"
+                                            onClick={handleOpenDrive}
+                                            title="Đính kèm từ Google Drive"
+                                        >
+                                            <Cloud size={18} />
+                                        </button>
+
+                                        {selectedFile && (
+                                            <div className="flex items-center gap-1.5 px-3 py-1 bg-[#e9edff] rounded-full text-[12px] font-semibold text-[#0058be]">
+                                                <Paperclip size={12} />
+                                                <span className="max-w-[150px] truncate">{selectedFile.name}</span>
+                                                <X size={14} className="cursor-pointer hover:text-red-500" onClick={() => setSelectedFile(null)} />
+                                            </div>
+                                        )}
+                                        {driveFile && (
+                                            <div className="flex items-center gap-1.5 px-3 py-1 bg-[#f0f4ff] rounded-full text-[12px] font-semibold text-[#0058be] border border-[#d8e2ff]">
+                                                <Cloud size={12} />
+                                                <span className="max-w-[150px] truncate">{driveFile.name}</span>
+                                                <X size={14} className="cursor-pointer hover:text-red-500" onClick={() => setDriveFile(null)} />
+                                            </div>
+                                        )}
+                                    </div>
                                     <button onClick={handleSend}
-                                        className={`flex cursor-pointer items-center gap-1.5 rounded-lg border-none px-4 py-1.5 text-[13px] font-bold transition-all ${input.trim() ? 'bg-[#0058be] text-white hover:bg-[#004aa0]' : 'bg-[#e2e6f0] text-[#9aa0a6] pointer-events-none'}`}>
+                                        className={`flex cursor-pointer items-center gap-1.5 rounded-lg border-none px-4 py-1.5 text-[13px] font-bold transition-all ${(input.trim() || selectedFile || driveFile) ? 'bg-[#0058be] text-white hover:bg-[#004aa0]' : 'bg-[#e2e6f0] text-[#9aa0a6] pointer-events-none'}`}>
                                         Gửi <Send size={14} />
                                     </button>
                                 </div>

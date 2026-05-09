@@ -29,9 +29,17 @@ export async function ensureMessagingTables() {
                 message_id        SERIAL      PRIMARY KEY,
                 conversation_id   INT         NOT NULL REFERENCES conversations(conversation_id) ON DELETE CASCADE,
                 sender_id         INT         NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-                content           TEXT        NOT NULL,
+                content           TEXT        NOT NULL DEFAULT '',
+                file_url          TEXT,
+                file_name         TEXT,
+                file_type         VARCHAR(100),
                 created_at        TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
+
+            ALTER TABLE messages ADD COLUMN IF NOT EXISTS file_url TEXT;
+            ALTER TABLE messages ADD COLUMN IF NOT EXISTS file_name TEXT;
+            ALTER TABLE messages ADD COLUMN IF NOT EXISTS file_type VARCHAR(100);
+            ALTER TABLE messages ALTER COLUMN content SET DEFAULT '';
 
             CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id, created_at DESC);
             CREATE INDEX IF NOT EXISTS idx_conv_members_user ON conversation_members(user_id);
@@ -214,13 +222,13 @@ export async function getMessages(conversationId, limit = 50, before = null) {
 }
 
 /** Send a message */
-export async function sendMessage(conversationId, senderId, content) {
+export async function sendMessage(conversationId, senderId, content, fileUrl = null, fileName = null, fileType = null) {
     const result = await con.query(`
-        INSERT INTO messages (conversation_id, sender_id, content)
-        VALUES ($1, $2, $3)
+        INSERT INTO messages (conversation_id, sender_id, content, file_url, file_name, file_type)
+        VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *, 
             (SELECT name FROM users WHERE user_id = $2) AS sender_name,
             (SELECT username FROM users WHERE user_id = $2) AS sender_username
-    `, [conversationId, senderId, content]);
+    `, [conversationId, senderId, content || '', fileUrl, fileName, fileType]);
     return result.rows[0];
 }

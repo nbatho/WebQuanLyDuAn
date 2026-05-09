@@ -78,6 +78,10 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 //public route
+import fs from 'fs';
+if (!fs.existsSync('uploads')) fs.mkdirSync('uploads', { recursive: true });
+app.use('/uploads', express.static('uploads'));
+
 app.get("/db-health", async (req, res) => {
   try {
     const result = await con.query("SELECT NOW()");
