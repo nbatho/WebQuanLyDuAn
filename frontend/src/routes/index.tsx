@@ -1,20 +1,25 @@
-import LandingPage from "../pages/LandingPage";
-import LoginPage from "../pages/AuthPage/LoginPage";
-import GoogleLoginPage from "../pages/AuthPage/GoogleLoginPage";
-import WorkspaceSetupPage from "../pages/WorkspaceSetupPage";
-import InviteTeamPage from "../pages/InviteTeamPage";
-import InboxPage from "../pages/InboxPage";
-import MyTasksPage from "../pages/MyTasksPage";
-import SpaceViewPage from '../pages/SpaceViewPage';
-import ListViewPage from '../pages/ListViewPage';
-import TimeTrackingPage from '../pages/TimeTrackingPage';
-import SettingsPage from '../pages/SettingsPage';
-import AIPage from '../pages/AIPage';
-import SprintViewPage from '../pages/SprintViewPage';
-import AppLayout from "../layouts/AppLayout";
+import { lazy } from "react";
 import type { RouteConfig } from "../types/app";
 import PrivateRoute from "./PrivateRoutes";
-import InvitationPage from "@/pages/InvitationPage";
+
+
+const LandingPage = lazy(() => import("../pages/LandingPage"));
+const LoginPage = lazy(() => import("../pages/AuthPage/LoginPage"));
+const GoogleLoginPage = lazy(() => import("../pages/AuthPage/GoogleLoginPage"));
+const WorkspaceSetupPage = lazy(() => import("../pages/WorkspaceSetupPage"));
+const InviteTeamPage = lazy(() => import("../pages/InviteTeamPage"));
+const InboxPage = lazy(() => import("../pages/InboxPage"));
+const MyTasksPage = lazy(() => import("../pages/MyTasksPage"));
+const SpaceViewPage = lazy(() => import('../pages/SpaceViewPage'));
+const ListViewPage = lazy(() => import('../pages/ListViewPage'));
+const TimeTrackingPage = lazy(() => import('../pages/TimeTrackingPage'));
+const SettingsPage = lazy(() => import('../pages/SettingsPage'));
+const AIPage = lazy(() => import('../pages/AIPage'));
+const SprintViewPage = lazy(() => import('../pages/SprintViewPage'));
+const AppLayout = lazy(() => import("../layouts/AppLayout"));
+const InvitationPage = lazy(() => import("../pages/InvitationPage"));
+
+
 export const routes: RouteConfig[] = [
     {
         path: '/',

@@ -137,8 +137,8 @@ export const fetchTasksForList = createAsyncThunk<StatusGroup[], number>(
         try {
             const response = await getTasksByListIds(list_id);
             return response;
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch tasks for list');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch tasks for list');
         }
     }
 );
@@ -149,8 +149,8 @@ export const fetchTasksForSprint = createAsyncThunk<StatusGroup[], { spaceId: nu
         try {
             const response = await getTasksBySprintId(spaceId, sprintId);
             return response;
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch tasks for sprint');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch tasks for sprint');
         }
     }
 );
@@ -160,8 +160,8 @@ export const fetchTasksForUser = createAsyncThunk<StatusGroup[], void>(
         try {
             const response = await getTasksByUserId();
             return response;
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch tasks for user');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch tasks for user');
         }
     }
 );
@@ -183,10 +183,10 @@ export const fetchCreateTask = createAsyncThunk<
             });
             
             return response as any as TaskWithSpaceData;
-        } catch (error: any) { 
+        } catch (error: unknown) { 
             return rejectWithValue(
-                error.response?.data?.error || 
-                error.response?.data?.message || 
+                (error as { response?: { data?: { error?: string; message?: string } } }).response?.data?.error ||
+                (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
                 'Failed to create task'
             );
         }
@@ -202,8 +202,8 @@ export const fetchUpdateTask = createAsyncThunk<
         try {
             const response = await updateTask(task_id, updates);
             return response;
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to update task');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to update task');
         }
     }
 );
@@ -214,8 +214,8 @@ export const fetchDeleteTask = createAsyncThunk<number, number>(
         try {
             await deleteTask(task_id);
             return task_id;
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to delete task');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to delete task');
         }
     }
 );
@@ -230,8 +230,8 @@ export const fetchSubTasks = createAsyncThunk<TaskWithSpaceData[], number>(
         try {
             const response = await getSubTasks(task_id);
             return response;
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch subtasks');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch subtasks');
         }
     }
 );
@@ -246,8 +246,8 @@ export const fetchAttachmentsByTask = createAsyncThunk<TaskAttachment[], number>
         try {
             const response = await getAttachmentsByTask(task_id);
             return response;
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch attachments');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch attachments');
         }
     }
 );
@@ -261,8 +261,8 @@ export const fetchCreateAttachment = createAsyncThunk<
         try {
             const response = await createAttachment(task_id, url, description);
             return response;
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to create attachment');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to create attachment');
         }
     }
 );
@@ -273,8 +273,8 @@ export const fetchDeleteAttachment = createAsyncThunk<number, number>(
         try {
             await deleteAttachment(attachment_id);
             return attachment_id;
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to delete attachment');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to delete attachment');
         }
     }
 );
@@ -292,8 +292,8 @@ export const fetchAddAssignee = createAsyncThunk<
         try {
             await addAssignee(task_id, userId);
             return { task_id, userId };
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to add assignee');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to add assignee');
         }
     }
 );
@@ -307,8 +307,8 @@ export const fetchRemoveAssignee = createAsyncThunk<
         try {
             await removeAssignee(task_id, userId);
             return { task_id, userId };
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to remove assignee');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to remove assignee');
         }
     }
 );

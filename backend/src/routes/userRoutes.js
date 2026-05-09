@@ -6,16 +6,8 @@ import {
 } from "../controllers/userControllers.js";
 const router = express.Router();
 
-
-
 router.get("/me", authMe);
-
-
 router.get("/profiles", getProfiles);
-
-
-
 router.put("/profiles", updateProfiles);
-// router.get('/profiles/stats', getProfileStats);
 
 export default router;

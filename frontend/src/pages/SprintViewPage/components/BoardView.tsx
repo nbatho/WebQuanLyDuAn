@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type DragEvent } from 'react';
 import type { Task } from '@/types/tasks';
 import { familyTaskIds, rootTasks } from '@/utils/taskFamily';
 
-import { useTaskView } from '../index';
+import { useTaskView } from '../SprintViewPage';
 
 export default function BoardView({
     showClosed

@@ -27,8 +27,8 @@ export const fetchWorkspaces = createAsyncThunk<WorkspacesData[], void, { reject
         try {
             const response = await getWorkspaces();
             return Array.isArray(response) ? response : [];
-        } catch (error: any) {
-            const msg = error.response?.data?.message || error.message || 'Failed to fetch workspaces';
+        } catch (error: unknown) {
+            const msg = (error as { response?: { data?: { message?: string } }; message?: string }).response?.data?.message || (error as { message?: string }).message || 'Failed to fetch workspaces';
             return rejectWithValue(msg);
         }
     },
@@ -42,8 +42,8 @@ export const addWorkspace = createAsyncThunk<
     try {
         const response = await createWorkspace(body.name, body.slug, body.description);
         return response;
-    } catch (error: any) {
-        const msg = error.response?.data?.error || error.response?.data?.message || error.message || 'Failed to create workspace';
+    } catch (error: unknown) {
+        const msg = (error as { response?: { data?: { error?: string; message?: string } }; message?: string }).response?.data?.error || (error as { response?: { data?: { message?: string } }; message?: string }).response?.data?.message || (error as { message?: string }).message || 'Failed to create workspace';
         return rejectWithValue(msg);
     }
 });
@@ -61,8 +61,8 @@ export const editWorkspace = createAsyncThunk<
             body.description,
         );
         return response;
-    } catch (error: any) {
-        const msg = error.response?.data?.message || error.message || 'Failed to update workspace';
+    } catch (error: unknown) {
+        const msg = (error as { response?: { data?: { message?: string } }; message?: string }).response?.data?.message || (error as { message?: string })          .message || 'Failed to update workspace';
         return rejectWithValue(msg);
     }
 });
@@ -73,8 +73,8 @@ export const removeWorkspace = createAsyncThunk<number, { workspace_id: number; 
         try {
             await deleteWorkspace(workspace_id, owner_id);
             return workspace_id;
-        } catch (error: any) {
-            const msg = error.response?.data?.message || error.message || 'Failed to delete workspace';
+        } catch (error: unknown) {
+            const msg = (error as { response?: { data?: { message?: string } }; message?: string }).response?.data?.message || (error as { message?: string }).message || 'Failed to delete workspace';
             return rejectWithValue(msg);
         }
     },
@@ -86,8 +86,8 @@ export const fetchWorkspaceById = createAsyncThunk<WorkspacesData, number, { rej
         try {
             const response = await getWorkspaceById(workspace_id);
             return response;
-        } catch (error: any) {
-            const msg = error.response?.data?.message || error.message || 'Failed to fetch workspace details';
+        } catch (error: unknown) {
+            const msg = (error as { response?: { data?: { message?: string } }; message?: string }).response?.data?.message || (error as { message?: string })  .message || 'Failed to fetch workspace details';
             return rejectWithValue(msg);
         }
     },
@@ -101,8 +101,8 @@ export const fetchWorkspaceMembers = createAsyncThunk<
     try {
         const response = await getWorkspaceMembers(workspace_id);
         return Array.isArray(response) ? response : [];
-    } catch (error: any) {
-        const msg = error.response?.data?.message || error.message || 'Failed to fetch workspace members';
+    } catch (error: unknown) {
+        const msg = (error as { response?: { data?: { message?: string } }; message?: string }).response?.data?.message || (error as { message?: string }).message || 'Failed to fetch workspace members';
         return rejectWithValue(msg);
     }
 });
@@ -114,8 +114,8 @@ export const sendInvitations = createAsyncThunk<
 >('workspaces/sendInvitations', async ( { workspaceId, emails, role }, { rejectWithValue }) => {
     try {
         await inviteMembers(workspaceId, emails, role);
-    } catch (error: any) {
-        const msg = error.response?.data?.message || error.message || 'Failed to send invitations';
+    } catch (error: unknown) {
+        const msg = (error as { response?: { data?: { message?: string } }; message?: string }).response?.data?.message || (error as { message?: string })  .message || 'Failed to send invitations';
         return rejectWithValue(msg);
     }
 });
@@ -127,8 +127,8 @@ export const respondToInvitations = createAsyncThunk<
 >('workspaces/respondToInvitations', async ( { token, action }, { rejectWithValue }) => {
     try {
         await respondToInvitation(token, action);
-    } catch (error: any) {
-        const msg = error.response?.data?.message || error.message || 'Failed to respond to invitation';
+    } catch (error: unknown) {
+        const msg = (error as { response?: { data?: { message?: string } }; message?: string }).response?.data?.message || (error as { message?: string }).message || 'Failed to respond to invitation';
         return rejectWithValue(msg);
     }
 });
@@ -141,9 +141,9 @@ export const fetchVerifyInvitation = createAsyncThunk<
     try {
         const verificationData = await verifyInvitation(token);
         return verificationData;
-    } catch (error: any) {
+    } catch (error: unknown) {
         // Ưu tiên lấy message lỗi từ Backend (như "Token không hợp lệ", "Lời mời hết hạn")
-        const msg = error.response?.data?.message || error.message || 'Failed to verify invitation';
+        const msg = (error as { response?: { data?: { message?: string } }; message?: string }).response?.data?.message || (error as { message?: string }).message || 'Failed to verify invitation';
         return rejectWithValue(msg);
     }
 });

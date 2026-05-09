@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { ChevronDown, ChevronRight, Calendar, Flag, User } from 'lucide-react';
 import { Popover, Avatar } from 'antd';
 import type { Task } from '@/types/tasks';
-import { useTaskView } from '../index';
-
+import { useTaskView } from '@/pages/SprintViewPage/SprintViewPage';
 import InlineCreateTask from '@/pages/ListViewPage/components/InlineCreateTask';
 import AssigneePopover from '@/components/Popovers/AssigneePopover';
 import DueDatePopover from '@/components/Popovers/DueDatePopover';

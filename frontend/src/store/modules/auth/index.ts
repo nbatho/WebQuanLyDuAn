@@ -8,8 +8,9 @@ export const fetchSignIn = createAsyncThunk<SignInResponse, SignInRequest, { rej
         try {
             const response = await signIn(email, password);
             return response;
-        } catch (error: unknown) { const err = error as any;
-            const message = err?.response?.data?.message || err?.message || "Failed to sign in";
+        } catch (error: unknown) { 
+
+            const message = (error as { response?: { data?: { message?: string } } }).response?.data?.message || (error as { message?: string }).message || "Failed to sign in";
             return rejectWithValue(message);
         }
     }
@@ -21,8 +22,9 @@ export const fetchSignUp = createAsyncThunk<SignUpResponse, SignUpRequest, { rej
             const response = await signUp(email, password, username, name, inviteToken);
             return response;
         } catch (error: unknown) {
-            const err = error as any;
-            const message = err?.response?.data?.message || err?.message || "Failed to sign up";
+            
+
+            const message = (error as { response?: { data?: { message?: string } } }).response?.data?.message || (error as { message?: string }).message || "Failed to sign up";
             return rejectWithValue(message);
         }
     }
@@ -32,8 +34,9 @@ export const fetchSignOut = createAsyncThunk<void, void, { rejectValue: string }
     async (_, { rejectWithValue }) => { 
         try {
             await signOut();
-        } catch (error: unknown) { const err = error as any;
-            const message = err?.response?.data?.message || err?.message || "Failed to sign out";
+        } catch (error: unknown) { 
+
+            const message = (error as { response?: { data?: { message?: string } } }).response?.data?.message || (error as { message?: string }).message || "Failed to sign out";
             return rejectWithValue(message);
         }
     }
@@ -44,8 +47,9 @@ export const fetchRefreshToken = createAsyncThunk<SignInResponse, void, { reject
         try {
             const response = await refreshToken();
             return response;
-        } catch (error: unknown) { const err = error as any;
-            const message = err?.response?.data?.message || err?.message || "Failed to refresh token";
+        } catch (error: unknown) { 
+
+            const message = (error as { response?: { data?: { message?: string } } }).response?.data?.message || (error as { message?: string }).message || "Failed to refresh token";
             return rejectWithValue(message);
         }
     }
@@ -131,6 +135,7 @@ const authSlice = createSlice({
                 return;
             }
 
+            state.signIn = action.payload; // LƯU TOÀN BỘ DATA USER
             state.access_token = access_token;
             localStorage.setItem('access_token', access_token);
         });

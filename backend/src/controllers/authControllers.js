@@ -3,6 +3,7 @@ import {
   createUser,
   findUserByEmail,
   findUserByUsername,
+  findUserById,
 } from "../models/Users.js";
 import {
   createSession,
@@ -122,7 +123,7 @@ export const signIn = async (req, res) => {
 
     //nếu khớp, tạo token và trả về cho client
     const access_token = jwt.sign(
-      { user_id: user.user_id },
+      { user_id: user.user_id, email: user.email },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: ACCESS_TOKEN_TTL },
     );
@@ -292,15 +293,23 @@ export const refreshToken = async (req, res) => {
     if (session.expires_at < new Date()) {
       return res.status(403).json({ message: "Token da het han" });
     }
+    const user = await findUserById(session.user_id);
+    if (!user) {
+      return res.status(403).json({ message: "User khong ton tai" });
+    }
+
     const access_token = jwt.sign(
-      { user_id: session.user_id },
+      { user_id: user.user_id, email: user.email },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: ACCESS_TOKEN_TTL },
     );
     return res.status(200).json({
       message: "Refresh token thanh cong",
       user: {
-        user_id: session.user_id,
+        user_id: user.user_id,
+        email: user.email,
+        username: user.username,
+        name: user.name,
         access_token,
       },
     });

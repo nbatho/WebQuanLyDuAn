@@ -16,7 +16,6 @@ import {
   tagRoutes,
   timeLogRoutes,
   activityLogRoutes,
-  dashboardRoutes,
   folderRoutes,
   listRoutes,
   memberRoutes,
@@ -113,7 +112,6 @@ app.use("/api/v1/notifications", notificationRoutes);
 app.use("/api/v1/tags", tagRoutes);
 app.use("/api/v1/timelogs", timeLogRoutes);
 app.use("/api/v1/activities", activityLogRoutes);
-app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/folders", folderRoutes);
 app.use("/api/v1/lists", listRoutes);
 app.use('/api/v1/messages', messageRoutes);

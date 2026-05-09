@@ -102,8 +102,8 @@ export const fetchSpacesForWorkspace = createAsyncThunk<SpaceDetail[], number>(
             const response = await getSpacesForWorkspace(workspace_id) as any;
             // BE trả về { status: "success", data: SpaceDetail[] }
             return (response.data ?? response) as SpaceDetail[];
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch spaces');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch spaces');
         }
     },
 );
@@ -116,8 +116,8 @@ export const fetchCreateSpace = createAsyncThunk<
     async ({ workspace_id, name, description, color, is_private }, { rejectWithValue }) => {
         try {
             return await createSpace(workspace_id, name, description, color, is_private);
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to create space');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to create space');
         }
     },
 );
@@ -130,8 +130,8 @@ export const fetchUpdateSpace = createAsyncThunk<
     async ({ space_id, name, description, color }, { rejectWithValue }) => {
         try {
             return await updateSpace(space_id, name, description, color);
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to update space');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to update space');
         }
     },
 );
@@ -143,8 +143,8 @@ export const fetchGetSpaceDetails = createAsyncThunk<SpaceDetail, number>(
             const response = await getSpaceDetails(space_id) as any;
             // BE trả về { status: "success", data: { spaceId, ... } }
             return (response.data ?? response) as SpaceDetail;
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch space details');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch space details');
         }
     },
 );

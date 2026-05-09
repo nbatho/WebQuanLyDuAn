@@ -38,8 +38,8 @@ export const fetchNotifications = createAsyncThunk<
         try {
             const response = await getNotifications(params);
             return response;
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch notifications');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch notifications');
         }
     },
 );
@@ -50,8 +50,8 @@ export const fetchMarkNotificationAsRead = createAsyncThunk<NotificationData, nu
         try {
             const response = await markNotificationAsRead(notificationId);
             return response;
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to mark notification as read');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to mark notification as read');
         }
     },
 );
@@ -61,8 +61,8 @@ export const fetchMarkAllNotificationsAsRead = createAsyncThunk<void>(
     async (_, { rejectWithValue }) => {
         try {
             await markAllNotificationsAsRead();
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to mark all notifications as read');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to mark all notifications as read');
         }
     },
 );
@@ -73,8 +73,8 @@ export const fetchDeleteNotification = createAsyncThunk<number, number>(
         try {
             await deleteNotification(notificationId);
             return notificationId;
-        } catch (error: any) { 
-            return rejectWithValue(error.response?.data?.message || 'Failed to delete notification');
+        } catch (error: unknown) { 
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to delete notification');
         }
     },
 );

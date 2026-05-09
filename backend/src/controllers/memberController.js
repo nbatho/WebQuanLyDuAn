@@ -50,7 +50,7 @@ export const InviteMember = async (req, res) => {
         const invitationLink = `${clientUrl}/join-workspace?token=${inviteToken}`;
 
         const { data, error } = await resend.emails.send({
-            from: "Flowise <onboarding@resend.dev>",
+            from: "Flowise <invite@contact.flowise.id.vn>",
             to: [email],
             subject: `${inviterName} đã mời bạn tham gia ${workspaceName} trên Floswise`,
             html: `

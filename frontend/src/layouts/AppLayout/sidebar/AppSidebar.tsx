@@ -91,10 +91,7 @@ export default function AppSidebar() {
                 {navItem(
                     '/inbox',
                     <MessageSquare size={18} strokeWidth={1.8} />,
-                    'Inbox',
-                    <span className="ml-auto flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-[#1a73e8] px-1 text-[10px] font-bold leading-none text-white">
-                        5
-                    </span>,
+                    'Inbox'
                 )}
                 {navItem('/time-tracking', <Clock size={18} strokeWidth={1.8} />, 'Time Tracking')}
 

@@ -5,10 +5,6 @@ dotenv.config();
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-// ═══════════════════════════════════════════════
-// FUNCTION CALLING TOOLS
-// ═══════════════════════════════════════════════
-
 const tools = [
     {
         type: "function",

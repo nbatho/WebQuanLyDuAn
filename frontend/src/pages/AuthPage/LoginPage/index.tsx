@@ -12,18 +12,11 @@ export default function AuthPage() {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
 
-    // ==========================================
-    // 1. Bắt các tham số từ URL
-    // ==========================================
+
     const location = useLocation();
     const [searchParams] = useSearchParams();
-    const urlEmail = searchParams.get('email');
-    const redirectUrl = searchParams.get('redirect');
-    const inviteToken = searchParams.get('invite_token');
+    const inviteToken = searchParams.get('inviteToken');
 
-    // ==========================================
-    // 2. Tự động chuyển tab dựa vào URL (VD: /register)
-    // ==========================================
     const [isRegister, setIsRegister] = useState(location.pathname === '/register');
 
     /* ── Login state ── */
@@ -40,12 +33,29 @@ export default function AuthPage() {
 
     const [isLoggingIn, setIsLoggingIn] = useState(false);
     const [isRegistering, setIsRegistering] = useState(false);
+    const [urlEmail, setUrlEmail] = useState('');
+
     useEffect(() => {
-        if (urlEmail) {
-            setLoginEmail(urlEmail);
-            setRegEmail(urlEmail);
+        if (inviteToken) {
+            try {
+                const payload = inviteToken.split('.')[1];
+                if (payload) {
+                    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonPayload = decodeURIComponent(
+                        atob(base64).split('').map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+                    );
+                    const decoded = JSON.parse(jsonPayload);
+                    if (decoded.email) {
+                        setUrlEmail(decoded.email);
+                        setLoginEmail(decoded.email);
+                        setRegEmail(decoded.email);
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to decode invite token", error);
+            }
         }
-    }, [urlEmail]);
+    }, [inviteToken]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -54,8 +64,8 @@ export default function AuthPage() {
         try {
             await dispatch(fetchSignIn({ email: loginEmail, password: loginPass })).unwrap();
 
-            if (redirectUrl) {
-                navigate(redirectUrl);
+            if (inviteToken) {
+                navigate(`/join-workspace?token=${inviteToken}`);
                 return;
             }
 
@@ -95,7 +105,7 @@ export default function AuthPage() {
             await dispatch(fetchSignIn({ email: regEmail, password: regPass })).unwrap();
 
             if (inviteToken) {
-                navigate('/home');
+                navigate(`/join-workspace?token=${inviteToken}`);
             } else {
                 navigate('/workspace-setup');
             }
