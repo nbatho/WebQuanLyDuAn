@@ -12,6 +12,7 @@ import {
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { OAuth2Client } from "google-auth-library";
+import { checkExistingInvitation, addMemberToWorkspace, updateInvitationStatus } from "../models/Member.js";
 const ACCESS_TOKEN_TTL = "15m";
 const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000; // 14 ngày
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
@@ -31,7 +32,7 @@ const refreshCookieClearOptions = {
 
 export const signUp = async (req, res) => {
   try {
-    const { username, password, email, name } = req.body;
+    const { username, password, email, name, inviteToken } = req.body;
 
     if (!username || !password || !email || !name) {
       return res.status(400).json({
@@ -51,6 +52,27 @@ export const signUp = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await createUser(username, hashedPassword, email, name);
+
+    // Xử lý tự động accept lời mời nếu có inviteToken
+    if (inviteToken) {
+      try {
+        const decoded = jwt.verify(inviteToken, process.env.EMAIL_TOKEN_SECRET);
+        const { workspace_id, email: inviteEmail } = decoded;
+        
+        // Kiểm tra xem email đăng ký có khớp với email được mời không
+        if (inviteEmail === email) {
+          const invitation = await checkExistingInvitation(workspace_id, email);
+          if (invitation && invitation.token === inviteToken) {
+            // Thêm vào workspace_members và cập nhật trạng thái
+            await addMemberToWorkspace(workspace_id, newUser.user_id, invitation.role_id);
+            await updateInvitationStatus(invitation.invitation_id, 'accepted');
+          }
+        }
+      } catch (err) {
+        console.error("Lỗi khi xử lý inviteToken trong quá trình đăng ký:", err);
+        // Không block đăng ký nếu invite token hỏng
+      }
+    }
 
     return res.status(201).json({
       message: "Dang ky thanh cong",
@@ -117,6 +139,9 @@ export const signIn = async (req, res) => {
       message: "Dang nhap thanh cong",
       user: {
         user_id: user.user_id,
+        email: user.email,
+        username: user.username,
+        name: user.name,
         access_token,
       },
     });

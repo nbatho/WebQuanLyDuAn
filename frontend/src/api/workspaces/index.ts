@@ -1,5 +1,5 @@
 import { beApi } from "../callApi";
-import type { WorkspaceMemberData, WorkspacesData } from "../../types/workspaces";
+import type { invationVerificationData, WorkspaceMemberData, WorkspacesData } from "../../types/workspaces";
 
 export const getWorkspaces = async (): Promise<WorkspacesData[]> => {
     return beApi.get("/workspaces");
@@ -39,4 +39,8 @@ export const respondToInvitation = async (token: string, action: 'accept' | 'rej
         token: token,
         action: action
     });
+}
+
+export const verifyInvitation = async (token: string) : Promise<invationVerificationData> => {
+    return beApi.get(`members/invitations/verify/${token}`);
 }

@@ -39,7 +39,7 @@ export const fetchStatusesBySpace = createAsyncThunk<StatusData[], number>(
         try {
             const response = await getStatusesBySpace(spaceId);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch statuses');
         }
     },
@@ -51,7 +51,7 @@ export const fetchStatusById = createAsyncThunk<StatusData, number>(
         try {
             const response = await getStatusById(statusId);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch status');
         }
     },
@@ -66,7 +66,7 @@ export const fetchCreateStatus = createAsyncThunk<
         try {
             const response = await createTaskStatus(spaceId, body);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to create status');
         }
     },
@@ -81,7 +81,7 @@ export const fetchUpdateStatus = createAsyncThunk<
         try {
             const response = await updateTaskStatus(statusId, body);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to update status');
         }
     },
@@ -93,7 +93,7 @@ export const fetchDeleteStatus = createAsyncThunk<number, number>(
         try {
             await deleteTaskStatus(statusId);
             return statusId;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to delete status');
         }
     },
@@ -108,7 +108,7 @@ export const fetchReorderStatus = createAsyncThunk<
         try {
             const response = await reorderStatus(statusId, position);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to reorder status');
         }
     },
@@ -202,6 +202,6 @@ export const statusesSlice = createSlice({
     },
 });
 
-export const {} = statusesSlice.actions;
+
 
 export default statusesSlice.reducer;

@@ -97,6 +97,7 @@ app.get("/db-health", async (req, res) => {
   }
 });
 app.use("/api/v1/auth", authRoutes);
+app.use('/api/v1/members', memberRoutes);
 
 //private route
 app.use(protectedRoute);
@@ -115,7 +116,6 @@ app.use("/api/v1/activities", activityLogRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/folders", folderRoutes);
 app.use("/api/v1/lists", listRoutes);
-app.use('/api/v1/members', memberRoutes);
 app.use('/api/v1/messages', messageRoutes);
 
 //error handling middleware

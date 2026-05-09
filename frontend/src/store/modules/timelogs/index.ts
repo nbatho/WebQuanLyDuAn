@@ -45,7 +45,7 @@ export const fetchMyTimeLogs = createAsyncThunk<TimeLogData[]>(
         try {
             const response = await getMyTimeLogs();
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch time logs');
         }
     },
@@ -57,7 +57,7 @@ export const fetchRunningTimer = createAsyncThunk<TimeLogData | null>(
         try {
             const response = await getRunningTimer();
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch running timer');
         }
     },
@@ -69,7 +69,7 @@ export const fetchTimeLogsByTask = createAsyncThunk<TimeLogData[], number>(
         try {
             const response = await getTimeLogsByTask(taskId);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch time logs for task');
         }
     },
@@ -81,7 +81,7 @@ export const fetchTotalTimeByTask = createAsyncThunk<{ total_seconds: number }, 
         try {
             const response = await getTotalTimeByTask(taskId);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch total time');
         }
     },
@@ -96,7 +96,7 @@ export const fetchStartTimer = createAsyncThunk<
         try {
             const response = await startTimer(taskId, note);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to start timer');
         }
     },
@@ -108,7 +108,7 @@ export const fetchStopTimer = createAsyncThunk<TimeLogData, number>(
         try {
             const response = await stopTimer(timeLogId);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to stop timer');
         }
     },
@@ -120,7 +120,7 @@ export const fetchDeleteTimeLog = createAsyncThunk<number, number>(
         try {
             await deleteTimeLog(timeLogId);
             return timeLogId;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to delete time log');
         }
     },
@@ -224,6 +224,6 @@ export const timeLogsSlice = createSlice({
     },
 });
 
-export const {} = timeLogsSlice.actions;
+
 
 export default timeLogsSlice.reducer;

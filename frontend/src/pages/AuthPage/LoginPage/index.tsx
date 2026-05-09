@@ -1,16 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, Input, Checkbox, message } from 'antd';
 import { ArrowRight, Mail, Lock, User, CheckCircle, Users, BarChart3, Blocks, GitBranch, Code } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom'; // Thêm useLocation, useSearchParams
 import './auth.css';
 import { useDispatch } from 'react-redux';
 import type { AppDispatch } from '@/store/configureStore';
 import { fetchSignIn, fetchSignUp } from '@/store/modules/auth';
 import { getWorkspaces } from '@/api/workspaces';
+
 export default function AuthPage() {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
-    const [isRegister, setIsRegister] = useState(false);
+
+    // ==========================================
+    // 1. Bắt các tham số từ URL
+    // ==========================================
+    const location = useLocation();
+    const [searchParams] = useSearchParams();
+    const urlEmail = searchParams.get('email');
+    const redirectUrl = searchParams.get('redirect');
+    const inviteToken = searchParams.get('invite_token');
+
+    // ==========================================
+    // 2. Tự động chuyển tab dựa vào URL (VD: /register)
+    // ==========================================
+    const [isRegister, setIsRegister] = useState(location.pathname === '/register');
 
     /* ── Login state ── */
     const [loginEmail, setLoginEmail] = useState('');
@@ -26,6 +40,12 @@ export default function AuthPage() {
 
     const [isLoggingIn, setIsLoggingIn] = useState(false);
     const [isRegistering, setIsRegistering] = useState(false);
+    useEffect(() => {
+        if (urlEmail) {
+            setLoginEmail(urlEmail);
+            setRegEmail(urlEmail);
+        }
+    }, [urlEmail]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -33,14 +53,19 @@ export default function AuthPage() {
         setIsLoggingIn(true);
         try {
             await dispatch(fetchSignIn({ email: loginEmail, password: loginPass })).unwrap();
-            // Check if user has workspaces
+
+            if (redirectUrl) {
+                navigate(redirectUrl);
+                return;
+            }
+
             const workspaces = await getWorkspaces();
             if (Array.isArray(workspaces) && workspaces.length > 0) {
                 navigate('/home');
             } else {
                 navigate('/workspace-setup');
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Login failed:', error);
             message.error(typeof error === 'string' ? error : 'Đăng nhập thất bại. Kiểm tra lại email và mật khẩu.');
         } finally {
@@ -57,12 +82,24 @@ export default function AuthPage() {
         }
         setIsRegistering(true);
         try {
-            await dispatch(fetchSignUp({ email: regEmail, password: regPass, username: regName, name: regName })).unwrap();
+            await dispatch(fetchSignUp({
+                email: regEmail,
+                password: regPass,
+                username: regName,
+                name: regName,
+                inviteToken: inviteToken || undefined // Chỉ truyền nếu có token
+            })).unwrap();
+
             message.success('Đăng ký thành công! Đang đăng nhập...');
-            // Auto-login after register
+
             await dispatch(fetchSignIn({ email: regEmail, password: regPass })).unwrap();
-            navigate('/workspace-setup');
-        } catch (error: any) {
+
+            if (inviteToken) {
+                navigate('/home');
+            } else {
+                navigate('/workspace-setup');
+            }
+        } catch (error: unknown) {
             console.error('Registration failed:', error);
             message.error(typeof error === 'string' ? error : 'Đăng ký thất bại. Vui lòng thử lại.');
         } finally {
@@ -229,7 +266,8 @@ export default function AuthPage() {
                                         type="email"
                                         value={loginEmail}
                                         onChange={(e) => setLoginEmail(e.target.value)}
-                                        className="h-11! bg-[#f1f3ff]! rounded-lg! border-0! text-[#141b2b]! font-medium!"
+                                        disabled={!!urlEmail} // KHÓA Ô NẾU ĐẾN TỪ LỜI MỜI
+                                        className="h-11! bg-[#f1f3ff]! rounded-lg! border-0! text-[#141b2b]! font-medium! disabled:bg-[#e2e6f0]! disabled:text-[#6b7280]!"
                                     />
                                 </div>
 
@@ -267,10 +305,11 @@ export default function AuthPage() {
                                     htmlType="submit"
                                     size="large"
                                     block
+                                    loading={isLoggingIn}
                                     className="group h-12! rounded-lg! font-bold! text-base! border-0! flex! items-center! justify-center! gap-2!"
                                 >
                                     <span>Sign into Dashboard</span>
-                                    <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+                                    {!isLoggingIn && <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />}
                                 </Button>
 
                                 <div className="relative py-2 flex items-center">
@@ -335,7 +374,8 @@ export default function AuthPage() {
                                         type="email"
                                         value={regEmail}
                                         onChange={(e) => setRegEmail(e.target.value)}
-                                        className="h-12! bg-white! rounded-lg! border-2! border-[#c2c6d6]! focus-within:border-[#0058be]! transition-colors!"
+                                        disabled={!!urlEmail} // KHÓA Ô NẾU ĐẾN TỪ LỜI MỜI
+                                        className="h-12! bg-white! rounded-lg! border-2! border-[#c2c6d6]! focus-within:border-[#0058be]! transition-colors! disabled:bg-[#f3f4f6]! disabled:text-[#9ca3af]!"
                                     />
                                 </div>
 
@@ -383,6 +423,7 @@ export default function AuthPage() {
                                     htmlType="submit"
                                     size="large"
                                     block
+                                    loading={isRegistering}
                                     className="h-11! rounded-lg! font-bold! text-sm! border-0!"
                                 >
                                     Create Account

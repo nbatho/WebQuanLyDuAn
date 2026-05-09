@@ -2,9 +2,10 @@ import { Resend } from "resend";
 import express from "express";
 import dotenv from "dotenv";
 const resend = new Resend(process.env.RESEND_API_KEY);
-import { createInvitations, checkExistingInvitation, deleteInvitation, updateInvitationStatus,addMemberToWorkspace } from "../models/Member.js";
+import { createInvitations, checkExistingInvitation, deleteInvitation, updateInvitationStatus, addMemberToWorkspace } from "../models/Member.js";
 import jwt from 'jsonwebtoken';
-
+import { findWorkspaceById } from "../models/Workspaces.js";
+import { findUserById } from "../models/Users.js";
 export const InviteMember = async (req, res) => {
     try {
         const { email, workspace_id, role } = req.body;
@@ -13,7 +14,7 @@ export const InviteMember = async (req, res) => {
         if (!email || !workspace_id || !role) {
             return res.status(400).json({ message: "Email, workspace_id và role là bắt buộc", receivedBody: req.body });
         }
-        
+
         const trimmedRole = role.trim();
 
         const existingInvitation = await checkExistingInvitation(workspace_id, email);
@@ -21,9 +22,21 @@ export const InviteMember = async (req, res) => {
             return res.status(400).json({ message: "Lời mời đã được gửi trước đó" });
         }
 
-        // 2. Tạo Token (Dùng JWT như code của bạn)
+        const workspace = await findWorkspaceById(workspace_id);
+        const inviter = await findUserById(req.user.user_id);
+
+        const workspaceName = workspace?.name || "Workspace";
+        const inviterName = inviter?.name || inviter?.username || "Một thành viên";
+        const inviterEmail = inviter?.email || "";
+        // 3. Tạo Token (Nhúng thêm workspaceName và inviterName)
         const inviteToken = jwt.sign(
-            { email: email, workspace_id },
+            {
+                email: email,
+                workspace_id: workspace_id,
+                workspaceName: workspaceName,
+                inviterName: inviterName,
+                inviterEmail: inviterEmail
+            },
             process.env.EMAIL_TOKEN_SECRET,
             { expiresIn: "1d" }
         );
@@ -37,16 +50,17 @@ export const InviteMember = async (req, res) => {
         const invitationLink = `${clientUrl}/join-workspace?token=${inviteToken}`;
 
         const { data, error } = await resend.emails.send({
-            from: "Acme <onboarding@resend.dev>",
+            from: "Flowise <onboarding@resend.dev>",
             to: [email],
-            subject: "Bạn có lời mời tham gia Workspace",
+            subject: `${inviterName} đã mời bạn tham gia ${workspaceName} trên Floswise`,
             html: `
-                <div style="font-family: sans-serif; padding: 20px;">
+                <div style="font-family: sans-serif; padding: 20px; color: #333;">
                     <h2>Chào bạn,</h2>
-                    <p>Bạn vừa nhận được lời mời tham gia Workspace.</p>
-                    <p>Vui lòng click vào nút bên dưới để chấp nhận (Link có hiệu lực trong 1 giờ):</p>
-                    <a href="${invitationLink}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-                        Chấp nhận lời mời
+                    <p><strong>${inviterName}</strong> vừa mời bạn tham gia làm việc trong dự án <strong>${workspaceName}</strong>.</p>
+                    <p>Vui lòng click vào nút bên dưới để chấp nhận (Link có hiệu lực trong 24 giờ):</p>
+                    <br/>
+                    <a href="${invitationLink}" style="display: inline-block; padding: 12px 24px; background-color: #0058be; color: white; font-weight: bold; text-decoration: none; border-radius: 8px;">
+                        Tham gia ngay
                     </a>
                 </div>
             `,
@@ -58,7 +72,6 @@ export const InviteMember = async (req, res) => {
             return res.status(400).json({ message: "Không thể gửi email lúc này", error });
         }
 
-        // Trả về thành công
         res.status(200).json({ message: "Đã gửi lời mời thành công", data });
 
     } catch (error) {
@@ -67,6 +80,44 @@ export const InviteMember = async (req, res) => {
     }
 }
 
+export const verifyInvitation = async (req, res) => {
+    try {
+        const { token } = req.params;
+        if (!token) {
+            return res.status(400).json({ message: "Token là bắt buộc" });
+        }
+
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.EMAIL_TOKEN_SECRET);
+        } catch (err) {
+            return res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
+        }
+
+        const { email, workspace_id, workspaceName, inviterName, inviterEmail } = decoded;
+
+        const invitation = await checkExistingInvitation(workspace_id, email);
+        if (!invitation || invitation.token !== token) {
+            return res.status(404).json({ message: "Lời mời không tồn tại, đã bị thu hồi hoặc đã được xử lý" });
+        }
+
+        const { findUserByEmail } = await import("../models/Users.js");
+        const existingUser = await findUserByEmail(email);
+
+        return res.status(200).json({
+            email: email,
+            isUserExists: !!existingUser,
+            workspaceId: workspace_id,
+            workspaceName: workspaceName,
+            inviterName: inviterName,
+            inviterEmail: inviterEmail
+        });
+
+    } catch (error) {
+        console.error("Error verifying invitation:", error);
+        return res.status(500).json({ message: "Lỗi Server nội bộ" });
+    }
+};
 export const RespondToInvitation = async (req, res) => {
     try {
         const { token, action } = req.body;
@@ -103,7 +154,7 @@ export const RespondToInvitation = async (req, res) => {
             await addMemberToWorkspace(workspace_id, req.user.user_id, invitation.role_id);
             await updateInvitationStatus(invitation.invitation_id, 'accepted');
             return res.status(200).json({ message: "Bạn đã gia nhập Workspace thành công!" });
-        } 
+        }
         else if (action === 'reject') {
             await updateInvitationStatus(invitation.invitation_id, 'rejected'); // Dùng 'rejected' thay vì 'declined'
             return res.status(200).json({ message: "Bạn đã từ chối lời mời tham gia Workspace." });
@@ -115,4 +166,4 @@ export const RespondToInvitation = async (req, res) => {
     }
 };
 
-export const RemoveMember = async (req, res) => {}
+export const RemoveMember = async (req, res) => { }

@@ -26,7 +26,7 @@ export const fetchCommentsByTask = createAsyncThunk<CommentData[], number>(
         try {
             const response = await getCommentsByTask(taskId);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch comments');
         }
     },
@@ -41,7 +41,7 @@ export const fetchCreateComment = createAsyncThunk<
         try {
             const response = await createComment(taskId, content);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to create comment');
         }
     },
@@ -89,6 +89,6 @@ export const commentsSlice = createSlice({
     },
 });
 
-export const {} = commentsSlice.actions;
+
 
 export default commentsSlice.reducer;

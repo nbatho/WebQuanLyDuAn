@@ -41,7 +41,7 @@ export default function WorkspaceSetupPage() {
             ).unwrap();
             message.success('Workspace đã được tạo thành công!');
             navigate('/home');
-        } catch (error: any) {
+        } catch (error: unknown) { 
             console.error('Failed to create workspace:', error);
             message.error(typeof error === 'string' ? error : 'Không thể tạo workspace. Vui lòng thử lại.');
         } finally {

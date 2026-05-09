@@ -8,20 +8,21 @@ export const fetchSignIn = createAsyncThunk<SignInResponse, SignInRequest, { rej
         try {
             const response = await signIn(email, password);
             return response;
-        } catch (error: any) {
-            const message = error?.response?.data?.message || error?.message || "Failed to sign in";
+        } catch (error: unknown) { const err = error as any;
+            const message = err?.response?.data?.message || err?.message || "Failed to sign in";
             return rejectWithValue(message);
         }
     }
 );
 export const fetchSignUp = createAsyncThunk<SignUpResponse, SignUpRequest, { rejectValue: string }>(
     "auth/fetchSignUp",
-    async ({ email, password, username, name }, { rejectWithValue }) => {
+    async ({ email, password, username, name, inviteToken }, { rejectWithValue }) => {
         try {
-            const response = await signUp(email, password, username, name);
+            const response = await signUp(email, password, username, name, inviteToken);
             return response;
-        } catch (error: any) {
-            const message = error?.response?.data?.message || error?.message || "Failed to sign up";
+        } catch (error: unknown) {
+            const err = error as any;
+            const message = err?.response?.data?.message || err?.message || "Failed to sign up";
             return rejectWithValue(message);
         }
     }
@@ -31,8 +32,8 @@ export const fetchSignOut = createAsyncThunk<void, void, { rejectValue: string }
     async (_, { rejectWithValue }) => { 
         try {
             await signOut();
-        } catch (error: any) {
-            const message = error?.response?.data?.message || error?.message || "Failed to sign out";
+        } catch (error: unknown) { const err = error as any;
+            const message = err?.response?.data?.message || err?.message || "Failed to sign out";
             return rejectWithValue(message);
         }
     }
@@ -43,8 +44,8 @@ export const fetchRefreshToken = createAsyncThunk<SignInResponse, void, { reject
         try {
             const response = await refreshToken();
             return response;
-        } catch (error: any) {
-            const message = error?.response?.data?.message || error?.message || "Failed to refresh token";
+        } catch (error: unknown) { const err = error as any;
+            const message = err?.response?.data?.message || err?.message || "Failed to refresh token";
             return rejectWithValue(message);
         }
     }
@@ -139,8 +140,5 @@ const authSlice = createSlice({
         });
     }
 });
-export const {
 
-
-} = authSlice.actions;
 export default authSlice.reducer;

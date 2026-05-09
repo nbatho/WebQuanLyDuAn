@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Hash, Plus, Search, Send, MessageSquare, Users, X, ChevronDown } from 'lucide-react';
+import { Hash, Plus, Send, MessageSquare, X } from 'lucide-react';
 import { message } from 'antd';
 import { useAppSelector } from '../../hooks';
 import * as msgApi from '../../api/messages';
@@ -28,13 +28,12 @@ export default function InboxPage() {
     const currentWsId = useAppSelector(s => s.workspaces.currentWorkspaceId);
     const wsMembers = useAppSelector(s => s.workspaces.listWorkspaceMembers);
     const currentUser = useAppSelector(s => s.auth.user);
-    const spaces = useAppSelector(s => s.spaces.listSpace);
+    const spaces = useAppSelector(s => s.spaces.listSpaces);
 
     const [convos, setConvos] = useState<ConversationData[]>([]);
     const [activeId, setActiveId] = useState<number | null>(null);
     const [messages, setMessages] = useState<MessageData[]>([]);
     const [input, setInput] = useState('');
-    const [loading, setLoading] = useState(false);
 
     // Modals
     const [showNewDM, setShowNewDM] = useState(false);
@@ -245,7 +244,6 @@ export default function InboxPage() {
                                 <div className="flex items-center justify-center py-20 text-[13px] text-[#9aa0a6]">Chưa có tin nhắn. Hãy gửi tin nhắn đầu tiên!</div>
                             )}
                             {messages.map((msg, i) => {
-                                const isMe = msg.sender_id === currentUser?.user_id;
                                 const showAvatar = i === 0 || messages[i - 1].sender_id !== msg.sender_id;
                                 return (
                                     <div key={msg.message_id} className={`group flex gap-3 ${showAvatar ? 'mt-3' : 'mt-0.5'}`}>

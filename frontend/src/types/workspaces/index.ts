@@ -18,7 +18,14 @@ export interface WorkspacesData {
     created_at?: string;
     updated_at?: string;
 }
-
+export interface invationVerificationData {
+    email : string;
+    inviterName : string;
+    inviterEmail : string;
+    isUserExists : boolean;
+    workspaceId : string;
+    workspaceName : string;
+}
 export interface WorkspacesState {
     listWorkspaces: WorkspacesData[];
     currentWorkspaceId: number | null;
@@ -29,4 +36,7 @@ export interface WorkspacesState {
     listWorkspaceMembers: WorkspaceMemberData[];    
     isLoadingWorkspaceMembers: boolean;
     workspaceMembersError: string | null;
+    isVerifyingInvitation: boolean;
+    verifyInvitationError: string | null;
+    verifyInvitationData: invationVerificationData | null;
 }

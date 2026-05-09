@@ -42,7 +42,7 @@ export const fetchMilestonesBySpace = createAsyncThunk<MilestoneData[], number>(
         try {
             const response = await getMilestonesBySpace(spaceId);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch milestones');
         }
     },
@@ -54,7 +54,7 @@ export const fetchMilestoneById = createAsyncThunk<MilestoneData, number>(
         try {
             const response = await getMilestoneById(milestoneId);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch milestone');
         }
     },
@@ -76,7 +76,7 @@ export const fetchCreateMilestone = createAsyncThunk<
         try {
             const response = await createMilestone(spaceId, body);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to create milestone');
         }
     },
@@ -98,7 +98,7 @@ export const fetchUpdateMilestone = createAsyncThunk<
         try {
             const response = await updateMilestone(milestoneId, body);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to update milestone');
         }
     },
@@ -110,7 +110,7 @@ export const fetchDeleteMilestone = createAsyncThunk<number, number>(
         try {
             await deleteMilestone(milestoneId);
             return milestoneId;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to delete milestone');
         }
     },
@@ -196,6 +196,6 @@ export const milestonesSlice = createSlice({
     },
 });
 
-export const {} = milestonesSlice.actions;
+
 
 export default milestonesSlice.reducer;

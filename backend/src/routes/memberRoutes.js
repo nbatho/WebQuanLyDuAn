@@ -1,22 +1,26 @@
 import express from "express";
 import {
     InviteMember,
+    verifyInvitation,
     RespondToInvitation,
     RemoveMember,
 } from "../controllers/memberController.js";
 
 // Import Middleware Phân quyền
 import { requirePermission } from '../middlewares/roleMiddlewares.js';
-
+import { protectedRoute } from "../middlewares/authMiddlewares.js";
 const router = express.Router();
 
+// Xác minh lời mời (trước khi đăng nhập/đăng ký)
+router.get("/invitations/verify/:token", verifyInvitation);
+
 // Mời thành viên vào Workspace -> Yêu cầu quyền: WORKSPACE_INVITE_MEMBER (Chỉ Admin)
-router.post("/invitations", requirePermission('WORKSPACE_INVITE_MEMBER'), InviteMember);
+router.post("/invitations", protectedRoute, requirePermission('WORKSPACE_INVITE_MEMBER'), InviteMember);
 
 // Phản hồi lời mời (accept/reject) -> Không cần check quyền (user tự xử lý lời mời của mình)
-router.post("/respond-to-invitation", RespondToInvitation);
+router.post("/respond-to-invitation",protectedRoute ,RespondToInvitation);
 
 // Xóa thành viên khỏi Workspace -> Yêu cầu quyền: WORKSPACE_MANAGE_ROLES (Chỉ Admin)
-router.post("/remove-member", requirePermission('WORKSPACE_MANAGE_ROLES'), RemoveMember);
+router.post("/remove-member", protectedRoute, requirePermission('WORKSPACE_MANAGE_ROLES'), RemoveMember);
 
 export default router;

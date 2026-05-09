@@ -46,7 +46,7 @@ export const fetchSprintsBySpace = createAsyncThunk<SprintData[], number>(
         try {
             const response = await getSprintsBySpace(spaceId);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch sprints');
         }
     },
@@ -58,7 +58,7 @@ export const fetchSprintById = createAsyncThunk<SprintData, number>(
         try {
             const response = await getSprintById(sprintId);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch sprint');
         }
     },
@@ -81,7 +81,7 @@ export const fetchCreateSprint = createAsyncThunk<
         try {
             const response = await createSprint(spaceId, body);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to create sprint');
         }
     },
@@ -105,7 +105,7 @@ export const fetchUpdateSprint = createAsyncThunk<
         try {
             const response = await updateSprint(sprintId, body);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to update sprint');
         }
     },
@@ -117,7 +117,7 @@ export const fetchDeleteSprint = createAsyncThunk<number, number>(
         try {
             await deleteSprint(sprintId);
             return sprintId;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to delete sprint');
         }
     },
@@ -203,6 +203,6 @@ export const sprintsSlice = createSlice({
     },
 });
 
-export const {} = sprintsSlice.actions;
+
 
 export default sprintsSlice.reducer;

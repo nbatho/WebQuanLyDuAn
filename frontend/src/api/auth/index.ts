@@ -6,8 +6,8 @@ export const signIn = async (email: string, password: string): Promise<SignInRes
     return beApi.post("/auth/signin", { email, password });
 }
 
-export const signUp = async (email: string, password: string, username : string, name : string): Promise<SignUpResponse> => {
-    return beApi.post("/auth/signup", { email, password, username, name });
+export const signUp = async (email: string, password: string, username : string, name : string, inviteToken?: string): Promise<SignUpResponse> => {
+    return beApi.post("/auth/signup", { email, password, username, name, inviteToken });
 }
 
 export const signOut = async (): Promise<void> => {

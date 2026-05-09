@@ -6,8 +6,7 @@ export interface UserData {
 }
 export interface SignInResponse {
     message: string;
-    user : {
-        user_id: number;
+    user : UserData & {
         access_token : string;
     }
 }
@@ -36,4 +35,5 @@ export interface SignUpRequest {
     password: string;
     username : string;
     name : string;
+    inviteToken?: string;
 }

@@ -187,7 +187,7 @@ export default function AIPage() {
                     : s
             ));
 
-        } catch (error: any) {
+        } catch (error: unknown) { 
             setSessions(prev => prev.map(s => 
                 s.id === activeSessionId 
                     ? { ...s, messages: s.messages.map(m => m.id === aiMessageId ? { 

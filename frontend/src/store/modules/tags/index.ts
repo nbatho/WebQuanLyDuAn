@@ -39,7 +39,7 @@ export const fetchTagsBySpace = createAsyncThunk<TagData[], number>(
         try {
             const response = await getTagsBySpace(spaceId);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch tags');
         }
     },
@@ -51,7 +51,7 @@ export const fetchTagById = createAsyncThunk<TagData, number>(
         try {
             const response = await getTagById(tagId);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch tag');
         }
     },
@@ -66,7 +66,7 @@ export const fetchCreateTag = createAsyncThunk<
         try {
             const response = await createTag(spaceId, body);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to create tag');
         }
     },
@@ -81,7 +81,7 @@ export const fetchUpdateTag = createAsyncThunk<
         try {
             const response = await updateTag(tagId, body);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to update tag');
         }
     },
@@ -93,7 +93,7 @@ export const fetchDeleteTag = createAsyncThunk<number, number>(
         try {
             await deleteTag(tagId);
             return tagId;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to delete tag');
         }
     },
@@ -105,7 +105,7 @@ export const fetchTaskTags = createAsyncThunk<TagData[], number>(
         try {
             const response = await getTaskTags(taskId);
             return response;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch task tags');
         }
     },
@@ -116,7 +116,7 @@ export const fetchAddTagToTask = createAsyncThunk<void, { taskId: number; tagId:
     async ({ taskId, tagId }, { rejectWithValue }) => {
         try {
             await addTagToTask(taskId, tagId);
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to add tag to task');
         }
     },
@@ -128,7 +128,7 @@ export const fetchRemoveTagFromTask = createAsyncThunk<number, { taskId: number;
         try {
             await removeTagFromTask(taskId, tagId);
             return tagId;
-        } catch (error: any) {
+        } catch (error: any) { 
             return rejectWithValue(error.response?.data?.message || 'Failed to remove tag from task');
         }
     },
@@ -223,6 +223,6 @@ export const tagsSlice = createSlice({
     },
 });
 
-export const {} = tagsSlice.actions;
+
 
 export default tagsSlice.reducer;
