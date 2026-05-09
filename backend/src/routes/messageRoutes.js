@@ -1,7 +1,4 @@
 import express from 'express';
-import multer from 'multer';
-import fs from 'fs';
-import path from 'path';
 
 import {
     getConversations,
@@ -16,19 +13,6 @@ import {
 
 const router = express.Router();
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const dir = 'uploads/messages';
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-        cb(null, dir);
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname));
-    }
-});
-const upload = multer({ storage });
-
-
 // ── Conversations ────────────────────────────────
 router.get('/conversations', getConversations);
 router.post('/direct', startDirectMessage);
@@ -41,6 +25,6 @@ router.delete('/conversations/:id/members/:userId', removeMember);
 
 // ── Messages ─────────────────────────────────────
 router.get('/:conversationId', getConversationMessages);
-router.post('/:conversationId', upload.single('file'), postMessage);
+router.post('/:conversationId', postMessage);
 
 export default router;

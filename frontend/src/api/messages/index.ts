@@ -45,20 +45,8 @@ export const getMessages = (conversationId: number, limit = 50): Promise<Message
 export const sendMessage = (
     conversationId: number, 
     content: string, 
-    file?: File | null,
     driveFile?: { url: string; name: string; mimeType: string } | null
 ): Promise<MessageData> => {
-    if (file) {
-        const formData = new FormData();
-        formData.append('content', content);
-        formData.append('file', file);
-        return beApi.post(`/messages/${conversationId}`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        });
-    }
-    
     const body: any = { content };
     if (driveFile) {
         body.fileUrl = driveFile.url;
