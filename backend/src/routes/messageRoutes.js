@@ -12,12 +12,6 @@ import {
 
 const router = express.Router();
 
-/**
- * @swagger
- * tags:
- *   - name: Messages
- *     description: Messaging & Chat endpoints
- */
 
 // ── Conversations ────────────────────────────────
 router.get('/conversations', getConversations);

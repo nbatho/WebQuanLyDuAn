@@ -16,7 +16,6 @@ import {
   tagRoutes,
   timeLogRoutes,
   activityLogRoutes,
-  roleRoutes,
   dashboardRoutes,
   folderRoutes,
   listRoutes,
@@ -37,8 +36,8 @@ const HOST = process.env.HOST || "0.0.0.0";
 
 //middleware
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
-    credentials: true,
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  credentials: true,
 }));
 app.use(express.json());
 app.use(cookieParser());
@@ -113,7 +112,6 @@ app.use("/api/v1/notifications", notificationRoutes);
 app.use("/api/v1/tags", tagRoutes);
 app.use("/api/v1/timelogs", timeLogRoutes);
 app.use("/api/v1/activities", activityLogRoutes);
-app.use("/api/v1/roles", roleRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/folders", folderRoutes);
 app.use("/api/v1/lists", listRoutes);

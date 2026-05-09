@@ -150,7 +150,6 @@ export const getTasksBySprintId = async (req, res) => {
             });
         }
 
-        // Trả về JSON giống hệt getTasksByListId
         res.status(200).json(groupedData);
 
     } catch (error) {
@@ -330,76 +329,6 @@ export const getTaskById = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-export const getSubTasksByTaskIds = async (req, res) => {
-    try {
-        const { taskId } = req.params;
-        if (!taskId) {
-            return res.status(400).json({ error: "Task ID is required" });
-        }
-        const subtasks = await getSubtasksByTaskId(taskId);
-        res.status(200).json(subtasks);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-export const createSubTasks = async (req, res) => {
-    try {
-        const { taskId } = req.params;
-        const { name, description } = req.body;
-        if (!taskId) {
-            return res.status(400).json({ error: "Task ID is required" });
-        }
-        if (!name) {
-            return res.status(400).json({ error: "Name is required" });
-        }
-        const newSubtask = await createSubtask(name, description || null, taskId);
-        res.status(201).json(newSubtask);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-export const updateSubTasks = async (req, res) => {
-    try {
-        const { subtaskId } = req.params;
-        const updateData = req.body;
-        if (!subtaskId) {
-            return res.status(400).json({ error: "Subtask ID is required" });
-        }
-        if (!updateData.parent_task_id) {
-            return res.status(400).json({ error: "Parent Task ID is required" });
-        }
-        const updated = await updateSubtask(subtaskId, updateData.parent_task_id, updateData);
-        if (!updated) {
-            return res.status(400).json({ error: "Không có dữ liệu hợp lệ để cập nhật" });
-        }
-        res.status(200).json(updated);
-    } catch (error) {
-        if (error.statusCode) {
-            return res.status(error.statusCode).json({ error: error.message });
-        }
-        res.status(500).json({ error: error.message });
-    }
-};
-export const deleteSubTasks = async (req, res) => {
-    try {
-        const { subtaskId } = req.params;
-        const { parent_task_id } = req.body;
-        if (!subtaskId) {
-            return res.status(400).json({ error: "Subtask ID is required" });
-        }
-        if (!parent_task_id) {
-            return res.status(400).json({ error: "Parent Task ID is required" });
-        }
-        await deleteSubtask(subtaskId, parent_task_id);
-        res.status(200).json({ message: "Subtask deleted successfully" });
-    } catch (error) {
-        if (error.statusCode) {
-            return res.status(error.statusCode).json({ error: error.message });
-        }
-        res.status(500).json({ error: error.message });
-    }
-};
-
 export const getCommentsByTaskIds = async (req, res) => {
     try {
         const { taskId } = req.params;

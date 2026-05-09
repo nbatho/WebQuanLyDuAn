@@ -25,11 +25,12 @@ export const getWorkspaceMembers = async (workspace_id: number): Promise<Workspa
     return beApi.get(`/workspaces/${workspace_id}/members`);
 }
 
-export const inviteMembers = async (workspaceId: string, emails: string) => {
-    
+export const inviteMembers = async (workspaceId: string, emails: string, role: string) => {
+    console.log("SENDING INVITATION FROM FE:", { email : emails, workspace_id : workspaceId, role: role });
     return beApi.post(`/members/invitations`, {
         email : emails,
-        workspace_id : workspaceId
+        workspace_id : workspaceId,
+        role: role
     });
 }
 

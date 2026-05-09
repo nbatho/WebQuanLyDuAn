@@ -101,7 +101,6 @@ export const deleteTags = async (req, res) => {
   }
 };
 
-// Task-Tag relationship controllers
 export const getTaskTags = async (req, res) => {
   try {
     const { taskId } = req.params;

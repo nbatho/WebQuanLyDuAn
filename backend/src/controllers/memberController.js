@@ -7,12 +7,14 @@ import jwt from 'jsonwebtoken';
 
 export const InviteMember = async (req, res) => {
     try {
-        const { email, workspace_id } = req.body;
+        const { email, workspace_id, role } = req.body;
 
         // 1. Validate đầu vào
-        if (!email || !workspace_id) {
-            return res.status(400).json({ message: "Email và workspace_id là bắt buộc" });
+        if (!email || !workspace_id || !role) {
+            return res.status(400).json({ message: "Email, workspace_id và role là bắt buộc", receivedBody: req.body });
         }
+        
+        const trimmedRole = role.trim();
 
         const existingInvitation = await checkExistingInvitation(workspace_id, email);
         if (existingInvitation) {
@@ -26,7 +28,7 @@ export const InviteMember = async (req, res) => {
             { expiresIn: "1d" }
         );
 
-        const invitationRecord = await createInvitations(workspace_id, email, inviteToken, req.user.user_id);
+        const invitationRecord = await createInvitations(workspace_id, email, inviteToken, req.user.user_id, trimmedRole);
         if (!invitationRecord) {
             return res.status(500).json({ message: "Không thể tạo lời mời lúc này" });
         }
@@ -96,9 +98,9 @@ export const RespondToInvitation = async (req, res) => {
             return res.status(404).json({ message: "Lời mời không tồn tại hoặc đã được xử lý" });
         }
 
-
+        console.log(invitation);
         if (action === 'accept') {
-            await addMemberToWorkspace(workspace_id, req.user.user_id);
+            await addMemberToWorkspace(workspace_id, req.user.user_id, invitation.role_id);
             await updateInvitationStatus(invitation.invitation_id, 'accepted');
             return res.status(200).json({ message: "Bạn đã gia nhập Workspace thành công!" });
         } 

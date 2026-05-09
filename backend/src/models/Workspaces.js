@@ -28,7 +28,7 @@ export const createWorkspace = async (name, description, slug, owner_id) => {
 
         const insertMemberQuery = `
             INSERT INTO workspace_members (workspace_id, user_id, role_id) 
-            VALUES ($1, $2, (SELECT role_id FROM roles WHERE role_name = 'admin'))
+            VALUES ($1, $2, (SELECT role_id FROM roles WHERE LOWER(role_name) = 'admin' LIMIT 1))
             ON CONFLICT (workspace_id, user_id)
             DO UPDATE SET role_id = EXCLUDED.role_id, deleted_at = NULL
         `;

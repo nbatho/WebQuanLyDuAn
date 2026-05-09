@@ -441,3 +441,84 @@ LEFT JOIN LATERAL (
 ) tl ON TRUE
 WHERE t.is_archived = FALSE AND t.deleted_at IS NULL AND ta.deleted_at IS NULL
 GROUP BY ta.user_id, t.space_id;
+
+
+-- =================================================================
+-- FLOSWISE - SEEDING ROLES & PERMISSIONS (CLEAN VERSION)
+-- =================================================================
+
+-- 1. Thêm Roles
+INSERT INTO roles (role_id, role_name) VALUES
+(1, 'ADMIN'),
+(2, 'MANAGER'),
+(3, 'MEMBER'),
+(4, 'GUEST')
+ON CONFLICT (role_name) DO NOTHING;
+
+-- Khôi phục lại sequence cho roles_id
+SELECT setval('roles_role_id_seq', (SELECT MAX(role_id) FROM roles));
+
+-- 2. Thêm Permissions
+INSERT INTO permissions (permission_id, permission_name, category) VALUES
+-- Workspace
+(1, 'WORKSPACE_UPDATE', 'WORKSPACE'), 
+(2, 'WORKSPACE_DELETE', 'WORKSPACE'),
+(3, 'WORKSPACE_INVITE_MEMBER', 'WORKSPACE'), 
+(4, 'WORKSPACE_MANAGE_ROLES', 'WORKSPACE'),
+
+-- Space & Structure
+(5, 'SPACE_CREATE', 'SPACE'), 
+(6, 'SPACE_UPDATE', 'SPACE'), 
+(7, 'SPACE_DELETE', 'SPACE'),
+(8, 'SPACE_MANAGE_MEMBERS', 'SPACE'), 
+(9, 'FOLDER_MANAGE', 'STRUCTURE'), 
+(10, 'LIST_MANAGE', 'STRUCTURE'), 
+(11, 'SETTING_MANAGE', 'STRUCTURE'), 
+
+-- Task
+(12, 'TASK_CREATE', 'TASK'), 
+(13, 'TASK_UPDATE', 'TASK'), 
+(14, 'TASK_DELETE', 'TASK'),
+(15, 'TASK_CHANGE_STATUS', 'TASK'), 
+(16, 'TASK_ASSIGN', 'TASK'),
+
+-- Interaction
+(17, 'COMMENT_CREATE', 'INTERACTION'), 
+(18, 'COMMENT_DELETE_OWN', 'INTERACTION'), 
+(19, 'COMMENT_DELETE_ANY', 'INTERACTION'),
+(20, 'TIME_LOG_ADD', 'INTERACTION'), 
+(21, 'ATTACHMENT_ADD', 'INTERACTION')
+ON CONFLICT (permission_name) DO NOTHING;
+
+-- Khôi phục lại sequence cho permissions_id
+SELECT setval('permissions_permission_id_seq', (SELECT MAX(permission_id) FROM permissions));
+
+-- 3. Mapping: Role_Permissions
+-- Xóa data cũ để map lại từ đầu (đảm bảo sạch sẽ khi chạy seed nhiều lần)
+TRUNCATE TABLE role_permissions CASCADE;
+
+INSERT INTO role_permissions (role_id, permission_id) VALUES
+-- ==========================================
+-- ADMIN (Role 1): Co TAT CA cac quyen (1 den 21)
+-- ==========================================
+(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10), 
+(1, 11), (1, 12), (1, 13), (1, 14), (1, 15), (1, 16), (1, 17), (1, 18), (1, 19), (1, 20), (1, 21),
+
+-- ==========================================
+-- MANAGER (Role 2): Quan ly Space & Task (Khong duoc xoa Workspace, khong doi role he thong)
+-- ==========================================
+(2, 6), (2, 8), (2, 9), (2, 10), (2, 11), 
+(2, 12), (2, 13), (2, 14), (2, 15), (2, 16), 
+(2, 17), (2, 18), (2, 19), (2, 20), (2, 21), 
+
+-- ==========================================
+-- MEMBER (Role 3): Lam viec binh thuong
+-- ==========================================
+(3, 12), (3, 13), (3, 15), (3, 16), 
+(3, 17), (3, 18), (3, 20), (3, 21), 
+
+-- ==========================================
+-- GUEST (Role 4): Khach moi / Quan sat vien
+-- ==========================================
+(4, 15), 
+(4, 17), (4, 18), (4, 21);

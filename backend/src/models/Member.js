@@ -1,13 +1,13 @@
 import con from "../config/connect.js";
 
-export const createInvitations = async (workspace_id, email, token, invited_by) => {
+export const createInvitations = async (workspace_id, email, token, invited_by, role) => {
     try {
         const query = `
-            INSERT INTO workspace_invitations (workspace_id, email, token, invited_by) 
-            VALUES ($1, $2, $3, $4) 
+            INSERT INTO workspace_invitations (workspace_id, email, token, invited_by, role_id) 
+            VALUES ($1, $2, $3, $4, (SELECT role_id FROM roles WHERE LOWER(role_name) = LOWER($5) LIMIT 1)) 
             RETURNING *;
         `;
-        const result = await con.query(query, [workspace_id, email, token, invited_by]);
+        const result = await con.query(query, [workspace_id, email, token, invited_by, role]);
 
         return result.rows[0];
     } catch (error) {
@@ -38,16 +38,16 @@ export const deleteInvitation = async (invitation_id) => {
     }
 };
 
-export const addMemberToWorkspace = async (workspace_id, user_id) => {
+export const addMemberToWorkspace = async (workspace_id, user_id, role_id) => {
     try {
         const query = `
-            INSERT INTO workspace_members (workspace_id, user_id) 
-            VALUES ($1, $2) 
+            INSERT INTO workspace_members (workspace_id, user_id, role_id) 
+            VALUES ($1, $2, $3) 
             ON CONFLICT (workspace_id, user_id)
-            DO UPDATE SET deleted_at = NULL
+            DO UPDATE SET deleted_at = NULL, role_id = EXCLUDED.role_id
             RETURNING *;
         `;
-        const result = await con.query(query, [workspace_id, user_id]);
+        const result = await con.query(query, [workspace_id, user_id, role_id]);
         return result.rows[0];
     } catch (error) {
         console.error("Database Error in addMemberToWorkspace:", error);

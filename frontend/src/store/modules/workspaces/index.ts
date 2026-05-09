@@ -105,11 +105,11 @@ export const fetchWorkspaceMembers = createAsyncThunk<
 
 export const sendInvitations = createAsyncThunk<
     void,
-    { workspaceId: string; emails: string },
+    { workspaceId: string; emails: string; role: string },
     { rejectValue: string }
->('workspaces/sendInvitations', async ( { workspaceId, emails }, { rejectWithValue }) => {
+>('workspaces/sendInvitations', async ( { workspaceId, emails, role }, { rejectWithValue }) => {
     try {
-        await inviteMembers(workspaceId, emails);
+        await inviteMembers(workspaceId, emails, role);
     } catch (error: unknown) {
         const msg = error instanceof Error ? error.message : 'Failed to send invitations';
         return rejectWithValue(msg);

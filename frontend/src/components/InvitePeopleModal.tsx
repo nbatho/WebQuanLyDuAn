@@ -10,7 +10,7 @@ type InvitePeopleModalProps = {
     onOpenChange: (open: boolean) => void;
 };
 
-type InviteRole = 'member' | 'limited_member' | 'guest' | 'admin';
+type InviteRole = 'ADMIN' | 'MANAGER' | 'MEMBER' | 'GUEST';
 
 const roleOptions: Array<{
     id: InviteRole;
@@ -19,23 +19,23 @@ const roleOptions: Array<{
     badge?: string;
 }> = [
         {
-            id: 'member',
+            id: 'MEMBER',
             label: 'Member',
             description: 'Can access all public items in your Workspace.',
         },
         {
-            id: 'limited_member',
-            label: 'Limited Member',
+            id: 'MANAGER',
+            label: 'Manager',
             description: 'Can only access items shared with them.',
             badge: 'Chat Collaborator',
         },
         {
-            id: 'guest',
+            id: 'GUEST',
             label: 'Guest',
             description: "Can't use all features or be added to Spaces. Can only access items shared with them.",
         },
         {
-            id: 'admin',
+            id: 'ADMIN',
             label: 'Admin',
             description: 'Can manage Spaces, People, Billing and other Workspace settings.',
         },
@@ -43,7 +43,7 @@ const roleOptions: Array<{
 
 export default function InvitePeopleModal({ open, onOpenChange }: InvitePeopleModalProps) {
     const [emails, setEmails] = useState('');
-    const [role, setRole] = useState<InviteRole>('member');
+    const [role, setRole] = useState<InviteRole>('MEMBER');
     const [showRolePicker, setShowRolePicker] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
     const roleValue = useMemo(
@@ -56,10 +56,10 @@ export default function InvitePeopleModal({ open, onOpenChange }: InvitePeopleMo
         if (!emails.trim()) {
             return;
         }
-
         await dispatch(sendInvitations({
             workspaceId: currentWorkspaceId?.toString() || '',
             emails: emails.trim(),
+            role: role,
         }));
         onOpenChange(false);
     };
@@ -163,10 +163,7 @@ export default function InvitePeopleModal({ open, onOpenChange }: InvitePeopleMo
                                     </p>
                                 </button>
                             ))}
-                        </div>
-                        <div className="mt-2 border-t border-(--color-border) pt-2 text-[12px] font-semibold text-(--color-text-secondary)">
-                            + Add custom role
-                        </div>
+                        </div>  
                     </div>
                 </div>
 
