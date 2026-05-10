@@ -1,5 +1,6 @@
 import {
   findStatusesByListId,
+  findStatusesBySpaceId,
   findStatusById,
   createStatus,
   updateStatusById,
@@ -17,6 +18,20 @@ export const getStatusesByListId = async (req, res) => {
     res.status(200).json(statuses);
   } catch (error) {
     console.error("Failed to retrieve statuses:", error.message);
+    res.status(500).json({ error: "Failed to retrieve statuses" });
+  }
+};
+
+export const getStatusesBySpaceId = async (req, res) => {
+  try {
+    const { spaceId } = req.params;
+    if (!spaceId) {
+      return res.status(400).json({ error: "Space ID is required" });
+    }
+    const statuses = await findStatusesBySpaceId(spaceId);
+    res.status(200).json(statuses);
+  } catch (error) {
+    console.error("Failed to retrieve statuses by space:", error.message);
     res.status(500).json({ error: "Failed to retrieve statuses" });
   }
 };

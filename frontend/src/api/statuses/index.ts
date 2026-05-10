@@ -5,6 +5,10 @@ export const getStatusesBySpace = async (spaceId: number): Promise<StatusData[]>
     return beApi.get(`/statuses/spaces/${spaceId}`);
 };
 
+export const getStatusesByList = async (listId: number): Promise<StatusData[]> => {
+    return beApi.get(`/statuses/lists/${listId}`);
+};
+
 export const getStatusById = async (statusId: number): Promise<StatusData> => {
     return beApi.get(`/statuses/${statusId}`);
 };

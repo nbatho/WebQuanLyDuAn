@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   getStatusesByListId,
+  getStatusesBySpaceId,
   createTaskStatus,
   getStatusById,
   updateTaskStatus,
@@ -11,20 +12,29 @@ import { requirePermission } from '../middlewares/roleMiddlewares.js';
 
 const router = express.Router();
 
-router.get('/:listId', getStatusesByListId);
+// ── Routes có prefix cụ thể (phải đặt TRƯỚC các route :param) ──
 
-// Quản lý cài đặt status -> Yêu cầu quyền: SETTING_MANAGE (Admin + Manager)
+// Lấy tất cả status theo Space
+router.get('/spaces/:spaceId', getStatusesBySpaceId);
+
+// Tạo status trong Space → Yêu cầu quyền: SETTING_MANAGE (Admin + Manager)
 router.post('/spaces/:spaceId', requirePermission('SETTING_MANAGE'), createTaskStatus);
 
+// Lấy tất cả status theo List (thông qua join space_id)
+router.get('/lists/:listId', getStatusesByListId);
+
+// ── Routes với :statusId (generic param — đặt SAU) ──
+
+// Reorder status → cần đặt trước GET/PUT/DELETE /:statusId vì match /:statusId/reorder
+router.put('/:statusId/reorder', requirePermission('SETTING_MANAGE'), reorderStatus);
+
+// Lấy status theo ID
 router.get('/:statusId', getStatusById);
 
-// Cập nhật status -> Yêu cầu quyền: SETTING_MANAGE (Admin + Manager)
+// Cập nhật status → Yêu cầu quyền: SETTING_MANAGE
 router.put('/:statusId', requirePermission('SETTING_MANAGE'), updateTaskStatus);
 
-// Xóa status -> Yêu cầu quyền: SETTING_MANAGE (Admin + Manager)
+// Xóa status → Yêu cầu quyền: SETTING_MANAGE
 router.delete('/:statusId', requirePermission('SETTING_MANAGE'), deleteTaskStatus);
-
-// Reorder status -> Yêu cầu quyền: SETTING_MANAGE (Admin + Manager)
-router.put('/:statusId/reorder', requirePermission('SETTING_MANAGE'), reorderStatus);
 
 export default router;

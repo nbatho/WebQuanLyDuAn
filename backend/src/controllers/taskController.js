@@ -329,6 +329,20 @@ export const getTaskById = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+export const getSubtasksByTaskIds = async (req, res) => {
+    try {
+        const { taskId } = req.params;
+        if (!taskId) {
+            return res.status(400).json({ error: "Task ID is required" });
+        }
+        const subtasks = await getSubtasksByTaskId(taskId);
+        res.status(200).json(subtasks);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 export const getCommentsByTaskIds = async (req, res) => {
     try {
         const { taskId } = req.params;

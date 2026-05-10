@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Calendar, Flag, User } from 'lucide-react';
+import { ChevronDown, ChevronRight, Calendar, Flag, User, Plus } from 'lucide-react';
 import { Popover, Avatar } from 'antd';
 import type { Task } from '@/types/tasks';
 import { useTaskView } from '../ListViewPage';
@@ -14,8 +14,13 @@ import { useSelector } from 'react-redux';
 const getInitials = (name: string) => name.substring(0, 2).toUpperCase();
 const formatDate = (dateString: string | null) => dateString ? new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : null;
 
+const STATUS_COLORS = [
+    '#6b7280', '#ef4444', '#f97316', '#eab308', '#22c55e',
+    '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899', '#06b6d4',
+];
+
 export default function ListView() {
-    const { groups, setGroups, columns, updateTask, handleInlineCreate, onContextMenu } = useTaskView();
+    const { groups, setGroups, columns, updateTask, handleInlineCreate, handleCreateStatus, onContextMenu } = useTaskView();
 
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [activePopover, setActivePopover] = useState<{ taskId: number, field: string } | null>(null);
@@ -23,6 +28,11 @@ export default function ListView() {
     const [inlineText, setInlineText] = useState('');
     const listMembers = useSelector((state: RootState) => state.workspaces.listWorkspaceMembers);
     const toggleGroup = (groupId: number) => setGroups(prev => prev.map(g => g.id === groupId ? { ...g, isExpanded: !g.isExpanded } : g));
+
+    // Add Status state
+    const [showAddStatus, setShowAddStatus] = useState(false);
+    const [newStatusName, setNewStatusName] = useState('');
+    const [newStatusColor, setNewStatusColor] = useState(STATUS_COLORS[0]);
     return (
         <div className="flex flex-1 flex-col overflow-hidden bg-white font-sans">
             <div className="flex-1 overflow-y-auto p-6">
@@ -90,6 +100,77 @@ export default function ListView() {
                         )}
                     </div>
                 ))}
+
+                {/* ── Add Status ── */}
+                {!showAddStatus ? (
+                    <button
+                        onClick={() => setShowAddStatus(true)}
+                        className="mt-2 flex cursor-pointer items-center gap-1.5 rounded-lg border border-dashed border-[#d1d5db] bg-transparent px-3 py-2 text-[12px] font-semibold text-[#9ca3af] transition-all hover:border-[#7c68ee] hover:text-[#7c68ee] hover:bg-[#f8f7ff]"
+                    >
+                        <Plus size={14} />
+                        Add Status
+                    </button>
+                ) : (
+                    <div className="mt-2 rounded-lg border border-[#e5e7eb] bg-[#fafbfc] p-3">
+                        <div className="flex items-center gap-2 mb-2.5">
+                            <div className="h-4 w-4 rounded-full border-2 border-dashed" style={{ borderColor: newStatusColor }} />
+                            <input
+                                autoFocus
+                                value={newStatusName}
+                                onChange={(e) => setNewStatusName(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && newStatusName.trim()) {
+                                        handleCreateStatus(newStatusName.trim(), newStatusColor);
+                                        setNewStatusName('');
+                                        setNewStatusColor(STATUS_COLORS[0]);
+                                        setShowAddStatus(false);
+                                    }
+                                    if (e.key === 'Escape') {
+                                        setShowAddStatus(false);
+                                        setNewStatusName('');
+                                    }
+                                }}
+                                placeholder="Status name..."
+                                className="flex-1 rounded-md border border-[#e5e7eb] bg-white px-2.5 py-1.5 text-[13px] font-medium text-[#292d34] outline-none focus:border-[#7c68ee] transition-colors"
+                            />
+                        </div>
+                        <div className="flex items-center gap-1.5 mb-3">
+                            {STATUS_COLORS.map((c) => (
+                                <button
+                                    key={c}
+                                    onClick={() => setNewStatusColor(c)}
+                                    className="h-5 w-5 rounded-full border-2 cursor-pointer transition-transform hover:scale-110"
+                                    style={{
+                                        backgroundColor: c,
+                                        borderColor: newStatusColor === c ? '#292d34' : 'transparent',
+                                    }}
+                                />
+                            ))}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => {
+                                    if (newStatusName.trim()) {
+                                        handleCreateStatus(newStatusName.trim(), newStatusColor);
+                                        setNewStatusName('');
+                                        setNewStatusColor(STATUS_COLORS[0]);
+                                        setShowAddStatus(false);
+                                    }
+                                }}
+                                disabled={!newStatusName.trim()}
+                                className="rounded-md border-none bg-[#7c68ee] px-3 py-1.5 text-[12px] font-bold text-white cursor-pointer transition-colors hover:bg-[#6c5ce7] disabled:opacity-40 disabled:cursor-not-allowed"
+                            >
+                                Create
+                            </button>
+                            <button
+                                onClick={() => { setShowAddStatus(false); setNewStatusName(''); }}
+                                className="rounded-md border border-[#e5e7eb] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#5f6368] cursor-pointer transition-colors hover:bg-[#f3f4f6]"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <TaskDetailModal

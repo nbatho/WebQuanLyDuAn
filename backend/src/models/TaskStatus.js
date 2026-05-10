@@ -19,6 +19,21 @@ export const findStatusesByListId = async (list_id) => {
         throw error;
     }
 };
+
+export const findStatusesBySpaceId = async (space_id) => {
+    try {
+        const query = `
+            SELECT * FROM task_status
+            WHERE space_id = $1
+            ORDER BY position ASC;
+        `;
+        const values = [space_id];
+        const result = await con.query(query, values);
+        return result.rows;
+    } catch (error) {
+        throw error;
+    }
+};
 export const findStatusesBySprintId = async (sprint_id) => {
     try {
         const query = `

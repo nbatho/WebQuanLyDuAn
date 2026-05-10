@@ -14,6 +14,7 @@ import ListView from './components/ListView';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '@/store/configureStore';
 import { fetchTasksForList, fetchCreateTask } from '@/store/modules/tasks';
+import { createTaskStatus } from '@/api/statuses';
 import type { Task, StatusGroup, NewTaskData, Assignee } from '@/types/tasks';
 export type { Task, StatusGroup, NewTaskData, Assignee };
 
@@ -152,10 +153,26 @@ export default function ListViewPage() {
         setIsCreateTaskOpen(false);
 
     }, [dispatch]);
-    const handleCreateStatus = useCallback((name: string, color: string) => {
-        console.log("Create Status:", { name, color });
-        // TODO: Gọi API tạo status
-    }, []);
+    const handleCreateStatus = useCallback(async (name: string, color: string) => {
+        if (!spaceId) return;
+        try {
+            const newStatus = await createTaskStatus(Number(spaceId), {
+                statusName: name,
+                color,
+                position: groups.length,
+            });
+            // Add the new status group to the list
+            setGroups(prev => [...prev, {
+                id: newStatus.status_id,
+                name: newStatus.status_name,
+                color: newStatus.color,
+                isExpanded: true,
+                tasks: [],
+            }]);
+        } catch (err) {
+            console.error('Create Status error:', err);
+        }
+    }, [spaceId, groups.length]);
 
     const onTaskContextMenu = (e: React.MouseEvent, task: Task) => {
         e.preventDefault();
