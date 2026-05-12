@@ -14,7 +14,7 @@ import PriorityPopover from '@/components/Popovers/PriorityPopover';
 
 import type { AppDispatch, RootState } from '@/store/configureStore';
 import type { Task } from '@/types/tasks';
-import { fetchTasksForUser } from '@/store/modules/tasks';
+import { fetchTasksForUser, fetchUpdateTask } from '@/store/modules/tasks';
 
 type TabType = 'assigned' | 'mentions' | 'created';
 
@@ -93,9 +93,21 @@ export default function MyTasksPage() {
     };
 
     const handleUpdateTask = (taskId: number, updates: Partial<Task>) => {
-        console.log("Dispatching update for task:", taskId, updates);
-        // dispatch(updateTask({ taskId, updates }));
+        // Build API payload - map frontend field names to backend field names
+        const apiPayload: Record<string, any> = {};
+        if (updates.name !== undefined) apiPayload.name = updates.name;
+        if (updates.description !== undefined) apiPayload.description = updates.description;
+        if (updates.due_date !== undefined) apiPayload.due_date = updates.due_date;
+        if (updates.status_id !== undefined) apiPayload.status_id = updates.status_id;
+        if (updates.priority_name !== undefined) apiPayload.priority = updates.priority_name;
+        if (updates.position !== undefined) apiPayload.position = updates.position;
 
+        // Call API if there are valid fields to update
+        if (Object.keys(apiPayload).length > 0) {
+            dispatch(fetchUpdateTask({ task_id: taskId, updates: apiPayload }));
+        }
+
+        // Optimistic UI update for selectedTask
         if (selectedTask?.task_id === taskId) {
             setSelectedTask(prev => prev ? { ...prev, ...updates } : null);
         }

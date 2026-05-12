@@ -13,7 +13,7 @@ import BoardView from './components/BoardView';
 import ListView from './components/ListView';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '@/store/configureStore';
-import { fetchTasksForList, fetchCreateTask } from '@/store/modules/tasks';
+import { fetchTasksForList, fetchCreateTask, fetchUpdateTask, fetchDeleteTask } from '@/store/modules/tasks';
 import { createTaskStatus } from '@/api/statuses';
 import type { Task, StatusGroup, NewTaskData, Assignee } from '@/types/tasks';
 export type { Task, StatusGroup, NewTaskData, Assignee };
@@ -71,6 +71,7 @@ export default function ListViewPage() {
     }
 
     const updateTask = useCallback((taskId: number, updates: Partial<Task>) => {
+        // Optimistic UI update
         setGroups((prevGroups) => {
             let taskToMove: Task | null = null;
             const newGroups = prevGroups.map((group) => {
@@ -96,8 +97,20 @@ export default function ListViewPage() {
             return newGroups;
         });
 
-        // TODO: dispatch(fetchUpdateTask(...))
-    }, []);
+        // Build API payload - map frontend field names to backend field names
+        const apiPayload: Record<string, any> = {};
+        if (updates.name !== undefined) apiPayload.name = updates.name;
+        if (updates.description !== undefined) apiPayload.description = updates.description;
+        if (updates.due_date !== undefined) apiPayload.due_date = updates.due_date;
+        if (updates.status_id !== undefined) apiPayload.status_id = updates.status_id;
+        if (updates.priority_name !== undefined) apiPayload.priority = updates.priority_name;
+        if (updates.position !== undefined) apiPayload.position = updates.position;
+
+        // Only call API if there are valid fields to update
+        if (Object.keys(apiPayload).length > 0) {
+            dispatch(fetchUpdateTask({ task_id: taskId, updates: apiPayload }));
+        }
+    }, [dispatch]);
 
     const handleInlineCreate = useCallback((groupId: number, name: string, extras?: any) => {
         const payload: NewTaskData = {
@@ -182,7 +195,10 @@ export default function ListViewPage() {
     const onContextActionSelect = (action: string) => {
         if (!ctxMenu) return;
         if (action === 'delete') {
+            // Optimistic UI update
             setGroups(prev => prev.map(g => ({ ...g, tasks: g.tasks.filter(t => t.task_id !== ctxMenu.task.task_id) })));
+            // Call API to delete
+            dispatch(fetchDeleteTask(ctxMenu.task.task_id));
         }
         setCtxMenu(null);
     };

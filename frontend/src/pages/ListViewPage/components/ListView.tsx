@@ -3,7 +3,6 @@ import { ChevronDown, ChevronRight, Calendar, Flag, User, Plus } from 'lucide-re
 import { Popover, Avatar } from 'antd';
 import type { Task } from '@/types/tasks';
 import { useTaskView } from '../ListViewPage';
-import InlineCreateTask from '@/pages/ListViewPage/components/InlineCreateTask';
 import AssigneePopover from '@/components/Popovers/AssigneePopover';
 import DueDatePopover from '@/components/Popovers/DueDatePopover';
 import PriorityPopover from '@/components/Popovers/PriorityPopover';
@@ -20,12 +19,10 @@ const STATUS_COLORS = [
 ];
 
 export default function ListView() {
-    const { groups, setGroups, columns, updateTask, handleInlineCreate, handleCreateStatus, onContextMenu } = useTaskView();
+    const { groups, setGroups, columns, updateTask, handleCreateStatus, onContextMenu } = useTaskView();
 
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [activePopover, setActivePopover] = useState<{ taskId: number, field: string } | null>(null);
-    const [inlineGroup, setInlineGroup] = useState<number | null>(null);
-    const [inlineText, setInlineText] = useState('');
     const listMembers = useSelector((state: RootState) => state.workspaces.listWorkspaceMembers);
     const toggleGroup = (groupId: number) => setGroups(prev => prev.map(g => g.id === groupId ? { ...g, isExpanded: !g.isExpanded } : g));
 
@@ -95,7 +92,6 @@ export default function ListView() {
                                         <div className="w-8 shrink-0" />
                                     </div>
                                 ))}
-                                <InlineCreateTask isActive={inlineGroup === group.id} text={inlineText} onChangeText={setInlineText} onActivate={() => setInlineGroup(group.id)} onCancel={() => { setInlineGroup(null); setInlineText(''); }} onSubmit={(extras) => { handleInlineCreate(group.id, inlineText, extras); setInlineText(''); setInlineGroup(null); }} />
                             </div>
                         )}
                     </div>

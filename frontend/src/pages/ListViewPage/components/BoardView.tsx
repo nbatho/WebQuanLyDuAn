@@ -1,8 +1,9 @@
 import { Calendar, Flag, MoreHorizontal, Plus } from 'lucide-react';
 import { Avatar, Tooltip } from 'antd';
-import { useEffect, useRef, useState, type DragEvent } from 'react';
+import { useRef, useState, type DragEvent } from 'react';
 import type { Task } from '@/types/tasks';
 import { familyTaskIds, rootTasks } from '@/utils/taskFamily';
+import TaskDetailModal from '@/components/TaskDetailModal';
 
 import { useTaskView } from '../ListViewPage';
 export default function BoardView({
@@ -13,21 +14,13 @@ export default function BoardView({
     const {
         groups,
         setGroups,
-        handleInlineCreate,
         updateTask,      
         onContextMenu,
     } = useTaskView();
 
     const dragItem = useRef<{ fromGroupId: number; taskId: number } | null>(null);
     const [dragOverGroup, setDragOverGroup] = useState<number | null>(null);
-    const [inlineCol, setInlineCol] = useState<number | null>(null);
-    const [inlineText, setInlineText] = useState('');
-    const inlineRef = useRef<HTMLInputElement>(null);
-
-    // Xử lý auto focus cho ô input
-    useEffect(() => {
-        if (inlineCol !== null) setTimeout(() => inlineRef.current?.focus(), 50);
-    }, [inlineCol]);
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
     // Lọc các cột đã đóng
     const displayGroups = showClosed ? groups : groups.filter((g) => g.name?.toLowerCase() !== 'done');
@@ -78,29 +71,10 @@ export default function BoardView({
             });
         });
 
-        // 2. GỌI API BẰNG HÀM TỪ HOOK
-        // Gọn gàng và nhất quán với ListView!
+        // GỌI API BẰNG HÀM TỪ HOOK
         updateTask(taskId, { status_id: toGroupId });
 
         dragItem.current = null;
-    };
-
-    const onInlineSubmit = (groupId: number) => {
-        if (!inlineText.trim()) {
-            setInlineCol(null);
-            return;
-        }
-
-        // Tạo task cũng dùng hàm từ Hook
-        handleInlineCreate(groupId, inlineText.trim());
-
-        setInlineText('');
-        setInlineCol(null);
-    };
-
-    const handleTaskClick = (task: Task) => {
-        console.log('Clicked task:', task);
-        // setSelectedTask(task); 
     };
 
     return (
@@ -125,7 +99,6 @@ export default function BoardView({
                                 </div>
                                 <div className="flex gap-0.5">
                                     <button className="rounded p-0.75 text-[#9aa0a6] hover:bg-[#eef0f5]"><MoreHorizontal size={14} /></button>
-                                    <button className="rounded p-0.75 text-[#9aa0a6] hover:bg-[#eef0f5]" onClick={() => setInlineCol(group.id)}><Plus size={14} /></button>
                                 </div>
                             </div>
 
@@ -137,7 +110,7 @@ export default function BoardView({
                                         draggable
                                         onDragStart={(e) => onDragStart(e, group.id, task.task_id)}
                                         onDragEnd={onDragEnd}
-                                        onClick={() => handleTaskClick(task)}
+                                        onClick={() => setSelectedTask(task)}
                                         onContextMenu={(e) => onContextMenu(e, task)}
                                     >
                                         <div className="mb-1.5 text-[13px] font-semibold text-[#141b2b]">{task.name}</div>
@@ -164,32 +137,18 @@ export default function BoardView({
                                         </div>
                                     </div>
                                 ))}
-
-                                {inlineCol === group.id ? (
-                                    <div className="rounded-lg border border-[#0058be] bg-[#f8fbff] px-3.5 py-3 shadow-[0_0_0_2px_rgba(0,88,190,0.15)]">
-                                        <input
-                                            ref={inlineRef}
-                                            className="w-full bg-transparent text-[13px] outline-none"
-                                            value={inlineText}
-                                            onChange={(e) => setInlineText(e.target.value)}
-                                            placeholder="Tên công việc..."
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') onInlineSubmit(group.id);
-                                                if (e.key === 'Escape') setInlineCol(null);
-                                            }}
-                                            onBlur={() => onInlineSubmit(group.id)}
-                                        />
-                                    </div>
-                                ) : (
-                                    <button className="flex items-center gap-1.5 rounded-md px-1.5 py-1.75 text-xs font-semibold text-[#9aa0a6] hover:bg-[#f0f4ff] hover:text-[#0058be]" onClick={() => setInlineCol(group.id)}>
-                                        <Plus size={13} /> Add Task
-                                    </button>
-                                )}
                             </div>
                         </div>
                     );
                 })}
             </div>
+
+            <TaskDetailModal
+                isOpen={!!selectedTask}
+                task={selectedTask || null}
+                onClose={() => setSelectedTask(null)}
+                updateTask={updateTask}
+            />
         </div>
     );
 }

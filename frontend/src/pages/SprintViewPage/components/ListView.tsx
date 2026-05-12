@@ -3,7 +3,6 @@ import { ChevronDown, ChevronRight, Calendar, Flag, User } from 'lucide-react';
 import { Popover, Avatar } from 'antd';
 import type { Task } from '@/types/tasks';
 import { useTaskView } from '../SprintViewPage';
-import InlineCreateTask from '@/pages/ListViewPage/components/InlineCreateTask';
 import AssigneePopover from '@/components/Popovers/AssigneePopover';
 import DueDatePopover from '@/components/Popovers/DueDatePopover';
 import PriorityPopover from '@/components/Popovers/PriorityPopover';
@@ -15,12 +14,10 @@ const getInitials = (name: string) => name.substring(0, 2).toUpperCase();
 const formatDate = (dateString: string | null) => dateString ? new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : null;
 
 export default function ListView() {
-    const { groups, setGroups, columns, updateTask, handleInlineCreate, onContextMenu } = useTaskView();
+    const { groups, setGroups, columns, updateTask, onContextMenu } = useTaskView();
 
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [activePopover, setActivePopover] = useState<{ taskId: number, field: string } | null>(null);
-    const [inlineGroup, setInlineGroup] = useState<number | null>(null);
-    const [inlineText, setInlineText] = useState('');
     const listMembers = useSelector((state: RootState) => state.workspaces.listWorkspaceMembers);
     const toggleGroup = (groupId: number) => setGroups(prev => prev.map(g => g.id === groupId ? { ...g, isExpanded: !g.isExpanded } : g));
     return (
@@ -85,7 +82,6 @@ export default function ListView() {
                                         <div className="w-8 shrink-0" />
                                     </div>
                                 ))}
-                                <InlineCreateTask isActive={inlineGroup === group.id} text={inlineText} onChangeText={setInlineText} onActivate={() => setInlineGroup(group.id)} onCancel={() => { setInlineGroup(null); setInlineText(''); }} onSubmit={(extras) => { handleInlineCreate(group.id, inlineText, extras); setInlineText(''); setInlineGroup(null); }} />
                             </div>
                         )}
                     </div>

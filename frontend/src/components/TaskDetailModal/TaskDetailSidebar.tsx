@@ -60,7 +60,7 @@ export default function TaskDetailSidebar({ task, updateTask }: TaskDetailSideba
                     <span className="text-[11px] font-bold uppercase tracking-[0.04em] text-[#9ca3af]">Priority</span>
                     <Popover content={<PriorityPopover
                         priority_name={task.priority_name || 'Normal'} 
-                        onSave={() => updateTask(task.task_id, {})}
+                        onSave={(_id, name, color) => updateTask(task.task_id, { priority_name: name, priority_color: color })}
                         onClose={() => setOpenPopover(null)}
                     />} trigger="click" open={openPopover === 'priority'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }} getPopupContainer={(trigger) => trigger.parentElement!}>
                         <div className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 transition-colors hover:bg-[#e5e7eb]" onClick={() => setOpenPopover('priority')}>
