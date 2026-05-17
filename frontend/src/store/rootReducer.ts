@@ -11,6 +11,7 @@ import timeLogsReducer from './modules/timelogs/index.ts';
 import milestonesReducer from './modules/milestones/index.ts';
 import sprintsReducer from './modules/sprints/index.ts';
 import notificationsReducer from './modules/notifications/index.ts';
+import aiReducer from './modules/ai/index.ts';
 
 const rootReducer = {
     app: appReducer,
@@ -26,6 +27,7 @@ const rootReducer = {
     milestones: milestonesReducer,
     sprints: sprintsReducer,
     notifications: notificationsReducer,
+    ai: aiReducer,
 };
 
 export default rootReducer;

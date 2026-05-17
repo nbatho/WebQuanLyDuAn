@@ -1,4 +1,4 @@
-import { Calendar, Flag, MoreHorizontal, Plus } from 'lucide-react';
+import { Calendar, Flag, MoreHorizontal } from 'lucide-react';
 import { Avatar, Tooltip } from 'antd';
 import { useRef, useState, type DragEvent } from 'react';
 import type { Task } from '@/types/tasks';

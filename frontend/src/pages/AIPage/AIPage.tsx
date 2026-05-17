@@ -1,7 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { beApi } from '../../api/callApi';
+import { useDispatch } from 'react-redux';
+import type { AppDispatch } from '@/store/configureStore';
+import { fetchAIChat } from '@/store/modules/ai';
+import type { AIChatMessage, ChatSession } from '@/types/ai';
 import { 
     Sparkles, 
     Plus, 
@@ -24,23 +27,8 @@ import {
     Trash2
 } from 'lucide-react';
 
-export interface AIChatMessage {
-    id: string;
-    role: 'user' | 'ai';
-    content: string;
-    isStreaming?: boolean;
-    isSearching?: boolean;
-    followUps?: string[];
-}
-
-interface ChatSession {
-    id: string;
-    title: string;
-    messages: AIChatMessage[];
-    timestamp: number;
-}
-
 export default function AIPage() {
+    const dispatch = useDispatch<AppDispatch>();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     
     const [sessions, setSessions] = useState<ChatSession[]>(() => {
@@ -145,14 +133,11 @@ export default function AIPage() {
 
         try {
             const chatHistory = messages.slice(-5).map(msg => ({
-                role: msg.role === 'user' ? 'user' : 'assistant',
+                role: msg.role === 'user' ? 'user' as const : 'assistant' as const,
                 content: msg.content
             }));
 
-            const response: any = await beApi.post('ai/chat', { 
-                message: text,
-                history: chatHistory
-            });
+            const response = await dispatch(fetchAIChat({ message: text, history: chatHistory })).unwrap();
 
             const fullResponse = response.response;
             const words = fullResponse.split(' ');

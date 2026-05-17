@@ -1,21 +1,5 @@
 import { Search } from 'lucide-react';
-
-type ViewOption = {
-    id: string;
-    icon: React.ElementType;
-    label: string;
-    desc: string;
-    color: string;
-    bg: string;
-};
-
-interface ViewPickerProps {
-    viewOptions: ViewOption[];
-    search: string;
-    onSearchChange: (value: string) => void;
-    onSelect: (viewId: string) => void;
-    onClose: () => void;
-}
+import type { ViewPickerProps } from '@/types/spaces';
 
 export default function ViewPicker({ viewOptions, search, onSearchChange, onSelect, onClose }: ViewPickerProps) {
     const filtered = viewOptions.filter(

@@ -1,35 +1,20 @@
 import React, { useState, createContext, useContext, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-    Plus, Zap, Search,
-    Users, Settings2, CheckCircle2, ChevronDown,
+    Plus, Zap,
+    ChevronDown,
 } from 'lucide-react';
 
 import { useSpaceTree } from '../../layouts/AppLayout/SpaceTreeContext';
 import PageHeader, { LIST_TABS } from '../../components/PageHeader';
 import ContextMenu from '../../components/ContextMenu';
-import CreateTaskModal from '../../components/CreateTaskModal/CreateTaskModal';
+import CreateTaskModal from '../../components/Modal/CreateTaskModal/CreateTaskModal';
 import BoardView from './components/BoardView';
 import ListView from './components/ListView';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '@/store/configureStore';
 import { fetchTasksForSprint, fetchCreateTask, fetchUpdateTask, fetchDeleteTask } from '@/store/modules/tasks';
-import type { Task, StatusGroup, NewTaskData, Assignee } from '@/types/tasks';
-export type { Task, StatusGroup, NewTaskData, Assignee };
-
-
-interface TaskViewContextType {
-    groups: StatusGroup[];
-    setGroups: React.Dispatch<React.SetStateAction<StatusGroup[]>>;
-    listId: number;
-    showClosed: boolean;
-    columns: { assignee: boolean; dueDate: boolean; priority: boolean };
-    setSelectedTask: (t: Task | null) => void;
-    onContextMenu: (e: React.MouseEvent, task: Task) => void;
-    updateTask: (taskId: number, updates: Partial<Task>) => void;
-    handleInlineCreate: (groupId: number, name: string, extras?: any) => void;
-    handleCreateStatus: (name: string, color: string) => void;
-}
+import type { Task, StatusGroup, NewTaskData, Assignee, TaskViewContextType } from '@/types/tasks';
 
 export const TaskViewContext = createContext<TaskViewContextType | null>(null);
 
@@ -45,7 +30,7 @@ export default function SprintViewPage() {
     const dispatch = useDispatch<AppDispatch>();
     const listTasks = useSelector((state: RootState) => state.tasks.listTask);
     const sprints = useSelector((state: RootState) => state.sprints.listSprints);
-    
+
     const [groups, setGroups] = useState<StatusGroup[]>([]);
     const [, setSelectedTask] = useState<Task | null>(null);
     const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; task: Task } | null>(null);
@@ -215,28 +200,11 @@ export default function SprintViewPage() {
                 />
 
                 <div className="flex shrink-0 items-center justify-between border-b border-[#eef0f5] bg-white px-5 py-2">
-                    <div className="flex items-center gap-1.5">
-                        <button className="flex cursor-pointer items-center gap-1 rounded-md border border-[#27ae60] bg-[#e6f9ef] px-2.5 py-1 text-xs font-semibold text-[#27ae60]">
-                            <CheckCircle2 size={13} /> Group: Status
-                        </button>
-                        <button className="flex cursor-pointer items-center gap-1 rounded-md border border-[#eef0f5] bg-transparent px-2.5 py-1 text-xs font-semibold text-[#5f6368] hover:bg-[#f8fafc]">Subtasks</button>
-                        <button className="flex cursor-pointer items-center gap-1 rounded-md border border-[#eef0f5] bg-transparent px-2.5 py-1 text-xs font-semibold text-[#5f6368] hover:bg-[#f8fafc]">Columns</button>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <button type="button" className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-transparent px-2 py-1 text-xs font-semibold text-[#5f6368] hover:bg-[#f0f4ff] hover:text-[#0058be]"><Search size={13} /> Filter</button>
-                        <button type="button" className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-transparent px-2 py-1 text-xs font-semibold text-[#5f6368] hover:bg-[#f0f4ff] hover:text-[#0058be]"><CheckCircle2 size={13} /> Closed</button>
-                        <button type="button" className="flex cursor-pointer items-center gap-1.5 rounded-md border-none bg-transparent px-2 py-1 text-xs font-semibold text-[#5f6368] hover:bg-[#f0f4ff] hover:text-[#0058be]">
-                            <Users size={13} /> Assignee
-                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#e8f0fe] text-[10px] font-bold text-[#0058be]">M</span>
-                        </button>
-                        <button type="button" className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-none bg-transparent text-[#5f6368] hover:bg-[#f0f4ff] hover:text-[#0058be]" aria-label="Search"><Search size={15} /></button>
-                        <button type="button" className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-transparent px-2 py-1 text-xs font-semibold text-[#5f6368] hover:bg-[#f0f4ff] hover:text-[#0058be]"><Settings2 size={13} /> Customize</button>
-                        <button type="button" className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-[#1e1f21] px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-black"
-                            onClick={() => setIsCreateTaskOpen(true)}
-                        >
-                            <Plus size={14} /> Add Task <ChevronDown size={12} />
-                        </button>
-                    </div>
+                    <button type="button" className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-[#1e1f21] px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-black"
+                        onClick={() => setIsCreateTaskOpen(true)}
+                    >
+                        <Plus size={14} /> Add Task <ChevronDown size={12} />
+                    </button>
                 </div>
 
                 <main className="flex flex-1 flex-col overflow-hidden">

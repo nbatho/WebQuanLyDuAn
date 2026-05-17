@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { ViewType } from '@/pages/SpaceViewPage/components/SpaceHeader';
+import type { ViewType } from '@/types/spaces';
 import type { Task } from '@/types/tasks';
 export function useSpaceViewState(
     spaceId?: string,

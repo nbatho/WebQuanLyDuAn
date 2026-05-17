@@ -58,3 +58,43 @@ export interface NewTaskData {
     assignees?: string[];
     listId?: number;
 }
+
+// ── Types moved from /pages per project rules ──────────────────────────────
+
+import type React from 'react';
+
+export interface TaskViewContextType {
+    groups: StatusGroup[];
+    setGroups: React.Dispatch<React.SetStateAction<StatusGroup[]>>;
+    listId: number;
+    showClosed: boolean;
+    columns: { assignee: boolean; dueDate: boolean; priority: boolean };
+    setSelectedTask: (t: Task | null) => void;
+    onContextMenu: (e: React.MouseEvent, task: Task) => void;
+    updateTask: (taskId: number, updates: Partial<Task>) => void;
+    handleInlineCreate: (groupId: number, name: string, extras?: any) => void;
+    handleCreateStatus: (name: string, color: string) => void;
+}
+
+export type TabType = 'assigned' | 'mentions' | 'created';
+
+export interface TaskGroup {
+    label: string;
+    icon?: string;
+    tasks: Task[];
+}
+
+export interface InlineCreateTaskProps {
+    isActive: boolean;
+    text: string;
+    onChangeText: (val: string) => void;
+    onActivate: () => void;
+    onCancel: () => void;
+    onSubmit: (extras?: {
+        assignees?: Assignee[];
+        due_date?: string | null;
+        priority_id?: number | null;
+        priority_name?: string | null;
+        priority_color?: string | null;
+    }) => void;
+}

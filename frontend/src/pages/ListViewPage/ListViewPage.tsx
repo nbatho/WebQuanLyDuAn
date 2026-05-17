@@ -1,37 +1,21 @@
 import React, { useState, createContext, useContext, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-    Plus, ListTodo, Search,
-    Users, Settings2, CheckCircle2, ChevronDown,
+    Plus, ListTodo,
+    ChevronDown,
 } from 'lucide-react';
 
 import { useSpaceTree } from '../../layouts/AppLayout/SpaceTreeContext';
 import PageHeader, { LIST_TABS } from '../../components/PageHeader';
 import ContextMenu from '../../components/ContextMenu';
-import CreateTaskModal from '../../components/CreateTaskModal/CreateTaskModal';
+import CreateTaskModal from '../../components/Modal/CreateTaskModal/CreateTaskModal';
 import BoardView from './components/BoardView';
 import ListView from './components/ListView';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '@/store/configureStore';
 import { fetchTasksForList, fetchCreateTask, fetchUpdateTask, fetchDeleteTask } from '@/store/modules/tasks';
-import { createTaskStatus } from '@/api/statuses';
-import type { Task, StatusGroup, NewTaskData, Assignee } from '@/types/tasks';
-export type { Task, StatusGroup, NewTaskData, Assignee };
-
-
-interface TaskViewContextType {
-    groups: StatusGroup[];
-    setGroups: React.Dispatch<React.SetStateAction<StatusGroup[]>>;
-    listId: number;
-    showClosed: boolean;
-    columns: { assignee: boolean; dueDate: boolean; priority: boolean };
-    setSelectedTask: (t: Task | null) => void;
-    onContextMenu: (e: React.MouseEvent, task: Task) => void;
-    updateTask: (taskId: number, updates: Partial<Task>) => void;
-    handleInlineCreate: (groupId: number, name: string, extras?: any) => void;
-    handleCreateStatus: (name: string, color: string) => void;
-}
-
+import { fetchCreateStatus } from '@/store/modules/statuses';
+import type { Task, StatusGroup, NewTaskData, Assignee, TaskViewContextType } from '@/types/tasks';
 export const TaskViewContext = createContext<TaskViewContextType | null>(null);
 
 export const useTaskView = () => {
@@ -169,23 +153,23 @@ export default function ListViewPage() {
     const handleCreateStatus = useCallback(async (name: string, color: string) => {
         if (!spaceId) return;
         try {
-            const newStatus = await createTaskStatus(Number(spaceId), {
+            const result = await dispatch(fetchCreateStatus({
+                spaceId: Number(spaceId),
                 statusName: name,
                 color,
                 position: groups.length,
-            });
-            // Add the new status group to the list
+            })).unwrap();
             setGroups(prev => [...prev, {
-                id: newStatus.status_id,
-                name: newStatus.status_name,
-                color: newStatus.color,
+                id: result.status_id,
+                name: result.status_name,
+                color: result.color ?? '#9ca3af',
                 isExpanded: true,
                 tasks: [],
             }]);
         } catch (err) {
             console.error('Create Status error:', err);
         }
-    }, [spaceId, groups.length]);
+    }, [spaceId, groups.length, dispatch]);
 
     const onTaskContextMenu = (e: React.MouseEvent, task: Task) => {
         e.preventDefault();

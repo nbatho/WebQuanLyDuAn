@@ -13,10 +13,8 @@ import DueDatePopover from '@/components/Popovers/DueDatePopover';
 import PriorityPopover from '@/components/Popovers/PriorityPopover';
 
 import type { AppDispatch, RootState } from '@/store/configureStore';
-import type { Task } from '@/types/tasks';
+import type { Task, TabType } from '@/types/tasks';
 import { fetchTasksForUser, fetchUpdateTask } from '@/store/modules/tasks';
-
-type TabType = 'assigned' | 'mentions' | 'created';
 
 /** --- HELPERS --- **/
 const getInitials = (name: string) => name ? name.substring(0, 2).toUpperCase() : 'NA';

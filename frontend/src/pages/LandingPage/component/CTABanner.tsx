@@ -27,9 +27,7 @@ export default function CTABanner() {
                             Xem Demo
                         </Button>
                     </div>
-                    <p className="text-slate-500 text-sm">
-                        Miễn phí mãi mãi • Không cần thẻ tín dụng • Thiết lập trong 2 phút
-                    </p>
+                    
                 </div>
 
                 {/* Geometric decorations */}
