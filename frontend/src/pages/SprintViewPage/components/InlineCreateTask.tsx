@@ -4,15 +4,9 @@ import { Avatar, Popover } from 'antd';
 import PriorityPopover from '@/components/Popovers/PriorityPopover';
 import AssigneePopover from '@/components/Popovers/AssigneePopover';
 import DueDatePopover from '@/components/Popovers/DueDatePopover';
-import type { Assignee } from '@/types/tasks';
+import type { Assignee, InlineCreateTaskProps } from '@/types/tasks';
 import type { RootState } from '@/store/configureStore';
 import { useSelector } from 'react-redux';
-
-interface InlineCreateTaskProps {
-    isActive: boolean; text: string; onChangeText: (val: string) => void;
-    onActivate: () => void; onCancel: () => void;
-    onSubmit: (extras?: { assignees?: Assignee[]; due_date?: string | null; priority_id?: number | null; priority_name?: string | null; priority_color?: string | null }) => void;
-}
 
 export default function InlineCreateTask({ isActive, text, onChangeText, onActivate, onCancel, onSubmit }: InlineCreateTaskProps) {
     const inlineRef = useRef<HTMLInputElement>(null);

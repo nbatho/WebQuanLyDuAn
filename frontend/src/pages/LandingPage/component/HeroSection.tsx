@@ -40,9 +40,6 @@ export default function HeroSection() {
                     </Button>
                 </div>
 
-                <p className="text-[#727785] text-sm">
-                    Miễn phí mãi mãi • Không cần thẻ tín dụng
-                </p>
             </div>
 
             {/* Benefit pills */}

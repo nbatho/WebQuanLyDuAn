@@ -13,11 +13,9 @@ import DueDatePopover from '@/components/Popovers/DueDatePopover';
 import PriorityPopover from '@/components/Popovers/PriorityPopover';
 
 import type { AppDispatch, RootState } from '@/store/configureStore';
-import type { Task, NewTaskData } from '@/types/tasks';
+import type { Task, NewTaskData, TabType } from '@/types/tasks';
 import { fetchTasksForUser, fetchUpdateTask, fetchCreateTask } from '@/store/modules/tasks';
 import { useSpaceTree } from '@/layouts/AppLayout/SpaceTreeContext';
-
-type TabType = 'assigned' | 'mentions' | 'created';
 
 /** --- HELPERS --- **/
 const getInitials = (name: string) => name ? name.substring(0, 2).toUpperCase() : 'NA';
@@ -42,7 +40,7 @@ export default function MyTasksPage() {
     const listTasks = useSelector((state: RootState) => state.tasks.listTaskByUserId) || [];
     const listMembers = useSelector((state: RootState) => state.workspaces.listWorkspaceMembers) || [];
     const listSpaces = useSelector((state: RootState) => state.spaces.listSpaces) || [];
-    const currentUserId = useSelector((state: RootState) => state.auth.user?.user_id);
+    const currentUserId = useSelector((state: RootState) => state.auth.signIn?.user?.user_id);
 
     const [activeTab, setActiveTab] = useState<TabType>('assigned');
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);

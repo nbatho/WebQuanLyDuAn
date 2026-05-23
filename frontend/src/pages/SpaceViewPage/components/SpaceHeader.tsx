@@ -1,14 +1,7 @@
 import {
     ChevronDown, Star, Hash, Bot, Share2,
 } from 'lucide-react';
-import type { SpaceItem } from '@/types/spaces';
-
-export type ViewType = 'overview';
-interface SpaceHeaderProps {
-    currentSpace: SpaceItem | undefined;
-    activeView: ViewType;
-    onViewChange: (view: ViewType) => void;
-}
+import type { SpaceHeaderProps } from '@/types/spaces';
 
 export default function SpaceHeader({ currentSpace }: SpaceHeaderProps) {
     return (

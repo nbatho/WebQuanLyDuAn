@@ -1,5 +1,6 @@
 import type { TaskWithSpaceData } from '@/store/modules/tasks';
 
+// Local override: TaskGroup with TaskWithSpaceData[] tasks (more specific than /types/tasks TaskGroup)
 interface TaskGroup {
     label: string;
     icon?: string;

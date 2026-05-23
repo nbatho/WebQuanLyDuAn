@@ -28,7 +28,7 @@ export default function InboxPage() {
     const dispatch = useAppDispatch();
     const currentWsId = useAppSelector(s => s.workspaces.currentWorkspaceId);
     const wsMembers = useAppSelector(s => s.workspaces.listWorkspaceMembers);
-    const currentUser = useAppSelector(s => s.auth.user);
+    const currentUser = useAppSelector(s => s.auth.signIn?.user);
     const spaces = useAppSelector(s => s.spaces.listSpaces);
 
     const [convos, setConvos] = useState<ConversationData[]>([]);

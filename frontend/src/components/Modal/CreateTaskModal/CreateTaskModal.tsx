@@ -100,7 +100,6 @@ export default function CreateTaskModal({
                 </div>
 
                 <div className="flex items-center gap-2 border-b border-[#f8f9fc] bg-[#fcfdfe] px-5 py-2.5">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#9aa0a6]">Danh mục:</span>
                     <div className="relative" onClick={e => e.stopPropagation()}>
                         <button className="flex items-center gap-1.5 rounded-md border border-[#eef0f5] bg-white px-2.5 py-1 text-xs font-semibold text-[#141b2b] hover:border-[#dcdfe4]" onClick={() => setActiveDropdown(activeDropdown === 'list' ? null : 'list')}>
                             <FolderOpen size={13} className="text-[#0058be]" />
