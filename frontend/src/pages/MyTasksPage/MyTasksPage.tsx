@@ -3,18 +3,19 @@ import {
     Calendar, ChevronDown, ChevronRight,
     Plus, Search, Flag, User
 } from 'lucide-react';
-import { Avatar, Popover } from 'antd';
+import { Avatar, Popover, message } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 
-// LƯU Ý: Đảm bảo các đường dẫn import này khớp với cấu trúc thư mục của bạn
 import TaskDetailModal from '@/components/TaskDetailModal';
+import CreateTaskModal from '@/components/CreateTaskModal/CreateTaskModal';
 import AssigneePopover from '@/components/Popovers/AssigneePopover';
 import DueDatePopover from '@/components/Popovers/DueDatePopover';
 import PriorityPopover from '@/components/Popovers/PriorityPopover';
 
 import type { AppDispatch, RootState } from '@/store/configureStore';
-import type { Task } from '@/types/tasks';
-import { fetchTasksForUser, fetchUpdateTask } from '@/store/modules/tasks';
+import type { Task, NewTaskData } from '@/types/tasks';
+import { fetchTasksForUser, fetchUpdateTask, fetchCreateTask } from '@/store/modules/tasks';
+import { useSpaceTree } from '@/layouts/AppLayout/SpaceTreeContext';
 
 type TabType = 'assigned' | 'mentions' | 'created';
 
@@ -36,10 +37,12 @@ function isDueToday(rawDueDate: string | null): boolean {
 
 export default function MyTasksPage() {
     const dispatch = useDispatch<AppDispatch>();
+    const { spaces: treeSpaces, spaceTree } = useSpaceTree();
 
     const listTasks = useSelector((state: RootState) => state.tasks.listTaskByUserId) || [];
     const listMembers = useSelector((state: RootState) => state.workspaces.listWorkspaceMembers) || [];
     const listSpaces = useSelector((state: RootState) => state.spaces.listSpaces) || [];
+    const currentUserId = useSelector((state: RootState) => state.auth.user?.user_id);
 
     const [activeTab, setActiveTab] = useState<TabType>('assigned');
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -48,8 +51,27 @@ export default function MyTasksPage() {
     const [activeSpaceId, setActiveSpaceId] = useState<number | null>(null);
     const [activePopover, setActivePopover] = useState<{ taskId: number, field: string } | null>(null);
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+    const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
 
     const columns = { assignee: true, dueDate: true, priority: true };
+
+    // Gather all lists from the space tree for the CreateTaskModal
+    const allLists = useMemo(() => {
+        const result: { id: number; name: string }[] = [];
+        for (const space of treeSpaces) {
+            const node = spaceTree[space.id];
+            if (!node) continue;
+            node.standaloneLists.forEach(l => result.push({ id: Number(l.id), name: `${space.name} / ${l.name}` }));
+            node.folders.forEach(f => f.lists.forEach(l => result.push({ id: Number(l.id), name: `${space.name} / ${f.name} / ${l.name}` })));
+        }
+        return result;
+    }, [treeSpaces, spaceTree]);
+
+    // Gather status groups for the modal
+    const modalGroups = useMemo(() => {
+        if (!Array.isArray(listTasks)) return [];
+        return listTasks.map((g: any) => ({ id: g.id, name: g.name, color: g.color }));
+    }, [listTasks]);
 
     useEffect(() => {
         dispatch(fetchTasksForUser());
@@ -77,6 +99,14 @@ export default function MyTasksPage() {
                 if (t.parent_task_id !== null) return false;
                 if (!showCompleted && isCompletedTask(t)) return false;
                 if (searchText && !t.name.toLowerCase().includes(searchText.toLowerCase())) return false;
+                // Tab filtering
+                if (activeTab === 'assigned' && currentUserId) {
+                    const isAssigned = (t.assignees || []).some((a: any) => a.user_id === currentUserId);
+                    if (!isAssigned) return false;
+                }
+                if (activeTab === 'created' && currentUserId) {
+                    if (t.created_by !== currentUserId) return false;
+                }
                 return true;
             });
 
@@ -86,7 +116,7 @@ export default function MyTasksPage() {
                 tasks: filteredTasksInGroup
             };
         }).filter((group: any) => group.tasks.length > 0);
-    }, [listTasks, showCompleted, searchText, expandedGroups, activeTab]);
+    }, [listTasks, showCompleted, searchText, expandedGroups, activeTab, currentUserId]);
 
     const toggleGroup = (groupId: number) => {
         setExpandedGroups(prev => ({ ...prev, [groupId]: prev[groupId] !== undefined ? !prev[groupId] : false }));
@@ -113,6 +143,17 @@ export default function MyTasksPage() {
         }
     };
 
+    const handleCreateTask = (payload: NewTaskData) => {
+        dispatch(fetchCreateTask({ list_id: payload.list_id, taskData: payload }))
+            .unwrap()
+            .then(() => {
+                message.success('Đã tạo task!');
+                dispatch(fetchTasksForUser());
+            })
+            .catch(() => message.error('Tạo task thất bại'));
+        setIsCreateTaskOpen(false);
+    };
+
     return (
         <div className="flex h-full flex-col overflow-hidden bg-white font-sans">
             <header className="shrink-0 border-b border-[#eef0f5] bg-white">
@@ -135,7 +176,10 @@ export default function MyTasksPage() {
                                 <option key={space.spaceId} value={space.spaceId}>{space.name}</option>
                             ))}
                         </select>
-                        <button className="flex items-center gap-1.5 rounded-md border border-[#0058be] bg-[#0058be] px-3 py-1 text-xs font-semibold text-white hover:bg-[#004aab] transition-colors">
+                        <button
+                            className="flex items-center gap-1.5 rounded-md border border-[#0058be] bg-[#0058be] px-3 py-1 text-xs font-semibold text-white hover:bg-[#004aab] transition-colors cursor-pointer"
+                            onClick={() => setIsCreateTaskOpen(true)}
+                        >
                             <Plus size={14} /> Add Task
                         </button>
                     </div>
@@ -277,6 +321,15 @@ export default function MyTasksPage() {
                 onClose={() => setSelectedTask(null)}
                 task={selectedTask || null}
                 updateTask={handleUpdateTask}
+            />
+
+            <CreateTaskModal
+                isOpen={isCreateTaskOpen}
+                onClose={() => setIsCreateTaskOpen(false)}
+                onCreate={handleCreateTask}
+                groups={modalGroups}
+                lists={allLists}
+                defaultListId={allLists.length > 0 ? allLists[0].id : undefined}
             />
         </div>
     );

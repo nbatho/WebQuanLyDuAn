@@ -250,14 +250,11 @@ export const findAllTasksByUserId = async (user_id) => {
       
       WHERE t.deleted_at IS NULL 
         AND s.deleted_at IS NULL
-        AND (
-            t.created_by = $1 
-            OR EXISTS (
-                SELECT 1 FROM task_assigns ta 
-                WHERE ta.task_id = t.task_id 
-                  AND ta.user_id = $1 
-                  AND ta.deleted_at IS NULL
-            )
+        AND EXISTS (
+            SELECT 1 FROM space_members sm
+            WHERE sm.space_id = s.space_id
+              AND sm.user_id = $1
+              AND sm.deleted_at IS NULL
         )
       ORDER BY t.position ASC;
     `;

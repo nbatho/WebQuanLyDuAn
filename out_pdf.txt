@@ -1,0 +1,504 @@
+Total pages: 59
+
+--- Page 1 ---
+ 
+HỌC  VIỆN  CÔNG  NGHỆ  BƯU  CHÍNH  VIỄN  THÔNG 
+KHOA CÔNG NGHỆ THÔNG TIN 1  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+BÁO  CÁO  MÔN  THỰC  TẬP CƠ SỞ 
+ĐỀ TÀI:  
+NGHIÊN CỨU VÀ XÂY DỰNG WEBSITE 
+BÁN  MỸ PHẨM  
+ 
+ 
+ 
+ 
+ 
+Giảng  viên hướng  dẫn : TS. Đào Ngọc Phong  
+Sinh viên thực hiện : Phan Ánh Nguyệt  
+Mã sinh viên : B22DCCN599  
+Lớp : D22CQCN11 - B 
+ 
+ 
+ 
+ 
+ 
+ 
+HÀ NỘI, THÁNG 06/2025
+
+--- Page 2 ---
+2  LỜI CẢM  ƠN 
+Trước tiên, em xin gửi lời cảm ơn chân thành đến thầy Đào Ngọc Phong 
+– người đã nhiệt tình hướng dẫn và góp ý giúp em trong suốt quá trình thực hiện 
+bài tập lớn này. Những chỉ dẫn và nhận  xét của thầy đã giúp em hiểu rõ hơn về 
+đề tài, định hướng tốt hơn cho quá trình làm bài và hoàn thành đúng tiến độ.  
+Bên cạnh  đó, em cũng  xin cảm ơn nhà trường  và khoa  Công  nghệ  thông 
+tin 1 đã tạo điều kiện về cơ sở vật chất, tài liệu và môi trường học  tập thuận  lợi 
+để em có thể tập trung nghiên cứu và hoàn thành bài tập một cách tốt nhất.  
+Cuối cùng, em xin chân thành cảm ơn gia đình và bạn bè, đã luôn tạo điều 
+kiện, quan tâm, giúp đỡ, động viên em trong suốt quá trình học tập. 
+Tuy đã cố gắng hết sức trong quá trình thực hiện, nhưng chắc chắn bài  
+báo cáo vẫn không tránh khỏi những thiếu sót. Em rất mong nhận được những 
+góp ý từ thầy và các bạn để có thể hoàn thiện hơn trong  các bài nghiên  cứu tiếp 
+theo.  
+Một lần nữa, em xin trân trọng  cảm ơn! 
+  
+
+--- Page 3 ---
+3  NHẬN  XÉT,  ĐÁNH  GIÁ 
+……………………………………………………………………………………  
+……………………………………………………………………………………  
+……………………………………………………………………………………  
+……………………………………………………………………………………  
+……………………………………………………………………………………  
+……………………………………………………………………………………  
+……………………………………………………………………………………  
+……………………………………………………………………………………  
+……………………………………………………………………………………  
+……………………………………………………………………………………  
+……………………………………………………………………………………  
+……………………………………………………………………………………  
+……………………………………………………………………………………  
+……………………………………………………………………………………  
+……………………………………………………………………………………  
+……………………………………………………………………………………  
+……………………………………………………………………………………  
+……………………………………………………………………………………  
+…………………………………………………  
+Hà Nội, ngày  ... tháng  06 năm 2025  
+GIẢNG  VIÊN  
+TS. Đào Ngọc Phong  
+ 
+  
+
+--- Page 4 ---
+4  MỤC  LỤC  
+ 
+MỤC  LỤC  ................................ ................................ ................................ ..............  4 
+DANH  MỤC  HÌNH  ẢNH  ................................ ................................ .....................  7 
+DANH  MỤC CÁC TỪ VIẾT TẮT  ................................ ................................ ........  9 
+CHƯƠNG  1: TỔNG  QUAN  ................................ ................................ ...............  10 
+1.1.  Đặt vấn đề ................................ ................................ ................................ .. 10 
+1.2.  Giới thiệu hệ thống  ................................ ................................ ....................  10 
+1.2.1.  Mục tiêu và ý nghĩa của đề tài  ................................ ..........................  10 
+1.2.2.  Phạm vi dự án  ................................ ................................ ....................  11 
+1.2.2.1.  Phạm  vi chức  năng ................................ ................................ .... 11 
+1.2.2.2.  Phạm vi kỹ thuật  ................................ ................................ ....... 12 
+1.2.2.3.  Phạm vi người dùng  ................................ ................................ .. 12 
+1.2.3.  Các bài toán cần giải quyết  ................................ ...............................  12 
+1.2.4.  Các công nghệ sử dụng  ................................ ................................ ..... 13 
+1.2.4.1.  Frontend  ................................ ................................ ....................  13 
+1.2.4.1.1  HTML  ................................ ................................ ...............  13 
+1.2.4.1.2  CSS ................................ ................................ ...................  13 
+1.2.4.1.3  Bootstrap  ................................ ................................ ...........  14 
+1.2.4.2.  Backend  ................................ ................................ .....................  15 
+1.2.4.2.1  NodeJS  ................................ ................................ ..............  15 
+1.2.4.2.2  ExpressJS  ................................ ................................ ..........  15 
+1.2.5.  Database : MySQL  ................................ ................................ .............  16 
+1.2.6.  Các công nghệ khác ................................ ................................ ...........  17 
+1.2.6.1.  Cloudinary  ................................ ................................ .................  17 
+1.2.6.2.  JSON Web Token (JWT)  ................................ ..........................  17 
+1.2.6.3.  dotenv  ................................ ................................ ........................  18 
+1.2.6.4.  Multer  ................................ ................................ ........................  18 
+1.3.  Tổng  kết chương  1 ................................ ................................ .....................  18 
+CHƯƠNG 2: PHÂN TÍCH VÀ THIẾT KẾ HỆ THỐNG  ..............................  19 
+2.1. Khảo  sát và đặc tả yêu cầu bài toán  ................................ ...........................  19 
+2.1.1.  Xác định và mô tả các tác nhân  ................................ .........................  19 
+2.1.2.  Các chức năng chính của hệ thống  ................................ ....................  19 
+2.1.3.  UseCase tổng quan của hệ thống  ................................ .......................  19 
+
+--- Page 5 ---
+5  2.1.4.  UseCase chi tiết  ................................ ................................ .................  20 
+2.2. Kiến trúc hệ thống  ................................ ................................ .....................  21 
+2.2.1.  Thành phần hệ thống  ................................ ................................ .........  21 
+2.2.2.  Quy trình xử lý  ................................ ................................ ..................  22 
+2.2.3.  Ưu điểm của kiến trúc  ................................ ................................ ....... 23 
+2.3.  Thiết kế cơ sở dữ liệu  ................................ ................................ ................  23 
+2.3.1.  Các bảng dữ liệu chính  ................................ ................................ ...... 24 
+2.3.2.  Mối quan hệ giữa các bảng  ................................ ...............................  25 
+2.4.  Data  Flow  Diagram  (DFD)  - Sơ đồ luồng  dữ liệu ................................ ..... 26 
+2.4.1.  Đối với khách hàn g. ................................ ................................ ..........  26 
+2.4.2.  Đối với quản trị viên (admin).  ................................ ...........................  27 
+2.5.  Sequence  Diagram  – Sơ đồ tuần tự  ................................ ............................  27 
+2.5.1.  Đối với khách hàng  ................................ ................................ ...........  27 
+2.5.1.1.  Chức năng đăng ký  ................................ ................................ ... 27 
+2.5.1.2.  Chức năng đăng nhập  ................................ ................................  28 
+2.5.1.3.  Chức năng xem thông tin cá nhân  ................................ .............  29 
+2.5.1.4.  Chức năng chỉnh sửa thông tin cá nhân  ................................ .... 29 
+2.5.1.5.  Chức năng tìm kiếm sản phẩm  ................................ ..................  29 
+2.5.1.6.  Chức năng xem sản phẩm  ................................ .........................  30 
+2.5.1.7.  Chức năng thao tác với giỏ hàng  ................................ ...............  30 
+2.5.1.8.  Chức năng đặt hàng  ................................ ................................ ... 31 
+2.5.1.9.  Chức năng xem lịch sử đơn hàng  ................................ ..............  31 
+2.5.1.10. Chức năng xem chi tiết đơn hàng  ................................ ............  32 
+2.5.2.  Đối với quản trị viên (admin)  ................................ ............................  32 
+2.5.2.1.  Chức năng đăng nhập đối với admin  ................................ ........  32 
+2.5.2.2.  Chức năng chỉnh thông tin tài khoản  ................................ ........  33 
+2.5.2.3.  Chức năng quản lý sản phẩm  ................................ ...................  34 
+2.5.2.4.  Chức năng quản lý danh mục  ................................ ....................  35 
+2.5.2.5.  Chức năng quản lý người dùng  ................................ .................  36 
+2.5.2.6.  Chức năng quản lý đơn hàng ................................ .....................  36 
+2.5.2.7.  Chức năng thống kê  ................................ ................................ .. 37 
+2.6.  Thiết kế giao diện  ................................ ................................ ......................  38 
+2.6.1.  Giao diện người dùng (khách hàng)  ................................ ..................  38 
+2.6.2.  Giao diện quản lý (admin)  ................................ ................................ . 39 
+
+--- Page 6 ---
+6  2.7.  Tổng kết chương 2  ................................ ................................ ....................  39 
+CHƯƠNG  3: THỬ  NGHIỆM VÀ ĐÁNH GIÁ  ................................ ................  40 
+3.1 Môi trường  triển khai ................................ ................................ .................  40 
+3.2 Thử nghiệm  và đánh  giá ................................ ................................ ............  40 
+3.2.1.  Giao diện cho người dùng (Khách hàng)  ................................ ..........  40 
+3.2.2.1.  Trang chủ  ................................ ................................ ..................  40 
+3.2.2.2.  Trang đăng nhập  ................................ ................................ ........  42 
+3.2.2.3.  Trang đăng ký  ................................ ................................ ...........  42 
+3.2.2.4.  Trang xem sản phẩm chi tiết  ................................ .....................  43 
+3.2.2.5.  Trang xem kết quả tìm kiếm  ................................ .....................  44 
+3.2.2.6.  Trang giỏ hàng  ................................ ................................ ..........  45 
+3.2.2.7.  Trang địa chỉ.  ................................ ................................ ............  46 
+3.2.2.8.  Trang lịch sử đơn hàng và xem chi tiết đơn hàng  .....................  46 
+3.2.2.9.  Trang xem và chỉnh sửa thông tin cá nhân  ...............................  48 
+3.2.2.10. Trang xem danh sách sản phẩm theo danh mục  ......................  48 
+3.2.2.  Giao diện cho quản lý (admin)  ................................ ..........................  49 
+3.2.2.1.  Trang đăng nhập  ................................ ................................ ........  49 
+3.2.2.2.  Trang quản lý thống kê  ................................ .............................  50 
+3.2.2.3.  Trang quản lý đơn hàng  ................................ ............................  51 
+3.2.2.4.  Trang quản lý sản phẩm  ................................ ............................  52 
+3.2.2.5.  Trang quản lý danh mục  ................................ ............................  53 
+3.2.2.6.  Trang quản lý tài khoản người dùng  ................................ .........  54 
+3.3 Đánh  giá ................................ ................................ ................................ ..... 55 
+3.3.1.  Giao diện cho người dùng (Khách hàng)  ................................ ..........  55 
+3.3.2.  Giao diện cho quản lý (admin)  ................................ ..........................  55 
+TỔNG  KẾT  ................................ ................................ ................................ ..........  57 
+1. Kết luận ................................ ................................ ................................ ..... 57 
+2. Hạn chế rút ra  ................................ ................................ ............................  57 
+3. Hướng phát triển trong tương lai  ................................ ..............................  57 
+TÀI LIỆU THAM KHẢO  ................................ ................................ ..................  59 
+ 
+  
+
+--- Page 7 ---
+7  DANH  MỤC  HÌNH  ẢNH  
+Hình  1: UseCase  tổng quan của hệ thống  ................................ ...................  20 
+Hình 2: UseCase chi tiết chức năng “Đặt hàng”  ................................ .........  20 
+Hình 3: UseCase chi tiết chức năng “Quản lý giỏ hàng”  ...........................  21 
+Hình 4: UseCase chi tiết chức năng “Quản lý sản phẩm”  ..........................  21 
+Hình 5: System Architecture Diagram - Thiết kế kiến trúc tổng thể  ..........  23 
+Hình 6: ERD (Entity Relationship Diagram) -Biểu diễn các bảng và mối 
+quan hệ giữa chúng trong cơ sở dữ liệu  ................................ ............  26 
+Hình 7: Data Flow Diagram (DFD) - Sơ đồ luồng dữ liệu - Đối với khách 
+hàng.  ................................ ................................ ................................ .. 26 
+Hình 8: Data Flow Diagram (DFD) - Sơ đồ luồng dữ liệu - Đối với admin.
+ ................................ ................................ ................................ ...........  27 
+Hình 9: Sequence Diagram chức năng đăng ký của user  ...........................  28 
+Hình 10: Sequence Diagram chức năng đăng nhập  ................................ .... 28 
+Hình 11: Sequence Diagram chức năng xem thông tin cá nhân  .................  29 
+Hình 12: Sequence Diagram chức năng chỉnh sửa thông tin cá nhân  ........  29 
+Hình 13: Sequence Diagram chức năng tìm kiếm sản phẩm  ......................  30 
+Hình 14: Sequence Diagram chức năng xem chi tiết sản phẩm  .................  30 
+Hình 15: Sequence Diagram chức năng thao tác với giỏ hàng  ...................  31 
+Hình 16: Sequence Diagram chức năng đặt hàng.  ................................ ...... 31 
+Hình 17: Sequence Diagram chức năng xem lịch sử đơn hàng.  .................  32 
+Hình 18: Sequence Diagram chức năng xem đơn hàng chi tiết  .................  32 
+Hình 19: Sequence Diagram chức năng đăng nhập (admin)  ......................  33 
+Hình 20: Sequence Diagram chức năng chỉnh sửa thông tin tài khoản 
+(admin).  ................................ ................................ .............................  33 
+Hình 21: Sequence Diagram chức năng quản lý sản phẩm (admin).  .........  34 
+Hình 22: Sequence Diagram chức năng quản danh mục (admin).  .............  35 
+Hình 23: Sequence Diagram chức năng quản lý người dùng (admin).  ...... 36 
+Hình 24: Sequence Diagram chức năng quản đơn hàng (admin).  ..............  37 
+Hình 25: Sequence Diagram chức năng quản lý thống kê (admin).  ...........  37 
+Hình 26: Thiết kế ban đầu trang user (khách hàng).  ................................ .. 38 
+Hình 27: Thiết kế ban đầu trang quản lý (admin).  ................................ ...... 39 
+Hình 28: Giao diện trang chủ.  ................................ ................................ ..... 41 
+Hình 29: Giao diện trang đăng nhập.  ................................ ..........................  42 
+Hình 30: Giao diện trang đăng ký.  ................................ ..............................  42 
+
+--- Page 8 ---
+8  Hình 31: Giao diện trang xem sản phẩm chi tiết.  ................................ ....... 43 
+Hình 32: Giao diện trang kết quả tìm kiếm.  ................................ ...............  44 
+Hình 33: Giao diện trang giỏ hàng. ................................ .............................  45 
+Hình 34: Giao diện trang địa chỉ nhận hàng.  ................................ ..............  46 
+Hình 35: Giao diện trang chi tiết đơn hàng.  ................................ ...............  47 
+Hình 36: Giao diện trang xem và chỉnh sửa thông tin cá nhân.  .................  48 
+Hình 37: Giao diện trang xem danh sách sản phẩm theo danh mục  ...........  48 
+Hình 38: Giao diện trang đăng nhập (admin).  ................................ ............  49 
+Hình 39: Giao diện quản lý thống kê.  ................................ .........................  50 
+Hình 40: Giao diện quản lý đơn hàng.  ................................ ........................  51 
+Hình 41: Giao diện quản lý sản phẩm.  ................................ .......................  52 
+Hình 42: Giao diện thêm sản phẩm.  ................................ ...........................  52 
+Hình 43: Giao diện quản lý danh mục.  ................................ .......................  53 
+Hình 44: Giao diện thêm danh mục.  ................................ ...........................  53 
+Hình 45: Giao diện quản lý người dùng.  ................................ ....................  54 
+Hình 46: Giao diện thêm người dùng.  ................................ ........................  54 
+Hình 47: Giao diện chỉnh sửa quyền người dùng.  ................................ ...... 55 
+ 
+  
+
+--- Page 9 ---
+9   
+DANH  MỤC  CÁC TỪ VIẾT TẮT  
+ 
+Từ viết tắt Từ đầy đủ Giải thích  
+SQL Structured  Query  Language  Ngôn  ngữ truy vấn có cấu trúc, 
+được sử dụng để quản lý cơ sở dữ 
+liệu 
+quan  hệ. 
+JSON  JavaScript  Object  Notation  Định dạng trao đổi dữ liệu nhẹ, dễ 
+đọc và viết, thường  dùng  trong  
+web APIs.  
+MVC  Model  – View – Controller  Mô hình kiến trúc phần mềm 
+MVC  
+API Application  Programming  
+Interface  Giao  diện lập trình  ứng dụng,  giúp 
+các phần  mềm  giao tiếp với nhau.  
+ORM.  Object Relational Mapping  Kỹ thuật ánh xạ đối tượng với 
+bảng cơ sở dữ liệu.  
+JWT  JSON Web Token  Phương thức xác thực an toàn cho 
+API. 
+HTML  HyperText Markup Language  Ngôn ngữ đánh dấu siêu văn bản 
+dùng để tạo trang web.  
+CSS Cascading Style Sheets  Ngôn ngữ định dạng các thành 
+phần trong trang web.  
+DOM  Document Object Model  Mô hình biểu diễn cấu trúc tài liệu 
+HTML dưới dạng đối tượng.  
+REST  Representational State Transfer  Kiểu kiến trúc phần mềm cho các 
+ứng dụng web  
+
+--- Page 10 ---
+10  CHƯƠNG  1: TỔNG  QUAN  
+1.1. Đặt vấn đề 
+Trong bối cảnh  kinh tế ngày  càng  phát triển,  nhu cầu làm đẹp và chăm  sóc 
+cá nhân trở thành một phần thiết yếu trong cuộc sống hiện đại. Đặc biệt, ngành 
+mỹ phẩm đang chứng kiến sự tăng trưởng  mạnh  mẽ cả về quy mô thị trường  lẫn 
+mức độ cạnh tranh. Việc kinh doanh mỹ phẩm không chỉ giới hạn ở các cửa  
+hàng truyền thống mà còn mở rộng mạnh  mẽ trên nền tảng trực tuyến  nhằm  tiếp 
+cận đông đảo khách hàng hơn, tiết kiệm chi phí và tối ưu hiệu quả kinh doanh.  
+Tuy nhiên, việc quản lý bán hàng mỹ phẩm một cách thủ công hoặc sử 
+dụng các  công  cụ quản  lý rời rạc thường  dẫn đến nhiều  bất cập như: sai sót trong 
+quản lý đơn hàng, khó khăn trong kiểm soát tồn kho, thời gian xử lý đơn hàng 
+lâu, và trải nghiệm người dùng chưa tối ưu. Điều này đòi hỏi cần có một hệ 
+thống bán hàng chuyên nghiệp, hiện đại, đáp ứng tốt nhu cầu quản lý nội bộ 
+cũng như nâng cao trải nghiệm mua sắm của khách hàng.  
+Vì vậy, việc xây dựng một hệ thống bán hàng mỹ phẩm với đầy  đủ các 
+chức năng như: quản lý sản phẩm, quản lý danh mục,  xử lý đơn hàng,  giỏ hàng, 
+tìm kiếm sản phẩm, quản lý người dùng và hỗ trợ khách hàng,... là  vô cùng  cần 
+thiết. Hệ thống không chỉ hỗ trợ chủ cửa hàng vận hành hiệu quả, mà còn giúp 
+khách hàng dễ dàng tìm kiếm, lựa chọn và đặt mua sản phẩm một  cách tiện lợi, 
+nhanh chóng.  
+Với mục tiêu đó, em thực hiện đề tài "Xây dựng hệ thống bán hàng mỹ 
+phẩm" nhằm mang đến một giải pháp phần mềm tối ưu, vừa đảm bảo tính thực 
+tiễn, vừa đáp ứng  tốt các yêu cầu kỹ thuật  hiện đại trong  phát triển ứng dụng 
+web.  
+1.2. Giới  thiệu hệ thống  
+1.2.1.  Mục tiêu và ý nghĩa của đề tài 
+Mục tiêu chính  là xây dựng một hệ thống thương mại điện tử hỗ trợ mua 
+bán mỹ phẩm trực tuyến với các chức năng cơ bản như tìm kiếm, xem chi tiết 
+sản phẩm, đặt hàng và thanh toán. Hệ thống được thiết kế nhằm phục vụ nhu cầu 
+ngày càng cao của người tiêu dùng trong việc tìm kiếm và  lựa chọn các sản 
+phẩm làm đẹp một cách thuận tiện, nhanh chóng và an toàn.  
+Bên cạnh đó, hệ thống  còn hướng  tới mục tiêu hỗ trợ các cửa hàng,  doanh 
+nghiệp kinh doanh mỹ phẩm – đặc biệt  là các đơn vị nhỏ và vừa – trong  việc tối 
+ưu hóa hoạt  động  kinh  doanh , quản  lý hiệu quả danh  mục sản phẩm,  đơn hàng, 
+khách hàng và doanh thu. Việc sở hữu một nền tảng bán hàng riêng giúp các 
+doanh  nghiệp  tăng tính chủ động trong chiến lược phát triển thương hiệu, nâng  
+
+--- Page 11 ---
+11  cao khả năng tương tác với khách hàng và giảm thiểu sự phụ thuộc vào  các sàn 
+thương mại điện tử lớn.  
+Đề tài không chỉ dừng lại ở khía cạnh ứng dụng công nghệ vào  thực tế, 
+mà còn mang  tính giáo dục và nghiên  cứu. Trong  quá trình  thực hiện dự án, em 
+sẽ có cơ hội tiếp cận và áp dụng các kiến thức đã học  vào một mô hình thực tiễn  
+bao gồm:  thiết kế hệ thống,  lập trình  frontend/backend,  quản  lý cơ sở dữ liệu, 
+triển khai giao diện người dùng và xử lý nghiệp vụ thương mại  điện tử. Cụ thể 
+như sau: 
+● Củng  cố kiến thức lập trình  với bộ công  nghệ  hiện đại như NodeJS, 
+ExpressJS, MySQL. Ngoài ra củng cố thêm kiến thức về Frontend như 
+HTML, CSS và Bootstrap.  
+● Hiểu rõ hơn về quy trình xây dựng một  ứng dụng  web hoàn  chỉnh , từ phân 
+tích yêu cầu đến triển khai và kiểm thử.  
+● Góp phần  đưa ra một mô hình tham  khảo  có thể tiếp tục mở rộng,  phát 
+triển hoặc ứng dụng vào các sản phẩm thực tế trong tương lai . 
+1.2.2.  Phạm  vi dự án 
+Dự án tập trung xây dựng một hệ thống  thương  mại điện tử cơ bản nhưng 
+đầy đủ chức năng cốt lõi, hỗ trợ hoạt động mua bán mỹ phẩm trực tuyến giữa 
+người dùng (khách hàng) và nhà bán hàng. Các phạm vi cụ thể bao gồm:  
+1.2.2.1.  Phạm  vi chức  năng  
+● Đối với khách  hàng 
+○ Đăng  ký, đăng  nhập,  xem và cập nhật thông  tin cá nhân.  
+○ Xem danh sách sản phẩm, sản phẩm theo danh mục, sản phẩm nổi bật 
+theo danh mục.  
+○ Tìm kiếm  sản phẩm  theo từ khóa  có ở trong  tên và danh  mục.  
+○ Xem  chi tiết thông  tin sản phẩm.  
+○ Thêm  sản phẩm  vào giỏ hàng,  cập nhật số lượng  hoặc  xóa giỏ hàng.  
+○ Đặt hàng và chọn phương thức thanh toán (Chỉ hỗ trợ thanh toán  trực tiếp 
+khi nhận hàng).  
+○ Theo dõi trạng thái  đơn hàng,  xem lịch sử mua hàng  và xem chi tiết đơn 
+hàng đã mua. Hủy đơn liên hệ hotline shop.  
+● Đối với admin  
+○ Đăng  nhập  hệ thống  quản  trị. 
+
+--- Page 12 ---
+12  ○ Quản  lý sản phẩm.  
+○ Quản  lý danh  mục.  
+○ Quản  lý đơn hàng.  
+○ Quản  lý người  dùng.  
+○ Quản  lý thống  kê. 
+1.2.2.2.  Phạm  vi kỹ thuật  
+Dự án sử dụng các công nghệ phổ biến và phù hợp để xây dựng một hệ 
+thống thương mại điện tử đơn giản, hiệu quả và dễ triển khai.  
+● MySQL được sử dụng làm hệ quản trị cơ sở dữ liệu quan hệ, lưu trữ  các 
+thông tin như người dùng, sản phẩm, đơn hàng, danh mục sản phẩm,... 
+MySQL đảm bảo tính toàn vẹn dữ liệu, dễ dàng truy vấn và quản lý dữ 
+liệu có cấu trúc.  
+● Node.js kết hợp với Express.js để xây dựng backend, xử lý logic nghiệp 
+vụ và cung cấp các API phục vụ frontend như: đăng nhập/đăng ký, quản  
+lý sản phẩm, đặt hàng, xử lý giỏ hàng,...  
+● HTML, CSS và Bootstrap được sử dụng để xây dựng giao diện người 
+dùng (frontend). Giao diện được thiết kế theo phong  cách đơn giản,  dễ sử 
+dụng,  hỗ trợ responsive  để hiển thị tốt trên cả máy tính và thiết bị di động.  
+● Cloudinary được tích hợp để lưu trữ hình ảnh sản  phẩm  trên cloud.  Điều 
+này giúp giảm tải cho server và tăng tốc độ  tải trang,  đồng  thời hỗ trợ các 
+chức năng xử lý ảnh (resize, tối ưu hóa).  
+● Hệ thống sẽ được triển khai  và chạy  trên môi trường  localhost  để phục 
+vụ phát triển và kiểm thử.  
+1.2.2.3.  Phạm  vi người  dùng  
+● Khách hàng (người dùng ): Là người  truy cập hệ thống  để tìm kiếm và 
+mua sắm các sản phẩm mỹ phẩm. Họ có thể đăng ký tài khoản, đăng 
+nhập, xem thông tin sản phẩm, thêm vào giỏ hàng, đặt đơn, theo dõi đơn 
+hàng,..  
+● Quản  trị viên (admin  / người  bán hàng) : Là người  quản  lý hệ thống.  
+1.2.3.   Các bài toán cần giải quyết  
+Xây dựng hệ thống có thể quản lý các thành phần sau:  
+● Quản lý người dùng : 
+○ Xây dựng chức năng đăng ký, đăng nhập với xác thực người dùng.  
+○ Tích hợp trang quản lý tài khoản cá nhân  chứa  thông tin cơ bản . 
+● Quản lý sản phẩm , danh mục sản phẩm : 
+○ Phát triển giao diện cho việc thêm, sửa, xóa, và tìm kiếm sản phẩm.  
+
+--- Page 13 ---
+13  ○ Cung cấp các danh mục sản phẩm để tối ưu trải nghiệm tìm kiếm.  
+● Quản lý giỏ hàng : 
+○ Tạo chức năng thêm sản phẩm vào giỏ hàng, cập nhật số lượng, và xóa 
+sản phẩm.  
+● Quản lý đơn hàng : 
+○ Thiết kế hệ thống theo dõi trạng thái đơn hàng, từ khi tạo mới đến khi 
+hoàn thành.  
+1.2.4.  Các công nghệ sử dụng   
+1.2.4.1.  Frontend  
+1.2.4.1.1  HTML  
+HTML (HyperText Markup Language) là ngôn ngữ đánh dấu chuẩn 
+được sử dụng để xây dựng cấu trúc nội dung  cho các trang  web.  Trong  dự án hệ 
+thống thương mại điện tử bán mỹ phẩm trực tuyến, HTML đóng vai trò là nền 
+tảng để tạo khung sườn cho các trang giao diện người dùng.  
+- Vai trò của HTML  trong  dự án: 
+● Định nghĩa  bố cục cơ bản của các trang  như: trang  chủ, danh  mục sản 
+phẩm, trang chi tiết sản phẩm, trang giỏ hàng, trang thanh toán,...  
+● Cấu trúc các thành  phần  nội dung  như tiêu đề, đoạn  văn, hình ảnh, nút 
+bấm, biểu mẫu đăng ký/đăng nhập,...  
+● Hỗ trợ kết hợp với CSS và JavaScript  để xây dựng  giao diện tương tác, 
+hiện đại và thân thiện với người dùng.  
+- Lý do sử dụng  HTML:  
+● Dễ học, dễ triển khai,  có cộng  đồng  hỗ trợ lớn. 
+● Tương  thích  với mọi trình  duyệt  web phổ biến hiện nay. 
+● Là nền tảng không thể thiếu khi phát triển frontend của bất kỳ ứng dụng 
+web nào.  
+1.2.4.1.2  CSS 
+CSS (Cascading Style Sheets) là ngôn ngữ dùng để định kiểu và trình 
+bày các phần  tử HTML  trên trang  web.  Trong  dự án hệ thống  thương  mại điện tử 
+bán mỹ phẩm trực tuyến, CSS đóng vai trò quan trọng trong việc tạo giao diện 
+đẹp, dễ nhìn và thân thiện với người dùng.  
+- Vai trò của CSS trong  dự án: 
+● Tùy chỉnh màu sắc, font chữ, khoảng cách, đường viền, bố cục,... giúp 
+giao diện trở nên thẩm mỹ và chuyên nghiệp hơn.  
+● Giúp điều chỉnh cách  hiển thị các phần  tử HTML  tùy theo từng thiết bị, từ 
+đó tăng khả năng tương thích và trải nghiệm người dùng (responsive 
+design).  
+
+--- Page 14 ---
+14  ● Kết hợp với Bootstrap để mở rộng khả  năng  tùy biến,  xây dựng  các thành 
+phần giao diện theo nhu cầu cụ thể của dự án.  
+- Lý do sử dụng  CSS:  
+● Cho phép tách biệt phần cấu trúc (HTML) và phần trình bày (CSS), giúp 
+mã nguồn dễ quản lý và bảo trì.  
+● Giảm  sự trùng  lặp mã nhờ khả năng  áp dụng  một kiểu cho nhiều  phần  tử. 
+● Dễ dàng tạo hiệu ứng giao diện như chuyển động mượt, hover, hiệu ứng 
+hiển thị,...  
+Trong dự án, CSS được sử dụng song song với thư viện Bootstrap để 
+nhanh chóng xây dựng giao diện có tính thẩm mỹ cao, đồng thời tùy chỉnh lại 
+các thành phần giao diện mặc định để phù hợp  với nhu cầu thực tế của hệ thống 
+bán mỹ phẩm.  
+1.2.4.1.3  Bootstrap  
+Bootstrap là một framework mã nguồn mở dành cho phát triển  giao diện 
+người dùng trên web,  được  xây dựng  dựa trên HTML,  CSS và JavaScript.  Trong 
+dự án hệ thống thương mại điện tử bán mỹ phẩm trực tuyến, Bootstrap  được  sử 
+dụng để hỗ trợ xây dựng giao diện đẹp, hiện đại và tương thích trên nhiều thiết 
+bị. 
+- Vai trò của Bootstrap  trong  dự án: 
+● Tạo các trang  hiển thị sản phẩm  với bố cục lưới đẹp mắt và linh hoạt.  
+● Xây dựng  các biểu mẫu đăng  ký, đăng  nhập,  đặt hàng  với định dạng  rõ 
+ràng, dễ sử dụng.  
+● Thiết  kế thanh  điều hướng, các phần tiêu đề, thông báo, footer,... mang 
+tính nhất quán và hiện đại.  
+● Hỗ trợ hiệu ứng động  như hiển thị thông  báo (alert),  chuyển  đổi tab, 
+collapse menu,... mà không cần viết JavaScript phức tạp.  
+- Lý do sử dụng  Bootstrap  trong  dự án: 
+● Thiết kế responsive : Bootstrap  tích hợp hệ thống  lưới (grid  system)  mạnh 
+mẽ, giúp dễ dàng thiết kế giao diện  tương  thích  với mọi độ phân  giải màn 
+hình, từ điện thoại, máy tính bảng đến máy tính để bàn.  
+● Thư viện thành phần giao diện phong phú : Cung cấp sẵn nhiều thành 
+phần như nút bấm, thanh điều hướng (navbar), biểu mẫu (form), modal, 
+bảng dữ liệu,... giúp tiết kiệm thời gian phát triển giao diện.  
+● Tùy chỉnh linh hoạt : Các lớp CSS tiện  lợi (utility  classes)  cho phép  định 
+dạng bố cục, căn chỉnh, màu sắc,... nhanh chóng  mà không  cần viết nhiều 
+đoạn mã CSS thủ công.  
+● Tích hợp dễ dàng : Có thể dễ dàng tích hợp vào dự án chỉ bằng cách 
+nhúng file CSS và JS từ CDN hoặc cài đặt thông qua npm.  
+
+--- Page 15 ---
+15  Nhờ có Bootstrap, dự án có thể đẩy nhanh tiến độ phát triển giao diện, 
+đồng  thời đảm bảo tính thẩm  mỹ và khả năng  tương  thích  trên nhiều  loại thiết bị. 
+1.2.4.2.  Backend  
+1.2.4.2.1  NodeJS  
+Node.js là một nền tảng chạy JavaScript phía máy chủ, được xây dựng 
+trên công cụ V8 JavaScript Engine của Google. Node.js cho phép xây  dựng  các 
+ứng dụng web hiệu suất cao,  nhẹ, có khả năng  xử lý đồng  thời nhiều  kết nối nhờ 
+vào kiến trúc bất đồng bộ (asynchronous) và hướng sự kiện (event -driven).  
+- Lý do sử dụng  NodeJS  trong  dự án: 
+● Hiệu năng cao, xử lý bất đồng bộ tốt : Node.js hoạt động trên mô hình 
+non-blocking I/O, giúp xử lý hiệu quả nhiều yêu cầu cùng lúc – phù hợp 
+với hệ thống  thương  mại điện tử có thể có nhiều  người  dùng  truy cập đồng 
+thời. 
+● Sử dụng cùng ngôn ngữ JavaScript : Cả frontend và backend đều dùng 
+JavaScript giúp đồng nhất về công nghệ, dễ học, dễ  bảo trì, và giảm  thiểu 
+chi phí học công nghệ mới.  
+● Thư viện phong phú : Node.js có hệ sinh thái npm (Node Package 
+Manager) với hàng  trăm nghìn  gói thư viện hỗ trợ hầu hết các nhu cầu của 
+một dự án web như xác thực, bảo mật, kết nối cơ sở dữ liệu, xử lý ảnh,...  
+● Phù hợp cho RESTful API : Node.js rất thích hợp để xây dựng các 
+RESTful API cho ứng dụng frontend giao tiếp.  
+- Vai trò của NodeJS  trong  dự án: 
+● Xây dựng server backend xử lý các chức năng chính như: đăng ký/đăng  
+nhập, quản lý sản phẩm, giỏ hàng, đơn hàng,...  
+● Giao tiếp  với cơ sở dữ liệu MySQL  để đọc/ghi  dữ liệu về sản phẩm,  người 
+dùng, đơn hàng.  
+● Xử lý logic nghiệp vụ như kiểm tra đăng nhập, xác thực người dùng,  cập 
+nhật trạng thái đơn hàng,...  
+● Kết hợp với Express.js  để định tuyến  và tạo API dễ quản  lý, mở rộng.  
+Việc sử dụng Node.js giúp xây dựng một hệ thống backend linh hoạt, hiệu 
+quả, dễ mở rộng và tương thích tốt với các công nghệ frontend hiện đại.  
+1.2.4.2.2  ExpressJS  
+ExpressJS là một framework nhẹ và linh hoạt của Node.js, được thiết  kế 
+để xây dựng các ứng dụng web và API một  cách nhanh  chóng  và đơn giản.  Đây 
+là một trong những framework phổ  biến nhất trong  hệ sinh thái Node.js  nhờ tính 
+dễ sử dụng, khả năng mở rộng và cộng đồng phát triển mạnh.  
+

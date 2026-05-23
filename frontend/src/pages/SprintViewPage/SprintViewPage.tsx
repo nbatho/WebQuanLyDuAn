@@ -12,8 +12,10 @@ import CreateTaskModal from '../../components/CreateTaskModal/CreateTaskModal';
 import BoardView from './components/BoardView';
 import ListView from './components/ListView';
 import { useDispatch, useSelector } from 'react-redux';
+import { message } from 'antd';
 import type { AppDispatch, RootState } from '@/store/configureStore';
 import { fetchTasksForSprint, fetchCreateTask, fetchUpdateTask, fetchDeleteTask } from '@/store/modules/tasks';
+import { createTaskStatus } from '@/api/statuses';
 import type { Task, StatusGroup, NewTaskData, Assignee } from '@/types/tasks';
 export type { Task, StatusGroup, NewTaskData, Assignee };
 
@@ -154,10 +156,27 @@ export default function SprintViewPage() {
         setIsCreateTaskOpen(false);
 
     }, [dispatch]);
-    const handleCreateStatus = useCallback((name: string, color: string) => {
-        console.log("Create Status:", { name, color });
-        // TODO: Gọi API tạo status
-    }, []);
+    const handleCreateStatus = useCallback(async (name: string, color: string) => {
+        const numSpaceId = Number(spaceId);
+        if (!numSpaceId) return;
+        try {
+            const newStatus = await createTaskStatus(numSpaceId, {
+                statusName: name,
+                color: color,
+            });
+            // Add the new status group to the UI
+            setGroups(prev => [...prev, {
+                id: newStatus.status_id,
+                name: newStatus.status_name,
+                color: newStatus.color || color,
+                isExpanded: true,
+                tasks: [],
+            }]);
+            message.success(`Đã tạo status "${name}"`);
+        } catch {
+            message.error('Không thể tạo status');
+        }
+    }, [spaceId]);
 
     const onTaskContextMenu = (e: React.MouseEvent, task: Task) => {
         e.preventDefault();

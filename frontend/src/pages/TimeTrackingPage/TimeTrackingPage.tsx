@@ -16,6 +16,7 @@ import {
     fetchStopTimer,
     fetchDeleteTimeLog,
 } from '../../store/modules/timelogs';
+import { fetchTasksForUser } from '../../store/modules/tasks';
 import type { TaskWithSpaceData } from '../../store/modules/tasks';
 
 // ── helpers ──────────────────────────────────────────────────────
@@ -56,7 +57,7 @@ function elapsedSince(startedAt: string): number {
 export default function TimeTrackingPage() {
     const dispatch = useAppDispatch();
     const { myTimeLogs, runningTimer, isLoadingTimeLogs } = useAppSelector(s => s.timelogs);
-    const { listTask } = useAppSelector(s => s.tasks);
+    const { listTaskByUserId } = useAppSelector(s => s.tasks);
     const spaces = useAppSelector(s => s.spaces.listSpaces);
 
     const [liveSeconds, setLiveSeconds] = useState(0);
@@ -69,6 +70,7 @@ export default function TimeTrackingPage() {
     useEffect(() => {
         dispatch(fetchMyTimeLogs());
         dispatch(fetchRunningTimer());
+        dispatch(fetchTasksForUser());
     }, [dispatch, spaces]);
 
     // ── Live timer tick ──
@@ -88,7 +90,7 @@ export default function TimeTrackingPage() {
     // ── Group tasks by space ──
     const tasksBySpace: Record<string, { spaceId: number; spaceName: string; spaceColor: string; tasks: TaskWithSpaceData[] }> = {};
     // Flatten StatusGroup[] → Task[]
-    const allTasks: TaskWithSpaceData[] = (listTask || []).flatMap(group => group.tasks || []) as unknown as TaskWithSpaceData[];
+    const allTasks: TaskWithSpaceData[] = (listTaskByUserId || []).flatMap(group => group.tasks || []) as unknown as TaskWithSpaceData[];
     allTasks.forEach(t => {
         const key = t.space_name || `Space #${t.space_id}`;
         if (!tasksBySpace[key]) {
