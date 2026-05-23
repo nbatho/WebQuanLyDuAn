@@ -210,6 +210,7 @@ export const findAllTasksByUserId = async (user_id) => {
         t.due_date,
         t.completed_at,
         t.position,
+        t.created_by,
         
         COALESCE(
           (

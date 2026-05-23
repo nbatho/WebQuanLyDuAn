@@ -7,7 +7,7 @@ import { Avatar, Popover, message } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 
 import TaskDetailModal from '@/components/TaskDetailModal';
-import CreateTaskModal from '@/components/CreateTaskModal/CreateTaskModal';
+import CreateTaskModal from '@/components/Modal/CreateTaskModal/CreateTaskModal';
 import AssigneePopover from '@/components/Popovers/AssigneePopover';
 import DueDatePopover from '@/components/Popovers/DueDatePopover';
 import PriorityPopover from '@/components/Popovers/PriorityPopover';
@@ -104,6 +104,10 @@ export default function MyTasksPage() {
                 }
                 if (activeTab === 'created' && currentUserId) {
                     if (t.created_by !== currentUserId) return false;
+                }
+                if (activeTab === 'mentions') {
+                    // Mentions: chưa có hệ thống @mention, tạm thời không hiện task nào
+                    return false;
                 }
                 return true;
             });
@@ -213,9 +217,25 @@ export default function MyTasksPage() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-6">
-                {taskGroups.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-10 text-[#9aa0a6]">
-                        <p>No tasks found.</p>
+                {activeTab === 'mentions' ? (
+                    <div className="flex flex-col items-center justify-center py-16 text-[#9aa0a6]">
+                        <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#f0f4ff]">
+                            <span className="text-2xl">💬</span>
+                        </div>
+                        <p className="text-sm font-semibold text-[#5f6368]">Chưa có lượt mention nào</p>
+                        <p className="mt-1 text-xs text-[#9aa0a6]">Khi ai đó @mention bạn trong comment, task sẽ hiện ở đây.</p>
+                    </div>
+                ) : taskGroups.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-16 text-[#9aa0a6]">
+                        <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#f0f4ff]">
+                            <span className="text-2xl">{activeTab === 'assigned' ? '📋' : '✏️'}</span>
+                        </div>
+                        <p className="text-sm font-semibold text-[#5f6368]">
+                            {activeTab === 'assigned' ? 'Không có task nào được giao cho bạn' : 'Bạn chưa tạo task nào'}
+                        </p>
+                        <p className="mt-1 text-xs text-[#9aa0a6]">
+                            {activeTab === 'assigned' ? 'Các task được giao (assign) cho bạn sẽ xuất hiện ở đây.' : 'Những task do bạn tạo sẽ xuất hiện ở đây.'}
+                        </p>
                     </div>
                 ) : null}
 
