@@ -7,6 +7,7 @@ import {
   deleteTimeLog,
   getTotalTimeByTaskId,
 } from "../models/TimeLogs.js";
+import pool from "../config/connect.js";
 
 export const getTimeLogsByTaskId = async (req, res) => {
   try {
@@ -109,9 +110,27 @@ export const stopTimerById = async (req, res) => {
 export const deleteTimeLogById = async (req, res) => {
   try {
     const { timeLogId } = req.params;
+    const userId = req.user?.user_id;
+
     if (!timeLogId) {
       return res.status(400).json({ error: "Time log ID is required" });
     }
+    if (!userId) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    // Kiểm tra ownership: chỉ cho phép xóa time log của chính mình
+    const ownerCheck = await pool.query(
+      "SELECT user_id FROM time_logs WHERE time_log_id = $1",
+      [timeLogId]
+    );
+    if (ownerCheck.rows.length === 0) {
+      return res.status(404).json({ error: "Time log not found" });
+    }
+    if (ownerCheck.rows[0].user_id !== userId) {
+      return res.status(403).json({ error: "Forbidden: Bạn chỉ có thể xóa time log của chính mình." });
+    }
+
     const deleted = await deleteTimeLog(timeLogId);
     if (!deleted) {
       return res.status(404).json({ error: "Time log not found" });
