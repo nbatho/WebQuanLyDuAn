@@ -20,7 +20,9 @@ import {
     assignUserToTask,
     unassignUserFromTask,
     getAssignedUsersByTaskId,
-    findAllTasksByUserId
+    findAllTasksByUserId,
+    shareTaskToUsers,
+    getShareableUsers,
 } from '../models/Task.js';
 import { findStatusById, findStatusesByListId, findStatusesBySprintId } from '../models/TaskStatus.js';
 import { createActivity } from '../models/ActivityLogs.js';
@@ -515,6 +517,64 @@ export const removeAssigneeFromTasks = async (req, res) => {
 
         res.status(200).json({ message: "Assignee removed successfully" });
     } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+export const shareTask = async (req, res) => {
+    try {
+        const { taskId } = req.params;
+        const { user_ids } = req.body;
+        const sharedBy = req.user?.user_id;
+
+        if (!taskId) {
+            return res.status(400).json({ error: "Task ID is required" });
+        }
+        if (!user_ids || !Array.isArray(user_ids) || user_ids.length === 0) {
+            return res.status(400).json({ error: "user_ids is required and must be a non-empty array" });
+        }
+
+        const task = await findTaskById(taskId);
+        if (!task) {
+            return res.status(404).json({ error: "Task not found" });
+        }
+
+        const results = await shareTaskToUsers(taskId, user_ids, sharedBy);
+
+        // Log activity for each shared user (fire-and-forget)
+        const { createActivity } = await import('../models/ActivityLogs.js');
+        for (const userId of user_ids) {
+            createActivity(taskId, sharedBy, 'assigned', null, { user_id: userId })
+                .catch((err) => console.error('[activity log] share task error:', err));
+        }
+
+        res.status(200).json({
+            message: "Task shared successfully",
+            assignees: results
+        });
+    } catch (error) {
+        console.error("[shareTask] Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+export const getShareableUsersForTask = async (req, res) => {
+    try {
+        const { taskId } = req.params;
+
+        if (!taskId) {
+            return res.status(400).json({ error: "Task ID is required" });
+        }
+
+        const task = await findTaskById(taskId);
+        if (!task) {
+            return res.status(404).json({ error: "Task not found" });
+        }
+
+        const users = await getShareableUsers(taskId);
+        res.status(200).json(users);
+    } catch (error) {
+        console.error("[getShareableUsersForTask] Error:", error);
         res.status(500).json({ error: error.message });
     }
 };

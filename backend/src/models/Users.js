@@ -84,3 +84,24 @@ export const createUser = async (username, hashedPassword, email, name = null, a
         throw error;
     }
 }
+
+export const getPasswordHash = async (user_id) => {
+    const query = 'SELECT password_hash FROM users WHERE user_id = $1 AND deleted_at IS NULL';
+    const values = [user_id];
+    try {
+        const result = await con.query(query, values);
+        return result.rows[0]?.password_hash || null;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const updatePassword = async (user_id, newPasswordHash) => {
+    const query = 'UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE user_id = $2 AND deleted_at IS NULL';
+    const values = [newPasswordHash, user_id];
+    try {
+        await con.query(query, values);
+    } catch (error) {
+        throw error;
+    }
+}

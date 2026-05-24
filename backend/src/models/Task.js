@@ -695,3 +695,54 @@ export const createAttachment = async (
     throw error;
   }
 };
+
+export const shareTaskToUsers = async (task_id, user_ids, shared_by) => {
+  try {
+    const values = [];
+    const placeholders = user_ids.map((uid, idx) => {
+      const offset = idx * 3;
+      values.push(task_id, uid, shared_by);
+      return `($${offset + 1}, $${offset + 2}, $${offset + 3})`;
+    }).join(', ');
+
+    const query = `
+      INSERT INTO task_assigns (task_id, user_id, assigned_by) 
+      VALUES ${placeholders}
+      ON CONFLICT (task_id, user_id) 
+      DO UPDATE SET deleted_at = NULL, assigned_by = EXCLUDED.assigned_by, assigned_at = CURRENT_TIMESTAMP
+      RETURNING *
+    `;
+
+    const result = await con.query(query, values);
+    return result.rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getShareableUsers = async (task_id) => {
+  try {
+    const query = `
+      SELECT u.user_id, u.username, u.name, u.email, u.avatar_url
+      FROM workspace_members wm
+      JOIN users u ON wm.user_id = u.user_id AND u.deleted_at IS NULL
+      WHERE wm.workspace_id = (
+        SELECT s.workspace_id 
+        FROM tasks t 
+        JOIN spaces s ON t.space_id = s.space_id 
+        WHERE t.task_id = $1 AND t.deleted_at IS NULL AND s.deleted_at IS NULL
+      )
+      AND wm.deleted_at IS NULL
+      AND u.user_id NOT IN (
+        SELECT ta.user_id 
+        FROM task_assigns ta 
+        WHERE ta.task_id = $1 AND ta.deleted_at IS NULL
+      )
+      ORDER BY u.name ASC
+    `;
+    const result = await con.query(query, [task_id]);
+    return result.rows;
+  } catch (error) {
+    throw error;
+  }
+};

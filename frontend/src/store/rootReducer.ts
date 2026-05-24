@@ -13,6 +13,7 @@ import sprintsReducer from './modules/sprints/index.ts';
 import notificationsReducer from './modules/notifications/index.ts';
 import aiReducer from './modules/ai/index.ts';
 import activityLogsReducer from './modules/activityLogs/index.ts';
+import usersReducer from './modules/users/index.ts';
 
 const rootReducer = {
     app: appReducer,
@@ -30,6 +31,7 @@ const rootReducer = {
     notifications: notificationsReducer,
     ai: aiReducer,
     activityLogs: activityLogsReducer,
+    users: usersReducer,
 };
 
 export default rootReducer;

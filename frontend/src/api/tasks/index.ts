@@ -68,3 +68,19 @@ export const removeAssignee = async (task_id: number, userId: string): Promise<v
     return beApi.delete(`/tasks/${task_id}/assignees/${userId}`);
 };
 
+export interface ShareableUser {
+    user_id: number;
+    username: string;
+    name: string;
+    email: string;
+    avatar_url: string | null;
+}
+
+export const getShareableUsers = async (task_id: number): Promise<ShareableUser[]> => {
+    return beApi.get(`/tasks/${task_id}/shareable-users`);
+};
+
+export const shareTask = async (task_id: number, user_ids: number[]): Promise<{ message: string; assignees: any[] }> => {
+    return beApi.post(`/tasks/${task_id}/share`, { user_ids });
+};
+

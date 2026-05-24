@@ -12,7 +12,10 @@ import {
     addAssignee,
     removeAssignee,
     getTasksByUserId,
+    getShareableUsers,
+    shareTask,
 } from "@/api/tasks";
+import type { ShareableUser } from "@/api/tasks";
 import type { StatusGroup, Task } from "@/types/tasks";
 
 export interface CreateTaskData {
@@ -128,6 +131,13 @@ export interface TasksState {
     listTaskByUserId: StatusGroup[];
     isTasksByUserIdLoading: boolean;
     errorTasksByUserId: string | null;
+
+    shareableUsers: ShareableUser[];
+    isLoadingShareableUsers: boolean;
+    errorShareableUsers: string | null;
+    isSharingTask: boolean;
+    errorShareTask: string | null;
+    shareTaskSuccess: boolean;
 }
 
 
@@ -313,6 +323,33 @@ export const fetchRemoveAssignee = createAsyncThunk<
     }
 );
 
+export const fetchShareableUsers = createAsyncThunk<ShareableUser[], number>(
+    'tasks/fetchShareableUsers',
+    async (task_id, { rejectWithValue }) => {
+        try {
+            const response = await getShareableUsers(task_id);
+            return response;
+        } catch (error: unknown) {
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch shareable users');
+        }
+    }
+);
+
+export const fetchShareTask = createAsyncThunk<
+    { message: string; assignees: any[] },
+    { task_id: number; user_ids: number[] }
+>(
+    'tasks/shareTask',
+    async ({ task_id, user_ids }, { rejectWithValue }) => {
+        try {
+            const response = await shareTask(task_id, user_ids);
+            return response;
+        } catch (error: unknown) {
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to share task');
+        }
+    }
+);
+
 // ─────────────────────────────────────────────
 // Initial State
 // ─────────────────────────────────────────────
@@ -353,6 +390,13 @@ const initialState: TasksState = {
     listTaskByUserId: [],
     isTasksByUserIdLoading: false,
     errorTasksByUserId: null,
+
+    shareableUsers: [],
+    isLoadingShareableUsers: false,
+    errorShareableUsers: null,
+    isSharingTask: false,
+    errorShareTask: null,
+    shareTaskSuccess: false,
 };
 
 export const tasksSlice = createSlice({
@@ -369,6 +413,15 @@ export const tasksSlice = createSlice({
             state.errorCreateTask = null;
             state.errorUpdateTask = null;
             state.errorDeleteTask = null;
+            state.errorShareTask = null;
+        },
+        clearShareTaskState(state) {
+            state.shareableUsers = [];
+            state.isLoadingShareableUsers = false;
+            state.errorShareableUsers = null;
+            state.isSharingTask = false;
+            state.errorShareTask = null;
+            state.shareTaskSuccess = false;
         },
         setSelectedTask(state, action: PayloadAction<TaskWithSpaceData | null>) {
             state.selectedTask = action.payload;
@@ -645,9 +698,38 @@ export const tasksSlice = createSlice({
             state.isRemovingAssignee = false;
             state.errorRemoveAssignee = action.payload as string;
         });
+
+        // ── Shareable Users ──
+        builder.addCase(fetchShareableUsers.pending, (state) => {
+            state.isLoadingShareableUsers = true;
+            state.errorShareableUsers = null;
+        });
+        builder.addCase(fetchShareableUsers.fulfilled, (state, action) => {
+            state.isLoadingShareableUsers = false;
+            state.shareableUsers = action.payload;
+        });
+        builder.addCase(fetchShareableUsers.rejected, (state, action) => {
+            state.isLoadingShareableUsers = false;
+            state.errorShareableUsers = action.payload as string;
+        });
+
+        // ── Share Task ──
+        builder.addCase(fetchShareTask.pending, (state) => {
+            state.isSharingTask = true;
+            state.errorShareTask = null;
+            state.shareTaskSuccess = false;
+        });
+        builder.addCase(fetchShareTask.fulfilled, (state) => {
+            state.isSharingTask = false;
+            state.shareTaskSuccess = true;
+        });
+        builder.addCase(fetchShareTask.rejected, (state, action) => {
+            state.isSharingTask = false;
+            state.errorShareTask = action.payload as string;
+        });
     },
 });
 
-export const { clearSelectedTask, clearTasksError, setSelectedTask } = tasksSlice.actions;
+export const { clearSelectedTask, clearTasksError, setSelectedTask, clearShareTaskState } = tasksSlice.actions;
 
 export default tasksSlice.reducer;

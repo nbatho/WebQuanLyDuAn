@@ -16,6 +16,8 @@ import {
     removeAssigneeFromTasks,
     getTasksByUserId,
     getTasksBySprintId,
+    shareTask,
+    getShareableUsersForTask,
 } from '../controllers/taskController.js';
 
 // Import Middleware Phân quyền
@@ -69,5 +71,14 @@ router.post('/:taskId/assignees', requirePermission('TASK_ASSIGN'), addAssigneeT
 
 // Gỡ người phụ trách -> Yêu cầu quyền: TASK_ASSIGN
 router.delete('/:taskId/assignees/:userId', requirePermission('TASK_ASSIGN'), removeAssigneeFromTasks);
+
+/**
+ * 5. CÁC API CHIA SẺ TASK (Share)
+ */
+// Lấy danh sách user có thể share
+router.get('/:taskId/shareable-users', getShareableUsersForTask);
+
+// Chia sẻ task cho nhiều user -> Yêu cầu quyền: TASK_ASSIGN
+router.post('/:taskId/share', requirePermission('TASK_ASSIGN'), shareTask);
 
 export default router;

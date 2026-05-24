@@ -9,6 +9,7 @@ import TaskDetailHeader from './TaskDetailHeader';
 import TaskDetailSidebar from './TaskDetailSidebar';
 import { fetchCommentsByTask, fetchCreateComment } from '@/store/modules/comments';
 import { fetchActivitiesByTask, clearActivities } from '@/store/modules/activityLogs';
+import ShareTaskModal from '../ShareTaskModal';
 
 export interface TaskDetailModalProps {
     isOpen: boolean;
@@ -99,6 +100,7 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
     const [taskTitle, setTaskTitle] = useState('');
     const [taskDesc, setTaskDesc] = useState('');
     const [commentContent, setCommentContent] = useState('');
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
     const groups = useSelector((state: RootState) => state.tasks.listTask);
     const listComments = useSelector((state: RootState) => state.comments.listComments);
@@ -178,6 +180,7 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
                     statusOptions={statusOptions}
                     isMaximized={isMaximized}
                     onToggleMaximize={() => setIsMaximized(!isMaximized)}
+                    onOpenShare={() => setIsShareModalOpen(true)}
                     onClose={onClose}
                 />
 
@@ -367,6 +370,15 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
                     />
                 </div>
             </div>
+
+            {isShareModalOpen && (
+                <ShareTaskModal
+                    taskId={task.task_id}
+                    taskName={taskTitle || task.name || ''}
+                    isOpen={isShareModalOpen}
+                    onClose={() => setIsShareModalOpen(false)}
+                />
+            )}
         </div>
     );
 }
