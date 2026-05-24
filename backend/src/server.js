@@ -23,6 +23,7 @@ import {
   messageRoutes,
 } from "./routes/index.js";
 import { protectedRoute } from "./middlewares/authMiddlewares.js";
+import { globalErrorHandler, notFoundHandler } from "./middlewares/errorMiddleware.js";
 import { ensureMessagingTables } from "./models/Messages.js";
 
 import swaggerUi from "swagger-ui-express";
@@ -120,14 +121,11 @@ app.use("/api/v1/folders", folderRoutes);
 app.use("/api/v1/lists", listRoutes);
 app.use('/api/v1/messages', messageRoutes);
 
-//error handling middleware
-app.use((err, req, res, _next) => {
-  console.error('[Global Error Handler]', err.stack || err);
-  const statusCode = err.statusCode || 500;
-  res.status(statusCode).json({
-    error: err.message || 'Internal Server Error',
-  });
-});
+// ── 404 handler (đặt sau tất cả routes) ────────────────────────
+app.use(notFoundHandler);
+
+// ── Global error handler (đặt cuối cùng) ────────────────────────
+app.use(globalErrorHandler);
 
 app.listen(PORT, HOST, () => {
   console.log(`Server is running on ${HOST}:${PORT}`);

@@ -1,61 +1,95 @@
-import axios, { type AxiosInstance } from 'axios';
+import axios, {
+    type AxiosInstance,
+    type InternalAxiosRequestConfig,
+    type AxiosResponse,
+} from 'axios';
+import { toast } from 'sonner';
 import { getAccessToken, removeAccessToken } from '../utils/localStorage';
+import { ApiError, type ApiErrorPayload } from '../utils/errorUtils';
+
+const STATUS_TOAST_MAP: Record<number, string> = {
+    401: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
+    403: 'Bạn không có quyền thực hiện thao tác này.',
+    404: 'Không tìm thấy dữ liệu yêu cầu.',
+    409: 'Dữ liệu bị xung đột. Vui lòng kiểm tra lại.',
+    429: 'Quá nhiều yêu cầu. Vui lòng đợi một lúc rồi thử lại.',
+    500: 'Máy chủ gặp sự cố. Vui lòng thử lại sau.',
+    502: 'Dịch vụ tạm thời không khả dụng. Vui lòng thử lại.',
+    503: 'Máy chủ đang bảo trì. Vui lòng thử lại sau.',
+};
 
 function createAxiosInstance(baseURL: string): AxiosInstance {
     const instance = axios.create({
         baseURL,
         withCredentials: true,
+        timeout: 15000,
         headers: {
             'Content-Type': 'application/json',
         },
     });
 
     instance.interceptors.request.use(
-        (config) => {
+        (config: InternalAxiosRequestConfig) => {
             const token = getAccessToken();
             if (token && config.headers) {
                 config.headers.Authorization = `Bearer ${token}`;
             }
             return config;
         },
-        (error) => {
-            return Promise.reject(error);
-        }
+        (error: unknown) => Promise.reject(error),
     );
 
     instance.interceptors.response.use(
-        (response) => {
-            return response.data;
-        },
-        (error) => {
-            const status = error.response?.status;
+        (response: AxiosResponse) => response.data,
+
+        async (error: unknown) => {
+            if (!axios.isAxiosError(error) || !error.response) {
+                const isTimeout = axios.isAxiosError(error) && error.code === 'ECONNABORTED';
+                toast.error(
+                    isTimeout
+                        ? 'Yêu cầu mất quá nhiều thời gian. Vui lòng thử lại.'
+                        : 'Không có kết nối mạng. Vui lòng kiểm tra lại.',
+                    { id: 'network-error' },
+                );
+                return Promise.reject(
+                    new Error(isTimeout ? 'Request timeout' : 'Network Error'),
+                );
+            }
+
+            const { status, data } = error.response;
+
+            const payload: ApiErrorPayload = {
+                status: status >= 500 ? 'error' : 'fail',
+                errorCode: (data as ApiErrorPayload)?.errorCode ?? 'UNKNOWN',
+                message:
+                    (data as ApiErrorPayload)?.message ??
+                    (data as { error?: string })?.error ??
+                    STATUS_TOAST_MAP[status] ??
+                    'Đã có lỗi xảy ra',
+                details: (data as ApiErrorPayload)?.details,
+            };
+            const apiError = new ApiError(payload, status);
 
             if (status === 401) {
                 removeAccessToken();
-                return Promise.reject(error);
-            } else if (status === 403 || status === 404) {
-                // TODO: Redirect logic khi bị lỗi phân quyền hoặc không tìm thấy
-                console.error(`Error ${status}: `, error.response?.data?.message);
+                toast.error(STATUS_TOAST_MAP[401], { id: 'unauthorized' });
+                window.location.href = '/login';
+            } else {
+                const toastMessage = STATUS_TOAST_MAP[status] ?? payload.message;
+                toast.error(toastMessage, { id: `err-${status}` });
             }
 
-            // Đối với status 422, nếu bạn muốn không throw error mà trả về data luôn (như code cũ)
-            if (status === 422) {
-                return Promise.resolve(error.response.data);
-            }
-
-            // Ném lỗi ra ngoài để createAsyncThunk có thể catch được
-            return Promise.reject(error);
-        }
+            return Promise.reject(apiError);
+        },
     );
 
     return instance;
 }
 
-
-
-// Gateway URL - single entry point for all services
+// ─────────────────────────────────────────────────────────────
+// Export instance
+// ─────────────────────────────────────────────────────────────
 const GATEWAY_URL = import.meta.env.VITE_API_GATEWAY_URL;
-// Tạo các API client thuần túy
-export const beApi = createAxiosInstance(
-    GATEWAY_URL ? `${GATEWAY_URL}/api/v1/` : '/api/v1/',
-);
+const BASE_URL = GATEWAY_URL ? `${GATEWAY_URL}/api/v1/` : '/api/v1/';
+
+export const beApi = createAxiosInstance(BASE_URL);

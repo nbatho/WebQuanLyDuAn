@@ -81,7 +81,7 @@ export default function CreateWorkspaceDialog({ open, onOpenChange }: Props) {
                 </div>
             }
             width={448}
-            destroyOnClose
+            destroyOnHidden
         >
             <p className="mt-0 mb-4 text-sm text-(--color-text-secondary)">
                 Workspace nhóm các space và thành viên. Slug dùng trong URL (chữ thường, số,

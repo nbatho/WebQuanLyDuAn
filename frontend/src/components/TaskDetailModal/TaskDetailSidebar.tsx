@@ -33,7 +33,7 @@ export default function TaskDetailSidebar({ task, updateTask }: TaskDetailSideba
                             onSave={(a) => updateTask(task.task_id, { assignees: a })}
                             onClose={() => setOpenPopover(null)}
                         />
-                    } trigger="click" open={openPopover === 'assignee'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }} getPopupContainer={(trigger) => trigger.parentElement!}>
+                    } trigger="click" open={openPopover === 'assignee'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false}   getPopupContainer={(trigger) => trigger.parentElement!}>
                         <div className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 transition-colors hover:bg-[#e5e7eb]" onClick={() => setOpenPopover('assignee')}>
                             {task.assignees && task.assignees.length > 0 ? (
                                 <div className="flex -space-x-1">
@@ -48,7 +48,7 @@ export default function TaskDetailSidebar({ task, updateTask }: TaskDetailSideba
 
                 <div className="flex flex-col gap-1">
                     <span className="text-[11px] font-bold uppercase tracking-[0.04em] text-[#9ca3af]">Due Date</span>
-                    <Popover content={<DueDatePopover date={task.due_date} onSave={(d) => updateTask(task.task_id, { due_date: d })} onClose={() => setOpenPopover(null)} />} trigger="click" open={openPopover === 'dueDate'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }} getPopupContainer={(trigger) => trigger.parentElement!}>
+                    <Popover content={<DueDatePopover date={task.due_date} onSave={(d) => updateTask(task.task_id, { due_date: d })} onClose={() => setOpenPopover(null)} />} trigger="click" open={openPopover === 'dueDate'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false}   getPopupContainer={(trigger) => trigger.parentElement!}>
                         <div className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 transition-colors hover:bg-[#e5e7eb]" onClick={() => setOpenPopover('dueDate')}>
                             <Calendar size={14} className={task.due_date ? "text-[#ef4444]" : "text-[#9ca3af]"} />
                             <span className={`text-[13px] font-medium ${task.due_date ? 'text-[#ef4444]' : 'text-[#6b7280]'}`}>{formatDate(task.due_date)}</span>
@@ -62,7 +62,7 @@ export default function TaskDetailSidebar({ task, updateTask }: TaskDetailSideba
                         priority_name={task.priority_name || 'Normal'} 
                         onSave={(_id, name, color) => updateTask(task.task_id, { priority_name: name, priority_color: color })}
                         onClose={() => setOpenPopover(null)}
-                    />} trigger="click" open={openPopover === 'priority'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }} getPopupContainer={(trigger) => trigger.parentElement!}>
+                    />} trigger="click" open={openPopover === 'priority'} onOpenChange={(v) => !v && setOpenPopover(null)} placement="bottomLeft" arrow={false}   getPopupContainer={(trigger) => trigger.parentElement!}>
                         <div className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 transition-colors hover:bg-[#e5e7eb]" onClick={() => setOpenPopover('priority')}>
                             <Flag size={14} fill={task.priority_name !== 'Clear' ? (task.priority_color ?? 'transparent') : 'none'} color={task.priority_color ?? '#9ca3af'} />
                             <span className="text-[13px] font-medium" style={{ color: task.priority_color ?? '#6b7280' }}>{task.priority_name || 'Normal'}</span>

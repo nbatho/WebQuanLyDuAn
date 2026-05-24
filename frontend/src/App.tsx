@@ -2,10 +2,18 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { routes } from './routes';
 import { Suspense } from 'react';
 import { App as AntdApp } from 'antd';
+import { Toaster } from 'sonner';
 const router = createBrowserRouter(routes);
 const App = () => {
     return (
         <AntdApp>
+            <Toaster
+                position="top-right"
+                richColors
+                expand={false}
+                duration={4000}
+                closeButton
+            />
             <Suspense fallback={
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                     <div style={{

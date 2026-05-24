@@ -284,7 +284,7 @@ export default function MyTasksPage() {
 
                                         {columns.assignee && (
                                             <div className="w-30 shrink-0 pl-2">
-                                                <Popover content={<AssigneePopover allMembers={listMembers} assignees={task.assignees || []} onSave={(a) => handleUpdateTask(task.task_id, { assignees: a })} onClose={() => setActivePopover(null)} />} trigger="click" open={activePopover?.taskId === task.task_id && activePopover?.field === 'assignee'} onOpenChange={(v) => !v && setActivePopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }}>
+                                                <Popover content={<AssigneePopover allMembers={listMembers} assignees={task.assignees || []} onSave={(a) => handleUpdateTask(task.task_id, { assignees: a })} onClose={() => setActivePopover(null)} />} trigger="click" open={activePopover?.taskId === task.task_id && activePopover?.field === 'assignee'} onOpenChange={(v) => !v && setActivePopover(null)} placement="bottomLeft" arrow={false} >
                                                     <div className="flex min-h-6 items-center px-1 rounded hover:bg-[#eef0f5] transition-colors" onClick={(e) => { e.stopPropagation(); setActivePopover({ taskId: task.task_id, field: 'assignee' }); }}>
                                                         {task.assignees?.length > 0 ? (
                                                             <div className="flex -space-x-1">
@@ -302,7 +302,7 @@ export default function MyTasksPage() {
 
                                         {columns.dueDate && (
                                             <div className="w-32.5 shrink-0 pl-2">
-                                                <Popover content={<DueDatePopover date={task.due_date} onSave={(d) => handleUpdateTask(task.task_id, { due_date: d })} onClose={() => setActivePopover(null)} />} trigger="click" open={activePopover?.taskId === task.task_id && activePopover?.field === 'dueDate'} onOpenChange={(v) => !v && setActivePopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }}>
+                                                <Popover content={<DueDatePopover date={task.due_date} onSave={(d) => handleUpdateTask(task.task_id, { due_date: d })} onClose={() => setActivePopover(null)} />} trigger="click" open={activePopover?.taskId === task.task_id && activePopover?.field === 'dueDate'} onOpenChange={(v) => !v && setActivePopover(null)} placement="bottomLeft" arrow={false} >
                                                     <div className="flex min-h-6 items-center px-1 rounded hover:bg-[#eef0f5] transition-colors" onClick={(e) => { e.stopPropagation(); setActivePopover({ taskId: task.task_id, field: 'dueDate' }); }}>
                                                         {task.due_date ? (
                                                             <span className={`text-[12px] font-medium ${isDueToday(task.due_date) ? 'text-[#ef4444]' : 'text-[#5f6368]'}`}>
@@ -316,7 +316,7 @@ export default function MyTasksPage() {
 
                                         {columns.priority && (
                                             <div className="w-27.5 shrink-0 pl-2">
-                                                <Popover content={<PriorityPopover priority_name={task.priority_name} onSave={(_id: number | null, name: string | null, color: string | null) => handleUpdateTask(task.task_id, { priority_name: name, priority_color: color })} onClose={() => setActivePopover(null)} />} trigger="click" open={activePopover?.taskId === task.task_id && activePopover?.field === 'priority'} onOpenChange={(v) => !v && setActivePopover(null)} placement="bottomLeft" arrow={false} overlayInnerStyle={{ padding: 0 }}>
+                                                <Popover content={<PriorityPopover priority_name={task.priority_name} onSave={(_id: number | null, name: string | null, color: string | null) => handleUpdateTask(task.task_id, { priority_name: name, priority_color: color })} onClose={() => setActivePopover(null)} />} trigger="click" open={activePopover?.taskId === task.task_id && activePopover?.field === 'priority'} onOpenChange={(v) => !v && setActivePopover(null)} placement="bottomLeft" arrow={false} >
                                                     <div className="flex min-h-6 items-center px-1 rounded hover:bg-[#eef0f5] transition-colors" onClick={(e) => { e.stopPropagation(); setActivePopover({ taskId: task.task_id, field: 'priority' }); }}>
                                                         {task.priority_name && task.priority_name !== 'Clear' ? (
                                                             <Flag size={14} color={task.priority_color ?? '#9ca3af'} fill={task.priority_color ?? 'transparent'} />

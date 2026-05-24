@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight, Calendar, Flag, User, Plus } from 'lucide-react';
 import { Avatar } from 'antd';
-import type { Task } from '@/types/tasks';
 import { useTaskView } from '../ListViewPage';
 import TaskDetailModal from '@/components/TaskDetailModal';
 
@@ -15,10 +14,9 @@ const STATUS_COLORS = [
 ];
 
 export default function ListView() {
-    const { groups, setGroups, columns, updateTask, handleCreateStatus, handleInlineCreate, onContextMenu } = useTaskView();
+    const { groups, setGroups, columns, updateTask, handleCreateStatus, onContextMenu } = useTaskView();
 
     const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
-    const [inlineState, setInlineState] = useState<{ groupId: number; text: string } | null>(null);
 
     const selectedTask = selectedTaskId != null
         ? groups.flatMap(g => g.tasks).find(t => t.task_id === selectedTaskId) ?? null
