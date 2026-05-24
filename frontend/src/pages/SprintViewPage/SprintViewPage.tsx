@@ -14,7 +14,7 @@ import ListView from './components/ListView';
 import { useDispatch, useSelector } from 'react-redux';
 import { message } from 'antd';
 import type { AppDispatch, RootState } from '@/store/configureStore';
-import { fetchTasksForSprint, fetchCreateTask, fetchUpdateTask, fetchDeleteTask } from '@/store/modules/tasks';
+import { fetchTasksForSprint, fetchCreateTask, fetchUpdateTask, fetchDeleteTask, fetchAddAssignee, fetchRemoveAssignee } from '@/store/modules/tasks';
 import { createTaskStatus } from '@/api/statuses';
 import type { Task, StatusGroup, NewTaskData, Assignee, TaskViewContextType } from '@/types/tasks';
 
@@ -63,7 +63,6 @@ export default function SprintViewPage() {
                 }
                 return group;
             });
-
             if (taskToMove && updates.status_id) {
                 return newGroups.map((g) =>
                     g.id === updates.status_id ? { ...g, tasks: [...g.tasks, taskToMove!] } : g
@@ -72,7 +71,18 @@ export default function SprintViewPage() {
             return newGroups;
         });
 
-        // Build API payload - map frontend field names to backend field names
+        // Assignees: xử lý add/remove riêng vì API update task không nhận assignees
+        if (updates.assignees !== undefined) {
+            const currentTask = groups.flatMap(g => g.tasks).find(t => t.task_id === taskId);
+            const prevIds = (currentTask?.assignees || []).map(a => String(a.user_id));
+            const nextIds = updates.assignees.map(a => String(a.user_id));
+            const toAdd = nextIds.filter(id => !prevIds.includes(id));
+            const toRemove = prevIds.filter(id => !nextIds.includes(id));
+            toAdd.forEach(userId => dispatch(fetchAddAssignee({ task_id: taskId, userId })));
+            toRemove.forEach(userId => dispatch(fetchRemoveAssignee({ task_id: taskId, userId })));
+        }
+
+        // Các field scalar: gửi lên API
         const apiPayload: Record<string, any> = {};
         if (updates.name !== undefined) apiPayload.name = updates.name;
         if (updates.description !== undefined) apiPayload.description = updates.description;
@@ -81,11 +91,10 @@ export default function SprintViewPage() {
         if (updates.priority_name !== undefined) apiPayload.priority = updates.priority_name;
         if (updates.position !== undefined) apiPayload.position = updates.position;
 
-        // Only call API if there are valid fields to update
         if (Object.keys(apiPayload).length > 0) {
-            dispatch(fetchUpdateTask({ task_id: taskId, updates: apiPayload }));
+            dispatch(fetchUpdateTask({ task_id: taskId, updates: apiPayload, frontendUpdates: updates }));
         }
-    }, [dispatch]);
+    }, [dispatch, groups]);
 
     const handleInlineCreate = useCallback((groupId: number, name: string, extras?: any) => {
         const payload: NewTaskData = {

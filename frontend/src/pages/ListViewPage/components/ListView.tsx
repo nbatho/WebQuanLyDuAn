@@ -4,7 +4,6 @@ import { Avatar } from 'antd';
 import type { Task } from '@/types/tasks';
 import { useTaskView } from '../ListViewPage';
 import TaskDetailModal from '@/components/TaskDetailModal';
-import InlineCreateTask from './InlineCreateTask';
 
 const getInitials = (name: string) => name.substring(0, 2).toUpperCase();
 const formatDate = (dateString: string | null) =>
@@ -18,8 +17,12 @@ const STATUS_COLORS = [
 export default function ListView() {
     const { groups, setGroups, columns, updateTask, handleCreateStatus, handleInlineCreate, onContextMenu } = useTaskView();
 
-    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+    const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
     const [inlineState, setInlineState] = useState<{ groupId: number; text: string } | null>(null);
+
+    const selectedTask = selectedTaskId != null
+        ? groups.flatMap(g => g.tasks).find(t => t.task_id === selectedTaskId) ?? null
+        : null;
 
     const toggleGroup = (groupId: number) =>
         setGroups(prev => prev.map(g => g.id === groupId ? { ...g, isExpanded: !g.isExpanded } : g));
@@ -65,7 +68,7 @@ export default function ListView() {
                                     <div
                                         key={task.task_id}
                                         className="group/row flex items-center border-b border-[#f3f4f6] py-1.5 pl-8 pr-4 hover:bg-[#fafbfc] transition-colors cursor-pointer"
-                                        onClick={() => setSelectedTask(task)}
+                                        onClick={() => setSelectedTaskId(task.task_id)}
                                         onContextMenu={(e) => onContextMenu(e, task)}
                                     >
                                         {/* Task Name */}
@@ -131,21 +134,6 @@ export default function ListView() {
                                         <div className="w-8 shrink-0" />
                                     </div>
                                 ))}
-
-                                {/* ── Inline Create Task ── */}
-                                <InlineCreateTask
-                                    isActive={inlineState?.groupId === group.id}
-                                    text={inlineState?.groupId === group.id ? inlineState.text : ''}
-                                    onChangeText={(val) => setInlineState({ groupId: group.id, text: val })}
-                                    onActivate={() => setInlineState({ groupId: group.id, text: '' })}
-                                    onCancel={() => setInlineState(null)}
-                                    onSubmit={(extras) => {
-                                        if (inlineState?.text?.trim()) {
-                                            handleInlineCreate(group.id, inlineState.text.trim(), extras);
-                                        }
-                                        setInlineState(null);
-                                    }}
-                                />
                             </div>
                         )}
                     </div>
@@ -226,7 +214,7 @@ export default function ListView() {
             <TaskDetailModal
                 isOpen={!!selectedTask}
                 task={selectedTask || null}
-                onClose={() => setSelectedTask(null)}
+                onClose={() => setSelectedTaskId(null)}
                 updateTask={updateTask}
             />
         </div>

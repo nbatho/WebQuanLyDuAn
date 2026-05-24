@@ -23,6 +23,20 @@ import {
     findAllTasksByUserId
 } from '../models/Task.js';
 import { findStatusById, findStatusesByListId, findStatusesBySprintId } from '../models/TaskStatus.js';
+import { createActivity } from '../models/ActivityLogs.js';
+
+// Mapping: field name → activity action type
+const FIELD_TO_ACTION = {
+    status_id:    'status_changed',
+    priority:     'priority_changed',
+    due_date:     'due_date_changed',
+    start_date:   'start_date_changed',
+    name:         'updated',
+    description:  'updated',
+    story_points: 'story_points_changed',
+    sprint_id:    'sprint_assigned',
+    is_archived:  'archived',
+};
 
 export const getTasksByListId = async (req, res) => {
     try {
@@ -267,13 +281,46 @@ export const updateTasks = async (req, res) => {
     try {
         const { taskId } = req.params;
         const updateData = req.body;
+        const userId = req.user?.user_id;
+
         if (!taskId) {
             return res.status(400).json({ error: "Task ID is required" });
         }
+
+        // Lấy snapshot trước khi update để so sánh
+        const oldTask = await findTaskById(taskId);
+
         const updatedTask = await updateTask(taskId, updateData);
 
         if (!updatedTask) {
             return res.status(400).json({ error: "Không có dữ liệu hợp lệ để cập nhật" });
+        }
+
+        // Ghi activity log cho từng field thay đổi (fire-and-forget)
+        if (oldTask) {
+            const loggedActions = new Set();
+
+            for (const [field, action] of Object.entries(FIELD_TO_ACTION)) {
+                if (!(field in updateData)) continue;
+
+                const oldVal = oldTask[field];
+                const newVal = updateData[field];
+
+                // Chỉ log khi giá trị thực sự thay đổi
+                if (String(oldVal) === String(newVal)) continue;
+
+                // Với name/description gộp thành 1 'updated' log
+                if (loggedActions.has(action)) continue;
+                loggedActions.add(action);
+
+                createActivity(
+                    taskId,
+                    userId,
+                    action,
+                    { [field]: oldVal },
+                    { [field]: newVal }
+                ).catch((err) => console.error('[activity log] updateTask error:', err));
+            }
         }
 
         res.status(200).json(updatedTask);
@@ -368,6 +415,11 @@ export const createComments = async (req, res) => {
         }
         // Model signature: createComment(content, task_id, user_id)
         const newComment = await createComment(content, taskId, userId);
+
+        // Log 'commented' activity (fire-and-forget)
+        createActivity(taskId, userId, 'commented', null, { content })
+            .catch((err) => console.error('[activity log] commented error:', err));
+
         res.status(201).json(newComment);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -425,14 +477,19 @@ export const addAssigneeToTasks = async (req, res) => {
     try {
         const { taskId } = req.params;
         const { userId } = req.body;
+        const actorId = req.user?.user_id;
         if (!taskId) {
             return res.status(400).json({ error: "Task ID is required" });
         }
         if (!userId) {
             return res.status(400).json({ error: "User ID is required" });
         }
-        // Use correct imported function name: assignUserToTask
         await assignUserToTask(taskId, userId);
+
+        // Log 'assigned' activity (fire-and-forget)
+        createActivity(taskId, actorId, 'assigned', null, { user_id: userId })
+            .catch((err) => console.error('[activity log] assigned error:', err));
+
         res.status(200).json({ message: "Assignee added successfully" });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -443,14 +500,19 @@ export const removeAssigneeFromTasks = async (req, res) => {
     try {
         const { taskId } = req.params;
         const { userId } = req.body;
+        const actorId = req.user?.user_id;
         if (!taskId) {
             return res.status(400).json({ error: "Task ID is required" });
         }
         if (!userId) {
             return res.status(400).json({ error: "User ID is required" });
         }
-        // Use correct imported function name: unassignUserFromTask
         await unassignUserFromTask(taskId, userId);
+
+        // Log 'unassigned' activity (fire-and-forget)
+        createActivity(taskId, actorId, 'unassigned', { user_id: userId }, null)
+            .catch((err) => console.error('[activity log] unassigned error:', err));
+
         res.status(200).json({ message: "Assignee removed successfully" });
     } catch (error) {
         res.status(500).json({ error: error.message });

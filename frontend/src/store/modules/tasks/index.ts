@@ -195,7 +195,7 @@ export const fetchCreateTask = createAsyncThunk<
 
 export const fetchUpdateTask = createAsyncThunk<
     TaskData,
-    { task_id: number; updates: Partial<TaskData> }
+    { task_id: number; updates: Partial<TaskData>; frontendUpdates?: Partial<Task> }
 >(
     'tasks/updateTask',
     async ({ task_id, updates }, { rejectWithValue }) => {
@@ -483,17 +483,61 @@ export const tasksSlice = createSlice({
         builder.addCase(fetchUpdateTask.fulfilled, (state, action) => {
             state.isUpdatingTask = false;
             const updatedTask = action.payload;
-            // Update task in listTask groups
+            const frontendUpdates = action.meta.arg.frontendUpdates;
+
+            // Dùng status_id từ API response (nguồn sự thật)
+            const newStatusId = updatedTask.status_id;
+
+            // Tra cứu status_name/color từ group tương ứng trong store
+            const targetGroup = newStatusId != null
+                ? state.listTask.find(g => g.id === newStatusId)
+                : null;
+
+            const safeFields = {
+                name: updatedTask.name,
+                description: updatedTask.description,
+                due_date: updatedTask.due_date,
+                status_id: newStatusId,
+                position: updatedTask.position,
+                updated_at: updatedTask.updated_at,
+                // Enrich status UI fields từ group lookup
+                ...(targetGroup && { status_name: targetGroup.name, status_color: targetGroup.color }),
+                // Giữ các UI field từ frontendUpdates
+                ...(frontendUpdates?.priority_name !== undefined && { priority_name: frontendUpdates.priority_name }),
+                ...(frontendUpdates?.priority_color !== undefined && { priority_color: frontendUpdates.priority_color }),
+                ...(frontendUpdates?.assignees !== undefined && { assignees: frontendUpdates.assignees }),
+                ...(frontendUpdates?.due_date !== undefined && { due_date: frontendUpdates.due_date }),
+            };
+
+            // Tìm task trong group hiện tại và tách ra
+            let movedTask: any = null;
+            let fromGroupId: number | null = null;
+
             for (const group of state.listTask) {
                 const idx = group.tasks.findIndex(t => t.task_id === updatedTask.task_id);
                 if (idx !== -1) {
-                    group.tasks[idx] = { ...group.tasks[idx], ...updatedTask };
+                    movedTask = { ...group.tasks[idx], ...safeFields };
+                    fromGroupId = group.id;
+                    group.tasks.splice(idx, 1);
                     break;
                 }
             }
-            // Update selectedTask if it's the same
+
+            if (movedTask) {
+                // Đặt task vào đúng group (group mới nếu status thay đổi, group cũ nếu không)
+                const destGroupId = newStatusId ?? fromGroupId;
+                const destGroup = state.listTask.find(g => g.id === destGroupId);
+                if (destGroup) {
+                    destGroup.tasks.push(movedTask);
+                } else if (fromGroupId !== null) {
+                    // Fallback: đặt lại về group cũ nếu không tìm thấy group mới
+                    const origGroup = state.listTask.find(g => g.id === fromGroupId);
+                    if (origGroup) origGroup.tasks.push(movedTask);
+                }
+            }
+
             if (state.selectedTask && state.selectedTask.task_id === updatedTask.task_id) {
-                state.selectedTask = { ...state.selectedTask, ...updatedTask };
+                state.selectedTask = { ...state.selectedTask, ...safeFields };
             }
         });
         builder.addCase(fetchUpdateTask.rejected, (state, action) => {

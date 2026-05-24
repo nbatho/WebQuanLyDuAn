@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight, Calendar, Flag, User } from 'lucide-react';
 import { Avatar } from 'antd';
-import type { Task } from '@/types/tasks';
+
 import { useTaskView } from '../SprintViewPage';
 import TaskDetailModal from '@/components/TaskDetailModal';
 import InlineCreateTask from './InlineCreateTask';
@@ -13,8 +13,12 @@ const formatDate = (dateString: string | null) =>
 export default function ListView() {
     const { groups, setGroups, columns, updateTask, handleInlineCreate, onContextMenu } = useTaskView();
 
-    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+    const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
     const [inlineState, setInlineState] = useState<{ groupId: number; text: string } | null>(null);
+
+    const selectedTask = selectedTaskId != null
+        ? groups.flatMap(g => g.tasks).find(t => t.task_id === selectedTaskId) ?? null
+        : null;
 
     const toggleGroup = (groupId: number) =>
         setGroups(prev => prev.map(g => g.id === groupId ? { ...g, isExpanded: !g.isExpanded } : g));
@@ -55,7 +59,7 @@ export default function ListView() {
                                     <div
                                         key={task.task_id}
                                         className="group/row flex items-center border-b border-[#f3f4f6] py-1.5 pl-8 pr-4 hover:bg-[#fafbfc] transition-colors cursor-pointer"
-                                        onClick={() => setSelectedTask(task)}
+                                        onClick={() => setSelectedTaskId(task.task_id)}
                                         onContextMenu={(e) => onContextMenu(e, task)}
                                     >
                                         {/* Task Name */}
@@ -145,7 +149,7 @@ export default function ListView() {
             <TaskDetailModal
                 isOpen={!!selectedTask}
                 task={selectedTask || null}
-                onClose={() => setSelectedTask(null)}
+                onClose={() => setSelectedTaskId(null)}
                 updateTask={updateTask}
             />
         </div>

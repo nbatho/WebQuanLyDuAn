@@ -13,7 +13,7 @@ import BoardView from './components/BoardView';
 import ListView from './components/ListView';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '@/store/configureStore';
-import { fetchTasksForList, fetchCreateTask, fetchUpdateTask, fetchDeleteTask } from '@/store/modules/tasks';
+import { fetchTasksForList, fetchCreateTask, fetchUpdateTask, fetchDeleteTask, fetchAddAssignee, fetchRemoveAssignee } from '@/store/modules/tasks';
 import { fetchCreateStatus } from '@/store/modules/statuses';
 import type { Task, StatusGroup, NewTaskData, Assignee, TaskViewContextType } from '@/types/tasks';
 export const TaskViewContext = createContext<TaskViewContextType | null>(null);
@@ -55,7 +55,6 @@ export default function ListViewPage() {
     }
 
     const updateTask = useCallback((taskId: number, updates: Partial<Task>) => {
-        // Optimistic UI update
         setGroups((prevGroups) => {
             let taskToMove: Task | null = null;
             const newGroups = prevGroups.map((group) => {
@@ -72,7 +71,6 @@ export default function ListViewPage() {
                 }
                 return group;
             });
-
             if (taskToMove && updates.status_id) {
                 return newGroups.map((g) =>
                     g.id === updates.status_id ? { ...g, tasks: [...g.tasks, taskToMove!] } : g
@@ -81,7 +79,16 @@ export default function ListViewPage() {
             return newGroups;
         });
 
-        // Build API payload - map frontend field names to backend field names
+        if (updates.assignees !== undefined) {
+            const currentTask = groups.flatMap(g => g.tasks).find(t => t.task_id === taskId);
+            const prevIds = (currentTask?.assignees || []).map(a => String(a.user_id));
+            const nextIds = updates.assignees.map(a => String(a.user_id));
+            const toAdd = nextIds.filter(id => !prevIds.includes(id));
+            const toRemove = prevIds.filter(id => !nextIds.includes(id));
+            toAdd.forEach(userId => dispatch(fetchAddAssignee({ task_id: taskId, userId })));
+            toRemove.forEach(userId => dispatch(fetchRemoveAssignee({ task_id: taskId, userId })));
+        }
+
         const apiPayload: Record<string, any> = {};
         if (updates.name !== undefined) apiPayload.name = updates.name;
         if (updates.description !== undefined) apiPayload.description = updates.description;
@@ -90,11 +97,10 @@ export default function ListViewPage() {
         if (updates.priority_name !== undefined) apiPayload.priority = updates.priority_name;
         if (updates.position !== undefined) apiPayload.position = updates.position;
 
-        // Only call API if there are valid fields to update
         if (Object.keys(apiPayload).length > 0) {
-            dispatch(fetchUpdateTask({ task_id: taskId, updates: apiPayload }));
+            dispatch(fetchUpdateTask({ task_id: taskId, updates: apiPayload, frontendUpdates: updates }));
         }
-    }, [dispatch]);
+    }, [dispatch, groups]);
 
     const handleInlineCreate = useCallback((groupId: number, name: string, extras?: any) => {
         const payload: NewTaskData = {
