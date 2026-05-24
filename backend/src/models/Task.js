@@ -731,7 +731,9 @@ export const getShareableUsers = async (task_id) => {
         FROM tasks t 
         JOIN spaces s ON t.space_id = s.space_id 
         WHERE t.task_id = $1 AND t.deleted_at IS NULL AND s.deleted_at IS NULL
+        LIMIT 1
       )
+      AND wm.workspace_id IS NOT NULL
       AND wm.deleted_at IS NULL
       AND u.user_id NOT IN (
         SELECT ta.user_id 

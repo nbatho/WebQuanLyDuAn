@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { ArrowLeft } from 'lucide-react';
 import { signInWithGoogle } from '../../../api/auth';
 import { getWorkspaces } from '@/api/workspaces';
+import { setAccessToken } from '@/store/modules/auth';
+import type { AppDispatch } from '@/store/configureStore';
 
 const GOOGLE_CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined)?.trim();
 
@@ -31,6 +34,7 @@ function GoogleBrandPanel() {
 
 function GoogleLoginContent() {
     const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -41,7 +45,8 @@ function GoogleLoginContent() {
             const result = await signInWithGoogle(credential);
             const accessToken = result?.user?.access_token;
             if (!accessToken) throw new Error('Could not receive access token');
-            localStorage.setItem('access_token', accessToken);
+            // Dispatch vào Redux store để trigger useEffect trong AppSidebar (fetchWorkspaces)
+            dispatch(setAccessToken(accessToken));
             const workspaces = await getWorkspaces();
             if (Array.isArray(workspaces) && workspaces.length > 0) {
                 navigate('/home');

@@ -44,7 +44,8 @@ export default function ShareTaskModal({ taskId, taskName, isOpen, onClose }: Sh
     }, [shareTaskSuccess, onClose]);
 
     const filteredUsers = shareableUsers.filter((user) => {
-        const q = searchQuery.toLowerCase();
+        const q = searchQuery.toLowerCase().trim();
+        if (!q) return true;
         return (
             user.name?.toLowerCase().includes(q) ||
             user.email?.toLowerCase().includes(q) ||
@@ -65,8 +66,15 @@ export default function ShareTaskModal({ taskId, taskName, isOpen, onClose }: Sh
 
     if (!isOpen) return null;
 
+    // Xác định trạng thái hiển thị danh sách
+    const hasNoMembersLeft = !isLoadingShareableUsers && shareableUsers.length === 0;
+    const hasNoSearchResult = !isLoadingShareableUsers && shareableUsers.length > 0 && filteredUsers.length === 0;
+
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm"
+            onClick={(e) => e.stopPropagation()}
+        >
             <div className="mx-4 flex w-full max-w-md flex-col rounded-2xl bg-white shadow-2xl">
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-[#eef0f5] px-6 py-4">
@@ -88,19 +96,21 @@ export default function ShareTaskModal({ taskId, taskName, isOpen, onClose }: Sh
                     <p className="m-0 mt-0.5 text-sm font-semibold text-[#141b2b] truncate">{taskName}</p>
                 </div>
 
-                {/* Search */}
-                <div className="px-6 pt-4">
-                    <div className="relative">
-                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9aa0a6]" />
-                        <input
-                            type="text"
-                            placeholder="Tìm kiếm theo tên, email..."
-                            className="w-full rounded-lg border border-[#dcdfe4] bg-[#f8f9fb] py-2.5 pl-10 pr-3 text-sm text-[#141b2b] outline-none transition-all focus:border-[#0058be] focus:bg-white focus:shadow-[0_0_0_3px_rgba(0,88,190,0.08)]"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
+                {/* Search — chỉ hiển thị khi có dữ liệu */}
+                {!hasNoMembersLeft && (
+                    <div className="px-6 pt-4">
+                        <div className="relative">
+                            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9aa0a6]" />
+                            <input
+                                type="text"
+                                placeholder="Tìm kiếm theo tên, email..."
+                                className="w-full rounded-lg border border-[#dcdfe4] bg-[#f8f9fb] py-2.5 pl-10 pr-3 text-sm text-[#141b2b] outline-none transition-all focus:border-[#0058be] focus:bg-white focus:shadow-[0_0_0_3px_rgba(0,88,190,0.08)]"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* User list */}
                 <div className="max-h-72 min-h-[120px] overflow-y-auto px-6 py-3">
@@ -108,14 +118,25 @@ export default function ShareTaskModal({ taskId, taskName, isOpen, onClose }: Sh
                         <div className="flex items-center justify-center py-10">
                             <Loader2 size={24} className="animate-spin text-[#0058be]" />
                         </div>
-                    ) : filteredUsers.length === 0 ? (
+                    ) : hasNoMembersLeft ? (
                         <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
                             <Users size={32} className="text-[#dcdfe4]" />
                             <p className="m-0 text-sm text-[#9aa0a6]">
-                                {shareableUsers.length === 0
-                                    ? 'Tất cả thành viên đã được gán vào task này'
-                                    : 'Không tìm thấy thành viên phù hợp'}
+                                Tất cả thành viên đã được gán vào task này
                             </p>
+                        </div>
+                    ) : hasNoSearchResult ? (
+                        <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
+                            <Search size={28} className="text-[#dcdfe4]" />
+                            <p className="m-0 text-sm text-[#9aa0a6]">
+                                Không tìm thấy thành viên phù hợp với &ldquo;{searchQuery}&rdquo;
+                            </p>
+                            <button
+                                onClick={() => setSearchQuery('')}
+                                className="mt-1 text-xs font-semibold text-[#0058be] hover:underline cursor-pointer border-none bg-transparent"
+                            >
+                                Xoá tìm kiếm
+                            </button>
                         </div>
                     ) : (
                         <div className="flex flex-col gap-1">

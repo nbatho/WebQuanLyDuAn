@@ -14,7 +14,7 @@ import type {
     WorkspacesData, 
     WorkspaceMemberData, 
     WorkspacesState, 
-    invationVerificationData // Cố gắng giữ nguyên tên interface theo file type của bạn
+    invationVerificationData
 } from '../../../types/workspaces';
 import {
     persistCurrentWorkspaceId,
@@ -270,7 +270,6 @@ const workspacesSlice = createSlice({
             state.workspaceMembersError = action.payload || action.error.message || 'Failed to fetch workspace members';
         });
 
-        // ==========================================
         builder.addCase(fetchVerifyInvitation.pending, (state) => {
             state.isVerifyingInvitation = true;
             state.verifyInvitationError = null;
@@ -284,6 +283,18 @@ const workspacesSlice = createSlice({
             state.isVerifyingInvitation = false;
             state.verifyInvitationError = action.payload || action.error?.message || 'Failed to verify invitation';
         });
+
+        // Xoá toàn bộ workspaces state khi logout để tránh lộ dữ liệu sang user khác
+        builder.addMatcher(
+            (action) => action.type === 'auth/fetchSignOut/fulfilled',
+            (state) => {
+                state.listWorkspaces = [];
+                state.currentWorkspaceId = null;
+                state.listWorkspaceMembers = [];
+                state.error = null;
+                persistCurrentWorkspaceId(null);
+            }
+        );
     },
 });
 

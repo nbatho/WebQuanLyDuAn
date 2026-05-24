@@ -70,6 +70,10 @@ const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
+        setAccessToken(state, action: import('@reduxjs/toolkit').PayloadAction<string>) {
+            state.access_token = action.payload;
+            localStorage.setItem('access_token', action.payload);
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(fetchSignIn.pending, (state) => {
@@ -146,4 +150,5 @@ const authSlice = createSlice({
     }
 });
 
+export const { setAccessToken } = authSlice.actions;
 export default authSlice.reducer;
