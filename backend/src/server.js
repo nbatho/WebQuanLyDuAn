@@ -13,7 +13,6 @@ import {
   milestoneRoutes,
   sprintRoutes,
   notificationRoutes,
-  tagRoutes,
   timeLogRoutes,
   activityLogRoutes,
   folderRoutes,
@@ -114,7 +113,6 @@ app.use("/api/v1/statuses", taskStatusRoutes);
 app.use("/api/v1/milestones", milestoneRoutes);
 app.use("/api/v1/sprints", sprintRoutes);
 app.use("/api/v1/notifications", notificationRoutes);
-app.use("/api/v1/tags", tagRoutes);
 app.use("/api/v1/timelogs", timeLogRoutes);
 app.use("/api/v1/activities", activityLogRoutes);
 app.use("/api/v1/folders", folderRoutes);

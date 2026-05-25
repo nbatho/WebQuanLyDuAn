@@ -56,8 +56,9 @@ export const findActivitiesBySpaceId = async (space_id, limit = 50, offset = 0) 
         const query = `SELECT al.*, u.username, u.name as user_name, t.name as task_name 
                        FROM activity_logs al 
                        JOIN tasks t ON al.task_id = t.task_id 
+                       JOIN lists l ON t.list_id = l.list_id
                        LEFT JOIN users u ON al.user_id = u.user_id AND u.deleted_at IS NULL
-                       WHERE t.space_id = $1 AND t.deleted_at IS NULL 
+                       WHERE l.space_id = $1 AND t.deleted_at IS NULL 
                        ORDER BY al.created_at DESC 
                        LIMIT $2 OFFSET $3`;
         const values = [space_id, limit, offset];

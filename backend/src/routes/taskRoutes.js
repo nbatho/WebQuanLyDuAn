@@ -6,7 +6,6 @@ import {
     getTaskById,
     updateTasks,
     deleteTasks,
-    getSubtasksByTaskIds,
     getCommentsByTaskIds,
     createComments,
     getAttachmentsByTaskIds,
@@ -32,7 +31,6 @@ router.get('/lists/:listId', getTasksByListId);
 router.get('/spaces/:spaceId/sprints/:sprintId', getTasksBySprintId);
 router.get('/my-tasks', getTasksByUserId);
 router.get('/:taskId', getTaskById);
-router.get('/:taskId/subtasks', getSubtasksByTaskIds);
 router.get('/:taskId/comments', getCommentsByTaskIds);
 router.get('/:taskId/attachments', getAttachmentsByTaskIds);
 

@@ -7,7 +7,6 @@ import taskStatusRoutes from './taskStatusRoutes.js';
 import milestoneRoutes from './milestonesRoutes.js';
 import sprintRoutes from './sprintRoutes.js';
 import notificationRoutes from './notificationsRoutes.js';
-import tagRoutes from './tagRoutes.js';
 import timeLogRoutes from './timeLogRoutes.js';
 import activityLogRoutes from './activityLogRoutes.js';
 import folderRoutes from './folderRoutes.js';
@@ -26,7 +25,6 @@ export {
     milestoneRoutes,
     sprintRoutes,
     notificationRoutes,
-    tagRoutes,
     timeLogRoutes,
     activityLogRoutes,
     folderRoutes,

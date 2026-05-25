@@ -35,19 +35,21 @@ export const getSpaceOverview = async (space_id) => {
     try {
         const query = `
             SELECT 
-                (SELECT COUNT(*) FROM tasks WHERE space_id = $1 AND is_archived = FALSE AND deleted_at IS NULL) as total_tasks,
-                (SELECT COUNT(*) FROM tasks t JOIN task_status ts ON t.status_id = ts.status_id 
-                 WHERE t.space_id = $1 AND ts.is_done_state = TRUE AND t.is_archived = FALSE AND t.deleted_at IS NULL) as completed_tasks,
-                (SELECT COUNT(*) FROM tasks WHERE space_id = $1 AND due_date < CURRENT_DATE 
-                 AND is_archived = FALSE AND completed_at IS NULL AND deleted_at IS NULL) as overdue_tasks,
-                (SELECT COUNT(*) FROM tasks WHERE space_id = $1 AND is_archived = FALSE 
-                 AND completed_at IS NULL AND deleted_at IS NULL) as in_progress_tasks,
+                (SELECT COUNT(*) FROM tasks t JOIN lists l ON t.list_id = l.list_id WHERE l.space_id = $1 AND t.is_archived = FALSE AND t.deleted_at IS NULL) as total_tasks,
+                (SELECT COUNT(*) FROM tasks t JOIN lists l ON t.list_id = l.list_id JOIN task_status ts ON t.status_id = ts.status_id 
+                 WHERE l.space_id = $1 AND ts.is_done_state = TRUE AND t.is_archived = FALSE AND t.deleted_at IS NULL) as completed_tasks,
+                (SELECT COUNT(*) FROM tasks t JOIN lists l ON t.list_id = l.list_id WHERE l.space_id = $1 AND t.due_date < CURRENT_DATE 
+                 AND t.is_archived = FALSE AND t.completed_at IS NULL AND t.deleted_at IS NULL) as overdue_tasks,
+                (SELECT COUNT(*) FROM tasks t JOIN lists l ON t.list_id = l.list_id WHERE l.space_id = $1 AND t.is_archived = FALSE 
+                 AND t.completed_at IS NULL AND t.deleted_at IS NULL) as in_progress_tasks,
                 (SELECT COUNT(DISTINCT ta.user_id) FROM task_assigns ta 
                  JOIN tasks t ON ta.task_id = t.task_id 
-                 WHERE t.space_id = $1 AND t.deleted_at IS NULL AND ta.deleted_at IS NULL) as total_members,
+                 JOIN lists l ON t.list_id = l.list_id
+                 WHERE l.space_id = $1 AND t.deleted_at IS NULL AND ta.deleted_at IS NULL) as total_members,
                 (SELECT COALESCE(SUM(tl.duration_secs), 0) FROM time_logs tl 
                  JOIN tasks t ON tl.task_id = t.task_id 
-                 WHERE t.space_id = $1 AND t.deleted_at IS NULL AND tl.stopped_at IS NOT NULL) as total_time_secs
+                 JOIN lists l ON t.list_id = l.list_id
+                 WHERE l.space_id = $1 AND t.deleted_at IS NULL AND tl.stopped_at IS NOT NULL) as total_time_secs
         `;
         const values = [space_id];
         const result = await con.query(query, values);
@@ -64,10 +66,12 @@ export const getWorkspaceOverview = async (workspace_id) => {
             SELECT 
                 (SELECT COUNT(*) FROM spaces WHERE workspace_id = $1 AND deleted_at IS NULL) as total_spaces,
                 (SELECT COUNT(*) FROM tasks t 
-                 JOIN spaces s ON t.space_id = s.space_id 
+                 JOIN lists l ON t.list_id = l.list_id
+                 JOIN spaces s ON l.space_id = s.space_id 
                  WHERE s.workspace_id = $1 AND s.deleted_at IS NULL AND t.is_archived = FALSE AND t.deleted_at IS NULL) as total_tasks,
                 (SELECT COUNT(*) FROM tasks t 
-                 JOIN spaces s ON t.space_id = s.space_id 
+                 JOIN lists l ON t.list_id = l.list_id
+                 JOIN spaces s ON l.space_id = s.space_id 
                  JOIN task_status ts ON t.status_id = ts.status_id
                  WHERE s.workspace_id = $1 AND s.deleted_at IS NULL AND ts.is_done_state = TRUE AND t.is_archived = FALSE AND t.deleted_at IS NULL) as completed_tasks,
                 (SELECT COUNT(DISTINCT wm.user_id) FROM workspace_members wm 

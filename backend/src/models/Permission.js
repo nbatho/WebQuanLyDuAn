@@ -11,7 +11,10 @@ import pool from '../config/connect.js';
  */
 export const getSpaceIdByTaskId = async (taskId) => {
     const result = await pool.query(
-        'SELECT space_id FROM tasks WHERE task_id = $1 AND deleted_at IS NULL',
+        `SELECT l.space_id 
+         FROM tasks t 
+         JOIN lists l ON t.list_id = l.list_id 
+         WHERE t.task_id = $1 AND t.deleted_at IS NULL`,
         [taskId]
     );
     return result.rows.length > 0 ? result.rows[0].space_id : null;
@@ -45,9 +48,10 @@ export const getSpaceIdByFolderId = async (folderId) => {
  */
 export const getSpaceIdByAttachmentId = async (attachmentId) => {
     const result = await pool.query(
-        `SELECT t.space_id 
+        `SELECT l.space_id 
          FROM attachments a
          JOIN tasks t ON a.task_id = t.task_id
+         JOIN lists l ON t.list_id = l.list_id
          WHERE a.attachment_id = $1 AND a.deleted_at IS NULL AND t.deleted_at IS NULL`,
         [attachmentId]
     );
@@ -60,9 +64,10 @@ export const getSpaceIdByAttachmentId = async (attachmentId) => {
  */
 export const getSpaceIdByCommentId = async (commentId) => {
     const result = await pool.query(
-        `SELECT t.space_id 
+        `SELECT l.space_id 
          FROM comments c
          JOIN tasks t ON c.task_id = t.task_id
+         JOIN lists l ON t.list_id = l.list_id
          WHERE c.comment_id = $1 AND c.deleted_at IS NULL AND t.deleted_at IS NULL`,
         [commentId]
     );
@@ -91,16 +96,7 @@ export const getSpaceIdByMilestoneId = async (milestoneId) => {
     return result.rows.length > 0 ? result.rows[0].space_id : null;
 };
 
-/**
- * Tìm space_id dựa vào tag_id
- */
-export const getSpaceIdByTagId = async (tagId) => {
-    const result = await pool.query(
-        'SELECT space_id FROM tags WHERE tag_id = $1 AND deleted_at IS NULL',
-        [tagId]
-    );
-    return result.rows.length > 0 ? result.rows[0].space_id : null;
-};
+
 
 /**
  * Tìm space_id dựa vào status_id
@@ -119,9 +115,10 @@ export const getSpaceIdByStatusId = async (statusId) => {
  */
 export const getSpaceIdByTimeLogId = async (timeLogId) => {
     const result = await pool.query(
-        `SELECT t.space_id
+        `SELECT l.space_id
          FROM time_logs tl
          JOIN tasks t ON tl.task_id = t.task_id
+         JOIN lists l ON t.list_id = l.list_id
          WHERE tl.time_log_id = $1 AND t.deleted_at IS NULL`,
         [timeLogId]
     );

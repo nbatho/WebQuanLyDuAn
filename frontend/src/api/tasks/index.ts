@@ -38,10 +38,6 @@ export const deleteTask = async (task_id: number): Promise<void> => {
     return beApi.delete(`/tasks/${task_id}`);
 };
 
-export const getSubTasks = async (task_id: number): Promise<TaskWithSpaceData[]> => {
-    return beApi.get(`/tasks/${task_id}/subtasks`);
-};
-
 
 export const getAttachmentsByTask = async (task_id: number): Promise<TaskAttachment[]> => {
     return beApi.get(`/tasks/${task_id}/attachments`);

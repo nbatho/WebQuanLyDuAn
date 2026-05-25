@@ -6,7 +6,6 @@ import {
     getSpaceIdByCommentId,
     getSpaceIdBySprintId,
     getSpaceIdByMilestoneId,
-    getSpaceIdByTagId,
     getSpaceIdByStatusId,
     getSpaceIdByTimeLogId,
     checkSpacePermission,
@@ -25,7 +24,6 @@ const PARAM_TO_SPACE_LOOKUP = [
     { param: 'commentId',    fn: getSpaceIdByCommentId,    notFoundMsg: 'Bình luận không tồn tại hoặc đã bị xóa.' },
     { param: 'sprintId',     fn: getSpaceIdBySprintId,     notFoundMsg: 'Sprint không tồn tại hoặc đã bị xóa.' },
     { param: 'milestoneId',  fn: getSpaceIdByMilestoneId,  notFoundMsg: 'Milestone không tồn tại hoặc đã bị xóa.' },
-    { param: 'tagId',        fn: getSpaceIdByTagId,        notFoundMsg: 'Tag không tồn tại hoặc đã bị xóa.' },
     { param: 'statusId',     fn: getSpaceIdByStatusId,     notFoundMsg: 'Trạng thái không tồn tại.' },
     { param: 'timeLogId',    fn: getSpaceIdByTimeLogId,    notFoundMsg: 'Time log không tồn tại hoặc đã bị xóa.' },
 ];

@@ -5,9 +5,6 @@ export const findAllTasksByListId = async (list_id) => {
     const query = `
       SELECT 
         t.task_id,
-        t.parent_task_id,
-        t.space_id,
-        t.folder_id,
         t.list_id,
         
         s.name AS space_name,
@@ -69,7 +66,8 @@ export const findAllTasksByListId = async (list_id) => {
         ) AS tags
 
       FROM tasks t
-      JOIN spaces s ON t.space_id = s.space_id
+      JOIN lists l ON t.list_id = l.list_id
+      JOIN spaces s ON l.space_id = s.space_id
       LEFT JOIN task_status ts ON t.status_id = ts.status_id
       
       WHERE t.list_id = $1 
@@ -93,9 +91,6 @@ export const findAllTasksBySprintId = async (sprint_id) => {
     const query = `
       SELECT 
         t.task_id,
-        t.parent_task_id,
-        t.space_id,
-        t.folder_id,
         t.list_id,
         t.sprint_id,
         
@@ -158,7 +153,8 @@ export const findAllTasksBySprintId = async (sprint_id) => {
         ) AS tags
 
       FROM tasks t
-      JOIN spaces s ON t.space_id = s.space_id
+      JOIN lists l ON t.list_id = l.list_id
+      JOIN spaces s ON l.space_id = s.space_id
       LEFT JOIN task_status ts ON t.status_id = ts.status_id
       
       WHERE t.sprint_id = $1 
@@ -181,9 +177,6 @@ export const findAllTasksByUserId = async (user_id) => {
     const query = `
       SELECT 
         t.task_id,
-        t.parent_task_id,
-        t.space_id,
-        t.folder_id,
         t.list_id,
         
         s.name AS space_name,
@@ -246,7 +239,8 @@ export const findAllTasksByUserId = async (user_id) => {
         ) AS tags
 
       FROM tasks t
-      JOIN spaces s ON t.space_id = s.space_id
+      JOIN lists l ON t.list_id = l.list_id
+      JOIN spaces s ON l.space_id = s.space_id
       LEFT JOIN task_status ts ON t.status_id = ts.status_id
       
       WHERE t.deleted_at IS NULL 
@@ -275,8 +269,23 @@ export const findAllTasksByUserId = async (user_id) => {
 
 export const createTask = async (name, description, space_id, due_date, created_by = null) => {
   try {
-    const query = `INSERT INTO tasks (name, description, space_id, start_date, due_date, created_by) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`;
-    const values = [name, description, space_id, new Date(), due_date, created_by];
+    const listRes = await con.query(
+      'SELECT list_id FROM lists WHERE space_id = $1 AND deleted_at IS NULL ORDER BY position ASC LIMIT 1',
+      [space_id]
+    );
+    if (listRes.rows.length === 0) {
+      throw new Error("Không tìm thấy List nào trong Space này để tạo task (No list found in this Space)");
+    }
+    const list_id = listRes.rows[0].list_id;
+
+    const statusRes = await con.query(
+      'SELECT status_id FROM task_status WHERE space_id = $1 AND is_default = true LIMIT 1',
+      [space_id]
+    );
+    const status_id = statusRes.rows[0]?.status_id || null;
+
+    const query = `INSERT INTO tasks (name, description, list_id, status_id, start_date, due_date, created_by) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+    const values = [name, description, list_id, status_id, new Date(), due_date, created_by];
     const result = await con.query(query, values);
     return result.rows[0];
   } catch (error) {
@@ -299,7 +308,7 @@ export const createTaskForList = async ({
   try {
     await client.query('BEGIN');
     const listRes = await client.query(
-      'SELECT space_id, folder_id FROM lists WHERE list_id = $1 AND deleted_at IS NULL',
+      'SELECT space_id FROM lists WHERE list_id = $1 AND deleted_at IS NULL',
       [listId]
     );
 
@@ -309,7 +318,7 @@ export const createTaskForList = async ({
       throw error;
     }
 
-    const { space_id, folder_id } = listRes.rows[0];
+    const { space_id } = listRes.rows[0];
     let final_status_id = status_id;
 
     if (!final_status_id) {
@@ -322,15 +331,13 @@ export const createTaskForList = async ({
 
     const taskQuery = `
                     INSERT INTO tasks (
-                        name, description, space_id, folder_id, list_id, 
+                        name, description, list_id, 
                         status_id, priority, due_date, start_date, created_by
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), $9) RETURNING *`;
+                    ) VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7) RETURNING *`;
 
     const taskValues = [
       name,
       description || null,
-      space_id,
-      folder_id,
       listId,
       final_status_id,
       priority || 'Normal',
@@ -391,7 +398,6 @@ export const updateTask = async (task_id, updateData) => {
       'story_points',
       'position',
       'list_id',
-      'folder_id',
       'sprint_id',
       'is_archived'
     ];
@@ -451,115 +457,6 @@ export const deleteTask = async (taskId) => {
   }
 
   return result.rows[0];
-};
-
-export const getSubtasksByTaskId = async (task_id) => {
-  try {
-    const query = `SELECT * FROM tasks WHERE parent_task_id = $1 AND deleted_at IS NULL`;
-    const values = [task_id];
-    const result = await con.query(query, values);
-    return result.rows;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const createSubtask = async (name, description, parent_task_id) => {
-  try {
-    // Get space_id from parent task to satisfy NOT NULL constraint
-    const parentResult = await con.query(
-      'SELECT space_id FROM tasks WHERE task_id = $1 AND deleted_at IS NULL',
-      [parent_task_id]
-    );
-    if (parentResult.rows.length === 0) {
-      const error = new Error("Parent task không tồn tại hoặc đã bị xóa");
-      error.statusCode = 404;
-      throw error;
-    }
-    const space_id = parentResult.rows[0].space_id;
-
-    const query = `INSERT INTO tasks (name, description, parent_task_id, space_id) VALUES ($1, $2, $3, $4) RETURNING *`;
-    const values = [name, description, parent_task_id, space_id];
-    const result = await con.query(query, values);
-    return result.rows[0];
-  } catch (error) {
-    throw error;
-  }
-};
-
-// ĐÃ LÀM ĐỘNG HÓA updateSubtask GIỐNG HỆT updateTask
-export const updateSubtask = async (task_id, parent_task_id, updateData) => {
-  try {
-    const allowedFields = [
-      'name',
-      'description',
-      'due_date',
-      'status_id',
-      'priority',
-      'start_date',
-      'story_points',
-      'position',
-      'is_archived'
-    ];
-
-    const fieldsToUpdate = [];
-    const values = [];
-    let paramIndex = 1;
-
-    for (const [key, value] of Object.entries(updateData)) {
-      if (allowedFields.includes(key)) {
-        fieldsToUpdate.push(`${key} = $${paramIndex}`);
-        values.push(value);
-        paramIndex++;
-      }
-    }
-
-    if (fieldsToUpdate.length === 0) {
-      return null;
-    }
-
-    // Nạp task_id và parent_task_id vào cuối mảng values
-    values.push(task_id, parent_task_id);
-
-    const query = `
-      UPDATE tasks 
-      SET ${fieldsToUpdate.join(', ')} 
-      WHERE task_id = $${paramIndex} 
-        AND parent_task_id = $${paramIndex + 1} 
-        AND deleted_at IS NULL 
-      RETURNING *
-    `;
-
-    const result = await con.query(query, values);
-
-    if (result.rows.length === 0) {
-      const error = new Error("Subtask không tồn tại hoặc đã bị xóa");
-      error.statusCode = 404;
-      throw error;
-    }
-
-    return result.rows[0];
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const deleteSubtask = async (task_id, parent_task_id) => {
-  try {
-    const query = `UPDATE tasks SET deleted_at = NOW() WHERE task_id = $1 AND parent_task_id = $2 AND deleted_at IS NULL RETURNING *`;
-    const values = [task_id, parent_task_id];
-    const result = await con.query(query, values);
-
-    if (result.rows.length === 0) {
-      const error = new Error("Subtask không tồn tại hoặc đã bị xóa");
-      error.statusCode = 404;
-      throw error;
-    }
-
-    return result.rows[0];
-  } catch (error) {
-    throw error;
-  }
 };
 
 export const getCommentsByTaskId = async (task_id) => {
@@ -675,14 +572,12 @@ export const createAttachment = async (
   file_size,
   mime_type,
   uploaded_by,
-  comment_id = null,
 ) => {
   try {
-    const query = `INSERT INTO attachments (task_id, comment_id, file_name, file_url, file_size, mime_type, uploaded_by) 
-                       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+    const query = `INSERT INTO attachments (task_id, file_name, file_url, file_size, mime_type, uploaded_by) 
+                       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`;
     const values = [
       task_id,
-      comment_id,
       file_name,
       file_url,
       file_size,
@@ -729,7 +624,8 @@ export const getShareableUsers = async (task_id) => {
       WHERE wm.workspace_id = (
         SELECT s.workspace_id 
         FROM tasks t 
-        JOIN spaces s ON t.space_id = s.space_id 
+        JOIN lists l ON t.list_id = l.list_id
+        JOIN spaces s ON l.space_id = s.space_id 
         WHERE t.task_id = $1 AND t.deleted_at IS NULL AND s.deleted_at IS NULL
         LIMIT 1
       )

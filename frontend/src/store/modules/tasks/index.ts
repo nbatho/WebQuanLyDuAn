@@ -5,7 +5,6 @@ import {
     createTaskInList,
     updateTask,
     deleteTask,
-    getSubTasks,
     getAttachmentsByTask,
     createAttachment,
     deleteAttachment,
@@ -103,10 +102,6 @@ export interface TasksState {
     selectedTask: TaskWithSpaceData | null;
     isLoadingTaskDetail: boolean;
     errorTaskDetail: string | null;
-
-    subTasks: TaskWithSpaceData[];
-    isLoadingSubTasks: boolean;
-    errorSubTasks: string | null;
 
     attachments: TaskAttachment[];
     isLoadingAttachments: boolean;
@@ -230,21 +225,7 @@ export const fetchDeleteTask = createAsyncThunk<number, number>(
     }
 );
 
-// ─────────────────────────────────────────────
-// Async Thunks — Subtasks
-// ─────────────────────────────────────────────
 
-export const fetchSubTasks = createAsyncThunk<TaskWithSpaceData[], number>(
-    'tasks/fetchSubTasks',
-    async (task_id, { rejectWithValue }) => {
-        try {
-            const response = await getSubTasks(task_id);
-            return response;
-        } catch (error: unknown) { 
-            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch subtasks');
-        }
-    }
-);
 
 // ─────────────────────────────────────────────
 // Async Thunks — Attachments
@@ -363,10 +344,6 @@ const initialState: TasksState = {
     isLoadingTaskDetail: false,
     errorTaskDetail: null,
 
-    subTasks: [],
-    isLoadingSubTasks: false,
-    errorSubTasks: null,
-
     attachments: [],
     isLoadingAttachments: false,
     errorAttachments: null,
@@ -405,7 +382,6 @@ export const tasksSlice = createSlice({
     reducers: {
         clearSelectedTask(state) {
             state.selectedTask = null;
-            state.subTasks = [];
             state.attachments = [];
         },
         clearTasksError(state) {
@@ -620,19 +596,7 @@ export const tasksSlice = createSlice({
             state.errorDeleteTask = action.payload as string;
         });
 
-        // ── SubTasks ──
-        builder.addCase(fetchSubTasks.pending, (state) => {
-            state.isLoadingSubTasks = true;
-            state.errorSubTasks = null;
-        });
-        builder.addCase(fetchSubTasks.fulfilled, (state, action) => {
-            state.isLoadingSubTasks = false;
-            state.subTasks = action.payload;
-        });
-        builder.addCase(fetchSubTasks.rejected, (state, action) => {
-            state.isLoadingSubTasks = false;
-            state.errorSubTasks = action.payload as string;
-        });
+
 
         // ── Attachments ──
         builder.addCase(fetchAttachmentsByTask.pending, (state) => {

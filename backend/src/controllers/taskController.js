@@ -6,10 +6,6 @@ import {
     findTaskById,
     updateTask,
     deleteTask,
-    getSubtasksByTaskId,
-    createSubtask,
-    updateSubtask,
-    deleteSubtask,
     createComment,
     getCommentsByTaskId,
     updateComment,
@@ -61,8 +57,8 @@ export const getTasksByListId = async (req, res) => {
                     return {
                         ...task,
                         assignees: task.assignees || [],
-                        subtask_count: Number(task.subtask_count) || 0,
-                        subtask_done_count: Number(task.subtask_done_count) || 0,
+                        subtask_count: 0,
+                        subtask_done_count: 0,
                         comment_count: Number(task.comment_count) || 0,
                         attachment_count: Number(task.attachment_count) || 0,
                     };
@@ -82,8 +78,8 @@ export const getTasksByListId = async (req, res) => {
             .map(task => ({
                 ...task,
                 assignees: task.assignees || [],
-                subtask_count: Number(task.subtask_count) || 0,
-                subtask_done_count: Number(task.subtask_done_count) || 0,
+                subtask_count: 0,
+                subtask_done_count: 0,
                 comment_count: Number(task.comment_count) || 0,
                 attachment_count: Number(task.attachment_count) || 0,
             }));
@@ -127,9 +123,9 @@ export const getTasksBySprintId = async (req, res) => {
                     return {
                         ...task,
                         assignees: task.assignees || [],
-                        tags: task.tags || [], 
-                        subtask_count: Number(task.subtask_count) || 0,
-                        subtask_done_count: Number(task.subtask_done_count) || 0,
+                        tags: [], 
+                        subtask_count: 0,
+                        subtask_done_count: 0,
                         comment_count: Number(task.comment_count) || 0,
                         attachment_count: Number(task.attachment_count) || 0,
                     };
@@ -149,9 +145,9 @@ export const getTasksBySprintId = async (req, res) => {
             .map(task => ({
                 ...task,
                 assignees: task.assignees || [],
-                tags: task.tags || [],
-                subtask_count: Number(task.subtask_count) || 0,
-                subtask_done_count: Number(task.subtask_done_count) || 0,
+                tags: [],
+                subtask_count: 0,
+                subtask_done_count: 0,
                 comment_count: Number(task.comment_count) || 0,
                 attachment_count: Number(task.attachment_count) || 0,
             }));
@@ -190,8 +186,8 @@ export const getTasksByUserId = async (req, res) => {
             const formattedTask = {
                 ...task,
                 assignees: task.assignees || [],
-                subtask_count: Number(task.subtask_count) || 0,
-                subtask_done_count: Number(task.subtask_done_count) || 0,
+                subtask_count: 0,
+                subtask_done_count: 0,
                 comment_count: Number(task.comment_count) || 0,
                 attachment_count: Number(task.attachment_count) || 0,
             };
@@ -379,18 +375,7 @@ export const getTaskById = async (req, res) => {
     }
 };
 
-export const getSubtasksByTaskIds = async (req, res) => {
-    try {
-        const { taskId } = req.params;
-        if (!taskId) {
-            return res.status(400).json({ error: "Task ID is required" });
-        }
-        const subtasks = await getSubtasksByTaskId(taskId);
-        res.status(200).json(subtasks);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
+// subtasks controller removed
 
 export const getCommentsByTaskIds = async (req, res) => {
     try {
@@ -452,9 +437,9 @@ export const createAttachments = async (req, res) => {
         if (!file_name || !file_url) {
             return res.status(400).json({ error: "file_name and file_url are required" });
         }
-        // Model signature: createAttachment(task_id, file_name, file_url, file_size, mime_type, uploaded_by, comment_id)
+        // Model signature: createAttachment(task_id, file_name, file_url, file_size, mime_type, uploaded_by)
         const newAttachment = await createAttachment(
-            taskId, file_name, file_url, file_size || null, mime_type || null, uploaded_by, null
+            taskId, file_name, file_url, file_size || null, mime_type || null, uploaded_by
         );
         res.status(201).json(newAttachment);
     } catch (error) {
