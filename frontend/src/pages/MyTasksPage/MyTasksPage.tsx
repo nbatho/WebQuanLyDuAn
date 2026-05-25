@@ -87,14 +87,13 @@ export default function MyTasksPage() {
     }, [listTasks]);
 
     const totalActive = flatTasks.filter((t: any) => !isCompletedTask(t)).length;
-    const totalOverdue = flatTasks.filter((t: any) => t.parent_task_id === null && isDueToday(t.due_date) && !isCompletedTask(t)).length;
+    const totalOverdue = flatTasks.filter((t: any) => isDueToday(t.due_date) && !isCompletedTask(t)).length;
 
     const taskGroups = useMemo(() => {
         if (!Array.isArray(listTasks)) return [];
 
         return listTasks.map((group: any) => {
             const filteredTasksInGroup = (group.tasks || []).filter((t: any) => {
-                if (t.parent_task_id !== null) return false;
                 if (!showCompleted && isCompletedTask(t)) return false;
                 if (searchText && !t.name.toLowerCase().includes(searchText.toLowerCase())) return false;
                 if (activeTab === 'assigned' && currentUserId) {

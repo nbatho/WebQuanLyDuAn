@@ -5,6 +5,7 @@ const BASE_TASK_SELECT = `
     t.task_id,
     t.list_id,
     t.sprint_id,
+    t.milestone_id,
     t.created_by,
     s.name AS space_name,
     s.color AS space_color,
