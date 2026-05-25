@@ -123,7 +123,6 @@ export const getTasksBySprintId = async (req, res) => {
                     return {
                         ...task,
                         assignees: task.assignees || [],
-                        tags: [], 
                         subtask_count: 0,
                         subtask_done_count: 0,
                         comment_count: Number(task.comment_count) || 0,
@@ -145,7 +144,6 @@ export const getTasksBySprintId = async (req, res) => {
             .map(task => ({
                 ...task,
                 assignees: task.assignees || [],
-                tags: [],
                 subtask_count: 0,
                 subtask_done_count: 0,
                 comment_count: Number(task.comment_count) || 0,

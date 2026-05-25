@@ -48,7 +48,7 @@ INSERT INTO permissions (permission_name, description, group_name) VALUES
     -- Nhóm Structure (3 quyền)
     ('FOLDER_MANAGE',           'Tạo, sửa, xóa Folder',                     'structure'),
     ('LIST_MANAGE',             'Tạo, sửa, xóa List',                       'structure'),
-    ('SETTING_MANAGE',          'Quản lý cài đặt (status, tags, sprints...)', 'structure'),
+    ('SETTING_MANAGE',          'Quản lý cài đặt (status, milestones, sprints...)', 'structure'),
 
     -- Nhóm Task (5 quyền)
     ('TASK_CREATE',             'Tạo task mới',                              'task'),

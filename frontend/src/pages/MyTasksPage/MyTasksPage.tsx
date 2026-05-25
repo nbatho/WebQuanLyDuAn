@@ -97,13 +97,12 @@ export default function MyTasksPage() {
                 if (t.parent_task_id !== null) return false;
                 if (!showCompleted && isCompletedTask(t)) return false;
                 if (searchText && !t.name.toLowerCase().includes(searchText.toLowerCase())) return false;
-                // Tab filtering
                 if (activeTab === 'assigned' && currentUserId) {
-                    const isAssigned = (t.assignees || []).some((a: any) => a.user_id === currentUserId);
+                    const isAssigned = (t.assignees || []).some((a: any) => Number(a.user_id) === Number(currentUserId));
                     if (!isAssigned) return false;
                 }
                 if (activeTab === 'created' && currentUserId) {
-                    if (t.created_by !== currentUserId) return false;
+                    if (Number(t.created_by) !== Number(currentUserId)) return false;
                 }
                 if (activeTab === 'mentions') {
                     // Mentions: chưa có hệ thống @mention, tạm thời không hiện task nào

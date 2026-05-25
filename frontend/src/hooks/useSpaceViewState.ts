@@ -18,7 +18,6 @@ export function useSpaceViewState(
         assignee: true,
         dueDate: true,
         priority: true,
-        tags: false,
     });
 
     useEffect(() => {

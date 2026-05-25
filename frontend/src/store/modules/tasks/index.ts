@@ -60,12 +60,6 @@ export interface TaskAssignee {
     avatar_url: string | null;
 }
 
-export interface TaskTag {
-    tag_id: number;
-    name: string;
-    color: string;
-}
-
 export interface TaskAttachment {
     attachment_id: number;
     task_id: number;
@@ -88,7 +82,6 @@ export interface TaskWithSpaceData extends TaskData {
     priority_color?: string | null;
 
     assignees?: TaskAssignee[]; 
-    tags?: TaskTag[];
     
     subtask_count?: number;
     comment_count?: number;
