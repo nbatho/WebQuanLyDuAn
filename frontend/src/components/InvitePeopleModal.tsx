@@ -10,7 +10,7 @@ type InvitePeopleModalProps = {
     onOpenChange: (open: boolean) => void;
 };
 
-type InviteRole = 'ADMIN' | 'MANAGER' | 'MEMBER' | 'GUEST';
+type InviteRole = 'ADMIN' | 'MANAGER' | 'MEMBER';
 
 const roleOptions: Array<{
     id: InviteRole;
@@ -21,18 +21,12 @@ const roleOptions: Array<{
         {
             id: 'MEMBER',
             label: 'Member',
-            description: 'Can access all public items in your Workspace.',
+            description: 'Can create and edit tasks, add comments, log time, and access all public items in your Workspace.',
         },
         {
             id: 'MANAGER',
             label: 'Manager',
-            description: 'Can only access items shared with them.',
-            badge: 'Chat Collaborator',
-        },
-        {
-            id: 'GUEST',
-            label: 'Guest',
-            description: "Can't use all features or be added to Spaces. Can only access items shared with them.",
+            description: 'Can manage Spaces structure, Sprints, Milestones, Status, Lists and delete tasks.',
         },
         {
             id: 'ADMIN',

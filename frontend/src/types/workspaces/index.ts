@@ -39,4 +39,8 @@ export interface WorkspacesState {
     isVerifyingInvitation: boolean;
     verifyInvitationError: string | null;
     verifyInvitationData: invationVerificationData | null;
+    isUpdatingWorkspace: boolean;
+    updateWorkspaceError: string | null;
+    currentWorkspaceDetail: WorkspacesData | null;
+    isLoadingWorkspaceDetail: boolean;
 }

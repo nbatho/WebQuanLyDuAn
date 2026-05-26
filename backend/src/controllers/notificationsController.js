@@ -4,8 +4,12 @@ import {
   markAsRead,
   markAllAsRead,
   deleteNotificationById,
+  findNotificationsByTypes,
+  findUpcomingDeadlineTasksForUser,
+  createDeadlineNotificationIfNotExists,
 } from "../models/Notifications.js";
 
+// --- GET all notifications (dùng chung, cho bell icon header) ---
 export const getNotifications = async (req, res) => {
   try {
     const userId = req.user?.user_id;
@@ -28,6 +32,45 @@ export const getNotifications = async (req, res) => {
   }
 };
 
+// --- GET notifications dành cho tab "Mentions" (assign + deadline) ---
+export const getMentionNotifications = async (req, res) => {
+  try {
+    const userId = req.user?.user_id;
+    const { limit = 50, offset = 0 } = req.query;
+
+    if (!userId) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    // Tự động tạo notification deadline nếu có task sắp hết hạn hôm nay
+    try {
+      const upcomingTasks = await findUpcomingDeadlineTasksForUser(userId);
+      const deadlinePromises = upcomingTasks.map((task) =>
+        createDeadlineNotificationIfNotExists(userId, task.task_id, task.name, task.due_date)
+      );
+      await Promise.allSettled(deadlinePromises);
+    } catch (deadlineErr) {
+      // fire-and-forget: không block response nếu lỗi
+      console.error("[getMentionNotifications] deadline check error:", deadlineErr.message);
+    }
+
+    const notifications = await findNotificationsByTypes(
+      userId,
+      ["task_assigned", "task_deadline"],
+      parseInt(limit),
+      parseInt(offset)
+    );
+
+    const unreadCount = notifications.filter((n) => !n.is_read).length;
+
+    res.status(200).json({ notifications, unreadCount });
+  } catch (error) {
+    console.error("Failed to retrieve mention notifications:", error.message);
+    res.status(500).json({ error: "Failed to retrieve mention notifications" });
+  }
+};
+
+// --- PATCH /:notificationId/read ---
 export const markNotificationAsRead = async (req, res) => {
   try {
     const { notificationId } = req.params;
@@ -51,6 +94,7 @@ export const markNotificationAsRead = async (req, res) => {
   }
 };
 
+// --- PATCH /read-all ---
 export const markAllNotificationsAsRead = async (req, res) => {
   try {
     const userId = req.user?.user_id;
@@ -59,9 +103,9 @@ export const markAllNotificationsAsRead = async (req, res) => {
     }
 
     const notifications = await markAllAsRead(userId);
-    res.status(200).json({ 
+    res.status(200).json({
       message: "All notifications marked as read",
-      count: notifications.length 
+      count: notifications.length,
     });
   } catch (error) {
     console.error("Failed to mark all notifications as read:", error.message);
@@ -69,6 +113,7 @@ export const markAllNotificationsAsRead = async (req, res) => {
   }
 };
 
+// --- DELETE /:notificationId ---
 export const deleteNotification = async (req, res) => {
   try {
     const { notificationId } = req.params;

@@ -4,8 +4,19 @@ import type { NotificationData } from '@/store/modules/notifications';
 export const getNotifications = async (params?: {
     limit?: number;
     offset?: number;
-}): Promise<{ notifications: NotificationData[]; unread_count: number }> => {
+}): Promise<{ notifications: NotificationData[]; unreadCount: number }> => {
     return beApi.get(`/notifications`, { params });
+};
+
+/**
+ * Lấy thông báo cho tab "Mentions": assign + deadline.
+ * Tự động trigger tạo deadline notification phía backend khi gọi.
+ */
+export const getMentionNotifications = async (params?: {
+    limit?: number;
+    offset?: number;
+}): Promise<{ notifications: NotificationData[]; unreadCount: number }> => {
+    return beApi.get(`/notifications/mentions`, { params });
 };
 
 export const markNotificationAsRead = async (notificationId: number): Promise<NotificationData> => {

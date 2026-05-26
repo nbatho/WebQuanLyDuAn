@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {
     getNotifications,
+    getMentionNotifications,
     markNotificationAsRead,
     markAllNotificationsAsRead,
     deleteNotification,
@@ -23,6 +24,12 @@ export interface NotificationsState {
     unreadCount: number;
     isLoadingNotifications: boolean;
     errorNotifications: string | null;
+    // Mentions tab state
+    mentionNotifications: NotificationData[];
+    mentionUnreadCount: number;
+    isLoadingMentions: boolean;
+    errorMentions: string | null;
+    // Mark / Delete
     isMarkingRead: boolean;
     errorMarkingRead: string | null;
     isDeletingNotification: boolean;
@@ -30,7 +37,7 @@ export interface NotificationsState {
 }
 
 export const fetchNotifications = createAsyncThunk<
-    { notifications: NotificationData[]; unread_count: number },
+    { notifications: NotificationData[]; unreadCount: number },
     { limit?: number; offset?: number } | undefined
 >(
     'notifications/fetchNotifications',
@@ -40,6 +47,21 @@ export const fetchNotifications = createAsyncThunk<
             return response;
         } catch (error: unknown) { 
             return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch notifications');
+        }
+    },
+);
+
+export const fetchMentionNotifications = createAsyncThunk<
+    { notifications: NotificationData[]; unreadCount: number },
+    { limit?: number; offset?: number } | undefined
+>(
+    'notifications/fetchMentionNotifications',
+    async (params, { rejectWithValue }) => {
+        try {
+            const response = await getMentionNotifications(params);
+            return response;
+        } catch (error: unknown) {
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch mention notifications');
         }
     },
 );
@@ -84,6 +106,10 @@ const initialState: NotificationsState = {
     unreadCount: 0,
     isLoadingNotifications: false,
     errorNotifications: null,
+    mentionNotifications: [],
+    mentionUnreadCount: 0,
+    isLoadingMentions: false,
+    errorMentions: null,
     isMarkingRead: false,
     errorMarkingRead: null,
     isDeletingNotification: false,
@@ -103,11 +129,25 @@ export const notificationsSlice = createSlice({
             .addCase(fetchNotifications.fulfilled, (state, action) => {
                 state.isLoadingNotifications = false;
                 state.listNotifications = action.payload.notifications;
-                state.unreadCount = action.payload.unread_count;
+                state.unreadCount = action.payload.unreadCount ?? 0;
             })
             .addCase(fetchNotifications.rejected, (state, action) => {
                 state.isLoadingNotifications = false;
                 state.errorNotifications = action.payload as string;
+            })
+
+            .addCase(fetchMentionNotifications.pending, (state) => {
+                state.isLoadingMentions = true;
+                state.errorMentions = null;
+            })
+            .addCase(fetchMentionNotifications.fulfilled, (state, action) => {
+                state.isLoadingMentions = false;
+                state.mentionNotifications = action.payload.notifications;
+                state.mentionUnreadCount = action.payload.unreadCount ?? 0;
+            })
+            .addCase(fetchMentionNotifications.rejected, (state, action) => {
+                state.isLoadingMentions = false;
+                state.errorMentions = action.payload as string;
             })
 
             .addCase(fetchMarkNotificationAsRead.pending, (state) => {

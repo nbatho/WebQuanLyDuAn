@@ -15,6 +15,7 @@ import PriorityPopover from '@/components/Popovers/PriorityPopover';
 import type { AppDispatch, RootState } from '@/store/configureStore';
 import type { Task, NewTaskData, TabType } from '@/types/tasks';
 import { fetchTasksForUser, fetchUpdateTask, fetchCreateTask } from '@/store/modules/tasks';
+import { fetchMentionNotifications, fetchMarkNotificationAsRead, fetchMarkAllNotificationsAsRead } from '@/store/modules/notifications';
 import { useSpaceTree } from '@/layouts/AppLayout/SpaceTreeContext';
 
 /** --- HELPERS --- **/
@@ -41,6 +42,9 @@ export default function MyTasksPage() {
     const listMembers = useSelector((state: RootState) => state.workspaces.listWorkspaceMembers) || [];
     const listSpaces = useSelector((state: RootState) => state.spaces.listSpaces) || [];
     const currentUserId = useSelector((state: RootState) => state.auth.signIn?.user?.user_id);
+    const mentionNotifications = useSelector((state: RootState) => state.notifications.mentionNotifications);
+    const isLoadingMentions = useSelector((state: RootState) => state.notifications.isLoadingMentions);
+    const mentionUnreadCount = useSelector((state: RootState) => state.notifications.mentionUnreadCount);
 
     const [activeTab, setActiveTab] = useState<TabType>('assigned');
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -74,6 +78,12 @@ export default function MyTasksPage() {
     useEffect(() => {
         dispatch(fetchTasksForUser());
     }, [dispatch]);
+
+    useEffect(() => {
+        if (activeTab === 'mentions') {
+            dispatch(fetchMentionNotifications());
+        }
+    }, [dispatch, activeTab]);
 
     useEffect(() => {
         if (listSpaces.length > 0 && activeSpaceId == null) {
@@ -185,13 +195,22 @@ export default function MyTasksPage() {
                     </div>
                 </div>
                 <div className="flex gap-1 px-6">
-                    {(['assigned', 'mentions', 'created'] as TabType[]).map((tab) => (
+                    {(['assigned', 'mentions'] as TabType[]).map((tab) => (
                         <button
                             key={tab}
                             className={`px-3 py-2 text-[13px] font-semibold border-b-2 transition-all ${activeTab === tab ? 'border-[#0058be] text-[#0058be]' : 'border-transparent text-[#5f6368]'}`}
                             onClick={() => setActiveTab(tab)}
                         >
-                            {tab === 'assigned' ? 'Assigned to me' : tab === 'mentions' ? 'Mentions' : 'Created by me'}
+                            {tab === 'assigned' ? 'Assigned to me' : (
+                                <span className="flex items-center gap-1">
+                                    Mentions
+                                    {mentionUnreadCount > 0 && (
+                                        <span className="ml-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#ef4444] px-1 text-[10px] font-bold text-white">
+                                            {mentionUnreadCount > 99 ? '99+' : mentionUnreadCount}
+                                        </span>
+                                    )}
+                                </span>
+                            )}
                         </button>
                     ))}
                 </div>
@@ -216,12 +235,97 @@ export default function MyTasksPage() {
 
             <div className="flex-1 overflow-y-auto p-6">
                 {activeTab === 'mentions' ? (
-                    <div className="flex flex-col items-center justify-center py-16 text-[#9aa0a6]">
-                        <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#f0f4ff]">
-                            <span className="text-2xl">💬</span>
+                    <div className="flex flex-col">
+                        {/* Header row */}
+                        <div className="mb-4 flex items-center justify-between">
+                            <p className="text-sm font-semibold text-[#292d34]">
+                                Thông báo
+                                {mentionUnreadCount > 0 && (
+                                    <span className="ml-2 rounded-full bg-[#ef4444] px-2 py-0.5 text-[10px] font-bold text-white">
+                                        {mentionUnreadCount} chưa đọc
+                                    </span>
+                                )}
+                            </p>
+                            {mentionUnreadCount > 0 && (
+                                <button
+                                    className="text-xs font-semibold text-[#0058be] hover:underline"
+                                    onClick={() => dispatch(fetchMarkAllNotificationsAsRead()).then(() => dispatch(fetchMentionNotifications()))}
+                                >
+                                    Đánh dấu tất cả đã đọc
+                                </button>
+                            )}
                         </div>
-                        <p className="text-sm font-semibold text-[#5f6368]">Chưa có lượt mention nào</p>
-                        <p className="mt-1 text-xs text-[#9aa0a6]">Khi ai đó @mention bạn trong comment, task sẽ hiện ở đây.</p>
+
+                        {/* Loading state */}
+                        {isLoadingMentions && (
+                            <div className="flex flex-col gap-2">
+                                {[1,2,3].map(i => (
+                                    <div key={i} className="h-16 animate-pulse rounded-lg bg-[#f3f4f6]" />
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Empty state */}
+                        {!isLoadingMentions && mentionNotifications.length === 0 && (
+                            <div className="flex flex-col items-center justify-center py-16 text-[#9aa0a6]">
+                                <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#f0f4ff]">
+                                    <span className="text-2xl">🔔</span>
+                                </div>
+                                <p className="text-sm font-semibold text-[#5f6368]">Chưa có thông báo nào</p>
+                                <p className="mt-1 text-xs text-[#9aa0a6]">Thông báo khi bạn được giao task hoặc task sắp đến hạn sẽ hiện ở đây.</p>
+                            </div>
+                        )}
+
+                        {/* Notification list */}
+                        {!isLoadingMentions && mentionNotifications.map((notif: any) => (
+                            <div
+                                key={notif.notification_id}
+                                className={`mb-2 flex cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 transition-all hover:border-[#e0e7ff] hover:bg-[#f5f7ff] ${
+                                    notif.is_read
+                                        ? 'border-[#f3f4f6] bg-white'
+                                        : 'border-[#dbeafe] bg-[#eff6ff]'
+                                }`}
+                                onClick={() => {
+                                    if (!notif.is_read) {
+                                        dispatch(fetchMarkNotificationAsRead(notif.notification_id));
+                                    }
+                                }}
+                            >
+                                {/* Icon */}
+                                <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg ${
+                                    notif.type === 'task_deadline'
+                                        ? 'bg-[#fef3c7]'
+                                        : 'bg-[#ede9fe]'
+                                }`}>
+                                    {notif.type === 'task_deadline' ? '⏰' : '🔔'}
+                                </div>
+
+                                {/* Content */}
+                                <div className="flex-1 min-w-0">
+                                    <p className={`text-[13px] leading-snug ${
+                                        notif.is_read ? 'text-[#5f6368]' : 'font-semibold text-[#292d34]'
+                                    }`}>
+                                        {notif.content}
+                                    </p>
+                                    {notif.actor_name && (
+                                        <p className="mt-0.5 text-[11px] text-[#9aa0a6]">
+                                            Bởi: {notif.actor_name}
+                                        </p>
+                                    )}
+                                    <p className="mt-1 text-[11px] text-[#b0b7c3]">
+                                        {new Date(notif.created_at).toLocaleString('vi-VN', {
+                                            day: '2-digit', month: '2-digit', year: 'numeric',
+                                            hour: '2-digit', minute: '2-digit'
+                                        })}
+                                    </p>
+                                </div>
+
+                                {/* Unread dot */}
+                                {!notif.is_read && (
+                                    <div className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[#0058be]" />
+                                )}
+                            </div>
+                        ))}
                     </div>
                 ) : taskGroups.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 text-[#9aa0a6]">

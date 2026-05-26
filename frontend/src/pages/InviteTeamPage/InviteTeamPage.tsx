@@ -9,7 +9,6 @@ const roleOptions = [
     { value: 'member', label: 'Member' },
     { value: 'admin', label: 'Admin' },
     { value: 'manager', label: 'Manager' },
-    { value: 'guest', label: 'Guest' },
 ];
 
 let nextId = 3;

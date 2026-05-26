@@ -2,14 +2,14 @@
 -- FLOSWISE AUTHORIZATION SYSTEM
 -- Migration: 001_authorization_setup.sql
 -- Mô tả: Tạo bảng permissions, role_permissions
---         và seed dữ liệu cho 4 roles x 21 quyền.
+--         và seed dữ liệu cho 3 roles x 21 quyền.
+--         Ghi chú: Đã loại bỏ role GUEST, mọi user khi join workspace sẽ có role MEMBER tối thiểu.
 -- =============================================
 
--- 1. Đảm bảo bảng roles đã có đủ 4 roles
+-- 1. Đảm bảo bảng roles đã có đủ 3 roles
 INSERT INTO roles (role_name) VALUES ('admin')    ON CONFLICT (role_name) DO NOTHING;
 INSERT INTO roles (role_name) VALUES ('manager')  ON CONFLICT (role_name) DO NOTHING;
 INSERT INTO roles (role_name) VALUES ('member')   ON CONFLICT (role_name) DO NOTHING;
-INSERT INTO roles (role_name) VALUES ('guest')    ON CONFLICT (role_name) DO NOTHING;
 
 -- 2. Tạo bảng permissions (Danh sách 21 quyền)
 CREATE TABLE IF NOT EXISTS permissions (
@@ -108,18 +108,7 @@ WHERE r.role_name = 'member'
   )
 ON CONFLICT (role_id, permission_id) DO NOTHING;
 
--- ========== GUEST (4/21 quyền) ==========
-INSERT INTO role_permissions (role_id, permission_id)
-SELECT r.role_id, p.permission_id
-FROM roles r
-CROSS JOIN permissions p
-WHERE r.role_name = 'guest'
-  AND p.permission_name IN (
-    'TASK_CHANGE_STATUS',
-    'COMMENT_CREATE', 'COMMENT_DELETE_OWN',
-    'ATTACHMENT_ADD'
-  )
-ON CONFLICT (role_id, permission_id) DO NOTHING;
+
 
 -- 6. Đảm bảo workspace_members và space_members có cột role_id
 -- (Chỉ chạy nếu cột chưa tồn tại - DO $$...$$)

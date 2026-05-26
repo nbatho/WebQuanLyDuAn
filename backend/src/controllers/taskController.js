@@ -22,6 +22,7 @@ import {
 } from '../models/Task.js';
 import { findStatusById, findStatusesByListId, findStatusesBySprintId } from '../models/TaskStatus.js';
 import { createActivity } from '../models/ActivityLogs.js';
+import { createAssignNotificationIfNotExists } from '../models/Notifications.js';
 
 // Mapping: field name → activity action type
 const FIELD_TO_ACTION = {
@@ -469,11 +470,21 @@ export const addAssigneeToTasks = async (req, res) => {
         if (!userId) {
             return res.status(400).json({ error: "User ID is required" });
         }
+
+        const task = await findTaskById(taskId);
         await assignUserToTask(taskId, userId);
 
         // Log 'assigned' activity (fire-and-forget)
         createActivity(taskId, actorId, 'assigned', null, { user_id: userId })
             .catch((err) => console.error('[activity log] assigned error:', err));
+
+        // Tạo notification assign cho người được giao (fire-and-forget)
+        if (Number(userId) !== Number(actorId)) {
+            const taskName = task?.name || `Task #${taskId}`;
+            const content = `Bạn đã được giao task "${taskName}".`;
+            createAssignNotificationIfNotExists(userId, actorId, taskId, content)
+                .catch((err) => console.error('[notification] assign error:', err));
+        }
 
         res.status(200).json({ message: "Assignee added successfully" });
     } catch (error) {
@@ -524,11 +535,17 @@ export const shareTask = async (req, res) => {
 
         const results = await shareTaskToUsers(taskId, user_ids, sharedBy);
 
-        // Log activity for each shared user (fire-and-forget)
-        const { createActivity } = await import('../models/ActivityLogs.js');
+        // Log activity + tạo notification cho từng user được chia sẻ (fire-and-forget)
+        const taskName = task?.name || `Task #${taskId}`;
         for (const userId of user_ids) {
             createActivity(taskId, sharedBy, 'assigned', null, { user_id: userId })
                 .catch((err) => console.error('[activity log] share task error:', err));
+
+            if (Number(userId) !== Number(sharedBy)) {
+                const content = `Bạn đã được giao task "${taskName}".`;
+                createAssignNotificationIfNotExists(userId, sharedBy, taskId, content)
+                    .catch((err) => console.error('[notification] share task assign error:', err));
+            }
         }
 
         res.status(200).json({

@@ -1,8 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { changePassword, requestPasswordOtp, verifyChangePassword } from "@/api/users";
-import type { ChangePasswordPayload } from "@/api/users";
+import { changePassword, requestPasswordOtp, verifyChangePassword, getProfile, updateProfile } from "@/api/users";
+import type { ChangePasswordPayload, UserProfileData, UpdateProfilePayload } from "@/api/users";
 
 export interface UsersState {
+    // Profile
+    profile: UserProfileData | null;
+    isLoadingProfile: boolean;
+    profileError: string | null;
+    isUpdatingProfile: boolean;
+    updateProfileError: string | null;
+    updateProfileSuccess: boolean;
+    // Password
     isChangingPassword: boolean;
     errorChangePassword: string | null;
     changePasswordSuccess: boolean;
@@ -14,6 +22,49 @@ export interface UsersState {
     isVerifyingOtp: boolean;
     errorVerifyOtp: string | null;
 }
+
+export const fetchGetProfile = createAsyncThunk<
+    UserProfileData,
+    void,
+    { rejectValue: string }
+>(
+    "users/getProfile",
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await getProfile();
+            return response.users;
+        } catch (error: unknown) {
+            const message =
+                (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+                (error as { message?: string }).message ||
+                "Không thể tải thông tin cá nhân";
+            return rejectWithValue(message);
+        }
+    }
+);
+
+export const fetchUpdateProfile = createAsyncThunk<
+    UserProfileData,
+    UpdateProfilePayload,
+    { rejectValue: string }
+>(
+    "users/updateProfile",
+    async (payload, { rejectWithValue, dispatch }) => {
+        try {
+            await updateProfile(payload);
+            // Re-fetch để lấy data mới nhất
+            const result = await dispatch(fetchGetProfile());
+            if (fetchGetProfile.fulfilled.match(result)) return result.payload;
+            throw new Error("Không thể tải lại thông tin");
+        } catch (error: unknown) {
+            const message =
+                (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+                (error as { message?: string }).message ||
+                "Cập nhật thông tin thất bại";
+            return rejectWithValue(message);
+        }
+    }
+);
 
 export const fetchChangePassword = createAsyncThunk<
     { message: string },
@@ -76,6 +127,12 @@ export const fetchVerifyChangePassword = createAsyncThunk<
 );
 
 const initialState: UsersState = {
+    profile: null,
+    isLoadingProfile: false,
+    profileError: null,
+    isUpdatingProfile: false,
+    updateProfileError: null,
+    updateProfileSuccess: false,
     isChangingPassword: false,
     errorChangePassword: null,
     changePasswordSuccess: false,
@@ -102,8 +159,43 @@ const usersSlice = createSlice({
             state.isVerifyingOtp = false;
             state.errorVerifyOtp = null;
         },
+        clearUpdateProfileState(state) {
+            state.isUpdatingProfile = false;
+            state.updateProfileError = null;
+            state.updateProfileSuccess = false;
+        },
     },
     extraReducers: (builder) => {
+        // fetchGetProfile
+        builder.addCase(fetchGetProfile.pending, (state) => {
+            state.isLoadingProfile = true;
+            state.profileError = null;
+        });
+        builder.addCase(fetchGetProfile.fulfilled, (state, action) => {
+            state.isLoadingProfile = false;
+            state.profile = action.payload;
+        });
+        builder.addCase(fetchGetProfile.rejected, (state, action) => {
+            state.isLoadingProfile = false;
+            state.profileError = typeof action.payload === "string" ? action.payload : "Không thể tải thông tin";
+        });
+
+        // fetchUpdateProfile
+        builder.addCase(fetchUpdateProfile.pending, (state) => {
+            state.isUpdatingProfile = true;
+            state.updateProfileError = null;
+            state.updateProfileSuccess = false;
+        });
+        builder.addCase(fetchUpdateProfile.fulfilled, (state, action) => {
+            state.isUpdatingProfile = false;
+            state.profile = action.payload;
+            state.updateProfileSuccess = true;
+        });
+        builder.addCase(fetchUpdateProfile.rejected, (state, action) => {
+            state.isUpdatingProfile = false;
+            state.updateProfileError = typeof action.payload === "string" ? action.payload : "Cập nhật thất bại";
+        });
+
         // Legacy change password
         builder.addCase(fetchChangePassword.pending, (state) => {
             state.isChangingPassword = true;
@@ -152,5 +244,5 @@ const usersSlice = createSlice({
     },
 });
 
-export const { clearChangePasswordState } = usersSlice.actions;
+export const { clearChangePasswordState, clearUpdateProfileState } = usersSlice.actions;
 export default usersSlice.reducer;

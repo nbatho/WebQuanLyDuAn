@@ -161,6 +161,10 @@ const initialState: WorkspacesState = {
     isVerifyingInvitation: false,
     verifyInvitationError: null,
     verifyInvitationData: null,
+    isUpdatingWorkspace: false,
+    updateWorkspaceError: null,
+    currentWorkspaceDetail: null,
+    isLoadingWorkspaceDetail: false,
 };
 
 const workspacesSlice = createSlice({
@@ -284,6 +288,39 @@ const workspacesSlice = createSlice({
             state.verifyInvitationError = action.payload || action.error?.message || 'Failed to verify invitation';
         });
 
+        // fetchWorkspaceById
+        builder.addCase(fetchWorkspaceById.pending, (state) => {
+            state.isLoadingWorkspaceDetail = true;
+            state.updateWorkspaceError = null;
+        });
+        builder.addCase(fetchWorkspaceById.fulfilled, (state, action) => {
+            state.isLoadingWorkspaceDetail = false;
+            state.currentWorkspaceDetail = action.payload;
+        });
+        builder.addCase(fetchWorkspaceById.rejected, (state, action) => {
+            state.isLoadingWorkspaceDetail = false;
+            state.updateWorkspaceError = action.payload || action.error.message || 'Failed to fetch workspace detail';
+        });
+
+        // editWorkspace
+        builder.addCase(editWorkspace.pending, (state) => {
+            state.isUpdatingWorkspace = true;
+            state.updateWorkspaceError = null;
+        });
+        builder.addCase(editWorkspace.fulfilled, (state, action) => {
+            state.isUpdatingWorkspace = false;
+            state.currentWorkspaceDetail = action.payload;
+            // Cập nhật workspace trong danh sách
+            const idx = state.listWorkspaces.findIndex(
+                (w) => w.workspace_id === action.payload.workspace_id,
+            );
+            if (idx !== -1) state.listWorkspaces[idx] = action.payload;
+        });
+        builder.addCase(editWorkspace.rejected, (state, action) => {
+            state.isUpdatingWorkspace = false;
+            state.updateWorkspaceError = action.payload || action.error.message || 'Failed to update workspace';
+        });
+
         // Xoá toàn bộ workspaces state khi logout để tránh lộ dữ liệu sang user khác
         builder.addMatcher(
             (action) => action.type === 'auth/fetchSignOut/fulfilled',
@@ -292,6 +329,7 @@ const workspacesSlice = createSlice({
                 state.currentWorkspaceId = null;
                 state.listWorkspaceMembers = [];
                 state.error = null;
+                state.currentWorkspaceDetail = null;
                 persistCurrentWorkspaceId(null);
             }
         );

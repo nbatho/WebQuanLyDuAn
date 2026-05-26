@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, MessageSquare, Clock, Plus, Settings, Users, LogOut, Sparkles, Grid3X3, ChevronDown, ChevronRight, RefreshCcw } from 'lucide-react';
+import { Home, MessageSquare, Clock, Plus, Settings, Users, LogOut, Sparkles, Grid3X3, ChevronDown, ChevronRight, RefreshCcw, PanelLeftOpen, X } from 'lucide-react';
 import WorkspaceSwitcher from '../workspace/WorkspaceSwitcher';
 import { fetchSignOut } from '@/store/modules/auth';
 import type { AppDispatch, RootState } from '@/store/configureStore';
@@ -17,6 +17,7 @@ export default function AppSidebar() {
     const tree = useSpaceTree();
     const [spacesCollapsed, setSpacesCollapsed] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [isMobileOpen, setIsMobileOpen] = useState(false);
     const currentWorkspaceId = useSelector((s: RootState) => s.workspaces.currentWorkspaceId);
     const access_token = useSelector((s: RootState) => s.auth.access_token);
     const handleRefreshSpaces = async () => {
@@ -71,8 +72,25 @@ export default function AppSidebar() {
         }
     }, [currentWorkspaceId, dispatch]);
 
-    return (
-        <aside className="flex w-65 shrink-0 flex-col overflow-y-auto border-r border-[#e2e4e9] bg-white px-2.5 py-3 max-[900px]:hidden">
+    const sidebarContent = (
+        <aside
+            className={`flex w-65 shrink-0 flex-col overflow-y-auto border-r border-[#e2e4e9] bg-white px-2.5 py-3
+                max-[900px]:fixed max-[900px]:inset-y-0 max-[900px]:left-0 max-[900px]:z-50 max-[900px]:shadow-2xl
+                max-[900px]:transition-transform max-[900px]:duration-300 max-[900px]:ease-in-out
+                ${isMobileOpen ? 'max-[900px]:translate-x-0' : 'max-[900px]:-translate-x-full'}
+            `}
+        >
+            {/* Mobile close button */}
+            <button
+                type="button"
+                className="absolute right-3 top-3 hidden max-[900px]:flex items-center justify-center w-7 h-7 rounded-md text-[#6b6f76] hover:bg-[#f3f4f8] hover:text-[#1e1f21] transition-colors"
+                onClick={() => setIsMobileOpen(false)}
+                aria-label="Close sidebar"
+            >
+                <X size={16} />
+            </button>
+
+            <div className="item-center gap-2.5 rounded-lg px-2 pb-3 pt-1 text-[14px] font-bold text-[#1e1f21]">Flowise PM</div>
             <div
                 className="mb-2 flex cursor-pointer items-center gap-2.5 rounded-lg px-2 pb-3 pt-1 border-b border-[#e2e4e9]"
                 onClick={() => navigate('/home')}
@@ -81,7 +99,6 @@ export default function AppSidebar() {
                     <Grid3X3 size={18} color="#fff" />
                 </div>
                 <div className="min-w-0 flex-1">
-                    <div className="text-[14px] font-bold text-[#1e1f21]">Flowise PM</div>
                     <WorkspaceSwitcher onOpenCreate={() => tree.setIsWorkspaceDialogOpen(true)} />
                 </div>
             </div>
@@ -164,5 +181,34 @@ export default function AppSidebar() {
                 </div>
             </div>
         </aside>
+    );
+
+    return (
+        <>
+            {sidebarContent}
+
+            {/* Mobile backdrop overlay */}
+            {isMobileOpen && (
+                <div
+                    className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] hidden max-[900px]:block"
+                    onClick={() => setIsMobileOpen(false)}
+                    aria-hidden="true"
+                />
+            )}
+
+            {/* Mobile toggle button — only visible when sidebar is closed */}
+            {!isMobileOpen && (
+                <button
+                    type="button"
+                    id="mobile-sidebar-toggle"
+                    aria-label="Open sidebar"
+                    className="hidden max-[900px]:flex fixed bottom-5 left-4 z-50 items-center justify-center gap-2 rounded-full bg-[#1a73e8] px-4 py-3 text-white shadow-lg shadow-[#1a73e8]/40 transition-all hover:bg-[#1557b0] active:scale-95"
+                    onClick={() => setIsMobileOpen(true)}
+                >
+                    <PanelLeftOpen size={18} />
+                    <span className="text-[13px] font-semibold">Menu</span>
+                </button>
+            )}
+        </>
     );
 }

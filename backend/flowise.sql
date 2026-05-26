@@ -403,8 +403,7 @@ GROUP BY ta.user_id, l.space_id;
 INSERT INTO roles (role_id, role_name) VALUES
 (1, 'ADMIN'),
 (2, 'MANAGER'),
-(3, 'MEMBER'),
-(4, 'GUEST')
+(3, 'MEMBER')
 ON CONFLICT (role_name) DO NOTHING;
 
 -- Khôi phục lại sequence cho roles_id
@@ -465,12 +464,8 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 
 -- ==========================================
 -- MEMBER (Role 3): Lam viec binh thuong
+-- Ghi chu: MEMBER co du cac quyen tuong tac co ban (tao/sua task, comment, time log, attachment)
+-- Quyen TASK_DELETE va quan ly cau truc (LIST, FOLDER, SPRINT, MILESTONE, STATUS) thuoc MANAGER tro len
 -- ==========================================
 (3, 12), (3, 13), (3, 15), (3, 16), 
-(3, 17), (3, 18), (3, 20), (3, 21), 
-
--- ==========================================
--- GUEST (Role 4): Khach moi / Quan sat vien
--- ==========================================
-(4, 15), 
-(4, 17), (4, 18), (4, 21);
+(3, 17), (3, 18), (3, 20), (3, 21);
