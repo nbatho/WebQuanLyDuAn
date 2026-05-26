@@ -18,7 +18,7 @@ const AIPage = lazy(() => import('../pages/AIPage'));
 const SprintViewPage = lazy(() => import('../pages/SprintViewPage'));
 const AppLayout = lazy(() => import("../layouts/AppLayout"));
 const InvitationPage = lazy(() => import("../pages/InvitationPage"));
-
+const NotFoundPage = lazy(() => import("../pages/NotFoundPage/NotFoundPage"));
 
 export const routes: RouteConfig[] = [
     {
@@ -85,5 +85,9 @@ export const routes: RouteConfig[] = [
     {
         path: '/join-workspace',
         element: <InvitationPage />
+    },
+    {
+        path: '*',
+        element: <NotFoundPage />
     }
 ];
