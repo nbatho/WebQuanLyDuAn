@@ -1,12 +1,13 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom'; // Đổi thành react-router-dom nếu bị lỗi
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { message, Spin } from 'antd';
+import { message } from 'antd';
 
 import './InvitationPage.css';
 import type { AppDispatch, RootState } from '@/store/configureStore';
 import { useAppDispatch } from '@/hooks';
 import { fetchVerifyInvitation, respondToInvitations } from '@/store/modules/workspaces';
+import { CheckCircle2, XCircle, Mail, Shield, Users } from 'lucide-react';
 
 export default function InvitationPage() {
     const [searchParams] = useSearchParams();
@@ -132,44 +133,98 @@ export default function InvitationPage() {
 
     const willAutoAccept = isAuthenticated && !!currentUserEmail && currentUserEmail === invitationInfo?.email;
 
+    // ── Loading State ──
     if (isVerifying || !invitationInfo || willAutoAccept || isResponding) {
         return (
-            <div className="flex h-screen items-center justify-center bg-[#f5f7ff]">
-                <div className="text-center">
-                    <Spin size="large" />
-                    <h2 className="mt-4 text-lg font-bold text-[#141b2b]">
+            <div className="inv-page">
+                <div className="inv-bg">
+                    <div className="inv-bg-shape inv-bg-shape--1" />
+                    <div className="inv-bg-shape inv-bg-shape--2" />
+                </div>
+                <div className="inv-loading-card">
+                    <div className="inv-loading-spinner" />
+                    <h2 className="inv-loading-text">
                         {isVerifying ? 'Đang xác thực lời mời...' : 'Đang xử lý tham gia...'}
                     </h2>
+                    <p className="inv-loading-sub">Vui lòng chờ trong giây lát</p>
                 </div>
             </div>
         );
     }
+
+    // ── Main UI ──
+    const workspaceInitial = (invitationInfo.workspaceName || 'W')[0].toUpperCase();
+
     return (
-        <div className="invitation-page">
-            <div className="invitation-card">
-                <p className="invitation-label">Bạn được mời tham gia dự án</p>
-                <h1 className="invitation-project-name">{invitationInfo.workspaceName || 'Floswise Workspace'}</h1>
+        <div className="inv-page">
+            <div className="inv-bg">
+                <div className="inv-bg-shape inv-bg-shape--1" />
+                <div className="inv-bg-shape inv-bg-shape--2" />
+                <div className="inv-bg-shape inv-bg-shape--3" />
+            </div>
 
-                <h2 className="invitation-title">
-                    Lời mời được gửi từ:
-                </h2>
-                <p className="invitation-email font-bold">{invitationInfo.inviterName || 'Admin'} ({invitationInfo.inviterEmail || invitationInfo.email})</p>
+            <div className="inv-card">
+                {/* Header decoration */}
+                <div className="inv-card-deco" />
 
-                <div className="invitation-actions mt-6 flex gap-4">
+                {/* Workspace Avatar */}
+                <div className="inv-workspace-avatar">
+                    <span>{workspaceInitial}</span>
+                </div>
+
+                {/* Label */}
+                <div className="inv-label">
+                    <Users size={14} />
+                    <span>Lời mời tham gia dự án</span>
+                </div>
+
+                {/* Workspace Name */}
+                <h1 className="inv-workspace-name">
+                    {invitationInfo.workspaceName || 'Floswise Workspace'}
+                </h1>
+
+                {/* Inviter Info */}
+                <div className="inv-inviter-section">
+                    <div className="inv-inviter-card">
+                        <div className="inv-inviter-avatar">
+                            {(invitationInfo.inviterName || 'A')[0].toUpperCase()}
+                        </div>
+                        <div className="inv-inviter-info">
+                            <span className="inv-inviter-name">
+                                {invitationInfo.inviterName || 'Admin'}
+                            </span>
+                            <span className="inv-inviter-email">
+                                <Mail size={12} />
+                                {invitationInfo.inviterEmail || invitationInfo.email}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Security badge */}
+                <div className="inv-security-badge">
+                    <Shield size={13} />
+                    <span>Lời mời được gửi cho: <strong>{invitationInfo.email}</strong></span>
+                </div>
+
+                {/* Actions */}
+                <div className="inv-actions">
                     <button
                         type="button"
-                        className="invitation-btn invitation-btn-accept flex-1 rounded bg-blue-600 py-2 text-white disabled:opacity-50 hover:bg-blue-700 transition-colors"
+                        className="inv-btn inv-btn--accept"
                         onClick={handleAccept}
                         disabled={isResponding}
                     >
-                        Chấp nhận
+                        <CheckCircle2 size={18} />
+                        Chấp nhận lời mời
                     </button>
                     <button
                         type="button"
-                        className="invitation-btn invitation-btn-reject flex-1 rounded border border-red-500 py-2 text-red-500 disabled:opacity-50 hover:bg-red-50 transition-colors"
+                        className="inv-btn inv-btn--reject"
                         onClick={handleReject}
                         disabled={isResponding}
                     >
+                        <XCircle size={18} />
                         Từ chối
                     </button>
                 </div>
