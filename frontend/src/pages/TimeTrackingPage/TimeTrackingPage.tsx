@@ -124,7 +124,7 @@ export default function TimeTrackingPage() {
             dispatch(fetchMyTimeLogs());
             dispatch(fetchRunningTimer());
             message.success(`⏱ Bắt đầu: ${taskName}`);
-        } catch (err: any) {
+        } catch (err: unknown) {
             message.error(typeof err === 'string' ? err : 'Không thể bắt đầu timer');
         }
     }, [dispatch, runningTimer]);
@@ -135,7 +135,7 @@ export default function TimeTrackingPage() {
             await dispatch(fetchStopTimer(runningTimer.time_log_id)).unwrap();
             dispatch(fetchMyTimeLogs());
             message.success('⏹ Timer đã dừng & lưu!');
-        } catch (err: any) {
+        } catch (err: unknown) {
             message.error(typeof err === 'string' ? err : 'Không thể dừng timer');
         }
     }, [dispatch, runningTimer]);
@@ -145,7 +145,7 @@ export default function TimeTrackingPage() {
             await dispatch(fetchDeleteTimeLog(id)).unwrap();
             dispatch(fetchMyTimeLogs());
             message.success('Đã xóa');
-        } catch (err: any) {
+        } catch (err: unknown) {
             message.error(typeof err === 'string' ? err : 'Không thể xóa');
         }
     }, [dispatch]);

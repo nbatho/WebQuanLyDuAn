@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useDispatch } from 'react-redux';
@@ -49,7 +49,7 @@ export default function AIPage() {
         const parsedSessions = savedSessions ? JSON.parse(savedSessions) : [];
         
         if (parsedSessions.length > 0) {
-            const sessionExists = parsedSessions.some((s: any) => s.id === lastActive);
+            const sessionExists = parsedSessions.some((s: ChatSession) => s.id === lastActive);
             return sessionExists ? lastActive! : parsedSessions[0].id;
         }
         return 'default';
@@ -60,7 +60,7 @@ export default function AIPage() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const activeSession = sessions.find(s => s.id === activeSessionId) || sessions[0];
-    const messages = activeSession?.messages || [];
+    const messages = useMemo(() => activeSession?.messages || [], [activeSession?.messages]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -133,7 +133,7 @@ export default function AIPage() {
 
         try {
             const chatHistory = messages.slice(-5).map(msg => ({
-                role: msg.role === 'user' ? 'user' as const : 'assistant' as const,
+                role: msg.role === 'user' ? 'user' as const : 'ai' as const,
                 content: msg.content
             }));
 
@@ -172,7 +172,7 @@ export default function AIPage() {
                     : s
             ));
 
-        } catch (error: unknown) { 
+        } catch { 
             setSessions(prev => prev.map(s => 
                 s.id === activeSessionId 
                     ? { ...s, messages: s.messages.map(m => m.id === aiMessageId ? { 

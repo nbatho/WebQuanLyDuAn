@@ -28,6 +28,7 @@ export const FolderNode = ({ folder, spaceId, spaceName }: { folder: FolderItem;
 
     const isFolderActive = location.pathname === `/folder/${folder.id}`;
 
+     
     useEffect(() => {
         if (isFolderActive) setExpanded(true);
     }, [isFolderActive]);

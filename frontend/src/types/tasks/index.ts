@@ -60,6 +60,14 @@ export interface NewTaskData {
     listId?: number;
 }
 
+export interface NewMilestoneData {
+    name: string;
+    description?: string | null;
+    status?: 'on_track' | 'at_risk' | 'completed' | 'cancelled';
+    color?: string;
+    dueDate?: string | null;
+}
+
 // ── Types moved from /pages per project rules ──────────────────────────────
 
 import type React from 'react';
@@ -73,7 +81,7 @@ export interface TaskViewContextType {
     setSelectedTask: (t: Task | null) => void;
     onContextMenu: (e: React.MouseEvent, task: Task) => void;
     updateTask: (taskId: number, updates: Partial<Task>) => void;
-    handleInlineCreate: (groupId: number, name: string, extras?: any) => void;
+    handleInlineCreate: (groupId: number, name: string, extras?: { assignees?: Assignee[]; due_date?: string | null; priority_id?: number | null; priority_name?: string | null; priority_color?: string | null }) => void;
     handleCreateStatus: (name: string, color: string) => void;
 }
 

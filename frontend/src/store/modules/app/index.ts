@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-export type appState = {
-};
+export type appState = Record<string, never>;
 
 const initialState: appState = {
 };

@@ -64,7 +64,7 @@ export interface SpaceDetail {
 }
 
 /** Shape trả về bởi GET /spaces/spacesDetails/:id */
-export interface SpaceDetailSingle extends SpaceDetail {}
+export type SpaceDetailSingle = SpaceDetail;
 
 /** Shape cũ — vẫn giữ để tương thích với createSpace / updateSpace */
 export interface SpaceData {
@@ -99,9 +99,9 @@ export const fetchSpacesForWorkspace = createAsyncThunk<SpaceDetail[], number>(
     'spaces/fetchSpacesForWorkspace',
     async (workspace_id, { rejectWithValue }) => {
         try {
-            const response = await getSpacesForWorkspace(workspace_id) as any;
+            const response = await getSpacesForWorkspace(workspace_id) as { data?: SpaceDetail[] } | SpaceDetail[];
             // BE trả về { status: "success", data: SpaceDetail[] }
-            return (response.data ?? response) as SpaceDetail[];
+            return ((response as { data?: SpaceDetail[] }).data ?? response) as SpaceDetail[];
         } catch (error: unknown) { 
             return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch spaces');
         }
@@ -140,9 +140,9 @@ export const fetchGetSpaceDetails = createAsyncThunk<SpaceDetail, number>(
     'spaces/getSpaceDetails',
     async (space_id, { rejectWithValue }) => {
         try {
-            const response = await getSpaceDetails(space_id) as any;
+            const response = await getSpaceDetails(space_id) as { data?: SpaceDetail } | SpaceDetail;
             // BE trả về { status: "success", data: { spaceId, ... } }
-            return (response.data ?? response) as SpaceDetail;
+            return ((response as { data?: SpaceDetail }).data ?? response) as SpaceDetail;
         } catch (error: unknown) { 
             return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch space details');
         }

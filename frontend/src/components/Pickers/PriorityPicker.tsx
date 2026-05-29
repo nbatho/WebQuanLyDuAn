@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Flag, ChevronDown } from 'lucide-react';
+// eslint-disable-next-line react-refresh/only-export-components
 export const PRIORITY_OPTIONS = [
     { value: 'Low', label: 'Low', color: '#6ee7b7' },
     { value: 'Normal', label: 'Normal', color: '#d1d5db' },

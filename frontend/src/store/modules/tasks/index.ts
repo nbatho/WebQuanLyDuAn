@@ -180,7 +180,7 @@ export const fetchCreateTask = createAsyncThunk<
                 assignee_ids: taskData.assignee_ids
             });
             
-            return response as any as TaskWithSpaceData;
+            return response as unknown as TaskWithSpaceData;
         } catch (error: unknown) { 
             return rejectWithValue(
                 (error as { response?: { data?: { error?: string; message?: string } } }).response?.data?.error ||
@@ -310,7 +310,7 @@ export const fetchShareableUsers = createAsyncThunk<ShareableUser[], number>(
 );
 
 export const fetchShareTask = createAsyncThunk<
-    { message: string; assignees: any[] },
+    { message: string; assignees: ShareableUser[] },
     { task_id: number; user_ids: number[] }
 >(
     'tasks/shareTask',
@@ -436,9 +436,9 @@ export const tasksSlice = createSlice({
             const newTask: Task = {
                 task_id: raw.task_id,
                 parent_task_id: raw.parent_task_id,
-                list_id: (raw as any).list_id ?? null,
+                list_id: (raw as TaskWithSpaceData & { list_id?: number; folder_id?: number; subtask_done_count?: number; attachment_count?: number }).list_id ?? null,
                 space_id: raw.space_id,
-                folder_id: (raw as any).folder_id ?? null,
+                folder_id: (raw as TaskWithSpaceData & { folder_id?: number }).folder_id ?? null,
                 name: raw.name,
                 description: raw.description,
                 status_id: raw.status_id ?? null,
@@ -449,9 +449,9 @@ export const tasksSlice = createSlice({
                 due_date: raw.due_date,
                 position: raw.position,
                 subtask_count: raw.subtask_count ?? 0,
-                subtask_done_count: (raw as any).subtask_done_count ?? 0,
+                subtask_done_count: (raw as TaskWithSpaceData & { subtask_done_count?: number }).subtask_done_count ?? 0,
                 comment_count: raw.comment_count ?? 0,
-                attachment_count: (raw as any).attachment_count ?? 0,
+                attachment_count: (raw as TaskWithSpaceData & { attachment_count?: number }).attachment_count ?? 0,
                 assignees: raw.assignees || [],
             };
             
@@ -532,7 +532,7 @@ export const tasksSlice = createSlice({
             };
 
             // Tìm task trong group hiện tại và tách ra
-            let movedTask: any = null;
+            let movedTask: Task | null = null;
             let fromGroupId: number | null = null;
 
             for (const group of state.listTask) {

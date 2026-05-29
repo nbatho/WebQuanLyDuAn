@@ -11,12 +11,16 @@ export interface NotificationData {
     notification_id: number;
     user_id: number;
     type: string;
-    title: string;
-    message: string;
+    title?: string;
+    message?: string;
+    content: string;
     is_read: boolean;
     related_task_id: number | null;
     related_space_id: number | null;
     created_at: string;
+    actor_name?: string | null;
+    actor_avatar?: string | null;
+    task_name?: string | null;
 }
 
 export interface NotificationsState {

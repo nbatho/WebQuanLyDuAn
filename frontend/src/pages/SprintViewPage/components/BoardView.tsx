@@ -1,7 +1,7 @@
 import { Calendar, Flag, MoreHorizontal } from 'lucide-react';
 import { Avatar, Tooltip } from 'antd';
 import { useRef, useState, type DragEvent } from 'react';
-import type { Task } from '@/types/tasks';
+import type { Task, Assignee } from '@/types/tasks';
 import { familyTaskIds, rootTasks } from '@/utils/taskFamily';
 import TaskDetailModal from '@/components/TaskDetailModal';
 
@@ -128,9 +128,9 @@ export default function BoardView({
                                                     <Flag size={11} /> {task.priority_name}
                                                 </span>
                                             )}
-                                            {task.assignees?.map((a: any) => (
-                                                <Tooltip key={a.id || a.user_id} title={a.name}>
-                                                    <Avatar size={20} src={a.avatar_url} style={{ backgroundColor: a.color }}>
+                                            {task.assignees?.map((a: Assignee) => (
+                                                <Tooltip key={a.user_id} title={a.name}>
+                                                    <Avatar size={20} src={a.avatar_url || undefined} style={{ backgroundColor: '#1e1f21' }}>
                                                         {a.name?.charAt(0).toUpperCase()}
                                                     </Avatar>
                                                 </Tooltip>

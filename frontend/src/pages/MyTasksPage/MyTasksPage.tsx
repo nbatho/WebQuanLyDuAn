@@ -13,7 +13,7 @@ import DueDatePopover from '@/components/Popovers/DueDatePopover';
 import PriorityPopover from '@/components/Popovers/PriorityPopover';
 
 import type { AppDispatch, RootState } from '@/store/configureStore';
-import type { Task, NewTaskData, TabType } from '@/types/tasks';
+import type { Task, NewTaskData, TabType, StatusGroup, Assignee } from '@/types/tasks';
 import { fetchTasksForUser, fetchUpdateTask, fetchCreateTask } from '@/store/modules/tasks';
 import { fetchMentionNotifications, fetchMarkNotificationAsRead, fetchMarkAllNotificationsAsRead } from '@/store/modules/notifications';
 import { useSpaceTree } from '@/layouts/AppLayout/SpaceTreeContext';
@@ -22,7 +22,7 @@ import { useSpaceTree } from '@/layouts/AppLayout/SpaceTreeContext';
 const getInitials = (name: string) => name ? name.substring(0, 2).toUpperCase() : 'NA';
 const formatDate = (dateString: string | null) => dateString ? new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : null;
 
-function isCompletedTask(task: any): boolean {
+function isCompletedTask(task: Task): boolean {
     return (task.status_name ?? '').toUpperCase() === 'COMPLETE' || !!task.completed_at;
 }
 
@@ -34,13 +34,15 @@ function isDueToday(rawDueDate: string | null): boolean {
     return parsed.getDate() === today.getDate() && parsed.getMonth() === today.getMonth() && parsed.getFullYear() === today.getFullYear();
 }
 
+const EMPTY_ARRAY: never[] = [];
+
 export default function MyTasksPage() {
     const dispatch = useDispatch<AppDispatch>();
     const { spaces: treeSpaces, spaceTree } = useSpaceTree();
 
-    const listTasks = useSelector((state: RootState) => state.tasks.listTaskByUserId) || [];
-    const listMembers = useSelector((state: RootState) => state.workspaces.listWorkspaceMembers) || [];
-    const listSpaces = useSelector((state: RootState) => state.spaces.listSpaces) || [];
+    const listTasks = useSelector((state: RootState) => state.tasks.listTaskByUserId ?? EMPTY_ARRAY);
+    const listMembers = useSelector((state: RootState) => state.workspaces.listWorkspaceMembers ?? EMPTY_ARRAY);
+    const listSpaces = useSelector((state: RootState) => state.spaces.listSpaces ?? EMPTY_ARRAY);
     const currentUserId = useSelector((state: RootState) => state.auth.signIn?.user?.user_id);
     const mentionNotifications = useSelector((state: RootState) => state.notifications.mentionNotifications);
     const isLoadingMentions = useSelector((state: RootState) => state.notifications.isLoadingMentions);
@@ -72,7 +74,7 @@ export default function MyTasksPage() {
     // Gather status groups for the modal
     const modalGroups = useMemo(() => {
         if (!Array.isArray(listTasks)) return [];
-        return listTasks.map((g: any) => ({ id: g.id, name: g.name, color: g.color }));
+        return listTasks.map((g: StatusGroup) => ({ id: g.id, name: g.name, color: g.color }));
     }, [listTasks]);
 
     useEffect(() => {
@@ -85,6 +87,7 @@ export default function MyTasksPage() {
         }
     }, [dispatch, activeTab]);
 
+     
     useEffect(() => {
         if (listSpaces.length > 0 && activeSpaceId == null) {
             setActiveSpaceId(listSpaces[0].spaceId);
@@ -93,21 +96,21 @@ export default function MyTasksPage() {
 
     const flatTasks = useMemo(() => {
         if (!Array.isArray(listTasks)) return [];
-        return listTasks.reduce((acc: any[], group: any) => acc.concat(group.tasks || []), []);
+        return listTasks.reduce((acc: Task[], group: StatusGroup) => acc.concat(group.tasks || []), []);
     }, [listTasks]);
 
-    const totalActive = flatTasks.filter((t: any) => !isCompletedTask(t)).length;
-    const totalOverdue = flatTasks.filter((t: any) => isDueToday(t.due_date) && !isCompletedTask(t)).length;
+    const totalActive = flatTasks.filter((t: Task) => !isCompletedTask(t)).length;
+    const totalOverdue = flatTasks.filter((t: Task) => isDueToday(t.due_date) && !isCompletedTask(t)).length;
 
     const taskGroups = useMemo(() => {
         if (!Array.isArray(listTasks)) return [];
 
-        return listTasks.map((group: any) => {
-            const filteredTasksInGroup = (group.tasks || []).filter((t: any) => {
+        return listTasks.map((group: StatusGroup) => {
+            const filteredTasksInGroup = (group.tasks || []).filter((t: Task) => {
                 if (!showCompleted && isCompletedTask(t)) return false;
                 if (searchText && !t.name.toLowerCase().includes(searchText.toLowerCase())) return false;
                 if (activeTab === 'assigned' && currentUserId) {
-                    const isAssigned = (t.assignees || []).some((a: any) => Number(a.user_id) === Number(currentUserId));
+                    const isAssigned = (t.assignees || []).some((a: Assignee) => Number(a.user_id) === Number(currentUserId));
                     if (!isAssigned) return false;
                 }
                 if (activeTab === 'created' && currentUserId) {
@@ -125,7 +128,7 @@ export default function MyTasksPage() {
                 isExpanded: expandedGroups[group.id] ?? group.isExpanded ?? true,
                 tasks: filteredTasksInGroup
             };
-        }).filter((group: any) => group.tasks.length > 0);
+        }).filter((group: StatusGroup) => group.tasks.length > 0);
     }, [listTasks, showCompleted, searchText, expandedGroups, activeTab, currentUserId]);
 
     const toggleGroup = (groupId: number) => {
@@ -134,12 +137,12 @@ export default function MyTasksPage() {
 
     const handleUpdateTask = (taskId: number, updates: Partial<Task>) => {
         // Build API payload - map frontend field names to backend field names
-        const apiPayload: Record<string, any> = {};
+        const apiPayload: Partial<import('@/store/modules/tasks').TaskData> = {};
         if (updates.name !== undefined) apiPayload.name = updates.name;
         if (updates.description !== undefined) apiPayload.description = updates.description;
         if (updates.due_date !== undefined) apiPayload.due_date = updates.due_date;
         if (updates.status_id !== undefined) apiPayload.status_id = updates.status_id;
-        if (updates.priority_name !== undefined) apiPayload.priority = updates.priority_name;
+        if (updates.priority_name !== undefined) apiPayload.priority = updates.priority_name ?? undefined;
         if (updates.position !== undefined) apiPayload.position = updates.position;
 
         // Call API if there are valid fields to update
@@ -277,7 +280,7 @@ export default function MyTasksPage() {
                         )}
 
                         {/* Notification list */}
-                        {!isLoadingMentions && mentionNotifications.map((notif: any) => (
+                        {!isLoadingMentions && mentionNotifications.map((notif) => (
                             <div
                                 key={notif.notification_id}
                                 className={`mb-2 flex cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 transition-all hover:border-[#e0e7ff] hover:bg-[#f5f7ff] ${
@@ -366,7 +369,7 @@ export default function MyTasksPage() {
                                     {columns.priority && <div className="w-27.5 shrink-0 pl-2"><span className="text-[12px] font-semibold text-[#7c828d]">Priority</span></div>}
                                 </div>
 
-                                {group.tasks.map((task: any) => (
+                                {group.tasks.map((task: Task) => (
                                     <div
                                         key={task.task_id}
                                         className="group/row flex items-center border-b border-[#f3f4f6] py-1.5 pl-8 pr-4 hover:bg-[#fafbfc] transition-colors cursor-pointer"
@@ -390,7 +393,7 @@ export default function MyTasksPage() {
                                                     <div className="flex min-h-6 items-center px-1 rounded hover:bg-[#eef0f5] transition-colors" onClick={(e) => { e.stopPropagation(); setActivePopover({ taskId: task.task_id, field: 'assignee' }); }}>
                                                         {task.assignees?.length > 0 ? (
                                                             <div className="flex -space-x-1">
-                                                                {task.assignees.map((a: any) => (
+                                                                {task.assignees.map((a: Assignee) => (
                                                                     <Avatar key={a.user_id} size={24} src={a.avatar_url} style={{ backgroundColor: '#1e1f21', fontSize: '10px' }} className="border-2 border-white">
                                                                         {!a.avatar_url && getInitials(a.name)}
                                                                     </Avatar>
@@ -450,6 +453,7 @@ export default function MyTasksPage() {
                 groups={modalGroups}
                 lists={allLists}
                 defaultListId={allLists.length > 0 ? allLists[0].id : undefined}
+                spaceId={activeSpaceId ?? undefined}
             />
         </div>
     );

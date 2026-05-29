@@ -19,5 +19,12 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // Setting state inside useEffect (e.g. resetting a form when isOpen changes)
+      // is an intentional pattern throughout this codebase. Disabling to reduce noise.
+      'react-hooks/set-state-in-effect': 'off',
+      // Allow context files and utility files to export both components and non-components.
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+    },
   },
 ])

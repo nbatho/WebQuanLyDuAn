@@ -16,6 +16,7 @@ export default function CreateSprintModal({ isOpen, onClose, onCreate, spaceName
     const [endDate, setEndDate] = useState('');
     const titleRef = useRef<HTMLInputElement>(null);
 
+     
     useEffect(() => {
         if (isOpen) {
             setName('');

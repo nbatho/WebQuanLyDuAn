@@ -33,7 +33,7 @@ export const getConversations = (workspaceId: number): Promise<ConversationData[
 export const startDirect = (workspaceId: number, targetUserId: number): Promise<{ conversation_id: number }> =>
     beApi.post('/messages/direct', { workspace_id: workspaceId, target_user_id: targetUserId });
 
-export const createChannel = (workspaceId: number, name: string, memberIds: number[]): Promise<any> =>
+export const createChannel = (workspaceId: number, name: string, memberIds: number[]): Promise<ConversationData> =>
     beApi.post('/messages/channels', { workspace_id: workspaceId, name, member_ids: memberIds });
 
 export const getOrCreateSpaceChat = (workspaceId: number, spaceId: number, spaceName: string): Promise<{ conversation_id: number }> =>
@@ -47,7 +47,7 @@ export const sendMessage = (
     content: string, 
     driveFile?: { url: string; name: string; mimeType: string } | null
 ): Promise<MessageData> => {
-    const body: any = { content };
+    const body: { content: string; fileUrl?: string; fileName?: string; fileType?: string } = { content };
     if (driveFile) {
         body.fileUrl = driveFile.url;
         body.fileName = driveFile.name;
@@ -56,8 +56,8 @@ export const sendMessage = (
     return beApi.post(`/messages/${conversationId}`, body);
 };
 
-export const addMember = (conversationId: number, userId: number): Promise<any> =>
+export const addMember = (conversationId: number, userId: number): Promise<{ success: boolean }> =>
     beApi.post(`/messages/conversations/${conversationId}/members`, { user_id: userId });
 
-export const removeMember = (conversationId: number, userId: number): Promise<any> =>
+export const removeMember = (conversationId: number, userId: number): Promise<{ success: boolean }> =>
     beApi.delete(`/messages/conversations/${conversationId}/members/${userId}`);

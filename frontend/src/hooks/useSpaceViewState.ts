@@ -20,12 +20,14 @@ export function useSpaceViewState(
         priority: true,
     });
 
+     
     useEffect(() => {
         setSelectedTask(null);
         setCtxMenu(null);
         setShowCreateTask(false);
     }, [spaceId, listParam, folderParam]);
 
+     
     useEffect(() => {
         setActiveView('overview');
     }, [spaceId]);

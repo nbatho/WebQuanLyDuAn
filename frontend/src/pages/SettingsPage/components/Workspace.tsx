@@ -31,6 +31,7 @@ export default function Workspace() {
     }, [currentWorkspaceId, dispatch]);
 
     // Populate form whenever detail arrives
+     
     useEffect(() => {
         if (currentWorkspaceDetail) {
             setName(currentWorkspaceDetail.name ?? '');

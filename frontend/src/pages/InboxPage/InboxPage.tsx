@@ -56,6 +56,7 @@ export default function InboxPage() {
         } catch { /* ignore */ }
     }, [currentWsId]);
 
+     
     useEffect(() => {
         loadConvos();
         if (currentWsId) dispatch(fetchWorkspaceMembers(currentWsId));
@@ -70,6 +71,7 @@ export default function InboxPage() {
         } catch { /* ignore */ }
     }, [activeId]);
 
+     
     useEffect(() => {
         loadMessages();
         // Poll every 3s
@@ -216,8 +218,8 @@ export default function InboxPage() {
                     {spaces && spaces.length > 0 && spaceChats.length === 0 && currentWsId && (
                         <button className="mt-4 flex w-full cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#d0d4d9] bg-transparent px-3 py-2 text-[12px] font-semibold text-[#9aa0a6] hover:border-[#0058be] hover:text-[#0058be]"
                             onClick={async () => {
-                                for (const sp of spaces as any[]) {
-                                    await msgApi.getOrCreateSpaceChat(currentWsId, sp.space_id, sp.name);
+                                for (const sp of spaces) {
+                                    await msgApi.getOrCreateSpaceChat(currentWsId, sp.spaceId, sp.name);
                                 }
                                 loadConvos();
                             }}>

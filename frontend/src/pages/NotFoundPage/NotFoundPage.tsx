@@ -41,7 +41,7 @@ export default function NotFoundPage() {
                     </button>
                     <button
                         className="notfound-btn notfound-btn--secondary"
-                        onClick={() => navigate(-1 as any)}
+                        onClick={() => navigate(-1)}
                     >
                         <ArrowLeft size={16} />
                         Quay lại

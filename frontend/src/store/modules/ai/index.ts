@@ -16,12 +16,12 @@ const initialState: AIState = {
 
 export const fetchAIChat = createAsyncThunk<
     ChatWithAIResponse,
-    { message: string; history: { role: 'user' | 'assistant'; content: string }[] }
+    { message: string; history: { role: 'user' | 'ai'; content: string }[] }
 >(
     'ai/chat',
     async ({ message, history }, { rejectWithValue }) => {
         try {
-            const response = await chatWithAI(message, history as any);
+            const response = await chatWithAI(message, history);
             return response;
         } catch (error: unknown) {
             return rejectWithValue(

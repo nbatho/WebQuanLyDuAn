@@ -113,6 +113,7 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
         return groups.map(g => ({ id: g.id, name: g.name, color: g.color }));
     }, [groups]);
 
+     
     useEffect(() => {
         if (task) {
             setTaskTitle(task.name || '');

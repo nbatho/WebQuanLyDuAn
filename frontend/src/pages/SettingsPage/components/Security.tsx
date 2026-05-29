@@ -5,7 +5,7 @@ import {
   fetchVerifyChangePassword,
   clearChangePasswordState,
 } from '@/store/modules/users';
-import type { AppDispatch } from '@/store/configureStore';
+import type { AppDispatch, RootState } from '@/store/configureStore';
 import { Eye, EyeOff, Check, AlertCircle, Loader2, Mail, ArrowLeft, RotateCcw } from 'lucide-react';
 
 // ─── OTP Input ──────────────────────────────────────────────────────────────
@@ -75,7 +75,7 @@ export default function Security() {
     errorRequestOtp,
     isVerifyingOtp,
     errorVerifyOtp,
-  } = useSelector((state: any) => state.users);
+  } = useSelector((state: RootState) => state.users);
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -88,8 +88,11 @@ export default function Security() {
   const [countdown, setCountdown] = useState(0);
 
   // Countdown timer khi OTP đã gửi
+   
   useEffect(() => {
-    if (otpRequested && countdown === 0) setCountdown(60);
+    if (otpRequested) {
+      setCountdown((c) => (c === 0 ? 60 : c));
+    }
   }, [otpRequested]);
 
   useEffect(() => {
@@ -99,6 +102,7 @@ export default function Security() {
   }, [countdown]);
 
   // Reset form sau khi đổi thành công
+   
   useEffect(() => {
     if (changePasswordSuccess) {
       setCurrentPassword('');

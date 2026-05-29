@@ -2,7 +2,6 @@ import React, { useState, createContext, useContext, useCallback, useEffect } fr
 import { useParams } from 'react-router-dom';
 import {
     Plus, ListTodo,
-    ChevronDown,
 } from 'lucide-react';
 
 import { useSpaceTree } from '../../layouts/AppLayout/SpaceTreeContext';
@@ -16,8 +15,10 @@ import type { AppDispatch, RootState } from '@/store/configureStore';
 import { fetchTasksForList, fetchCreateTask, fetchUpdateTask, fetchDeleteTask, fetchAddAssignee, fetchRemoveAssignee } from '@/store/modules/tasks';
 import { fetchCreateStatus } from '@/store/modules/statuses';
 import type { Task, StatusGroup, NewTaskData, Assignee, TaskViewContextType } from '@/types/tasks';
+// eslint-disable-next-line react-refresh/only-export-components
 export const TaskViewContext = createContext<TaskViewContextType | null>(null);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useTaskView = () => {
     const context = useContext(TaskViewContext);
     if (!context) throw new Error('useTaskView must be used within TaskViewProvider');
@@ -89,12 +90,12 @@ export default function ListViewPage() {
             toRemove.forEach(userId => dispatch(fetchRemoveAssignee({ task_id: taskId, userId })));
         }
 
-        const apiPayload: Record<string, any> = {};
+        const apiPayload: Partial<import('@/store/modules/tasks').TaskData> = {};
         if (updates.name !== undefined) apiPayload.name = updates.name;
         if (updates.description !== undefined) apiPayload.description = updates.description;
         if (updates.due_date !== undefined) apiPayload.due_date = updates.due_date;
         if (updates.status_id !== undefined) apiPayload.status_id = updates.status_id;
-        if (updates.priority_name !== undefined) apiPayload.priority = updates.priority_name;
+        if (updates.priority_name !== undefined) apiPayload.priority = updates.priority_name ?? undefined;
         if (updates.position !== undefined) apiPayload.position = updates.position;
 
         if (Object.keys(apiPayload).length > 0) {
@@ -102,12 +103,12 @@ export default function ListViewPage() {
         }
     }, [dispatch, groups]);
 
-    const handleInlineCreate = useCallback((groupId: number, name: string, extras?: any) => {
+    const handleInlineCreate = useCallback((groupId: number, name: string, extras?: { assignees?: Assignee[]; due_date?: string | null; priority_id?: number | null; priority_name?: string | null; priority_color?: string | null }) => {
         const payload: NewTaskData = {
             name,
             list_id: Number(listId),
             status_id: groupId,
-            priority: extras?.priority || 'Normal',
+            priority: extras?.priority_name || 'Normal',
             due_date: extras?.due_date || null,
             assignee_ids: extras?.assignees?.map((a: Assignee) => a.user_id) || []
         };
@@ -197,6 +198,7 @@ export default function ListViewPage() {
         dispatch(fetchTasksForList(Number(listId)));
     }, [dispatch, listId]);
 
+     
     useEffect(() => {
         if (listTasks.length > 0) {
             setGroups(listTasks);
@@ -237,7 +239,7 @@ export default function ListViewPage() {
                         <button type="button" className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-[#1e1f21] px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-black"
                             onClick={() => setIsCreateTaskOpen(true)}
                         >
-                            <Plus size={14} /> Add Task <ChevronDown size={12} />
+                            <Plus size={14} /> Add Task 
                         </button>
                     </div>
                 </div>
@@ -265,6 +267,7 @@ export default function ListViewPage() {
 
                     lists={[{ id: Number(listInfo.id), name: listInfo.name }]}
                     defaultListId={Number(listInfo.id)}
+                    spaceId={Number(spaceId)}
                 />
             </div>
         </TaskViewContext.Provider>

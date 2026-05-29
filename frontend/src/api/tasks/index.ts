@@ -76,7 +76,7 @@ export const getShareableUsers = async (task_id: number): Promise<ShareableUser[
     return beApi.get(`/tasks/${task_id}/shareable-users`);
 };
 
-export const shareTask = async (task_id: number, user_ids: number[]): Promise<{ message: string; assignees: any[] }> => {
+export const shareTask = async (task_id: number, user_ids: number[]): Promise<{ message: string; assignees: ShareableUser[] }> => {
     return beApi.post(`/tasks/${task_id}/share`, { user_ids });
 };
 

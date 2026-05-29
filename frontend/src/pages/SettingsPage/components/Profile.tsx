@@ -34,6 +34,7 @@ export default function Profile() {
     }, [dispatch]);
 
     // Sync form khi profile được load
+     
     useEffect(() => {
         if (profile) {
             setName(profile.name ?? '');

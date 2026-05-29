@@ -1,3 +1,4 @@
+ 
 import { createContext, useContext, type ReactNode } from 'react';
 import type { SpaceTreeValue } from './spaceTreeTypes';
 
@@ -13,6 +14,7 @@ export function SpaceTreeProvider({
     return <SpaceTreeContext.Provider value={value}>{children}</SpaceTreeContext.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useSpaceTree(): SpaceTreeValue {
     const ctx = useContext(SpaceTreeContext);
     if (!ctx) {

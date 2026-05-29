@@ -18,8 +18,10 @@ import { fetchTasksForSprint, fetchCreateTask, fetchUpdateTask, fetchDeleteTask,
 import { createTaskStatus } from '@/api/statuses';
 import type { Task, StatusGroup, NewTaskData, Assignee, TaskViewContextType } from '@/types/tasks';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const TaskViewContext = createContext<TaskViewContextType | null>(null);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useTaskView = () => {
     const context = useContext(TaskViewContext);
     if (!context) throw new Error('useTaskView must be used within TaskViewProvider');
@@ -83,12 +85,12 @@ export default function SprintViewPage() {
         }
 
         // Các field scalar: gửi lên API
-        const apiPayload: Record<string, any> = {};
+        const apiPayload: Partial<import('@/store/modules/tasks').TaskData> = {};
         if (updates.name !== undefined) apiPayload.name = updates.name;
         if (updates.description !== undefined) apiPayload.description = updates.description;
         if (updates.due_date !== undefined) apiPayload.due_date = updates.due_date;
         if (updates.status_id !== undefined) apiPayload.status_id = updates.status_id;
-        if (updates.priority_name !== undefined) apiPayload.priority = updates.priority_name;
+        if (updates.priority_name !== undefined) apiPayload.priority = updates.priority_name ?? undefined;
         if (updates.position !== undefined) apiPayload.position = updates.position;
 
         if (Object.keys(apiPayload).length > 0) {
@@ -96,12 +98,12 @@ export default function SprintViewPage() {
         }
     }, [dispatch, groups]);
 
-    const handleInlineCreate = useCallback((groupId: number, name: string, extras?: any) => {
+    const handleInlineCreate = useCallback((groupId: number, name: string, extras?: { assignees?: Assignee[]; due_date?: string | null; priority_id?: number | null; priority_name?: string | null; priority_color?: string | null }) => {
         const payload: NewTaskData = {
             name,
             list_id: 0, // Not tied to a specific list by default in sprint view, though technically tasks should belong to lists. We'll leave it 0 or require a list selector if needed.
             status_id: groupId,
-            priority: extras?.priority || 'Normal',
+            priority: extras?.priority_name || 'Normal',
             due_date: extras?.due_date || null,
             assignee_ids: extras?.assignees?.map((a: Assignee) => a.user_id) || []
         };
@@ -138,7 +140,7 @@ export default function SprintViewPage() {
             list_id: payload.list_id,
             taskData: payload
         }));
-    }, [sprintId, spaceId, groups, dispatch]);
+    }, [spaceId, groups, dispatch]);
 
     const handleCreateTask = useCallback((payload: NewTaskData) => {
 
@@ -192,6 +194,7 @@ export default function SprintViewPage() {
         }
     }, [dispatch, spaceId, sprintId]);
 
+     
     useEffect(() => {
         if (listTasks.length > 0) {
             setGroups(listTasks);
@@ -256,6 +259,7 @@ export default function SprintViewPage() {
                     groups={groups.map(g => ({ id: g.id, name: g.name, color: g.color }))}
                     lists={[]}
                     defaultListId={0}
+                    spaceId={Number(spaceId)}
                 />
             </div>
         </TaskViewContext.Provider>

@@ -15,6 +15,7 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
     const [showColorPicker, setShowColorPicker] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
+     
     useEffect(() => {
         if (isOpen) {
             setSpaceName('');
