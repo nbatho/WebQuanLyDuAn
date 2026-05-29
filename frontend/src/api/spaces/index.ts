@@ -1,4 +1,5 @@
 import type { SpaceData, SpaceDetail } from "@/store/modules/spaces";
+import type { SpaceMember } from "@/types/spaces";
 import { beApi } from "../callApi";
 export interface FolderData {
     folder_id: number;
@@ -37,7 +38,7 @@ export const deleteSpace = async (space_id: number) => {
     return beApi.delete(`/spaces/${space_id}`);
 }
 
-export const getSpaceMembers = async (space_id: number) => {
+export const getSpaceMembers = async (space_id: number): Promise<SpaceMember[]> => {
     return beApi.get(`/spaces/${space_id}/members`);
 }
 

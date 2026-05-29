@@ -3,10 +3,27 @@ export interface ActivityLog {
     task_id: number;
     user_id: number | null;
     action: ActivityAction;
+    /** Nhãn tiếng Việt, được tạo bởi CASE expression ở backend */
+    action_label: string;
     old_value: unknown;
     new_value: unknown;
     created_at: string;
-    // Joined fields from BE query
+
+    // ── Task context (joined từ tasks) ────────────────────────────────────────
+    task_name: string;
+    priority: 'Urgent' | 'High' | 'Normal' | 'Low' | 'Clear';
+
+    // ── List context (joined từ lists) ────────────────────────────────────────
+    list_id: number;
+    list_name: string;
+    /** Chỉ có trong findActivitiesByUserId */
+    space_id?: number;
+
+    // ── Status context (joined từ task_status) ────────────────────────────────
+    status_name: string | null;
+    status_color: string | null;
+
+    // ── Actor (joined từ users) ───────────────────────────────────────────────
     username: string | null;
     user_name: string | null;
     avatar_url: string | null;

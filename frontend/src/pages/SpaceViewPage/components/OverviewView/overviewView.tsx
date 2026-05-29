@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     FolderOpen,
@@ -14,19 +14,12 @@ import {
     BarChart3,
 } from 'lucide-react';
 import type { SpaceTreeData } from '@/types/tree';
-import type { ActivityLog } from '@/types/activityLogs';
-import { getActivitiesBySpace } from '@/api/activityLogs';
+import type { SpaceMember } from '@/types/spaces';
 import { getSpaceMembers } from '@/api/spaces';
-import { useAppSelector } from '@/hooks';
-import './overviewView.css';
+import { useAppSelector, useAppDispatch } from '@/hooks';
+import { fetchActivitiesBySpace, clearActivities } from '@/store/modules/activityLogs';
 
-interface SpaceMember {
-    user_id: number;
-    name: string;
-    email: string;
-    avatar_url: string | null;
-    role_name: string;
-}
+import './overviewView.css';
 
 interface Props {
     spaceId?: string;
@@ -44,25 +37,6 @@ function timeAgo(dateStr: string): string {
     const d = Math.floor(h / 24);
     return `${d} ngày trước`;
 }
-
-const ACTION_LABELS: Record<string, string> = {
-    created: 'đã tạo task',
-    updated: 'đã cập nhật task',
-    deleted: 'đã xoá task',
-    status_changed: 'đã đổi trạng thái',
-    priority_changed: 'đã đổi ưu tiên',
-    assigned: 'đã phân công',
-    unassigned: 'đã gỡ phân công',
-    commented: 'đã bình luận',
-    attachment_added: 'đã thêm file đính kèm',
-    attachment_removed: 'đã xoá file đính kèm',
-    due_date_changed: 'đã đổi hạn chót',
-    moved: 'đã di chuyển task',
-    timer_started: 'đã bắt đầu bấm giờ',
-    timer_stopped: 'đã dừng bấm giờ',
-    sprint_assigned: 'đã gán sprint',
-    subtask_added: 'đã thêm subtask',
-};
 
 function getInitials(name: string): string {
     return name
@@ -84,6 +58,7 @@ function avatarColor(id: number): string {
 /* ── Component ── */
 export default function OverviewView({ spaceId, currentSpaceTree }: Props) {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
 
     // Data from Redux
     const listSpaces = useAppSelector((s) => s.spaces.listSpaces);
@@ -92,33 +67,38 @@ export default function OverviewView({ spaceId, currentSpaceTree }: Props) {
         [listSpaces, spaceId],
     );
 
-    // Local state
-    const [activities, setActivities] = useState<ActivityLog[]>([]);
-    const [loadingActivities, setLoadingActivities] = useState(false);
+    // Activities from Redux
+    const activities = useAppSelector((s) => s.activityLogs.listActivities);
+    const loadingActivities = useAppSelector((s) => s.activityLogs.isLoadingActivities);
+
+    // Members — local state (chưa có Redux module riêng)
     const [members, setMembers] = useState<SpaceMember[]>([]);
     const [loadingMembers, setLoadingMembers] = useState(false);
 
-    // Fetch activities
+    // Fetch activities via Redux
     useEffect(() => {
         if (!spaceId) return;
-        setLoadingActivities(true);
-        getActivitiesBySpace(Number(spaceId), 8)
-            .then((data) => setActivities(Array.isArray(data) ? data : []))
-            .catch(() => setActivities([]))
-            .finally(() => setLoadingActivities(false));
-    }, [spaceId]);
+        void dispatch(fetchActivitiesBySpace({ spaceId: Number(spaceId), limit: 8 }));
+        return () => {
+            dispatch(clearActivities());
+        };
+    }, [spaceId, dispatch]);
 
     // Fetch members
     useEffect(() => {
         if (!spaceId) return;
-        setLoadingMembers(true);
-        getSpaceMembers(Number(spaceId))
-            .then((data: any) => {
-                const list = Array.isArray(data) ? data : data?.data ?? data?.members ?? [];
-                setMembers(list);
-            })
-            .catch(() => setMembers([]))
-            .finally(() => setLoadingMembers(false));
+        const fetchMembers = async () => {
+            setLoadingMembers(true);
+            try {
+                const data = await getSpaceMembers(Number(spaceId));
+                setMembers(data);
+            } catch {
+                setMembers([]);
+            } finally {
+                setLoadingMembers(false);
+            }
+        };
+        void fetchMembers();
     }, [spaceId]);
 
     // Compute stats from tree
@@ -267,7 +247,7 @@ export default function OverviewView({ spaceId, currentSpaceTree }: Props) {
                                             <div className="activity-content">
                                                 <p>
                                                     <strong>{act.user_name || act.username || 'Ai đó'}</strong>{' '}
-                                                    {ACTION_LABELS[act.action] || act.action}
+                                                    {act.action_label || act.action}
                                                 </p>
                                                 <span className="activity-time">{timeAgo(act.created_at)}</span>
                                             </div>

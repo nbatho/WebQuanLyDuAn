@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useSpaceTree } from '../../layouts/AppLayout/SpaceTreeContext';
 
 import SpaceHeader from './components/SpaceHeader';
-import OverviewView from '@/components/OverviewView/overviewView';
+import OverviewView from '@/pages/SpaceViewPage/components/OverviewView/overviewView';
 
 export default function SpaceViewPage() {
     const { spaceId } = useParams<{ spaceId: string }>();
