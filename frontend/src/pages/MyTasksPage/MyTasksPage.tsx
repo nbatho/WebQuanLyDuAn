@@ -19,7 +19,7 @@ import { fetchMentionNotifications, fetchMarkNotificationAsRead, fetchMarkAllNot
 import { useSpaceTree } from '@/layouts/AppLayout/SpaceTreeContext';
 
 /** --- HELPERS --- **/
-const getInitials = (name: string) => name ? name.substring(0, 2).toUpperCase() : 'NA';
+const getInitials = (name?: string | null) => name ? name.substring(0, 2).toUpperCase() : 'NA';
 const formatDate = (dateString: string | null) => dateString ? new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : null;
 
 function isCompletedTask(task: Task): boolean {

@@ -26,8 +26,9 @@ export default function AssigneePopover({ allMembers = [], assignees = [], onSav
         p.name?.toLowerCase().includes(search.toLowerCase())
     );
 
-    const getInitials = (name: string) => {
-        const parts = name.trim().split(' ');
+    const getInitials = (name?: string | null) => {
+        if (!name) return 'NA';
+        const parts = name.trim().split(/\s+/);
         return parts.length >= 2
             ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
             : name.substring(0, 2).toUpperCase();

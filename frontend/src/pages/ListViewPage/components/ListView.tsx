@@ -4,7 +4,7 @@ import { Avatar } from 'antd';
 import { useTaskView } from '../ListViewPage';
 import TaskDetailModal from '@/components/TaskDetailModal';
 
-const getInitials = (name: string) => name.substring(0, 2).toUpperCase();
+const getInitials = (name?: string | null) => name ? name.substring(0, 2).toUpperCase() : 'NA';
 const formatDate = (dateString: string | null) =>
     dateString ? new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : null;
 

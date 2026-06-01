@@ -23,7 +23,7 @@ export default function InlineCreateTask({ isActive, text, onChangeText, onActiv
     }, [isActive]);
 
     const handleSubmit = () => onSubmit({ assignees, due_date: dueDate, priority_id: priorityId, priority_name: priorityName, priority_color: priorityColor });
-    const getInitials = (name: string) => name.substring(0, 2).toUpperCase();
+    const getInitials = (name?: string | null) => name ? name.substring(0, 2).toUpperCase() : 'NA';
 
     if (isActive) {
         return (

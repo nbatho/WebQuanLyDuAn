@@ -15,7 +15,7 @@ interface TaskDetailSidebarProps {
 
 export default function TaskDetailSidebar({ task, updateTask }: TaskDetailSidebarProps) {
     const [openPopover, setOpenPopover] = useState<'assignee' | 'dueDate' | 'priority' | null>(null);
-    const getInitials = (name: string) => name.substring(0, 2).toUpperCase();
+    const getInitials = (name?: string | null) => name ? name.substring(0, 2).toUpperCase() : 'NA';
     const formatDate = (date: string | null) => date ? new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Set date';
     const listMembers = useSelector((state: RootState) => state.workspaces.listWorkspaceMembers);
 

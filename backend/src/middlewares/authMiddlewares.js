@@ -9,10 +9,6 @@ export const protectedRoute = async (req, res, next) => {
         if (!token) {
             return res.status(401).json({ message: 'Khong tim thay token' });
         }
-        // Kiểm tra token đã bị revoke (user đã đăng xuất) chưa
-        if (isTokenRevoked(token)) {
-            return res.status(401).json({ message: 'Token da bi thu hoi. Vui long dang nhap lai.' });
-        }
         // xác nhận token (synchronous - throws on failure)
         let decoded;
         try {

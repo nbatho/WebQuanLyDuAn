@@ -6,7 +6,7 @@ import { useTaskView } from '../SprintViewPage';
 import TaskDetailModal from '@/components/TaskDetailModal';
 import InlineCreateTask from './InlineCreateTask';
 
-const getInitials = (name: string) => name.substring(0, 2).toUpperCase();
+const getInitials = (name?: string | null) => name ? name.substring(0, 2).toUpperCase() : 'NA';
 const formatDate = (dateString: string | null) =>
     dateString ? new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : null;
 

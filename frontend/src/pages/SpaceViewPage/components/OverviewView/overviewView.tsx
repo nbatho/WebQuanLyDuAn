@@ -38,13 +38,16 @@ function timeAgo(dateStr: string): string {
     return `${d} ngày trước`;
 }
 
-function getInitials(name: string): string {
+function getInitials(name?: string | null): string {
+    if (!name) return '?';
     return name
-        .split(' ')
+        .trim()
+        .split(/\s+/)
         .map((w) => w[0])
+        .filter(Boolean)
         .join('')
         .slice(0, 2)
-        .toUpperCase();
+        .toUpperCase() || '?';
 }
 
 const AVATAR_COLORS = [
