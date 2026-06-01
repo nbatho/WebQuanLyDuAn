@@ -23,10 +23,8 @@ import {
 } from "./routes/index.js";
 import { protectedRoute } from "./middlewares/authMiddlewares.js";
 import { globalErrorHandler, notFoundHandler } from "./middlewares/errorMiddleware.js";
+import { generalLimiter } from "./middlewares/rateLimitMiddleware.js";
 import { ensureMessagingTables } from "./models/Messages.js";
-
-import swaggerUi from "swagger-ui-express";
-import swaggerJsdoc from "swagger-jsdoc";
 
 dotenv.config();
 const app = express();
@@ -40,42 +38,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
-
-//swagger
-const swaggerOptions = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "FLOWISE API",
-      version: "1.0.0",
-      description: "Tài liệu API cho hệ thống quản lý công việc Flowise",
-    },
-    servers: [
-      {
-        url: `http://localhost:${PORT}`,
-        description: "Development Server",
-      },
-    ],
-
-    components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
-        },
-      },
-    },
-    security: [
-      {
-        bearerAuth: [],
-      },
-    ],
-  },
-  apis: ["./src/routes/*.js"],
-};
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(generalLimiter);
 
 //public route
 import fs from 'fs';

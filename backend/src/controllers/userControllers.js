@@ -10,9 +10,10 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// In-memory OTP store: Map<user_id, { otp, newPasswordHash, expiresAt }>
+// In-memory OTP store: Map<user_id, { otp, newPasswordHash, expiresAt, attempts }>
 const otpStore = new Map();
 const OTP_TTL_MS = 10 * 60 * 1000; // 10 phút
+const MAX_OTP_ATTEMPTS = 5;          // tối đa 5 lần thử
 
 export const authMe = async (req, res) => {
     try {
@@ -134,6 +135,7 @@ export const requestPasswordChangeOtp = async (req, res) => {
             otp,
             newPasswordHash,
             expiresAt: Date.now() + OTP_TTL_MS,
+            attempts: 0,
         });
 
         // Gửi email OTP qua Resend
@@ -184,7 +186,14 @@ export const verifyAndChangePassword = async (req, res) => {
             return res.status(400).json({ message: 'Mã OTP đã hết hạn, vui lòng yêu cầu mã mới' });
         }
         if (stored.otp !== otp.trim()) {
-            return res.status(400).json({ message: 'Mã OTP không đúng' });
+            stored.attempts = (stored.attempts || 0) + 1;
+            if (stored.attempts >= MAX_OTP_ATTEMPTS) {
+                otpStore.delete(user_id);
+                return res.status(400).json({ message: 'Quá nhiều lần nhập sai OTP. Vui lòng yêu cầu mã mới.' });
+            }
+            return res.status(400).json({ 
+                message: `Mã OTP không đúng. Còn ${MAX_OTP_ATTEMPTS - stored.attempts} lần thử.` 
+            });
         }
 
         await updatePassword(user_id, stored.newPasswordHash);

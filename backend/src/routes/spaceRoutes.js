@@ -13,11 +13,12 @@ import {
 
 // Import Middleware Phân quyền
 import { requirePermission } from '../middlewares/roleMiddlewares.js';
+import { requireWorkspaceMembership, requireSpaceMembership } from '../middlewares/membershipMiddleware.js';
 
 const router = express.Router();
 
 
-router.get("/workspaces/:workspaceId", getSpacesByWorkspaceId);
+router.get("/workspaces/:workspaceId", requireWorkspaceMembership, getSpacesByWorkspaceId);
 
 
 
@@ -26,7 +27,7 @@ router.post("/workspaces/:workspaceId", requirePermission('SPACE_CREATE'), creat
 
 
 
-router.get("/:spaceId", getSpaceById);
+router.get("/:spaceId", requireSpaceMembership, getSpaceById);
 
 
 
@@ -39,10 +40,10 @@ router.delete("/:spaceId", requirePermission('SPACE_DELETE'), deleteSpaces);
 
 
 
-router.get("/:spaceId/members", getSpaceMembers);
+router.get("/:spaceId/members", requireSpaceMembership, getSpaceMembers);
 
 
-router.get("/spacesDetails/:spaceId", getSpaceDetails);
+router.get("/spacesDetails/:spaceId", requireSpaceMembership, getSpaceDetails);
 
 // Mời thành viên vào Space -> Yêu cầu quyền: SPACE_MANAGE_MEMBERS (Admin + Manager)
 router.post("/:spaceId/members", requirePermission('SPACE_MANAGE_MEMBERS'), inviteMembersToSpace);

@@ -190,6 +190,13 @@ export const chatWithAI = async (req, res) => {
 
         if (!message) return res.status(400).json({ message: "Message is required" });
 
+        // ── Input Validation: chống prompt injection & abuse ──
+        if (typeof message !== 'string' || message.length > 2000) {
+            return res.status(400).json({ message: "Message không hợp lệ hoặc quá dài (tối đa 2000 ký tự)." });
+        }
+        // Giới hạn history để tránh token overload
+        const safeHistory = Array.isArray(history) ? history.slice(-50) : [];
+
         // Lấy danh sách Space thật
         const spaceResult = await con.query(
             "SELECT s.space_id, s.name FROM spaces s JOIN space_members sm ON s.space_id = sm.space_id WHERE sm.user_id = $1 AND s.deleted_at IS NULL AND sm.deleted_at IS NULL",
@@ -223,7 +230,7 @@ export const chatWithAI = async (req, res) => {
                 - Hướng dẫn dùng Flowise
                 `
             },
-            ...(history || []).map(msg => ({
+            ...(safeHistory).map(msg => ({
                 role: msg.role === 'assistant' || msg.role === 'model' || msg.role === 'ai' ? 'assistant' : 'user',
                 content: msg.content
             })),
@@ -273,7 +280,7 @@ export const chatWithAI = async (req, res) => {
                     return res.status(200).json({
                         response: `✅ **Đã tạo Space "${functionArgs.name}" thành công!**\\nHệ thống đã đồng bộ không gian mới này vào tài khoản của bạn. Bạn có muốn tạo task đầu tiên cho nó không?`,
                         suggestions: ["Tạo task mới", "Xem danh sách Space"],
-                        suggestedTitle: history.length === 0 ? `Tạo: ${functionArgs.name}` : null
+                        suggestedTitle: safeHistory.length === 0 ? `Tạo: ${functionArgs.name}` : null
                     });
                 } catch (err) {
                     await dbClient.query('ROLLBACK');

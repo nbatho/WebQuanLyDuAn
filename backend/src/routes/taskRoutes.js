@@ -21,18 +21,19 @@ import {
 
 // Import Middleware Phân quyền
 import { requirePermission } from '../middlewares/roleMiddlewares.js';
+import { requireSpaceMembership } from '../middlewares/membershipMiddleware.js';
 
 const router = express.Router();
 
 /**
- * 1. CÁC API ĐỌC/XEM DỮ LIỆU (GET)
+ * 1. CÁC API ĐỌC/XEM DỮ LIỆU (GET) — Yêu cầu membership trong Space
  */
-router.get('/lists/:listId', getTasksByListId);
-router.get('/spaces/:spaceId/sprints/:sprintId', getTasksBySprintId);
+router.get('/lists/:listId', requireSpaceMembership, getTasksByListId);
+router.get('/spaces/:spaceId/sprints/:sprintId', requireSpaceMembership, getTasksBySprintId);
 router.get('/my-tasks', getTasksByUserId);
-router.get('/:taskId', getTaskById);
-router.get('/:taskId/comments', getCommentsByTaskIds);
-router.get('/:taskId/attachments', getAttachmentsByTaskIds);
+router.get('/:taskId', requireSpaceMembership, getTaskById);
+router.get('/:taskId/comments', requireSpaceMembership, getCommentsByTaskIds);
+router.get('/:taskId/attachments', requireSpaceMembership, getAttachmentsByTaskIds);
 
 /**
  * 2. CÁC API THAO TÁC TRÊN TASK
@@ -73,8 +74,8 @@ router.delete('/:taskId/assignees/:userId', requirePermission('TASK_ASSIGN'), re
 /**
  * 5. CÁC API CHIA SẺ TASK (Share)
  */
-// Lấy danh sách user có thể share
-router.get('/:taskId/shareable-users', getShareableUsersForTask);
+// Lấy danh sách user có thể share — Yêu cầu membership
+router.get('/:taskId/shareable-users', requireSpaceMembership, getShareableUsersForTask);
 
 // Chia sẻ task cho nhiều user -> Yêu cầu quyền: TASK_ASSIGN
 router.post('/:taskId/share', requirePermission('TASK_ASSIGN'), shareTask);

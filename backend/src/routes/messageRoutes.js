@@ -11,6 +11,8 @@ import {
     postMessage,
 } from '../controllers/messageController.js';
 
+import { requireConversationMembership } from '../middlewares/membershipMiddleware.js';
+
 const router = express.Router();
 
 // ── Conversations ────────────────────────────────
@@ -19,12 +21,12 @@ router.post('/direct', startDirectMessage);
 router.post('/channels', createNewChannel);
 router.post('/space', getOrCreateSpaceChat);
 
-// ── Conversation Members ─────────────────────────
-router.post('/conversations/:id/members', addMember);
-router.delete('/conversations/:id/members/:userId', removeMember);
+// ── Conversation Members ───────────────────────── (yêu cầu membership)
+router.post('/conversations/:id/members', requireConversationMembership, addMember);
+router.delete('/conversations/:id/members/:userId', requireConversationMembership, removeMember);
 
-// ── Messages ─────────────────────────────────────
-router.get('/:conversationId', getConversationMessages);
-router.post('/:conversationId', postMessage);
+// ── Messages ───────────────────────────────────── (yêu cầu membership)
+router.get('/:conversationId', requireConversationMembership, getConversationMessages);
+router.post('/:conversationId', requireConversationMembership, postMessage);
 
 export default router;

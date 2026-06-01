@@ -9,6 +9,7 @@ import {
 } from "../controllers/workspacesControllers.js";
 
 import { requirePermission } from '../middlewares/roleMiddlewares.js';
+import { requireWorkspaceMembership } from '../middlewares/membershipMiddleware.js';
 
 const router = express.Router();
 
@@ -19,7 +20,7 @@ router.get("/", getWorkspaces);
 router.post("/", createWorkspaces);
 
 
-router.get("/:workspaceId", getWorkspaceById);
+router.get("/:workspaceId", requireWorkspaceMembership, getWorkspaceById);
 
 // Chỉ Admin mới được cập nhật Workspace
 router.put("/:workspaceId", requirePermission('WORKSPACE_UPDATE'), updateWorkspaces);
@@ -27,8 +28,8 @@ router.put("/:workspaceId", requirePermission('WORKSPACE_UPDATE'), updateWorkspa
 // Chỉ Admin mới được xóa Workspace
 router.delete("/:workspaceId", requirePermission('WORKSPACE_DELETE'), deleteWorkspaces);
 
-// --- Members ---
-router.get("/:workspaceId/members", getWorkspaceMembers);
+// --- Members --- (yêu cầu membership)
+router.get("/:workspaceId/members", requireWorkspaceMembership, getWorkspaceMembers);
 
 
 export default router;
