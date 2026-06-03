@@ -33,7 +33,7 @@ const HOST = process.env.HOST || "0.0.0.0";
 
 //middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: process.env.CLIENT_URL,
   credentials: true,
 }));
 app.use(express.json());
