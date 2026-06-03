@@ -10,7 +10,7 @@ const tools = [
         type: "function",
         function: {
             name: "create_task",
-            description: "Tạo một nhiệm vụ (task) mới vào một Space cụ thể.",
+            description: "Tạo một nhiệm vụ (task) mới vào một Space cụ thể. Nếu người dùng chưa chỉ định gán cho ai thì KHÔNG truyền assignee_name.",
             parameters: {
                 type: "object",
                 properties: {
@@ -18,6 +18,7 @@ const tools = [
                     space_name: { type: "string", description: "Tên của Space muốn tạo task vào." },
                     due_date: { type: "string", description: "Ngày hết hạn (YYYY-MM-DD)." },
                     priority: { type: "string", enum: ["High", "Medium", "Low"], description: "Mức độ ưu tiên." },
+                    assignee_name: { type: "string", description: "Tên hoặc username của thành viên muốn gán task. Chỉ truyền khi người dùng đã chỉ rõ tên người được gán." },
                 },
                 required: ["title", "space_name"],
             },
@@ -219,6 +220,7 @@ export const chatWithAI = async (req, res) => {
                 5. Khi đếm task, trình bày số liệu rõ ràng, dễ hiểu.
                 6. Khi tìm task quá hạn, cảnh báo và gợi ý hành động.
                 7. ĐA NĂNG & THẬN TRỌNG VỚI TOOLS: Bạn hãy thoải mái trò chuyện và giải đáp mọi thắc mắc của người dùng về bất cứ chủ đề gì. TUYỆT ĐỐI KHÔNG gọi hàm (function/tools) trừ khi người dùng RA LỆNH CỤ THỂ (ví dụ: "tạo task", "tạo space", "thống kê task", "tìm task quá hạn"). Nếu người dùng hỏi "bạn làm được gì?", hãy giới thiệu bạn là một AI đa năng có thể làm mọi việc từ trò chuyện, giải đáp kiến thức đến quản lý dự án.
+                8. KHI TẠO TASK: Sau khi xác định được Space, bạn PHẢI hỏi người dùng muốn gán task cho ai. KHÔNG tự động gán. Gọi create_task lần đầu KHÔNG truyền assignee_name để hệ thống trả về danh sách thành viên. Sau khi người dùng chọn, gọi lại create_task với assignee_name.
                 
                 CẤU TRÚC PHẢN HỒI CHUẨN MỰC:
                 Trình bày câu trả lời của bạn, sau đó ĐỂ TRỐNG MỘT DÒNG và cung cấp tối đa 3 câu hỏi gợi ý hành động tiếp theo, bắt đầu bằng "GỢI Ý:" dưới dạng danh sách gạch đầu dòng. Ví dụ:
@@ -266,19 +268,39 @@ export const chatWithAI = async (req, res) => {
                 const dbClient = await con.connect();
                 try {
                     await dbClient.query('BEGIN');
+
+                    // 1. Tạo Space
                     const spaceInsert = await dbClient.query(
                         "INSERT INTO spaces (workspace_id, name, description) VALUES ($1, $2, $3) RETURNING space_id",
                         [workspaceId, functionArgs.name, functionArgs.description || ""]
                     );
                     const newSpaceId = spaceInsert.rows[0].space_id;
+
+                    // 2. Gán admin (user hiện tại) vào space_members
                     await dbClient.query(
                         "INSERT INTO space_members (space_id, user_id) VALUES ($1, $2) ON CONFLICT (space_id, user_id) DO UPDATE SET deleted_at = NULL",
                         [newSpaceId, userId]
                     );
+
+                    // 3. Tạo các trạng thái mặc định cho Space
+                    await dbClient.query(
+                        `INSERT INTO task_status (space_id, status_name, color, position, is_done_state, is_default) VALUES 
+                            ($1, 'TO DO', '#9CA3AF', 0, false, true),
+                            ($1, 'IN PROGRESS', '#2563EB', 1, false, false),
+                            ($1, 'COMPLETE', '#22C55E', 2, true, false)`,
+                        [newSpaceId]
+                    );
+
+                    // 4. Tạo List mặc định "General" (bắt buộc để tạo task)
+                    await dbClient.query(
+                        "INSERT INTO lists (space_id, name, created_by) VALUES ($1, $2, $3)",
+                        [newSpaceId, 'General', userId]
+                    );
+
                     await dbClient.query('COMMIT');
 
                     return res.status(200).json({
-                        response: `✅ **Đã tạo Space "${functionArgs.name}" thành công!**\\nHệ thống đã đồng bộ không gian mới này vào tài khoản của bạn. Bạn có muốn tạo task đầu tiên cho nó không?`,
+                        response: `✅ **Đã tạo Space "${functionArgs.name}" thành công!**\nHệ thống đã tự động gán bạn làm thành viên và tạo danh sách mặc định. Bạn có muốn tạo task đầu tiên cho nó không?`,
                         suggestions: ["Tạo task mới", "Xem danh sách Space"],
                         suggestedTitle: safeHistory.length === 0 ? `Tạo: ${functionArgs.name}` : null
                     });
@@ -303,24 +325,93 @@ export const chatWithAI = async (req, res) => {
                     });
                 }
 
-                // Actually INSERT the task into database
+                // Query danh sách thành viên trong workspace (để gán task)
+                const spaceDetailRes = await con.query(
+                    "SELECT workspace_id FROM spaces WHERE space_id = $1 AND deleted_at IS NULL",
+                    [spaceMatch.space_id]
+                );
+                const wsId = spaceDetailRes.rows[0]?.workspace_id;
+                const membersRes = await con.query(
+                    `SELECT u.user_id, u.username, u.name, u.email 
+                     FROM workspace_members wm 
+                     JOIN users u ON wm.user_id = u.user_id AND u.deleted_at IS NULL
+                     WHERE wm.workspace_id = $1 AND wm.deleted_at IS NULL
+                     ORDER BY u.name ASC`,
+                    [wsId]
+                );
+                const members = membersRes.rows;
+
+                // Nếu chưa chỉ định assignee → hiển thị danh sách thành viên và hỏi
+                if (!functionArgs.assignee_name) {
+                    let memberList = members.map((m, i) => 
+                        `${i + 1}. **${m.name || m.username}** (${m.email})`
+                    ).join('\n');
+
+                    return res.status(200).json({
+                        response: `📋 **Task "${functionArgs.title}"** sẵn sàng được tạo trong Space **${functionArgs.space_name}**!\n\n👥 **Bạn muốn gán task này cho ai?** Danh sách thành viên:\n${memberList}\n\n💡 Hãy cho tôi biết tên người bạn muốn gán, hoặc nói "không gán" để tạo task không gán cho ai.`,
+                        suggestions: members.slice(0, 3).map(m => `Gán cho ${m.name || m.username}`)
+                    });
+                }
+
+                // Đã chỉ định assignee → tìm user trong danh sách members
+                const assigneeName = functionArgs.assignee_name.toLowerCase();
+                const assignee = members.find(m => 
+                    (m.name && m.name.toLowerCase().includes(assigneeName)) ||
+                    (m.username && m.username.toLowerCase().includes(assigneeName))
+                );
+
+                // Tạo task bằng model (tự tìm list_id + status_id mặc định)
+                const listRes = await con.query(
+                    'SELECT list_id FROM lists WHERE space_id = $1 AND deleted_at IS NULL ORDER BY position ASC LIMIT 1',
+                    [spaceMatch.space_id]
+                );
+                if (listRes.rows.length === 0) {
+                    return res.status(200).json({
+                        response: `⚠️ Space "${functionArgs.space_name}" chưa có danh sách (List) nào. Vui lòng tạo List trước.`,
+                        suggestions: ["Tạo Space mới"]
+                    });
+                }
+                const listId = listRes.rows[0].list_id;
+
+                // Tìm status mặc định
+                const statusRes = await con.query(
+                    'SELECT status_id FROM task_status WHERE space_id = $1 AND is_default = true LIMIT 1',
+                    [spaceMatch.space_id]
+                );
+                const statusId = statusRes.rows[0]?.status_id || null;
+
+                // INSERT task
                 const taskInsert = await con.query(
-                    `INSERT INTO tasks (name, space_id, priority, due_date, start_date, created_by)
-                     VALUES ($1, $2, $3, $4, NOW(), $5) RETURNING task_id, name`,
+                    `INSERT INTO tasks (name, list_id, status_id, priority, due_date, start_date, created_by)
+                     VALUES ($1, $2, $3, $4, $5, NOW(), $6) RETURNING task_id, name`,
                     [
                         functionArgs.title,
-                        spaceMatch.space_id,
+                        listId,
+                        statusId,
                         functionArgs.priority || 'Normal',
                         functionArgs.due_date || null,
                         userId
                     ]
                 );
-
                 const newTask = taskInsert.rows[0];
+
+                // Gán assignee nếu tìm thấy
+                let assignMsg = '';
+                if (assignee) {
+                    await con.query(
+                        `INSERT INTO task_assigns (task_id, user_id, assigned_by) VALUES ($1, $2, $3)
+                         ON CONFLICT (task_id, user_id) DO UPDATE SET deleted_at = NULL`,
+                        [newTask.task_id, assignee.user_id, userId]
+                    );
+                    assignMsg = `\n👤 Đã gán cho: **${assignee.name || assignee.username}**`;
+                } else if (assigneeName !== 'không' && assigneeName !== 'không gán') {
+                    assignMsg = `\n⚠️ Không tìm thấy thành viên "${functionArgs.assignee_name}". Task đã được tạo nhưng chưa gán cho ai.`;
+                }
+
                 return res.status(200).json({
-                    response: `✅ **Đã tạo nhiệm vụ: ${newTask.name}** (ID: ${newTask.task_id})\\nVào Space: **${functionArgs.space_name}**`,
+                    response: `✅ **Đã tạo nhiệm vụ: ${newTask.name}** (ID: ${newTask.task_id})\nVào Space: **${functionArgs.space_name}**${assignMsg}`,
                     suggestions: ["Mở danh sách task", "Tạo thêm task"],
-                    suggestedTitle: history.length === 0 ? `Task: ${functionArgs.title}` : null
+                    suggestedTitle: safeHistory.length === 0 ? `Task: ${functionArgs.title}` : null
                 });
             }
 
