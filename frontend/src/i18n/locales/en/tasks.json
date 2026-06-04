@@ -1,0 +1,22 @@
+{
+  "create": {
+    "title": "Create New Task",
+    "createTask": "Create task",
+    "createMilestone": "Create Milestone",
+    "createMilestoneNew": "Create New Milestone",
+    "createFailed": "Failed to create task",
+    "save": "Save ↵"
+  },
+  "sprint": {
+    "create": "Create Sprint",
+    "cancelled": "Cancelled"
+  },
+  "share": {
+    "clearSearch": "Clear search"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "description": "Get notified when you are assigned a new task or there are updates."
+  },
+  "dashboard": "Dashboard"
+}

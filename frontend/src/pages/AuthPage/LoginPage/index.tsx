@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Button, Input, Checkbox, message } from 'antd';
 import { ArrowRight, Mail, Lock, User, CheckCircle, Users, BarChart3, Blocks, GitBranch, Code } from 'lucide-react';
-import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom'; // Thêm useLocation, useSearchParams
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './auth.css';
 import { useDispatch } from 'react-redux';
 import type { AppDispatch } from '@/store/configureStore';
@@ -11,7 +12,7 @@ import { getWorkspaces } from '@/api/workspaces';
 export default function AuthPage() {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
-
+    const { t } = useTranslation('auth');
 
     const location = useLocation();
     const [searchParams] = useSearchParams();
@@ -77,7 +78,7 @@ export default function AuthPage() {
             }
         } catch (error: unknown) {
             console.error('Login failed:', error);
-            message.error(typeof error === 'string' ? error : 'Đăng nhập thất bại. Kiểm tra lại email và mật khẩu.');
+            message.error(typeof error === 'string' ? error : t('login.loginFailed'));
         } finally {
             setIsLoggingIn(false);
         }
@@ -87,7 +88,7 @@ export default function AuthPage() {
         e.preventDefault();
         if (isRegistering) return;
         if (regPass !== regConfirmPass) {
-            message.error('Mật khẩu xác nhận không khớp!');
+            message.error(t('security.mismatch', { ns: 'settings', defaultValue: 'Mật khẩu xác nhận không khớp!' }));
             return;
         }
         setIsRegistering(true);
@@ -97,10 +98,10 @@ export default function AuthPage() {
                 password: regPass,
                 username: regName,
                 name: regName,
-                inviteToken: inviteToken || undefined // Chỉ truyền nếu có token
+                inviteToken: inviteToken || undefined
             })).unwrap();
 
-            message.success('Đăng ký thành công! Đang đăng nhập...');
+            message.success(t('register.success'));
 
             await dispatch(fetchSignIn({ email: regEmail, password: regPass })).unwrap();
 
@@ -111,16 +112,16 @@ export default function AuthPage() {
             }
         } catch (error: unknown) {
             console.error('Registration failed:', error);
-            message.error(typeof error === 'string' ? error : 'Đăng ký thất bại. Vui lòng thử lại.');
+            message.error(typeof error === 'string' ? error : t('register.failed'));
         } finally {
             setIsRegistering(false);
         }
     };
 
     return (
-        <div className="h-screen flex flex-col md:flex-row overflow-hidden">
+        <div className="h-screen flex flex-col md:flex-row overflow-hidden bg-[var(--color-surface-container-lowest)] font-['Plus_Jakarta_Sans',sans-serif]">
             {/* ═══════ LEFT PANEL: Brand Visual (55%) ═══════ */}
-            <section className="relative flex min-h-100 w-full flex-col justify-between overflow-hidden bg-[#0058be] p-10 md:h-screen md:w-[55%] md:p-14">
+            <section className="relative flex min-h-100 w-full flex-col justify-between overflow-hidden bg-[var(--color-primary)] p-10 md:h-screen md:w-[55%] md:p-14">
                 {/* Decorative Geometric Shapes */}
                 <div className="pointer-events-none absolute -left-20 -top-20 h-100 w-100 rounded-full bg-white opacity-5" />
                 <div className="pointer-events-none absolute -right-20 top-1/2 h-62.5 w-62.5 rotate-15 bg-white opacity-[0.08]" />
@@ -129,10 +130,10 @@ export default function AuthPage() {
                 {/* Logo */}
                 <div className="relative z-10">
                     <div className="flex items-center gap-1 mb-8">
-                        <Link to="/" className="text-3xl font-extrabold text-white tracking-tighter no-underline">
+                        <Link to="/" className="text-h1 font-extrabold text-[var(--color-on-primary)] tracking-tighter no-underline">
                             Flowise
                         </Link>
-                        <div className="w-3 h-3 bg-[#825100] rounded-full mt-2" />
+                        <div className="w-3 h-3 bg-[var(--color-tertiary)] rounded-full mt-2" />
                     </div>
                 </div>
 
@@ -144,30 +145,30 @@ export default function AuthPage() {
                             className={`slide-panel-content ${!isRegister ? 'slide-active' : 'slide-exit-up'}`}
                         >
                             <div className="max-w-md">
-                                <h1 className="text-4xl md:text-5xl font-bold text-white leading-[1.1] tracking-tight mb-4">
-                                    Where work feels less like work.
+                                <h1 className="text-display font-bold text-[var(--color-on-primary)] leading-[1.1] tracking-tight mb-4">
+                                    {t('marketing.login.title')}
                                 </h1>
-                                <p className="text-lg text-white/80 mb-8">
-                                    Join 10,000+ teams managing projects with clarity and speed.
+                                <p className="text-h4 text-[var(--color-on-primary)] opacity-80 mb-8">
+                                    {t('marketing.login.subtitle')}
                                 </p>
                                 <div className="space-y-5">
                                     <div className="flex items-center gap-3">
                                         <div className="h-10 w-10 bg-white/15 rounded-lg flex items-center justify-center">
-                                            <CheckCircle size={20} className="text-white" strokeWidth={2.5} />
+                                            <CheckCircle size={20} className="text-[var(--color-on-primary)]" strokeWidth={2.5} />
                                         </div>
-                                        <span className="text-white font-semibold text-base">Milestone tracking</span>
+                                        <span className="text-[var(--color-on-primary)] font-semibold text-body">{t('marketing.login.feature1')}</span>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <div className="h-10 w-10 bg-white/15 rounded-lg flex items-center justify-center">
-                                            <Users size={20} className="text-white" strokeWidth={2.5} />
+                                            <Users size={20} className="text-[var(--color-on-primary)]" strokeWidth={2.5} />
                                         </div>
-                                        <span className="text-white font-semibold text-base">Team collaboration</span>
+                                        <span className="text-[var(--color-on-primary)] font-semibold text-body">{t('marketing.login.feature2')}</span>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <div className="h-10 w-10 bg-white/15 rounded-lg flex items-center justify-center">
-                                            <BarChart3 size={20} className="text-white" strokeWidth={2.5} />
+                                            <BarChart3 size={20} className="text-[var(--color-on-primary)]" strokeWidth={2.5} />
                                         </div>
-                                        <span className="text-white font-semibold text-base">Real-time analytics</span>
+                                        <span className="text-[var(--color-on-primary)] font-semibold text-body">{t('marketing.login.feature3')}</span>
                                     </div>
                                 </div>
                             </div>
@@ -178,35 +179,35 @@ export default function AuthPage() {
                             className={`slide-panel-content ${isRegister ? 'slide-active' : 'slide-exit-down'}`}
                         >
                             <div className="max-w-md">
-                                <h1 className="text-4xl md:text-5xl font-bold text-white leading-[1.1] tracking-tight mb-5">
-                                    Start Automating Today
+                                <h1 className="text-display font-bold text-[var(--color-on-primary)] leading-[1.1] tracking-tight mb-5">
+                                    {t('marketing.register.title')}
                                 </h1>
                                 <div className="space-y-6">
                                     <div className="flex items-start gap-4">
-                                        <div className="bg-[#2170e4] p-3 rounded-lg flex items-center justify-center">
-                                            <Blocks size={22} className="text-white" strokeWidth={2.5} />
+                                        <div className="bg-[var(--color-primary-container)] p-3 rounded-lg flex items-center justify-center">
+                                            <Blocks size={22} className="text-[var(--color-on-primary)]" strokeWidth={2.5} />
                                         </div>
                                         <div>
-                                            <h3 className="text-xl font-bold text-white mb-2">100+ Integrations</h3>
-                                            <p className="text-white/80 leading-relaxed">Connect your entire tech stack seamlessly with pre-built connectors for every major platform.</p>
+                                            <h3 className="text-h2 font-bold text-[var(--color-on-primary)] mb-2">{t('marketing.register.f1Title')}</h3>
+                                            <p className="text-[var(--color-on-primary)] opacity-80 leading-relaxed text-body">{t('marketing.register.f1Desc')}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-start gap-4">
-                                        <div className="bg-[#2170e4] p-3 rounded-lg flex items-center justify-center">
-                                            <GitBranch size={22} className="text-white" strokeWidth={2.5} />
+                                        <div className="bg-[var(--color-primary-container)] p-3 rounded-lg flex items-center justify-center">
+                                            <GitBranch size={22} className="text-[var(--color-on-primary)]" strokeWidth={2.5} />
                                         </div>
                                         <div>
-                                            <h3 className="text-xl font-bold text-white mb-2">Visual Workflow Builder</h3>
-                                            <p className="text-white/80 leading-relaxed">Design complex automation logic through an intuitive drag-and-drop interface. No code required.</p>
+                                            <h3 className="text-h2 font-bold text-[var(--color-on-primary)] mb-2">{t('marketing.register.f2Title')}</h3>
+                                            <p className="text-[var(--color-on-primary)] opacity-80 leading-relaxed text-body">{t('marketing.register.f2Desc')}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-start gap-4">
-                                        <div className="bg-[#2170e4] p-3 rounded-lg flex items-center justify-center">
-                                            <Code size={22} className="text-white" strokeWidth={2.5} />
+                                        <div className="bg-[var(--color-primary-container)] p-3 rounded-lg flex items-center justify-center">
+                                            <Code size={22} className="text-[var(--color-on-primary)]" strokeWidth={2.5} />
                                         </div>
                                         <div>
-                                            <h3 className="text-xl font-bold text-white mb-2">No-code logic</h3>
-                                            <p className="text-white/80 leading-relaxed">Implement advanced branching, filters, and data transformations without writing a single line of script.</p>
+                                            <h3 className="text-h2 font-bold text-[var(--color-on-primary)] mb-2">{t('marketing.register.f3Title')}</h3>
+                                            <p className="text-[var(--color-on-primary)] opacity-80 leading-relaxed text-body">{t('marketing.register.f3Desc')}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -217,32 +218,32 @@ export default function AuthPage() {
 
                 {/* Footer copyright */}
                 <div className="relative z-10">
-                    <p className="text-white/50 text-sm font-medium uppercase tracking-widest">© 2026 Flowise</p>
+                    <p className="text-[var(--color-on-primary)] opacity-50 text-body-sm font-medium uppercase tracking-widest">© 2026 Flowise</p>
                 </div>
             </section>
 
             {/* ═══════ RIGHT PANEL: Form (45%) ═══════ */}
-            <main className="w-full md:w-[45%] h-screen bg-white flex flex-col p-6 md:p-10 overflow-hidden">
+            <main className="w-full md:w-[45%] h-screen bg-[var(--color-surface-container-lowest)] flex flex-col p-6 md:p-10 overflow-hidden">
                 {/* Header Actions */}
                 <div className="flex justify-end mb-4">
                     {!isRegister ? (
-                        <p className="text-[#424754] text-sm font-medium">
-                            New here?{' '}
+                        <p className="text-[var(--color-text-secondary)] text-body-sm font-medium">
+                            {t('login.newHere')}{' '}
                             <button
                                 onClick={() => setIsRegister(true)}
-                                className="text-[#0058be] font-bold hover:underline bg-transparent border-0 cursor-pointer text-sm"
+                                className="text-[var(--color-primary)] font-bold hover:underline bg-transparent border-0 cursor-pointer text-body-sm"
                             >
-                                Create account
+                                {t('login.createAccount')}
                             </button>
                         </p>
                     ) : (
-                        <p className="text-[#424754] text-sm font-medium">
-                            Already have an account?{' '}
+                        <p className="text-[var(--color-text-secondary)] text-body-sm font-medium">
+                            {t('register.hasAccount')}{' '}
                             <button
                                 onClick={() => setIsRegister(false)}
-                                className="text-[#0058be] font-bold hover:underline bg-transparent border-0 cursor-pointer text-sm"
+                                className="text-[var(--color-primary)] font-bold hover:underline bg-transparent border-0 cursor-pointer text-body-sm"
                             >
-                                Sign In
+                                {t('register.signIn')}
                             </button>
                         </p>
                     )}
@@ -256,47 +257,47 @@ export default function AuthPage() {
                             className={`slide-form-content ${!isRegister ? 'slide-active' : 'slide-exit-left'}`}
                         >
                             <header className="mb-6">
-                                <h2 className="text-3xl font-extrabold text-[#141b2b] tracking-tighter mb-1">
-                                    Sign in
+                                <h2 className="text-h1 font-extrabold text-[var(--color-on-surface)] tracking-tighter mb-1">
+                                    {t('login.title')}
                                 </h2>
-                                <p className="text-[#424754] opacity-50 text-base">
-                                    Welcome back. Let's get to work.
+                                <p className="text-[var(--color-text-secondary)] opacity-50 text-body">
+                                    {t('login.welcomeBack')}
                                 </p>
                             </header>
 
                             <form className="space-y-4" onSubmit={handleLogin}>
                                 <div className="space-y-2">
-                                    <label className="block text-xs font-bold text-[#141b2b] uppercase tracking-wider">
-                                        Email Address
+                                    <label className="block text-caption font-bold text-[var(--color-on-surface)] uppercase tracking-wider">
+                                        {t('login.email')}
                                     </label>
                                     <Input
                                         size="large"
-                                        prefix={<Mail size={18} className="text-[#424754]/40" />}
+                                        prefix={<Mail size={18} className="text-[var(--color-text-secondary)] opacity-40" />}
                                         placeholder="name@company.com"
                                         type="email"
                                         value={loginEmail}
                                         onChange={(e) => setLoginEmail(e.target.value)}
                                         disabled={!!urlEmail} // KHÓA Ô NẾU ĐẾN TỪ LỜI MỜI
-                                        className="h-11! bg-[#f1f3ff]! rounded-lg! border-0! text-[#141b2b]! font-medium! disabled:bg-[#e2e6f0]! disabled:text-[#6b7280]!"
+                                        className="h-11! bg-[var(--color-surface-container-low)]! rounded-lg! border-0! text-[var(--color-on-surface)]! font-medium! disabled:bg-[var(--color-surface-variant)]! disabled:text-[var(--color-text-tertiary)]!"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
                                     <div className="flex justify-between items-center">
-                                        <label className="block text-xs font-bold text-[#141b2b] uppercase tracking-wider">
-                                            Password
+                                        <label className="block text-caption font-bold text-[var(--color-on-surface)] uppercase tracking-wider">
+                                            {t('login.password')}
                                         </label>
-                                        <a href="#" className="text-xs font-bold text-[#0058be] hover:underline no-underline">
-                                            Forgot?
+                                        <a href="#" className="text-caption font-bold text-[var(--color-primary)] hover:underline no-underline">
+                                            {t('login.forgotPassword')}
                                         </a>
                                     </div>
                                     <Input.Password
                                         size="large"
-                                        prefix={<Lock size={18} className="text-[#424754]/40" />}
+                                        prefix={<Lock size={18} className="text-[var(--color-text-secondary)] opacity-40" />}
                                         placeholder="••••••••"
                                         value={loginPass}
                                         onChange={(e) => setLoginPass(e.target.value)}
-                                        className="h-11! bg-[#f1f3ff]! rounded-lg! border-0! text-[#141b2b]! font-medium!"
+                                        className="h-11! bg-[var(--color-surface-container-low)]! rounded-lg! border-0! text-[var(--color-on-surface)]! font-medium!"
                                     />
                                 </div>
 
@@ -304,9 +305,9 @@ export default function AuthPage() {
                                     <Checkbox
                                         checked={remember}
                                         onChange={(e) => setRemember(e.target.checked)}
-                                        className="text-sm! font-semibold! text-[#424754]!"
+                                        className="text-body-sm! font-semibold! text-[var(--color-text-secondary)]!"
                                     >
-                                        Remember this device
+                                        {t('login.rememberDevice')}
                                     </Checkbox>
                                 </div>
 
@@ -316,23 +317,23 @@ export default function AuthPage() {
                                     size="large"
                                     block
                                     loading={isLoggingIn}
-                                    className="group h-12! rounded-lg! font-bold! text-base! border-0! flex! items-center! justify-center! gap-2!"
+                                    className="group h-12! rounded-lg! font-bold! text-body! border-0! flex! items-center! justify-center! gap-2! bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white"
                                 >
-                                    <span>Sign into Dashboard</span>
+                                    <span>{t('login.signIntoDashboard')}</span>
                                     {!isLoggingIn && <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />}
                                 </Button>
 
                                 <div className="relative py-2 flex items-center">
-                                    <div className="grow border-t border-[#c2c6d6]" />
-                                    <span className="mx-4 shrink text-xs font-black uppercase tracking-widest text-[#424754]/40">or</span>
-                                    <div className="grow border-t border-[#c2c6d6]" />
+                                    <div className="grow border-t border-[var(--color-border)]" />
+                                    <span className="mx-4 shrink text-caption font-black uppercase tracking-widest text-[var(--color-text-secondary)] opacity-40">{t('login.or')}</span>
+                                    <div className="grow border-t border-[var(--color-border)]" />
                                 </div>
 
                                 <Button
                                     size="large"
                                     block
                                     onClick={() => navigate('/google-login')}
-                                    className="h-12! bg-[#f1f3ff]! text-[#141b2b]! rounded-lg! font-bold! text-base! border-0! flex! items-center! justify-center! gap-3! hover:bg-[#e1e8fd]!"
+                                    className="h-12! bg-[var(--color-surface-container-low)]! text-[var(--color-on-surface)]! rounded-lg! font-bold! text-body! border-0! flex! items-center! justify-center! gap-3! hover:bg-[var(--color-surface-container-high)]!"
                                 >
                                     <svg className="w-6 h-6" viewBox="0 0 24 24">
                                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -340,7 +341,7 @@ export default function AuthPage() {
                                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
                                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                                     </svg>
-                                    <span>Continue with Google</span>
+                                    <span>{t('login.loginWithGoogle')}</span>
                                 </Button>
                             </form>
                         </div>
@@ -350,81 +351,81 @@ export default function AuthPage() {
                             className={`slide-form-content ${isRegister ? 'slide-active' : 'slide-exit-right'}`}
                         >
                             <header className="mb-3">
-                                <h2 className="text-2xl font-extrabold text-[#141b2b] tracking-tight mb-1">
-                                    Create your account
+                                <h2 className="text-h1 font-extrabold text-[var(--color-on-surface)] tracking-tight mb-1">
+                                    {t('register.title')}
                                 </h2>
-                                <p className="text-[#424754] text-sm">
-                                    Join 10,000+ developers building the future of automation.
+                                <p className="text-[var(--color-text-secondary)] text-body-sm">
+                                    {t('register.subtitle')}
                                 </p>
                             </header>
 
                             <form className="space-y-3" onSubmit={handleRegister}>
                                 <div className="space-y-1">
-                                    <label className="block text-xs font-bold text-[#424754] uppercase tracking-widest">
-                                        Full Name
+                                    <label className="block text-caption font-bold text-[var(--color-text-secondary)] uppercase tracking-widest">
+                                        {t('register.name')}
                                     </label>
                                     <Input
                                         size="large"
-                                        prefix={<User size={16} className="text-[#727785]" />}
+                                        prefix={<User size={16} className="text-[var(--color-outline)]" />}
                                         placeholder="John Doe"
                                         value={regName}
                                         onChange={(e) => setRegName(e.target.value)}
-                                        className="h-10! bg-white! rounded-lg! border-2! border-[#c2c6d6]! focus-within:border-[#0058be]! transition-colors!"
+                                        className="h-10! bg-[var(--color-surface-container-lowest)]! rounded-lg! border-2! border-[var(--color-border)]! focus-within:border-[var(--color-primary)]! transition-colors!"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="block text-xs font-bold text-[#424754] uppercase tracking-widest">
-                                        Email Address
+                                    <label className="block text-caption font-bold text-[var(--color-text-secondary)] uppercase tracking-widest">
+                                        {t('register.email')}
                                     </label>
                                     <Input
                                         size="large"
-                                        prefix={<Mail size={16} className="text-[#727785]" />}
+                                        prefix={<Mail size={16} className="text-[var(--color-outline)]" />}
                                         placeholder="name@company.com"
                                         type="email"
                                         value={regEmail}
                                         onChange={(e) => setRegEmail(e.target.value)}
                                         disabled={!!urlEmail} // KHÓA Ô NẾU ĐẾN TỪ LỜI MỜI
-                                        className="h-12! bg-white! rounded-lg! border-2! border-[#c2c6d6]! focus-within:border-[#0058be]! transition-colors! disabled:bg-[#f3f4f6]! disabled:text-[#9ca3af]!"
+                                        className="h-12! bg-[var(--color-surface-container-lowest)]! rounded-lg! border-2! border-[var(--color-border)]! focus-within:border-[var(--color-primary)]! transition-colors! disabled:bg-[var(--color-surface-subtle)]! disabled:text-[var(--color-text-tertiary)]!"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="block text-xs font-bold text-[#424754] uppercase tracking-widest">
-                                        Password
+                                    <label className="block text-caption font-bold text-[var(--color-text-secondary)] uppercase tracking-widest">
+                                        {t('register.password')}
                                     </label>
                                     <Input.Password
                                         size="large"
-                                        prefix={<Lock size={16} className="text-[#727785]" />}
+                                        prefix={<Lock size={16} className="text-[var(--color-outline)]" />}
                                         placeholder="••••••••"
                                         value={regPass}
                                         onChange={(e) => setRegPass(e.target.value)}
-                                        className="h-12! bg-white! rounded-lg! border-2! border-[#c2c6d6]! focus-within:border-[#0058be]! transition-colors!"
+                                        className="h-12! bg-[var(--color-surface-container-lowest)]! rounded-lg! border-2! border-[var(--color-border)]! focus-within:border-[var(--color-primary)]! transition-colors!"
                                     />
-                                    <p className="text-xs text-[#424754]">Must be at least 8 characters with a symbol.</p>
+                                    <p className="text-caption text-[var(--color-text-secondary)]">{t('register.passwordHint')}</p>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="block text-xs font-bold text-[#424754] uppercase tracking-widest">
-                                        Confirm Password
+                                    <label className="block text-caption font-bold text-[var(--color-text-secondary)] uppercase tracking-widest">
+                                        {t('register.confirmPassword')}
                                     </label>
                                     <Input.Password
                                         size="large"
-                                        prefix={<Lock size={16} className="text-[#727785]" />}
+                                        prefix={<Lock size={16} className="text-[var(--color-outline)]" />}
                                         placeholder="••••••••"
                                         value={regConfirmPass}
                                         onChange={(e) => setRegConfirmPass(e.target.value)}
-                                        className="h-12! bg-white! rounded-lg! border-2! border-[#c2c6d6]! focus-within:border-[#0058be]! transition-colors!"
+                                        className="h-12! bg-[var(--color-surface-container-lowest)]! rounded-lg! border-2! border-[var(--color-border)]! focus-within:border-[var(--color-primary)]! transition-colors!"
                                     />
-                                    <p className="text-xs text-[#424754]">Must be at least 8 characters with a symbol.</p>
+                                    <p className="text-caption text-[var(--color-text-secondary)]">{t('register.passwordHint')}</p>
                                 </div>
 
                                 <div className="py-1">
                                     <Checkbox
                                         checked={agreed}
                                         onChange={(e) => setAgreed(e.target.checked)}
-                                        className="text-sm! text-[#424754]!"
+                                        className="text-body-sm! text-[var(--color-text-secondary)]!"
                                     >
-                                        I agree to the <a href="#" className="text-[#0058be] hover:underline">Terms of Service</a> and <a href="#" className="text-[#0058be] hover:underline">Privacy Policy</a>.
+                                        {t('register.agreeTerms')} <a href="#" className="text-[var(--color-primary)] hover:underline">{t('register.termsOfService')}</a> {t('register.and')} <a href="#" className="text-[var(--color-primary)] hover:underline">{t('register.privacyPolicy')}</a>.
                                     </Checkbox>
                                 </div>
 
@@ -434,20 +435,20 @@ export default function AuthPage() {
                                     size="large"
                                     block
                                     loading={isRegistering}
-                                    className="h-11! rounded-lg! font-bold! text-sm! border-0!"
+                                    className="h-11! rounded-lg! font-bold! text-body-sm! border-0! bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white"
                                 >
-                                    Create Account
+                                    {t('register.createAccount')}
                                 </Button>
                             </form>
 
                             {/* Social register */}
-                            <div className="mt-4 pt-3 border-t border-[#e1e8fd] text-center">
-                                <p className="text-xs font-medium text-[#424754] mb-2">Or register with</p>
+                            <div className="mt-4 pt-3 border-t border-[var(--color-surface-container-highest)] text-center">
+                                <p className="text-caption font-medium text-[var(--color-text-secondary)] mb-2">{t('register.orRegisterWith')}</p>
                                 <Button
                                     size="middle"
                                     block
                                     onClick={() => navigate('/google-login')}
-                                    className="h-10! bg-[#f1f3ff]! rounded-lg! font-bold! border-0! flex! items-center! justify-center! gap-2! hover:bg-[#e1e8fd]!"
+                                    className="h-10! bg-[var(--color-surface-container-low)]! rounded-lg! font-bold! border-0! flex! items-center! justify-center! gap-2! hover:bg-[var(--color-surface-container-high)]! text-[var(--color-on-surface)]"
                                 >
                                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -455,7 +456,7 @@ export default function AuthPage() {
                                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
                                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                                     </svg>
-                                    Continue with Google
+                                    {t('login.loginWithGoogle')}
                                 </Button>
                             </div>
                         </div>

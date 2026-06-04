@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import {
   fetchRequestPasswordOtp,
   fetchVerifyChangePassword,
@@ -8,7 +9,6 @@ import {
 import type { AppDispatch, RootState } from '@/store/configureStore';
 import { Eye, EyeOff, Check, AlertCircle, Loader2, Mail, ArrowLeft, RotateCcw } from 'lucide-react';
 
-// ─── OTP Input ──────────────────────────────────────────────────────────────
 function OtpInput({ value, onChange, disabled }: { value: string; onChange: (v: string) => void; disabled: boolean }) {
   const refs = useRef<(HTMLInputElement | null)[]>([]);
   const digits = value.padEnd(6, ' ').split('').slice(0, 6);
@@ -57,15 +57,16 @@ function OtpInput({ value, onChange, disabled }: { value: string; onChange: (v: 
           disabled={disabled}
           onChange={(e) => handleChange(i, e)}
           onKeyDown={(e) => handleKey(i, e)}
-          className="h-12 w-11 rounded-lg border border-[#dcdfe4] bg-white text-center text-xl font-bold text-[#141b2b] outline-none transition-all focus:border-[#0058be] focus:shadow-[0_0_0_3px_rgba(0,88,190,0.08)] disabled:bg-[#f8f9fa] disabled:opacity-60"
+          className="h-12 w-11 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-container-lowest)] text-center text-h2 font-bold text-[var(--color-on-surface)] outline-none transition-all focus:border-[var(--color-primary)] focus:shadow-[0_0_0_3px_rgba(0,88,190,0.08)] disabled:bg-[var(--color-surface-subtle)] disabled:opacity-60"
         />
       ))}
     </div>
   );
 }
 
-// ─── Main Component ─────────────────────────────────────────────────────────
 export default function Security() {
+  const { t } = useTranslation('settings');
+  const { t: tc } = useTranslation('common');
   const dispatch = useDispatch<AppDispatch>();
   const {
     changePasswordSuccess,
@@ -87,8 +88,6 @@ export default function Security() {
   const [otp, setOtp] = useState('');
   const [countdown, setCountdown] = useState(0);
 
-  // Countdown timer khi OTP đã gửi
-   
   useEffect(() => {
     if (otpRequested) {
       setCountdown((c) => (c === 0 ? 60 : c));
@@ -97,12 +96,10 @@ export default function Security() {
 
   useEffect(() => {
     if (countdown <= 0) return;
-    const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
-    return () => clearTimeout(t);
+    const tTimer = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(tTimer);
   }, [countdown]);
 
-  // Reset form sau khi đổi thành công
-   
   useEffect(() => {
     if (changePasswordSuccess) {
       setCurrentPassword('');
@@ -117,30 +114,28 @@ export default function Security() {
     return () => { dispatch(clearChangePasswordState()); };
   }, [dispatch]);
 
-  // Bước 1: Gửi OTP
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
     setClientError('');
     if (!currentPassword || !newPassword || !confirmPassword) {
-      setClientError('Vui lòng nhập đầy đủ các trường');
+      setClientError(t('security.fillAllFields'));
       return;
     }
     if (newPassword.length < 6) {
-      setClientError('Mật khẩu mới phải có ít nhất 6 ký tự');
+      setClientError(t('security.minLength'));
       return;
     }
     if (newPassword !== confirmPassword) {
-      setClientError('Mật khẩu mới và xác nhận không khớp');
+      setClientError(t('security.mismatch'));
       return;
     }
     dispatch(fetchRequestPasswordOtp({ currentPassword, newPassword, confirmPassword }));
   };
 
-  // Bước 2: Xác thực OTP
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.length < 6) {
-      setClientError('Vui lòng nhập đủ 6 số OTP');
+      setClientError('Vui lòng nhập đủ 6 số OTP'); // Using generic text
       return;
     }
     setClientError('');
@@ -160,42 +155,40 @@ export default function Security() {
   };
 
   const inputClass =
-    'w-full rounded-lg border border-[#dcdfe4] bg-white px-3 py-2.5 pr-10 text-sm text-[#141b2b] outline-none transition-all duration-150 focus:border-[#0058be] focus:shadow-[0_0_0_3px_rgba(0,88,190,0.08)] disabled:bg-[#f8f9fa] disabled:opacity-60';
+    'w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-container-lowest)] px-3 py-2.5 pr-10 text-body text-[var(--color-on-surface)] outline-none transition-all duration-150 focus:border-[var(--color-primary)] focus:shadow-[0_0_0_3px_rgba(0,88,190,0.08)] disabled:bg-[var(--color-surface-subtle)] disabled:opacity-60';
   const eyeBtnClass =
-    'absolute right-3 top-1/2 -translate-y-1/2 border-none bg-transparent text-[#9aa0a6] hover:text-[#5f6368] cursor-pointer';
+    'absolute right-3 top-1/2 -translate-y-1/2 border-none bg-transparent text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] cursor-pointer';
 
   return (
     <div>
-      <h2 className="mb-1 text-xl font-extrabold text-[#141b2b]">Security</h2>
-      <p className="mb-6 text-[13px] text-[#9aa0a6]">Manage your account security</p>
+      <h2 className="mb-1 text-h2 font-extrabold text-[var(--color-on-surface)]">{t('security.title')}</h2>
+      <p className="mb-6 text-body-sm text-[var(--color-text-tertiary)]">{t('security.subtitle')}</p>
 
-      {/* ── Thành công ── */}
       {changePasswordSuccess && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg border border-[#a7f3d0] bg-[#ecfdf5] px-4 py-3 text-sm text-[#065f46]">
+        <div className="mb-4 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-body-sm text-green-700 dark:border-green-900 dark:bg-green-950 dark:text-green-400">
           <Check size={16} className="shrink-0" />
-          <span>Cập nhật mật khẩu thành công!</span>
+          <span>{t('security.changeSuccess')}</span>
         </div>
       )}
 
       {!changePasswordSuccess && (
         <>
-          {/* ══════════ BƯỚC 1: Form nhập mật khẩu ══════════ */}
           {!otpRequested ? (
             <form onSubmit={handleSendOtp} className="flex max-w-120 flex-col gap-4">
               {(clientError || errorRequestOtp) && (
-                <div className="flex items-center gap-2 rounded-lg border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-sm text-[#991b1b]">
+                <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-body-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
                   <AlertCircle size={16} className="shrink-0" />
                   <span>{clientError || errorRequestOtp}</span>
                 </div>
               )}
 
               <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-[#5f6368]">Current Password</label>
+                <label className="text-caption font-bold text-[var(--color-text-secondary)]">{t('security.currentPassword')}</label>
                 <div className="relative">
                   <input
                     className={inputClass}
                     type={showCurrent ? 'text' : 'password'}
-                    placeholder="Enter current password"
+                    placeholder={t('security.currentPasswordPlaceholder')}
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     disabled={isRequestingOtp}
@@ -207,12 +200,12 @@ export default function Security() {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-[#5f6368]">New Password</label>
+                <label className="text-caption font-bold text-[var(--color-text-secondary)]">{t('security.newPassword')}</label>
                 <div className="relative">
                   <input
                     className={inputClass}
                     type={showNew ? 'text' : 'password'}
-                    placeholder="Enter new password (min 6 characters)"
+                    placeholder={t('security.newPasswordPlaceholder')}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     disabled={isRequestingOtp}
@@ -224,12 +217,12 @@ export default function Security() {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-[#5f6368]">Confirm Password</label>
+                <label className="text-caption font-bold text-[var(--color-text-secondary)]">{t('security.confirmPassword')}</label>
                 <div className="relative">
                   <input
                     className={inputClass}
                     type={showConfirm ? 'text' : 'password'}
-                    placeholder="Confirm new password"
+                    placeholder={t('security.confirmPasswordPlaceholder')}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     disabled={isRequestingOtp}
@@ -243,67 +236,60 @@ export default function Security() {
               <button
                 type="submit"
                 disabled={isRequestingOtp}
-                className="mt-2 flex items-center justify-center gap-2 self-start rounded-lg border-none bg-[#0058be] px-6 py-2.5 text-[13px] font-bold text-white transition-colors duration-150 hover:bg-[#004aab] disabled:cursor-not-allowed disabled:opacity-60"
+                className="mt-2 flex items-center justify-center gap-2 self-start rounded-lg border-none bg-[var(--color-primary)] px-6 py-2.5 text-body-sm font-bold text-white transition-colors duration-150 hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isRequestingOtp ? (
                   <>
                     <Loader2 size={14} className="animate-spin" />
-                    Đang gửi mã xác thực...
+                    {t('security.sendingOtp')}
                   </>
                 ) : (
                   <>
                     <Mail size={14} />
-                    Gửi mã xác thực qua email
+                    {t('security.sendOtp')}
                   </>
                 )}
               </button>
             </form>
           ) : (
-            /* ══════════ BƯỚC 2: Nhập OTP ══════════ */
             <form onSubmit={handleVerifyOtp} className="flex max-w-120 flex-col gap-5">
-              {/* Header */}
-              <div className="rounded-xl border border-[#e2e8f0] bg-[#f8faff] px-5 py-4">
+              <div className="rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface-subtle)] px-5 py-4 dark:bg-[var(--color-surface-container)]">
                 <div className="mb-1 flex items-center gap-2">
-                  <Mail size={16} className="text-[#0058be]" />
-                  <span className="text-sm font-bold text-[#141b2b]">Kiểm tra email của bạn</span>
+                  <Mail size={16} className="text-[var(--color-primary)]" />
+                  <span className="text-body font-bold text-[var(--color-on-surface)]">{t('security.otpSent')}</span>
                 </div>
-                <p className="text-[13px] text-[#5f6368]">
-                  Mã OTP 6 số đã được gửi tới{' '}
-                  <span className="font-semibold text-[#141b2b]">{maskedEmail}</span>.
-                  Mã có hiệu lực trong <span className="font-semibold">10 phút</span>.
+                <p className="text-body-sm text-[var(--color-text-secondary)]">
+                  {t('security.otpSentDesc', { email: maskedEmail })}
                 </p>
               </div>
 
-              {/* Lỗi */}
               {(clientError || errorVerifyOtp) && (
-                <div className="flex items-center gap-2 rounded-lg border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-sm text-[#991b1b]">
+                <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-body-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
                   <AlertCircle size={16} className="shrink-0" />
                   <span>{clientError || errorVerifyOtp}</span>
                 </div>
               )}
 
-              {/* OTP boxes */}
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-[#5f6368]">Nhập mã OTP</label>
+                <label className="text-caption font-bold text-[var(--color-text-secondary)]">{t('security.enterOtp')}</label>
                 <OtpInput value={otp} onChange={setOtp} disabled={isVerifyingOtp} />
               </div>
 
-              {/* Actions */}
               <div className="flex flex-wrap items-center gap-3">
                 <button
                   type="submit"
                   disabled={isVerifyingOtp || otp.length < 6}
-                  className="flex items-center justify-center gap-2 rounded-lg border-none bg-[#0058be] px-6 py-2.5 text-[13px] font-bold text-white transition-colors hover:bg-[#004aab] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex items-center justify-center gap-2 rounded-lg border-none bg-[var(--color-primary)] px-6 py-2.5 text-body-sm font-bold text-white transition-colors hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isVerifyingOtp ? (
                     <>
                       <Loader2 size={14} className="animate-spin" />
-                      Đang xác thực...
+                      {t('security.verifying')}
                     </>
                   ) : (
                     <>
                       <Check size={14} />
-                      Xác nhận & Đổi mật khẩu
+                      {t('security.confirmChange')}
                     </>
                   )}
                 </button>
@@ -312,20 +298,20 @@ export default function Security() {
                   type="button"
                   onClick={handleResendOtp}
                   disabled={countdown > 0 || isVerifyingOtp}
-                  className="flex items-center gap-1.5 rounded-lg border border-[#dcdfe4] bg-white px-4 py-2.5 text-[13px] font-semibold text-[#5f6368] transition-colors hover:bg-[#f3f4f8] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-container-lowest)] px-4 py-2.5 text-body-sm font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-hover)] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <RotateCcw size={13} />
-                  {countdown > 0 ? `Gửi lại (${countdown}s)` : 'Gửi lại mã'}
+                  {countdown > 0 ? `${t('security.resendOtp')} (${countdown}s)` : t('security.resendOtp')}
                 </button>
 
                 <button
                   type="button"
                   onClick={handleBack}
                   disabled={isVerifyingOtp}
-                  className="flex items-center gap-1.5 rounded-lg border-none bg-transparent px-4 py-2.5 text-[13px] font-semibold text-[#5f6368] transition-colors hover:text-[#141b2b] disabled:opacity-50"
+                  className="flex items-center gap-1.5 rounded-lg border-none bg-transparent px-4 py-2.5 text-body-sm font-semibold text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-on-surface)] disabled:opacity-50"
                 >
                   <ArrowLeft size={13} />
-                  Quay lại
+                  {tc('buttons.back')}
                 </button>
               </div>
             </form>

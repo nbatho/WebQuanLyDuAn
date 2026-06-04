@@ -1,0 +1,22 @@
+{
+  "create": {
+    "title": "Tạo Task Mới",
+    "createTask": "Tạo công việc",
+    "createMilestone": "Tạo Milestone",
+    "createMilestoneNew": "Tạo Milestone Mới",
+    "createFailed": "Tạo task thất bại",
+    "save": "Lưu ↵"
+  },
+  "sprint": {
+    "create": "Tạo Sprint",
+    "cancelled": "Đã huỷ"
+  },
+  "share": {
+    "clearSearch": "Xoá tìm kiếm"
+  },
+  "notifications": {
+    "title": "Thông báo",
+    "description": "Thông báo khi bạn được giao task mới hoặc có cập nhật."
+  },
+  "dashboard": "Tổng quan"
+}
