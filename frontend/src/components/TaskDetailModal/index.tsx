@@ -100,7 +100,6 @@ function parseJsonValue(raw: unknown): string {
 export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: TaskDetailModalProps) {
     const dispatch = useDispatch<AppDispatch>();
     const { t, i18n } = useTranslation('tasks');
-    const { t: tc } = useTranslation('common');
     const [isMaximized, setIsMaximized] = useState(false);
     const [activeTab, setActiveTab] = useState<'comments' | 'activity'>('comments');
     const [taskTitle, setTaskTitle] = useState('');
