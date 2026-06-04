@@ -50,10 +50,15 @@
 
     /* ─── Error / Danger ─── */
     --color-error: #ba1a1a;
+    --color-success: #059669;
+    --color-success-bg: #f0fdf4;
+    --color-warning: #d97706;
+    --color-warning-bg: #fffbeb;
 
     /* ─── Border / Outline ─── */
     --color-border: #c2c6d6;
     --color-border-light: #eef0f5;
+    --color-primary-border: rgba(0,88,190,0.2);
     --color-outline: #727785;
     --color-outline-variant: #c2c6d6;
 
@@ -149,10 +154,15 @@
 
     /* ─── Error / Danger ─── */
     --color-error: #ff6b6b;
+    --color-success: #34d399;
+    --color-success-bg: #022c22;
+    --color-warning: #fbbf24;
+    --color-warning-bg: #1c1400;
 
     /* ─── Border / Outline ─── */
     --color-border: #3a3d52;
     --color-border-light: #252838;
+    --color-primary-border: rgba(110,168,255,0.25);
     --color-outline: #5a5e72;
     --color-outline-variant: #3a3d52;
 

@@ -64,5 +64,35 @@
   },
   "errors": {
     "genericError": "Đã xảy ra lỗi. Vui lòng thử lại."
+  },
+  "pageHeader": {
+    "askAI": "Hỏi AI",
+    "share": "Chia sẻ",
+    "overview": "Tổng quan",
+    "list": "Danh sách",
+    "board": "Bảng"
+  },
+  "ai": {
+    "newConversation": "Cuộc trò chuyện mới",
+    "recentChats": "Trò chuyện gần đây",
+    "superAgents": "Super Agents",
+    "createAgent": "Tạo Agent",
+    "allAgents": "Tất cả Agent",
+    "myAgents": "Agent của tôi",
+    "activity": "Hoạt động",
+    "askOrCreate": "Hỏi hoặc Tạo",
+    "newChat": "Cuộc trò chuyện mới",
+    "thinking": "Flowise đang suy nghĩ...",
+    "inputPlaceholder": "Đặt câu hỏi, nhận gợi ý và ý tưởng ngay.",
+    "inputPlaceholder2": "Nói với AI bước tiếp theo",
+    "allSources": "Tất cả nguồn",
+    "createTask": "Tạo Task",
+    "createTaskDesc": "Thêm hành động mới",
+    "setReminder": "Đặt nhắc nhở",
+    "setReminderDesc": "Nhắc về task",
+    "brainstorm": "Brainstorm Ý tưởng",
+    "brainstormDesc": "Tạo ra các khái niệm mới",
+    "findTasks": "Tìm Tasks",
+    "findTasksDesc": "Tìm kiếm task quá hạn"
   }
 }

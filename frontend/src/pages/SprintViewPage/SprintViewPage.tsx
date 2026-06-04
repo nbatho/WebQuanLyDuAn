@@ -1,5 +1,6 @@
 import React, { useState, createContext, useContext, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
     Plus, Zap,
     ChevronDown,
@@ -30,6 +31,7 @@ export const useTaskView = () => {
 
 export default function SprintViewPage() {
     const { sprintId, spaceId } = useParams<{ sprintId: string; spaceId: string }>();
+    const { t } = useTranslation('tasks');
     const { spaces } = useSpaceTree();
     const dispatch = useDispatch<AppDispatch>();
     const listTasks = useSelector((state: RootState) => state.tasks.listTask);
@@ -231,10 +233,10 @@ export default function SprintViewPage() {
                 />
 
                 <div className="flex shrink-0 items-center justify-between border-b border-[var(--color-border-light)] bg-[var(--color-surface-container-lowest)] px-5 py-2">
-                    <button type="button" className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-[#1e1f21] px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-black"
+                    <button type="button" className="flex cursor-pointer items-center gap-1 rounded-md border border-[var(--color-border)] bg-[var(--color-surface-container-high)] px-3 py-1.5 text-caption font-bold text-[var(--color-on-surface)] transition-colors hover:bg-[var(--color-surface-container-highest)] hover:border-[var(--color-border)]"
                         onClick={() => setIsCreateTaskOpen(true)}
                     >
-                        <Plus size={14} /> Add Task <ChevronDown size={12} />
+                        <Plus size={14} /> {t('addTask')} <ChevronDown size={12} />
                     </button>
                 </div>
 

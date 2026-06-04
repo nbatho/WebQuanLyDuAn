@@ -67,7 +67,7 @@ export default function ContextMenu({ x, y, isOpen, onClose, onAction, taskTitle
                     >
                         <item.icon size={14} />
                         <span>{item.label}</span>
-                        {item.hasSubmenu && <ArrowRight size={12} className="ml-auto text-[#c2c9e0]" />}
+                        {item.hasSubmenu && <ArrowRight size={12} className="ml-auto text-[var(--color-text-tertiary)]" />}
                     </button>
                     {item.divider && <div className="mx-2 my-0.75 h-px bg-[#f0f2f5]" />}
                 </div>

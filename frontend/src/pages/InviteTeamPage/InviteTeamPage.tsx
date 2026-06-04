@@ -51,7 +51,7 @@ export default function InviteTeamPage() {
                 </div>
 
                 <nav className="flex flex-col gap-0.75">
-                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg border-l-[3px] border-transparent px-3 py-2.5 text-[11px] font-bold tracking-[0.04em] text-[#6b7280] transition-all hover:bg-[#e8edff]">
+                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg border-l-[3px] border-transparent px-3 py-2.5 text-[11px] font-bold tracking-[0.04em] text-[var(--color-text-secondary)] transition-all hover:bg-[#e8edff]">
                         <Grid3X3 size={15} className="text-[var(--color-text-tertiary)]" />
                         <span>WORKSPACE SETUP</span>
                     </div>
@@ -59,7 +59,7 @@ export default function InviteTeamPage() {
                         <Users size={15} className="text-white" />
                         <span>INVITE TEAM</span>
                     </div>
-                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg border-l-[3px] border-transparent px-3 py-2.5 text-[11px] font-bold tracking-[0.04em] text-[#6b7280] transition-all hover:bg-[#e8edff]">
+                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg border-l-[3px] border-transparent px-3 py-2.5 text-[11px] font-bold tracking-[0.04em] text-[var(--color-text-secondary)] transition-all hover:bg-[#e8edff]">
                         <CheckCircle size={15} className="text-[var(--color-text-tertiary)]" />
                         <span>FINALIZE</span>
                     </div>
@@ -89,7 +89,7 @@ export default function InviteTeamPage() {
                     {/* ── Content ── */}
                     <section className="flex-1 overflow-y-auto px-10 py-7">
                         <h1 className="mb-2 text-[34px] font-black leading-[1.1] tracking-[-0.03em] text-[var(--color-on-surface)]">Invite your team</h1>
-                        <p className="mb-6 max-w-115 text-sm font-medium leading-[1.6] text-[#6b7280]">
+                        <p className="mb-6 max-w-115 text-sm font-medium leading-[1.6] text-[var(--color-text-secondary)]">
                             Collaborative workspaces are 40% more productive. Add your
                             teammates now to start building workflows together and
                             streamline your operations.
@@ -135,7 +135,7 @@ export default function InviteTeamPage() {
                         {/* Divider + Actions */}
                         <div className="my-5 h-px max-w-130 bg-[#e8eaed]" />
                         <div className="flex items-center gap-3">
-                            <button className="border-none bg-transparent px-1 py-2 text-sm font-bold text-[#6b7280] transition-colors hover:text-[var(--color-on-surface)]" onClick={() => navigate('/home')}>Skip for now</button>
+                            <button className="border-none bg-transparent px-1 py-2 text-sm font-bold text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-on-surface)]" onClick={() => navigate('/home')}>Skip for now</button>
                             <button className="rounded-[10px] border-2 border-[#e2e6f0] bg-[var(--color-surface-container-lowest)] px-6 py-2.5 text-sm font-bold text-[var(--color-text-secondary)] transition-all hover:border-[#141b2b] hover:text-[var(--color-on-surface)]" onClick={() => navigate('/workspace-branding')}>Back</button>
                             <Button type="primary" size="large" onClick={handleSendInvites} className="h-11 min-w-35 rounded-[10px] text-[15px] font-extrabold">
                                 Send Invites
@@ -192,16 +192,16 @@ export default function InviteTeamPage() {
                                 {/* Empty slot */}
                                 {invites.some((r) => !r.email.trim()) && (
                                     <div className="flex items-center gap-2.5 opacity-70">
-                                        <div className="h-8 w-8 rounded-full bg-[#eef0f5]" />
+                                        <div className="h-8 w-8 rounded-full bg-[var(--color-surface-container-high)]" />
                                         <div className="min-w-0">
                                             <span className="block overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-bold text-[var(--color-text-tertiary)]">Invite pending…</span>
-                                            <span className="text-xs font-semibold text-[#c2c9e0]">Waiting for input</span>
+                                            <span className="text-xs font-semibold text-[var(--color-text-tertiary)]">Waiting for input</span>
                                         </div>
                                     </div>
                                 )}
                             </div>
 
-                            <div className="rounded-lg bg-[#f8fafc] p-2.5 text-xs font-medium leading-normal text-[#6b7280]">
+                            <div className="rounded-lg bg-[var(--color-surface-hover)] p-2.5 text-xs font-medium leading-normal text-[var(--color-text-secondary)]">
                                 Members will receive an email invitation to join this
                                 workspace. You can manage permissions at any
                                 time in Workspace Settings.

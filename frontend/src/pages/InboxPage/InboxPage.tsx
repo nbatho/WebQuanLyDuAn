@@ -331,7 +331,7 @@ export default function InboxPage() {
                                 <div className="flex items-center justify-between rounded-b-xl bg-[var(--color-surface-container-low)] px-3 py-2 border-t border-[var(--color-border)]">
                                     <div className="flex items-center gap-2">
                                         <button 
-                                            className="cursor-pointer border-none bg-transparent p-1.5 text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-container-high)] hover:text-[var(--color-primary)] rounded-md transition-colors"
+                                            className="cursor-pointer border-none bg-transparent p-1.5 text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-primary)] rounded-md transition-colors"
                                             onClick={handleOpenDrive}
                                             title="Attach from Google Drive"
                                         >

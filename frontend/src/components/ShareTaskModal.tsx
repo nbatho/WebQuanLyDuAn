@@ -90,7 +90,7 @@ export default function ShareTaskModal({ taskId, taskName, isOpen, onClose }: Sh
                     </div>
                     <button
                         onClick={onClose}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg border-none bg-transparent text-[var(--color-text-tertiary)] transition-colors hover:bg-[var(--color-surface-container-high)] hover:text-[var(--color-on-surface)] cursor-pointer"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg border-none bg-transparent text-[var(--color-text-tertiary)] transition-colors hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-on-surface)] cursor-pointer"
                     >
                         <X size={18} />
                     </button>
@@ -155,7 +155,7 @@ export default function ShareTaskModal({ taskId, taskName, isOpen, onClose }: Sh
                                         className={`flex w-full items-center gap-3 rounded-lg border-none px-3 py-2.5 text-left transition-all cursor-pointer ${
                                             isSelected
                                                 ? 'bg-[var(--color-primary-bg)] ring-1 ring-[var(--color-primary-border)]'
-                                                : 'bg-transparent hover:bg-[var(--color-surface-container-high)]'
+                                                : 'bg-transparent hover:bg-[var(--color-surface-hover)]'
                                         }`}
                                     >
                                         {/* Avatar */}
@@ -212,7 +212,7 @@ export default function ShareTaskModal({ taskId, taskName, isOpen, onClose }: Sh
                         )}
                         <button
                             onClick={onClose}
-                            className="rounded-lg border border-[var(--color-border)] bg-transparent px-4 py-2 text-[13px] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-container-high)] cursor-pointer"
+                            className="rounded-lg border border-[var(--color-border)] bg-transparent px-4 py-2 text-[13px] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-hover)] cursor-pointer"
                         >
                             {tc('buttons.cancel', { defaultValue: 'Hủy' })}
                         </button>

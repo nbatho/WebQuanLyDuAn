@@ -236,7 +236,7 @@ export default function ListViewPage() {
 
                 <div className="flex shrink-0 items-center justify-between border-b border-[var(--color-border-light)] bg-[var(--color-surface-container-lowest)] px-5 py-2">
                     <div className="flex items-center gap-1.5">
-                        <button type="button" className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-[#1e1f21] px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-black"
+                        <button type="button" className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-[var(--color-inverse-surface)] px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-black"
                             onClick={() => setIsCreateTaskOpen(true)}
                         >
                             <Plus size={14} /> Add Task 

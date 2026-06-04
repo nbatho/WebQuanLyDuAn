@@ -32,21 +32,21 @@ export default function ListView() {
                         <div className="group flex cursor-pointer items-center gap-2 py-1 mb-2">
                             <button
                                 onClick={(e) => { e.stopPropagation(); toggleGroup(group.id); }}
-                                className="flex h-5 w-5 items-center justify-center text-[#9ca3af] hover:text-[var(--color-text-secondary)]"
+                                className="flex h-5 w-5 items-center justify-center text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"
                             >
                                 {group.isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                             </button>
-                            <div className="flex items-center gap-1.5 rounded-md bg-[#f3f4f6] px-2 py-1">
+                            <div className="flex items-center gap-1.5 rounded-md bg-[var(--color-surface-hover)] px-2 py-1">
                                 <div className="h-3.5 w-3.5 rounded-full border-[1.5px] border-dashed" style={{ borderColor: group.color }} />
-                                <span className="text-[12px] font-semibold text-[#292d34]">{group.name}</span>
+                                <span className="text-[12px] font-semibold text-[var(--color-on-surface)]">{group.name}</span>
                             </div>
-                            <span className="text-[12px] text-[#9ca3af] ml-1">{group.tasks.length}</span>
+                            <span className="text-[12px] text-[var(--color-text-tertiary)] ml-1">{group.tasks.length}</span>
                         </div>
 
                         {group.isExpanded && (
                             <div className="flex flex-col">
                                 {/* ── Column Headers ── */}
-                                <div className="flex items-center border-b border-[#e5e7eb] py-2 pl-8 pr-4">
+                                <div className="flex items-center border-b border-[var(--color-border-light)] py-2 pl-8 pr-4">
                                     <div className="flex-1 pr-4"><span className="text-[12px] font-semibold text-[#7c828d]">Name</span></div>
                                     {columns.assignee && <div className="w-30 shrink-0 pl-2"><span className="text-[12px] font-semibold text-[#7c828d]">Assignee</span></div>}
                                     {columns.dueDate && <div className="w-32.5 shrink-0 pl-2"><span className="text-[12px] font-semibold text-[#7c828d]">Due date</span></div>}
@@ -58,7 +58,7 @@ export default function ListView() {
                                 {group.tasks.map((task) => (
                                     <div
                                         key={task.task_id}
-                                        className="group/row flex items-center border-b border-[#f3f4f6] py-1.5 pl-8 pr-4 hover:bg-[#fafbfc] transition-colors cursor-pointer"
+                                        className="group/row flex items-center border-b border-[var(--color-surface-hover)] py-1.5 pl-8 pr-4 hover:bg-[var(--color-surface-container-low)] transition-colors cursor-pointer"
                                         onClick={() => setSelectedTaskId(task.task_id)}
                                         onContextMenu={(e) => onContextMenu(e, task)}
                                     >
@@ -68,7 +68,7 @@ export default function ListView() {
                                                 className="h-3.5 w-3.5 shrink-0 rounded-full border-[1.5px] border-dashed"
                                                 style={{ borderColor: task.status_color ?? '#9ca3af' }}
                                             />
-                                            <span className="text-[13px] font-medium text-[#292d34] truncate group-hover/row:text-[#7c68ee] transition-colors">
+                                            <span className="text-[13px] font-medium text-[var(--color-on-surface)] truncate group-hover/row:text-[var(--color-accent)] transition-colors">
                                                 {task.name}
                                             </span>
                                         </div>
@@ -90,7 +90,7 @@ export default function ListView() {
                                                         ))}
                                                     </div>
                                                 ) : (
-                                                    <User size={13} className="text-[#d1d5db]" />
+                                                    <User size={13} className="text-[var(--color-border)]" />
                                                 )}
                                             </div>
                                         )}
@@ -103,7 +103,7 @@ export default function ListView() {
                                                         {formatDate(task.due_date)}
                                                     </span>
                                                 ) : (
-                                                    <Calendar size={13} className="text-[#d1d5db]" />
+                                                    <Calendar size={13} className="text-[var(--color-border)]" />
                                                 )}
                                             </div>
                                         )}
@@ -118,7 +118,7 @@ export default function ListView() {
                                                         fill={task.priority_color ?? 'transparent'}
                                                     />
                                                 ) : (
-                                                    <Flag size={13} className="text-[#d1d5db]" />
+                                                    <Flag size={13} className="text-[var(--color-border)]" />
                                                 )}
                                             </div>
                                         )}

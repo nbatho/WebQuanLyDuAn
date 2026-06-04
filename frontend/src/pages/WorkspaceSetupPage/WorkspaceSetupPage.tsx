@@ -60,7 +60,7 @@ export default function WorkspaceSetupPage() {
                     <h1 className="mb-2.5 text-[34px] leading-[1.15] font-black tracking-[-0.03em] text-[var(--color-on-surface)]">
                         What's the name of<br />your workspace?
                     </h1>
-                    <p className="mb-8 text-[15px] font-medium text-[#6b7280]">
+                    <p className="mb-8 text-[15px] font-medium text-[var(--color-text-secondary)]">
                         This is where your team works and collaborates.
                     </p>
 
@@ -80,7 +80,7 @@ export default function WorkspaceSetupPage() {
                     <div className="mb-5">
                         <label className="mb-2 block text-[11px] font-extrabold tracking-[0.08em] text-[var(--color-on-surface)] uppercase">WORKSPACE URL</label>
                         <div className="flex items-stretch overflow-hidden rounded-[10px] border-2 border-[#e2e6f0] transition-colors focus-within:border-[var(--color-primary)]">
-                            <span className="flex select-none items-center whitespace-nowrap border-r-2 border-[#e2e6f0] bg-[#f5f7ff] px-3.5 text-[14px] font-bold text-[#6b7280]">flowise.app/</span>
+                            <span className="flex select-none items-center whitespace-nowrap border-r-2 border-[#e2e6f0] bg-[#f5f7ff] px-3.5 text-[14px] font-bold text-[var(--color-text-secondary)]">flowise.app/</span>
                             <Input
                                 size="large"
                                 value={slug}
@@ -148,7 +148,7 @@ export default function WorkspaceSetupPage() {
                                     <line x1="16" y1="16" x2="21" y2="21" stroke="#9aa0a6" strokeWidth="2.5" strokeLinecap="round" />
                                 </svg>
                             </div>
-                            <div className="h-2 w-[70%] rounded bg-[#c2c9e0]" />
+                            <div className="h-2 w-[70%] rounded bg-[var(--color-text-tertiary)]" />
                         </div>
 
                         {/* Nav Items */}
@@ -203,7 +203,7 @@ export default function WorkspaceSetupPage() {
                     </div>
 
                     {/* Caption */}
-                    <p className="mt-10 max-w-85 text-center text-[13px] leading-normal font-medium italic text-[#6b7280]">
+                    <p className="mt-10 max-w-85 text-center text-[13px] leading-normal font-medium italic text-[var(--color-text-secondary)]">
                         "Changes to your workspace name and logo will update across
                         the entire application interface in real-time."
                     </p>

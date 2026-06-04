@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import type { AppDispatch } from '@/store/configureStore';
 import { fetchAIChat } from '@/store/modules/ai';
 import type { AIChatMessage, ChatSession } from '@/types/ai';
@@ -29,15 +30,15 @@ import {
 
 export default function AIPage() {
     const dispatch = useDispatch<AppDispatch>();
+    const { t } = useTranslation('common');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     
     const [sessions, setSessions] = useState<ChatSession[]>(() => {
         const saved = localStorage.getItem('flowise_ai_sessions');
         if (saved) return JSON.parse(saved);
-        
         return [{
             id: 'default',
-            title: 'Cuộc trò chuyện mới',
+            title: t('ai.newConversation'),
             messages: [],
             timestamp: Date.now()
         }];
@@ -79,7 +80,7 @@ export default function AIPage() {
         const newId = Date.now().toString();
         const newSession: ChatSession = {
             id: newId,
-            title: 'Cuộc trò chuyện mới',
+            title: t('ai.newConversation'),
             messages: [],
             timestamp: Date.now()
         };
@@ -93,7 +94,7 @@ export default function AIPage() {
         
         if (updatedSessions.length === 0) {
             const newId = Date.now().toString();
-            const newSession = { id: newId, title: 'Cuộc trò chuyện mới', messages: [], timestamp: Date.now() };
+            const newSession = { id: newId, title: t('ai.newConversation'), messages: [], timestamp: Date.now() };
             setSessions([newSession]);
             setActiveSessionId(newId);
         } else {
@@ -192,7 +193,7 @@ export default function AIPage() {
         <div className="relative flex h-screen w-full bg-[var(--color-surface-hover)] font-['Plus_Jakarta_Sans',sans-serif]">
             
             <div 
-                className={`flex shrink-0 flex-col bg-[#fafbfc] transition-all duration-300 ease-in-out z-30 ${
+                className={`flex shrink-0 flex-col bg-[var(--color-surface-container-low)] transition-all duration-300 ease-in-out z-30 ${
                     isSidebarOpen ? 'w-60 border-r border-[var(--color-border-light)] opacity-100' : 'w-0 border-none opacity-0 overflow-hidden'
                 }`}
             >
@@ -200,9 +201,9 @@ export default function AIPage() {
                     <span className="text-[14px] font-extrabold text-[var(--color-on-surface)]">AI</span>
                     <div className="flex items-center gap-1.5">
                         <button 
-                            className="flex h-6 w-6 items-center justify-center rounded text-[var(--color-text-tertiary)] hover:bg-[#eef0f5] hover:text-[var(--color-text-secondary)] transition-colors"
+                            className="flex h-6 w-6 items-center justify-center rounded text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-secondary)] transition-colors border-none bg-transparent cursor-pointer"
                             onClick={() => setIsSidebarOpen(false)}
-                            title="Close sidebar"
+                            title={t('buttons.close')}
                         >
                             <PanelLeftClose size={14} />
                         </button>
@@ -217,42 +218,42 @@ export default function AIPage() {
                         <div className="flex items-center justify-center">
                             <Sparkles size={14} className="text-[#e84393]" />
                         </div>
-                        <span>Ask or Create</span>
+                        <span>{t('ai.askOrCreate')}</span>
                     </div>
                 </div>
 
                 <div className="mt-6 flex w-60 flex-col px-2">
                     <div className="mb-1 px-2.5 text-[11px] font-extrabold text-[var(--color-text-tertiary)] uppercase tracking-[0.05em]">
-                        Super Agents
+                        {t('ai.superAgents')}
                     </div>
-                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[#eef0f5] transition-colors">
+                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] transition-colors">
                         <Blocks size={14} className="text-[#3498db]" />
-                        <span>Create Agent</span>
+                        <span>{t('ai.createAgent')}</span>
                     </div>
-                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[#eef0f5] transition-colors">
+                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] transition-colors">
                         <Users2 size={14} className="text-[#e67e22]" />
-                        <span>All Agents</span>
+                        <span>{t('ai.allAgents')}</span>
                     </div>
-                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[#eef0f5] transition-colors">
-                        <UserCircle size={14} className="text-[#2c3e50]" />
-                        <span>My Agents</span>
+                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] transition-colors">
+                        <UserCircle size={14} className="text-[var(--color-text-secondary)]" />
+                        <span>{t('ai.myAgents')}</span>
                     </div>
-                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[#eef0f5] transition-colors">
-                        <History size={14} className="text-[#95a5a6]" />
-                        <span>Activity</span>
+                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] transition-colors">
+                        <History size={14} className="text-[var(--color-text-tertiary)]" />
+                        <span>{t('ai.activity')}</span>
                     </div>
                 </div>
 
                 <div className="mt-6 flex flex-1 flex-col px-2 overflow-y-auto scrollbar-thin">
                     <div className="mb-1 px-2.5 text-[11px] font-extrabold text-[var(--color-text-tertiary)] uppercase tracking-[0.05em]">
-                        Recent Chats
+                        {t('ai.recentChats')}
                     </div>
                     <button 
                         onClick={handleNewChat}
-                        className="mb-2 flex cursor-pointer items-center gap-2.5 rounded-lg border border-dashed border-[#d0d4d9] px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[#eef0f5] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-all"
+                        className="mb-2 flex cursor-pointer items-center gap-2.5 rounded-lg border border-dashed border-[var(--color-border)] px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-all bg-transparent"
                     >
                         <Plus size={14} />
-                        <span>New Conversation</span>
+                        <span>{t('ai.newConversation')}</span>
                     </button>
 
                     <div className="flex flex-col gap-0.5">
@@ -264,8 +265,8 @@ export default function AIPage() {
                                     onClick={() => setActiveSessionId(session.id)}
                                     className={`group relative flex items-center justify-between rounded-lg px-2.5 py-1.5 transition-all cursor-pointer ${
                                         activeSessionId === session.id 
-                                        ? 'bg-[#eef0f5] text-[var(--color-on-surface)]' 
-                                        : 'text-[var(--color-text-secondary)] hover:bg-[#eef0f5] hover:text-[var(--color-on-surface)]'
+                                        ? 'bg-[var(--color-surface-container-high)] text-[var(--color-on-surface)]' 
+                                        : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-on-surface)]'
                                     }`}
                                 >
                                 <div className="flex items-center gap-2 overflow-hidden">
@@ -330,7 +331,7 @@ export default function AIPage() {
                                 </div>
 
                                 <div className="flex flex-col rounded-[22px] bg-[var(--color-surface-container-lowest)] pt-4 pb-2 px-3">
-                                    <textarea
+                                    <input
                                         value={inputValue}
                                         onChange={(e) => setInputValue(e.target.value)}
                                         onKeyDown={(e) => {
@@ -339,14 +340,14 @@ export default function AIPage() {
                                                 handleSendMessage();
                                             }
                                         }}
-                                        placeholder="Get instant answers, insights, and ideas."
+                                        placeholder={t('ai.inputPlaceholder')}
                                         autoFocus
-                                        className="min-h-17.5 max-h-50 w-full resize-none border-none bg-transparent px-3 py-1 text-[15px] font-medium text-[var(--color-on-surface)] outline-none placeholder:text-[#b0b5c1] scrollbar-hide"
+                                        className="min-h-17.5 max-h-50 w-full resize-none border-none bg-transparent px-3 py-1 text-[15px] font-medium text-[var(--color-on-surface)] outline-none placeholder:text-[var(--color-text-tertiary)] scrollbar-hide"
                                     />
                                     
                                     <div className="mt-3 flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <button className="flex h-7 w-7 items-center justify-center rounded bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] transition-colors hover:bg-[#eef0f5]">
+                                            <button className="flex h-7 w-7 items-center justify-center rounded bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-hover)]">
                                                 <Plus size={14} />
                                             </button>
                                             <div className="flex cursor-pointer items-center gap-1.5 px-2 rounded hover:bg-[var(--color-surface-hover)] py-1 transition-colors">
@@ -366,8 +367,8 @@ export default function AIPage() {
                                                 disabled={!inputValue.trim() || isGenerating}
                                                 className={`flex h-8 w-8 items-center justify-center rounded-full transition-all ${
                                                     inputValue.trim() 
-                                                        ? 'bg-[#eef0f5] text-[var(--color-on-surface)] hover:bg-[#dcdfe4]' 
-                                                        : 'bg-[var(--color-surface-hover)] text-[#c2c9e0]'
+                                                        ? 'bg-[var(--color-surface-container-high)] text-[var(--color-on-surface)] hover:bg-[#dcdfe4]' 
+                                                        : 'bg-[var(--color-surface-hover)] text-[var(--color-text-tertiary)]'
                                                 }`}
                                             >
                                                 <ArrowRight size={14} strokeWidth={2.5} />
@@ -413,7 +414,7 @@ export default function AIPage() {
                                         className={`flex w-full ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                                     >
                                         {message.role === 'user' ? (
-                                            <div className="max-w-[70%] rounded-2xl bg-[#eef0f5] px-4 py-2.5 text-[14px] font-medium text-[var(--color-on-surface)]">
+                                            <div className="max-w-[70%] rounded-2xl bg-[var(--color-surface-container-high)] px-4 py-2.5 text-[14px] font-medium text-[var(--color-on-surface)]">
                                                 {message.content}
                                             </div>
                                         ) : (
@@ -429,7 +430,7 @@ export default function AIPage() {
                                                         <span className="text-[13px] font-semibold text-[var(--color-accent)]">Flowise thinking...</span>
                                                     </div>
                                                 ) : (
-                                                    <div className="text-[14px] font-medium leading-[1.6] text-[#3a3f47] markdown-content overflow-hidden">
+                                                    <div className="text-[14px] font-medium leading-[1.6] text-[var(--color-on-surface)] markdown-content overflow-hidden">
                                                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                                             {message.content + (message.isStreaming ? ' █' : '')}
                                                         </ReactMarkdown>
@@ -438,13 +439,13 @@ export default function AIPage() {
                                                 
                                                 {!message.isStreaming && !message.isSearching && (
                                                     <div className="mt-3 flex items-center gap-1">
-                                                        <button className="flex h-7 w-7 items-center justify-center rounded text-[var(--color-text-tertiary)] hover:bg-[#eef0f5] hover:text-[var(--color-text-secondary)] transition-colors">
+                                                        <button className="flex h-7 w-7 items-center justify-center rounded text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-secondary)] transition-colors">
                                                             <Copy size={13} />
                                                         </button>
-                                                        <button className="flex h-7 w-7 items-center justify-center rounded text-[var(--color-text-tertiary)] hover:bg-[#eef0f5] hover:text-[var(--color-text-secondary)] transition-colors">
+                                                        <button className="flex h-7 w-7 items-center justify-center rounded text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-secondary)] transition-colors">
                                                             <CheckSquare size={13} />
                                                         </button>
-                                                        <button className="flex h-7 w-7 items-center justify-center rounded text-[var(--color-text-tertiary)] hover:bg-[#eef0f5] hover:text-[var(--color-text-secondary)] transition-colors">
+                                                        <button className="flex h-7 w-7 items-center justify-center rounded text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-secondary)] transition-colors">
                                                             <FileText size={13} />
                                                         </button>
                                                     </div>
@@ -460,7 +461,7 @@ export default function AIPage() {
                                                                     onClick={() => handleSendMessage(prompt)}
                                                                     className="flex items-center gap-1.5 rounded-full border border-[var(--color-border-light)] bg-[var(--color-surface-container-lowest)] px-3 py-1.5 text-left text-[13px] font-medium text-[var(--color-text-secondary)] shadow-[0_2px_4px_rgb(0,0,0,0.02)] transition-all hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] hover:shadow-sm"
                                                                 >
-                                                                    <span className="text-[#b0b5c1]">↳</span> {prompt}
+                                                                    <span className="text-[var(--color-text-tertiary)]">↳</span> {prompt}
                                                                 </button>
                                                             ))}
                                                         </div>
@@ -488,12 +489,12 @@ export default function AIPage() {
                                             }
                                         }}
                                         placeholder="Tell AI what to do next"
-                                        className="min-h-11 max-h-50 w-full resize-none border-none bg-transparent px-2 py-1 text-[14px] font-medium text-[var(--color-on-surface)] outline-none placeholder:text-[#b0b5c1] scrollbar-hide"
+                                        className="min-h-11 max-h-50 w-full resize-none border-none bg-transparent px-2 py-1 text-[14px] font-medium text-[var(--color-on-surface)] outline-none placeholder:text-[var(--color-text-tertiary)] scrollbar-hide"
                                     />
                                     
                                     <div className="mt-2 flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <button className="flex h-7 w-7 items-center justify-center rounded bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] transition-colors hover:bg-[#eef0f5]">
+                                            <button className="flex h-7 w-7 items-center justify-center rounded bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-hover)]">
                                                 <Plus size={14} />
                                             </button>
                                             <div className="flex items-center gap-1.5 px-2">
@@ -514,8 +515,8 @@ export default function AIPage() {
                                                 disabled={!inputValue.trim() || isGenerating}
                                                 className={`flex h-7 w-7 items-center justify-center rounded-full transition-all ${
                                                     inputValue.trim() 
-                                                        ? 'bg-[#eef0f5] text-[var(--color-on-surface)] hover:bg-[#dcdfe4]' 
-                                                        : 'bg-[var(--color-surface-hover)] text-[#c2c9e0]'
+                                                        ? 'bg-[var(--color-surface-container-high)] text-[var(--color-on-surface)] hover:bg-[#dcdfe4]' 
+                                                        : 'bg-[var(--color-surface-hover)] text-[var(--color-text-tertiary)]'
                                                 }`}
                                             >
                                                 <ArrowRight size={14} strokeWidth={2.5} />

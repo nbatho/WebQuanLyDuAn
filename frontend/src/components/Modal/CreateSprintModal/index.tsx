@@ -79,7 +79,7 @@ export default function CreateSprintModal({ isOpen, onClose, onCreate, spaceName
                         </label>
                         <input
                             ref={titleRef}
-                            className="w-full rounded-lg border border-[var(--color-border-light)] bg-[#f8fafb] px-3 py-2 text-[14px] font-medium text-[var(--color-on-surface)] outline-none transition-all placeholder:text-[#c2c9e0] focus:border-[var(--color-accent)] focus:bg-[var(--color-surface-container-lowest)] focus:shadow-[0_0_0_3px_rgba(124,92,252,0.08)]"
+                            className="w-full rounded-lg border border-[var(--color-border-light)] bg-[var(--color-surface-container-low)] px-3 py-2 text-[14px] font-medium text-[var(--color-on-surface)] outline-none transition-all placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-accent)] focus:bg-[var(--color-surface-container-lowest)] focus:shadow-[0_0_0_3px_rgba(124,92,252,0.08)]"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="Sprint 1"
@@ -95,7 +95,7 @@ export default function CreateSprintModal({ isOpen, onClose, onCreate, spaceName
                             <Target size={11} /> Mục tiêu Sprint
                         </label>
                         <input
-                            className="w-full rounded-lg border border-[var(--color-border-light)] bg-[#f8fafb] px-3 py-2 text-[13px] text-[var(--color-on-surface)] outline-none transition-all placeholder:text-[#c2c9e0] focus:border-[var(--color-accent)] focus:bg-[var(--color-surface-container-lowest)]"
+                            className="w-full rounded-lg border border-[var(--color-border-light)] bg-[var(--color-surface-container-low)] px-3 py-2 text-[13px] text-[var(--color-on-surface)] outline-none transition-all placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-accent)] focus:bg-[var(--color-surface-container-lowest)]"
                             value={goal}
                             onChange={(e) => setGoal(e.target.value)}
                             placeholder="Hoàn thành module đăng nhập..."
@@ -108,7 +108,7 @@ export default function CreateSprintModal({ isOpen, onClose, onCreate, spaceName
                             <AlignLeft size={11} /> Mô tả
                         </label>
                         <textarea
-                            className="min-h-[60px] w-full resize-y rounded-lg border border-[var(--color-border-light)] bg-[#f8fafb] px-3 py-2 text-[13px] text-[var(--color-text-secondary)] outline-none transition-all placeholder:text-[#c2c9e0] focus:border-[var(--color-accent)] focus:bg-[var(--color-surface-container-lowest)]"
+                            className="min-h-[60px] w-full resize-y rounded-lg border border-[var(--color-border-light)] bg-[var(--color-surface-container-low)] px-3 py-2 text-[13px] text-[var(--color-text-secondary)] outline-none transition-all placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-accent)] focus:bg-[var(--color-surface-container-lowest)]"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Thêm mô tả..."
@@ -124,7 +124,7 @@ export default function CreateSprintModal({ isOpen, onClose, onCreate, spaceName
                             </label>
                             <input
                                 type="date"
-                                className="w-full rounded-lg border border-[var(--color-border-light)] bg-[#f8fafb] px-3 py-2 text-[13px] text-[var(--color-on-surface)] outline-none transition-all focus:border-[var(--color-accent)] focus:bg-[var(--color-surface-container-lowest)]"
+                                className="w-full rounded-lg border border-[var(--color-border-light)] bg-[var(--color-surface-container-low)] px-3 py-2 text-[13px] text-[var(--color-on-surface)] outline-none transition-all focus:border-[var(--color-accent)] focus:bg-[var(--color-surface-container-lowest)]"
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
                             />
@@ -135,7 +135,7 @@ export default function CreateSprintModal({ isOpen, onClose, onCreate, spaceName
                             </label>
                             <input
                                 type="date"
-                                className="w-full rounded-lg border border-[var(--color-border-light)] bg-[#f8fafb] px-3 py-2 text-[13px] text-[var(--color-on-surface)] outline-none transition-all focus:border-[var(--color-accent)] focus:bg-[var(--color-surface-container-lowest)]"
+                                className="w-full rounded-lg border border-[var(--color-border-light)] bg-[var(--color-surface-container-low)] px-3 py-2 text-[13px] text-[var(--color-on-surface)] outline-none transition-all focus:border-[var(--color-accent)] focus:bg-[var(--color-surface-container-lowest)]"
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
                             />
@@ -146,7 +146,7 @@ export default function CreateSprintModal({ isOpen, onClose, onCreate, spaceName
                 {/* Footer */}
                 <div className="flex items-center justify-end gap-2 border-t border-[var(--color-border-light)] px-5 py-3.5">
                     <button
-                        className="cursor-pointer rounded-lg border border-[var(--color-border-light)] bg-transparent px-4 py-2 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[#f8fafb]"
+                        className="cursor-pointer rounded-lg border border-[var(--color-border-light)] bg-transparent px-4 py-2 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-container-low)]"
                         onClick={onClose}
                     >
                         Hủy

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Paperclip, MessageSquare, Activity, Save, Clock, User, Tag, Flag, Calendar } from 'lucide-react';
 import { Button, Input, Avatar, Spin } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import type { AppDispatch, RootState } from '@/store/configureStore';
 import type { Task } from '@/types/tasks';
 import type { ActivityAction } from '@/types/activityLogs';
@@ -20,58 +21,62 @@ export interface TaskDetailModalProps {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const ACTION_META: Record<ActivityAction, { label: string; icon: React.ReactNode; color: string }> = {
-    created:             { label: 'đã tạo task',             icon: <Clock size={13} />,    color: '#7c68ee' },
-    updated:             { label: 'đã cập nhật task',        icon: <Clock size={13} />,    color: '#52a7f9' },
-    deleted:             { label: 'đã xóa task',             icon: <Clock size={13} />,    color: '#ef4444' },
-    status_changed:      { label: 'đã thay đổi trạng thái', icon: <Clock size={13} />,    color: '#f59e0b' },
-    priority_changed:    { label: 'đã thay đổi độ ưu tiên', icon: <Flag size={13} />,     color: '#f97316' },
-    assigned:            { label: 'đã giao cho',             icon: <User size={13} />,     color: '#10b981' },
-    unassigned:          { label: 'đã bỏ giao',              icon: <User size={13} />,     color: '#6b7280' },
-    commented:           { label: 'đã bình luận',            icon: <MessageSquare size={13} />, color: '#7c68ee' },
-    attachment_added:    { label: 'đã thêm tệp đính kèm',   icon: <Paperclip size={13} />, color: '#52a7f9' },
-    attachment_removed:  { label: 'đã xóa tệp đính kèm',    icon: <Paperclip size={13} />, color: '#ef4444' },
-    due_date_changed:    { label: 'đã thay đổi hạn chót',   icon: <Calendar size={13} />, color: '#f59e0b' },
-    start_date_changed:  { label: 'đã thay đổi ngày bắt đầu', icon: <Calendar size={13} />, color: '#f59e0b' },
-    moved:               { label: 'đã di chuyển task',       icon: <Clock size={13} />,    color: '#8b5cf6' },
-    archived:            { label: 'đã lưu trữ task',         icon: <Clock size={13} />,    color: '#6b7280' },
-    restored:            { label: 'đã khôi phục task',       icon: <Clock size={13} />,    color: '#10b981' },
-    timer_started:       { label: 'đã bắt đầu tính giờ',    icon: <Clock size={13} />,    color: '#10b981' },
-    timer_stopped:       { label: 'đã dừng tính giờ',        icon: <Clock size={13} />,    color: '#6b7280' },
-    sprint_assigned:     { label: 'đã gắn vào sprint',       icon: <Tag size={13} />,      color: '#7c68ee' },
-    milestone_assigned:  { label: 'đã gắn milestone',        icon: <Tag size={13} />,      color: '#f97316' },
-    tag_added:           { label: 'đã thêm nhãn',            icon: <Tag size={13} />,      color: '#10b981' },
-    tag_removed:         { label: 'đã xóa nhãn',             icon: <Tag size={13} />,      color: '#ef4444' },
-    subtask_added:       { label: 'đã thêm công việc con',   icon: <Clock size={13} />,    color: '#52a7f9' },
-    story_points_changed:{ label: 'đã thay đổi story points',icon: <Flag size={13} />,     color: '#8b5cf6' },
+const ACTION_META: Record<ActivityAction, { labelKey: string; icon: React.ReactNode; color: string }> = {
+    created:             { labelKey: 'activity.created',           icon: <Clock size={13} />,       color: '#7c68ee' },
+    updated:             { labelKey: 'activity.updated',           icon: <Clock size={13} />,       color: '#52a7f9' },
+    deleted:             { labelKey: 'activity.deleted',           icon: <Clock size={13} />,       color: '#ef4444' },
+    status_changed:      { labelKey: 'activity.statusChanged',     icon: <Clock size={13} />,       color: '#f59e0b' },
+    priority_changed:    { labelKey: 'activity.priorityChanged',   icon: <Flag size={13} />,        color: '#f97316' },
+    assigned:            { labelKey: 'activity.assigned',          icon: <User size={13} />,        color: '#10b981' },
+    unassigned:          { labelKey: 'activity.unassigned',        icon: <User size={13} />,        color: '#6b7280' },
+    commented:           { labelKey: 'activity.commented',         icon: <MessageSquare size={13} />, color: '#7c68ee' },
+    attachment_added:    { labelKey: 'activity.attachmentAdded',   icon: <Paperclip size={13} />,   color: '#52a7f9' },
+    attachment_removed:  { labelKey: 'activity.attachmentRemoved', icon: <Paperclip size={13} />,   color: '#ef4444' },
+    due_date_changed:    { labelKey: 'activity.dueDateChanged',    icon: <Calendar size={13} />,    color: '#f59e0b' },
+    start_date_changed:  { labelKey: 'activity.startDateChanged',  icon: <Calendar size={13} />,    color: '#f59e0b' },
+    moved:               { labelKey: 'activity.moved',             icon: <Clock size={13} />,       color: '#8b5cf6' },
+    archived:            { labelKey: 'activity.archived',          icon: <Clock size={13} />,       color: '#6b7280' },
+    restored:            { labelKey: 'activity.restored',          icon: <Clock size={13} />,       color: '#10b981' },
+    timer_started:       { labelKey: 'activity.timerStarted',      icon: <Clock size={13} />,       color: '#10b981' },
+    timer_stopped:       { labelKey: 'activity.timerStopped',      icon: <Clock size={13} />,       color: '#6b7280' },
+    sprint_assigned:     { labelKey: 'activity.sprintAssigned',    icon: <Tag size={13} />,         color: '#7c68ee' },
+    milestone_assigned:  { labelKey: 'activity.milestoneAssigned', icon: <Tag size={13} />,         color: '#f97316' },
+    tag_added:           { labelKey: 'activity.tagAdded',          icon: <Tag size={13} />,         color: '#10b981' },
+    tag_removed:         { labelKey: 'activity.tagRemoved',        icon: <Tag size={13} />,         color: '#ef4444' },
+    subtask_added:       { labelKey: 'activity.subtaskAdded',      icon: <Clock size={13} />,       color: '#52a7f9' },
+    story_points_changed:{ labelKey: 'activity.storyPointsChanged',icon: <Flag size={13} />,        color: '#8b5cf6' },
 };
 
-function formatRelativeTime(dateStr: string): string {
+function formatRelativeTime(dateStr: string, lang: string): string {
     const diff = Date.now() - new Date(dateStr).getTime();
     const mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'vừa xong';
-    if (mins < 60) return `${mins} phút trước`;
-    const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours} giờ trước`;
-    const days = Math.floor(hours / 24);
-    if (days < 30) return `${days} ngày trước`;
-    return new Date(dateStr).toLocaleDateString('vi-VN');
+    if (lang === 'vi') {
+        if (mins < 1) return 'vừa xong';
+        if (mins < 60) return `${mins} phút trước`;
+        const hours = Math.floor(mins / 60);
+        if (hours < 24) return `${hours} giờ trước`;
+        const days = Math.floor(hours / 24);
+        if (days < 30) return `${days} ngày trước`;
+    } else {
+        if (mins < 1) return 'just now';
+        if (mins < 60) return `${mins} min ago`;
+        const hours = Math.floor(mins / 60);
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.floor(hours / 24);
+        if (days < 30) return `${days}d ago`;
+    }
+    return new Date(dateStr).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US');
 }
 
 function parseJsonValue(raw: unknown): string {
     if (raw == null || raw === '') return '';
-
-    // PostgreSQL JSONB: axios đã parse sẵn thành object
     if (typeof raw === 'object') {
         const obj = raw as Record<string, unknown>;
         const named = obj.name ?? obj.title ?? obj.label ?? obj.value;
         if (named != null) return String(named);
-        // Fallback: lấy giá trị đầu tiên có trong object (vd: { status_id: 5 } → '5')
         const firstVal = Object.values(obj)[0];
         return firstVal != null ? String(firstVal) : JSON.stringify(raw);
     }
-
-    // TEXT column: vẫn là string JSON
     if (typeof raw === 'string') {
         try {
             const parsed = JSON.parse(raw);
@@ -87,7 +92,6 @@ function parseJsonValue(raw: unknown): string {
             return raw;
         }
     }
-
     return String(raw);
 }
 
@@ -95,6 +99,8 @@ function parseJsonValue(raw: unknown): string {
 
 export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: TaskDetailModalProps) {
     const dispatch = useDispatch<AppDispatch>();
+    const { t, i18n } = useTranslation('tasks');
+    const { t: tc } = useTranslation('common');
     const [isMaximized, setIsMaximized] = useState(false);
     const [activeTab, setActiveTab] = useState<'comments' | 'activity'>('comments');
     const [taskTitle, setTaskTitle] = useState('');
@@ -104,8 +110,6 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
 
     const groups = useSelector((state: RootState) => state.tasks.listTask);
     const listComments = useSelector((state: RootState) => state.comments.listComments);
-
-    // Activity selectors
     const listActivities = useSelector((state: RootState) => state.activityLogs.listActivities);
     const isLoadingActivities = useSelector((state: RootState) => state.activityLogs.isLoadingActivities);
 
@@ -113,7 +117,6 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
         return groups.map(g => ({ id: g.id, name: g.name, color: g.color }));
     }, [groups]);
 
-     
     useEffect(() => {
         if (task) {
             setTaskTitle(task.name || '');
@@ -126,21 +129,18 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
         return taskTitle !== task.name || taskDesc !== (task.description || '');
     }, [taskTitle, taskDesc, task]);
 
-    // Fetch comments when task opens
     useEffect(() => {
         if (task?.task_id) {
             dispatch(fetchCommentsByTask(task.task_id));
         }
     }, [task?.task_id, dispatch]);
 
-    // Fetch activities when switching to activity tab or when task changes
     useEffect(() => {
         if (task?.task_id && activeTab === 'activity') {
             dispatch(fetchActivitiesByTask(task.task_id));
         }
     }, [task?.task_id, activeTab, dispatch]);
 
-    // Clear activities when modal closes
     useEffect(() => {
         if (!isOpen) {
             dispatch(clearActivities());
@@ -151,23 +151,20 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
 
     const handleUpdate = () => {
         if (!isChanged) return;
-        updateTask(task.task_id, {
-            name: taskTitle,
-            description: taskDesc,
-        });
+        updateTask(task.task_id, { name: taskTitle, description: taskDesc });
     };
 
     const handleCommentSubmit = async () => {
         if (!commentContent.trim() || !task?.task_id) return;
-        await dispatch(fetchCreateComment({
-            taskId: task.task_id,
-            content: commentContent
-        }));
+        await dispatch(fetchCreateComment({ taskId: task.task_id, content: commentContent }));
         setCommentContent('');
     };
 
     return (
-        <div className="fixed inset-0 z-1500 flex items-center justify-center bg-[rgba(20,27,43,0.5)]" onClick={onClose}>
+        <div
+            className="fixed inset-0 z-1500 flex items-center justify-center bg-[rgba(20,27,43,0.6)] backdrop-blur-sm"
+            onClick={onClose}
+        >
             <div
                 className={`${isMaximized
                     ? 'h-screen max-h-screen w-screen max-w-screen rounded-none'
@@ -188,26 +185,36 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
                 <div className="flex flex-1 overflow-hidden">
                     <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-5">
                         {isChanged && (
-                            <div className="flex items-center justify-between rounded-lg bg-[var(--color-primary-bg)] p-3 border border-[#d6e4ff]">
-                                <span className="text-[13px] font-medium text-[var(--color-primary)]">Bạn có thay đổi chưa lưu</span>
-                                <Button type="primary" size="small" icon={<Save size={14} />} onClick={handleUpdate} className="bg-[#7c68ee] hover:bg-[#6b56db] border-none">
-                                    Update
+                            <div className="flex items-center justify-between rounded-lg bg-[var(--color-primary-bg)] p-3 border border-[var(--color-primary-border)]">
+                                <span className="text-body-sm font-medium text-[var(--color-primary)]">
+                                    {t('detail.unsavedChanges')}
+                                </span>
+                                <Button
+                                    type="primary"
+                                    size="small"
+                                    icon={<Save size={14} />}
+                                    onClick={handleUpdate}
+                                    style={{ backgroundColor: 'var(--color-accent)', borderColor: 'transparent' }}
+                                >
+                                    {t('detail.update')}
                                 </Button>
                             </div>
                         )}
 
                         <input
-                            className="w-full border-b-2 border-transparent p-0 text-[22px] font-extrabold text-[#292d34] outline-none transition-colors placeholder:text-[#c2c9e0] focus:border-[#7c68ee]"
+                            className="w-full border-b-2 border-transparent p-0 text-[22px] font-extrabold text-[var(--color-on-surface)] outline-none transition-colors placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-accent)] bg-transparent"
                             value={taskTitle}
                             onChange={(e) => setTaskTitle(e.target.value)}
-                            placeholder="Task name"
+                            placeholder={t('detail.taskName')}
                         />
 
                         <div className="mt-1">
-                            <h3 className="mb-2 text-[13px] font-bold uppercase tracking-[0.04em] text-[#6b7280]">Description</h3>
+                            <h3 className="mb-2 text-caption font-bold uppercase tracking-[0.04em] text-[var(--color-text-secondary)]">
+                                {t('detail.description')}
+                            </h3>
                             <textarea
-                                className="min-h-25 w-full resize-y rounded-lg border border-[#e5e7eb] p-3 text-[13px] leading-6 text-[#292d34] outline-none transition-colors placeholder:text-[#c2c9e0] focus:border-[#7c68ee]"
-                                placeholder="Add a more detailed description..."
+                                className="min-h-25 w-full resize-y rounded-lg border border-[var(--color-border-light)] bg-[var(--color-surface-container-low)] p-3 text-body-sm leading-6 text-[var(--color-on-surface)] outline-none transition-colors placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-accent)]"
+                                placeholder={t('detail.description') + '...'}
                                 value={taskDesc}
                                 onChange={(e) => setTaskDesc(e.target.value)}
                             />
@@ -215,34 +222,35 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
 
                         {/* Attachments */}
                         <div className="mt-1">
-                            <h3 className="mb-2 text-[13px] font-bold uppercase tracking-[0.04em] text-[#6b7280]">Attachments</h3>
-                            <div className="flex cursor-pointer flex-col items-center gap-1.5 rounded-[10px] border-2 border-dashed border-[#e5e7eb] p-6 text-center text-[13px] text-[#9ca3af] transition-all hover:border-[#7c68ee] hover:bg-[#f0f0ff] hover:text-[#6b7280]">
+                            <h3 className="mb-2 text-caption font-bold uppercase tracking-[0.04em] text-[var(--color-text-secondary)]">
+                                {t('detail.attachments')}
+                            </h3>
+                            <div className="flex cursor-pointer flex-col items-center gap-1.5 rounded-[10px] border-2 border-dashed border-[var(--color-border)] p-6 text-center text-body-sm text-[var(--color-text-tertiary)] transition-all hover:border-[var(--color-accent)] hover:bg-[var(--color-primary-bg)] hover:text-[var(--color-text-secondary)]">
                                 <Paperclip size={20} className="opacity-50" />
-                                <p>Drag &amp; drop files or click to upload</p>
+                                <p>{t('detail.dropFiles')}</p>
                             </div>
                         </div>
 
-
                         <div className="mt-2">
                             {/* Tab bar */}
-                            <div className="mb-3 flex gap-0 border-b border-[#e5e7eb]">
+                            <div className="mb-3 flex gap-0 border-b border-[var(--color-border-light)]">
                                 <button
                                     onClick={() => setActiveTab('comments')}
-                                    className={`flex items-center gap-1.5 px-3 pb-2.5 text-[13px] font-medium transition-colors ${activeTab === 'comments'
-                                        ? 'border-b-2 border-[#7c68ee] text-[#7c68ee]'
-                                        : 'text-[#6b7280] hover:text-[#292d34]'
+                                    className={`flex items-center gap-1.5 px-3 pb-2.5 text-body-sm font-medium transition-colors cursor-pointer bg-transparent border-none ${activeTab === 'comments'
+                                        ? 'border-b-2 border-[var(--color-accent)] text-[var(--color-accent)]'
+                                        : 'text-[var(--color-text-secondary)] hover:text-[var(--color-on-surface)]'
                                         }`}
                                 >
-                                    <MessageSquare size={14} /> Comments
+                                    <MessageSquare size={14} /> {t('detail.comments')}
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('activity')}
-                                    className={`flex items-center gap-1.5 px-3 pb-2.5 text-[13px] font-medium transition-colors ${activeTab === 'activity'
-                                        ? 'border-b-2 border-[#7c68ee] text-[#7c68ee]'
-                                        : 'text-[#6b7280] hover:text-[#292d34]'
+                                    className={`flex items-center gap-1.5 px-3 pb-2.5 text-body-sm font-medium transition-colors cursor-pointer bg-transparent border-none ${activeTab === 'activity'
+                                        ? 'border-b-2 border-[var(--color-accent)] text-[var(--color-accent)]'
+                                        : 'text-[var(--color-text-secondary)] hover:text-[var(--color-on-surface)]'
                                         }`}
                                 >
-                                    <Activity size={14} /> Activity
+                                    <Activity size={14} /> {t('detail.activity')}
                                 </button>
                             </div>
 
@@ -256,15 +264,15 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
                                                     <Avatar src={comment.author_avatar} />
                                                     <div className="flex-1">
                                                         <div className="mb-1 flex items-center gap-2">
-                                                            <strong className="text-[13px] text-[#292d34]">{comment.author_name}</strong>
-                                                            <span className="text-xs text-[#9ca3af]">{comment.created_at}</span>
+                                                            <strong className="text-body-sm text-[var(--color-on-surface)]">{comment.author_name}</strong>
+                                                            <span className="text-caption text-[var(--color-text-tertiary)]">{comment.created_at}</span>
                                                         </div>
-                                                        <p className="m-0 text-[13px] leading-6 text-[#374151]">{comment.content}</p>
+                                                        <p className="m-0 text-body-sm leading-6 text-[var(--color-on-surface)]">{comment.content}</p>
                                                     </div>
                                                 </div>
                                             ))
                                         ) : (
-                                            <p className="text-gray-400 text-sm">Chưa có bình luận nào.</p>
+                                            <p className="text-body-sm text-[var(--color-text-tertiary)]">{t('detail.noComments')}</p>
                                         )}
                                     </div>
                                 ) : (
@@ -275,17 +283,20 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
                                                 <Spin size="small" />
                                             </div>
                                         ) : listActivities.length === 0 ? (
-                                            <p className="text-gray-400 text-sm py-4 text-center">Chưa có hoạt động nào.</p>
+                                            <p className="py-4 text-center text-body-sm text-[var(--color-text-tertiary)]">{t('detail.noActivity')}</p>
                                         ) : (
                                             listActivities.map((activity) => {
                                                 const meta = ACTION_META[activity.action] ?? {
-                                                    label: activity.action,
+                                                    labelKey: activity.action,
                                                     icon: <Clock size={13} />,
                                                     color: '#6b7280',
                                                 };
                                                 const oldVal = parseJsonValue(activity.old_value);
                                                 const newVal = parseJsonValue(activity.new_value);
-                                                const displayName = activity.user_name ?? activity.username ?? 'Hệ thống';
+                                                const displayName = activity.user_name ?? activity.username ?? (i18n.language === 'vi' ? 'Hệ thống' : 'System');
+                                                const actionLabel = meta.labelKey.startsWith('activity.')
+                                                    ? t(meta.labelKey, { defaultValue: activity.action })
+                                                    : meta.labelKey;
 
                                                 return (
                                                     <div
@@ -300,38 +311,32 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
                                                             >
                                                                 {meta.icon}
                                                             </div>
-                                                            <div className="mt-1 w-px flex-1 bg-[#e5e7eb] group-last:hidden" style={{ minHeight: 16 }} />
+                                                            <div className="mt-1 w-px flex-1 bg-[var(--color-border-light)] group-last:hidden" style={{ minHeight: 16 }} />
                                                         </div>
 
                                                         {/* Content */}
                                                         <div className="flex-1 pt-0.5">
-                                                            <p className="m-0 text-[13px] leading-[1.5] text-[#374151]">
-                                                                <span className="font-semibold text-[#292d34]">{displayName}</span>
+                                                            <p className="m-0 text-body-sm leading-[1.5] text-[var(--color-on-surface)]">
+                                                                <span className="font-semibold">{displayName}</span>
                                                                 {' '}
-                                                                <span>{meta.label}</span>
+                                                                <span className="text-[var(--color-text-secondary)]">{actionLabel}</span>
                                                                 {oldVal && newVal && (
                                                                     <>
-                                                                        {' '}từ{' '}
-                                                                        <em className="not-italic font-semibold" style={{ color: '#6b7280' }}>
-                                                                            {oldVal}
-                                                                        </em>
-                                                                        {' '}sang{' '}
-                                                                        <em className="not-italic font-semibold" style={{ color: meta.color }}>
-                                                                            {newVal}
-                                                                        </em>
+                                                                        {' '}{i18n.language === 'vi' ? 'từ' : 'from'}{' '}
+                                                                        <em className="not-italic font-semibold text-[var(--color-text-secondary)]">{oldVal}</em>
+                                                                        {' '}{i18n.language === 'vi' ? 'sang' : 'to'}{' '}
+                                                                        <em className="not-italic font-semibold" style={{ color: meta.color }}>{newVal}</em>
                                                                     </>
                                                                 )}
                                                                 {!oldVal && newVal && (
                                                                     <>
                                                                         {': '}
-                                                                        <em className="not-italic font-semibold" style={{ color: meta.color }}>
-                                                                            {newVal}
-                                                                        </em>
+                                                                        <em className="not-italic font-semibold" style={{ color: meta.color }}>{newVal}</em>
                                                                     </>
                                                                 )}
                                                             </p>
-                                                            <span className="text-[11px] text-[#9ca3af]">
-                                                                {formatRelativeTime(activity.created_at)}
+                                                            <span className="text-caption text-[var(--color-text-tertiary)]">
+                                                                {formatRelativeTime(activity.created_at, i18n.language)}
                                                             </span>
                                                         </div>
                                                     </div>
@@ -344,20 +349,25 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
 
                             {/* Comment input — only shown on comments tab */}
                             {activeTab === 'comments' && (
-                                <div className="mt-3.5 flex gap-2.5 border-t border-[#e5e7eb] pt-3.5">
+                                <div className="mt-3.5 flex gap-2.5 border-t border-[var(--color-border-light)] pt-3.5">
                                     <Avatar src="https://i.pravatar.cc/150?u=fake@pravatar.com" />
                                     <div className="flex flex-1 flex-col gap-1.5">
                                         <Input.TextArea
-                                            placeholder="Write a comment..."
+                                            placeholder={t('detail.writeComment')}
                                             autoSize={{ minRows: 2, maxRows: 6 }}
-                                            className="text-[13px] focus:border-[#7c68ee] hover:border-[#a798ff]"
+                                            className="text-body-sm"
                                             value={commentContent}
                                             onChange={(e) => setCommentContent(e.target.value)}
                                         />
                                         <div className="flex justify-end">
-                                            <Button type="primary" size="small" className="bg-[#7c68ee] hover:bg-[#6b56db] border-none text-[12px]"
+                                            <Button
+                                                type="primary"
+                                                size="small"
+                                                style={{ backgroundColor: 'var(--color-accent)', borderColor: 'transparent', fontSize: '12px' }}
                                                 onClick={handleCommentSubmit}
-                                            >Comment</Button>
+                                            >
+                                                {t('detail.comments')}
+                                            </Button>
                                         </div>
                                     </div>
                                 </div>
@@ -365,10 +375,7 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
                         </div>
                     </div>
 
-                    <TaskDetailSidebar
-                        task={task}
-                        updateTask={updateTask}
-                    />
+                    <TaskDetailSidebar task={task} updateTask={updateTask} />
                 </div>
             </div>
 

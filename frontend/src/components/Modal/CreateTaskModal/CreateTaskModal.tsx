@@ -225,7 +225,7 @@ export default function CreateTaskModal({
                         <>
                             {/* Milestone status */}
                             <div className="relative" onClick={e => e.stopPropagation()}>
-                                <button className="flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-container-high)] cursor-pointer" onClick={() => setActiveDropdown('milestoneStatus')}>
+                                <button className="flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] cursor-pointer" onClick={() => setActiveDropdown('milestoneStatus')}>
                                     <div className="h-2 w-2 rounded-full" style={{ backgroundColor: currentMilestoneStatus.color }} />
                                     {currentMilestoneStatus.label}
                                 </button>
@@ -241,7 +241,7 @@ export default function CreateTaskModal({
                             </div>
 
                             {/* Milestone color */}
-                            <div className="relative flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-container-high)] cursor-pointer">
+                            <div className="relative flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] cursor-pointer">
                                 <div className="h-3 w-3 rounded-full border border-gray-200" style={{ backgroundColor: milestoneColor }} />
                                 Color
                                 <input
@@ -253,7 +253,7 @@ export default function CreateTaskModal({
                             </div>
 
                             {/* Milestone due date */}
-                            <div className="relative flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-container-high)] cursor-pointer">
+                            <div className="relative flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] cursor-pointer">
                                 <Calendar size={14} />
                                 <input type="date" className="absolute inset-0 opacity-0 cursor-pointer" onChange={e => setMilestoneDueDate(e.target.value)} />
                                 {milestoneDueDate || 'Due date'}
@@ -263,7 +263,7 @@ export default function CreateTaskModal({
                         <>
                             {/* Task status */}
                             <div className="relative" onClick={e => e.stopPropagation()}>
-                                <button className="flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-container-high)] cursor-pointer" onClick={() => setActiveDropdown('status')}>
+                                <button className="flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] cursor-pointer" onClick={() => setActiveDropdown('status')}>
                                     <div className="h-2 w-2 rounded-full" style={{ backgroundColor: currentStatus.color }} />
                                     {currentStatus.name}
                                 </button>
@@ -280,7 +280,7 @@ export default function CreateTaskModal({
 
                             {/* Task assignee */}
                             <div className="relative" onClick={e => e.stopPropagation()}>
-                                <button className="flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-container-high)] cursor-pointer" onClick={() => setActiveDropdown('assignee')}>
+                                <button className="flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] cursor-pointer" onClick={() => setActiveDropdown('assignee')}>
                                     <User size={14} /> {assigneeIds.length > 0 ? `${assigneeIds.length} members` : 'Assignee'}
                                 </button>
                                 {activeDropdown === 'assignee' && (
@@ -297,7 +297,7 @@ export default function CreateTaskModal({
 
                             {/* Task priority */}
                             <div className="relative" onClick={e => e.stopPropagation()}>
-                                <button className="flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold hover:bg-[var(--color-surface-container-high)] cursor-pointer" style={{ color: currentPriority.color }} onClick={() => setActiveDropdown('priority')}>
+                                <button className="flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold hover:bg-[var(--color-surface-hover)] cursor-pointer" style={{ color: currentPriority.color }} onClick={() => setActiveDropdown('priority')}>
                                     <Flag size={14} fill={priority !== 'Clear' ? currentPriority.color : 'none'} /> {currentPriority.label}
                                 </button>
                                 {activeDropdown === 'priority' && (
@@ -312,7 +312,7 @@ export default function CreateTaskModal({
                             </div>
 
                             {/* Task due date */}
-                            <div className="relative flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-container-high)] cursor-pointer">
+                            <div className="relative flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] cursor-pointer">
                                 <Calendar size={14} />
                                 <input type="date" className="absolute inset-0 opacity-0 cursor-pointer" onChange={e => setDueDate(e.target.value)} />
                                 {dueDate || 'Due Date'}
@@ -327,7 +327,7 @@ export default function CreateTaskModal({
                         <Paperclip size={14} /> Attach File
                     </button>
                     <div className="flex gap-2">
-                        <button onClick={onClose} className="rounded-md border border-[var(--color-border)] bg-transparent px-4 py-2 text-body-sm font-bold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-container-high)] cursor-pointer">{tc('buttons.cancel')}</button>
+                        <button onClick={onClose} className="rounded-md border border-[var(--color-border)] bg-transparent px-4 py-2 text-body-sm font-bold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] cursor-pointer">{tc('buttons.cancel')}</button>
                         <button
                             onClick={handleCreate}
                             disabled={submitDisabled}

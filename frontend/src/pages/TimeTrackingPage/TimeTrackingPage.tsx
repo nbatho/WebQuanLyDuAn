@@ -222,23 +222,23 @@ export default function TimeTrackingPage() {
 
             {/* ═══ Summary Cards ═══ */}
             <div className="flex shrink-0 gap-4 px-6 py-3">
-                <div className="flex-1 rounded-xl border border-[var(--color-border-light)] bg-[#f8fafb] px-4 py-3">
+                <div className="flex-1 rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface-container-low)] px-4 py-3">
                     <span className="block text-[11px] font-extrabold uppercase tracking-[0.06em] text-[var(--color-text-tertiary)]">Hôm nay</span>
                     <span className="my-0.5 block text-[24px] font-black text-[var(--color-on-surface)]">{todayHrs}h</span>
-                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[#eef0f5]">
+                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[var(--color-surface-container-high)]">
                         <div className="h-full rounded-full bg-[var(--color-primary)] transition-[width] duration-500" style={{ width: `${Math.min(100, (parseFloat(todayHrs) / 8) * 100)}%` }} />
                     </div>
                     <span className="text-[10px] font-semibold text-[var(--color-text-tertiary)]">/ 8h mục tiêu</span>
                 </div>
-                <div className="flex-1 rounded-xl border border-[var(--color-border-light)] bg-[#f8fafb] px-4 py-3">
+                <div className="flex-1 rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface-container-low)] px-4 py-3">
                     <span className="block text-[11px] font-extrabold uppercase tracking-[0.06em] text-[var(--color-text-tertiary)]">Tuần này</span>
                     <span className="my-0.5 block text-[24px] font-black text-[var(--color-on-surface)]">{weekHrs}h</span>
-                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[#eef0f5]">
+                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[var(--color-surface-container-high)]">
                         <div className="h-full rounded-full bg-[#7c5cfc] transition-[width] duration-500" style={{ width: `${Math.min(100, (parseFloat(weekHrs) / 40) * 100)}%` }} />
                     </div>
                     <span className="text-[10px] font-semibold text-[var(--color-text-tertiary)]">/ 40h mục tiêu</span>
                 </div>
-                <div className="flex-1 rounded-xl border border-[var(--color-border-light)] bg-[#f8fafb] px-4 py-3">
+                <div className="flex-1 rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface-container-low)] px-4 py-3">
                     <span className="block text-[11px] font-extrabold uppercase tracking-[0.06em] text-[var(--color-text-tertiary)]">Entries</span>
                     <span className="my-0.5 block text-[24px] font-black text-[var(--color-on-surface)]">{completedEntries.length}</span>
                     <span className="text-[10px] font-medium text-[var(--color-text-tertiary)]">lượt đã ghi nhận</span>
@@ -256,7 +256,7 @@ export default function TimeTrackingPage() {
                             <div className="relative">
                                 <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]" />
                                 <input
-                                    className="box-border w-full rounded-lg border border-[var(--color-border-light)] bg-[#f8fafb] py-2 pl-9 pr-3 text-[13px] text-[var(--color-on-surface)] outline-none transition-all focus:border-[var(--color-primary)] focus:bg-[var(--color-surface-container-lowest)] focus:shadow-[0_0_0_3px_rgba(0,88,190,0.06)]"
+                                    className="box-border w-full rounded-lg border border-[var(--color-border-light)] bg-[var(--color-surface-container-low)] py-2 pl-9 pr-3 text-[13px] text-[var(--color-on-surface)] outline-none transition-all focus:border-[var(--color-primary)] focus:bg-[var(--color-surface-container-lowest)] focus:shadow-[0_0_0_3px_rgba(0,88,190,0.06)]"
                                     placeholder="Lọc task..."
                                     value={taskFilter}
                                     onChange={e => setTaskFilter(e.target.value)}
@@ -266,7 +266,7 @@ export default function TimeTrackingPage() {
 
                         {filteredSpaces.length === 0 && (
                             <div className="flex flex-col items-center justify-center py-16 text-center">
-                                <Clock size={40} className="mb-3 text-[#d0d4d9]" />
+                                <Clock size={40} className="mb-3 text-[var(--color-border)]" />
                                 <p className="text-[14px] font-bold text-[var(--color-text-secondary)]">Không có task nào</p>
                                 <p className="mt-1 text-[13px] text-[var(--color-text-tertiary)]">Hãy tạo task trong Space trước</p>
                             </div>
@@ -302,7 +302,7 @@ export default function TimeTrackingPage() {
                                                         key={task.task_id}
                                                         className={`group flex items-center gap-3 rounded-lg px-2.5 py-2 transition-colors ${isRunningThis
                                                                 ? 'bg-[#e8f5e9]'
-                                                                : 'hover:bg-[#f8fafb]'
+                                                                : 'hover:bg-[var(--color-surface-container-low)]'
                                                             }`}
                                                     >
                                                         {/* Play / Running indicator */}
@@ -316,7 +316,7 @@ export default function TimeTrackingPage() {
                                                             </button>
                                                         ) : (
                                                             <button
-                                                                className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 border-[#e0e0e0] bg-transparent text-[#bdc3c7] transition-all hover:border-[#4caf50] hover:bg-[#e8f5e9] hover:text-[#4caf50] group-hover:border-[#c2c9e0]"
+                                                                className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 border-[#e0e0e0] bg-transparent text-[#bdc3c7] transition-all hover:border-[#4caf50] hover:bg-[#e8f5e9] hover:text-[#4caf50] group-hover:border-[var(--color-text-tertiary)]"
                                                                 onClick={() => handleStartTimer(task.task_id, task.name)}
                                                                 title="Bắt đầu timer"
                                                             >
@@ -398,7 +398,7 @@ export default function TimeTrackingPage() {
                                         <Calendar size={13} />
                                         <span className="text-[13px] font-extrabold text-[var(--color-on-surface)]">{date}</span>
                                         <span className="text-xs font-semibold text-[var(--color-primary)]">{dayHrs}h tổng</span>
-                                        <div className="ml-2 h-px flex-1 bg-[#eef0f5]" />
+                                        <div className="ml-2 h-px flex-1 bg-[var(--color-surface-container-high)]" />
                                     </div>
                                     <div className="flex flex-col">
                                         {dateEntries.map(entry => {
@@ -415,10 +415,10 @@ export default function TimeTrackingPage() {
                                                 : '';
 
                                             return (
-                                                <div key={entry.time_log_id} className="group flex items-center gap-3 rounded-lg border-b border-[#f5f7fa] px-2 py-2.5 transition-colors hover:bg-[#f8fafb]">
+                                                <div key={entry.time_log_id} className="group flex items-center gap-3 rounded-lg border-b border-[#f5f7fa] px-2 py-2.5 transition-colors hover:bg-[var(--color-surface-container-low)]">
                                                     {/* Re-start */}
                                                     <button
-                                                        className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-[#c2c9e0] opacity-0 transition-all group-hover:opacity-100 hover:bg-[#e8f5e9] hover:text-[#4caf50]"
+                                                        className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-[var(--color-text-tertiary)] opacity-0 transition-all group-hover:opacity-100 hover:bg-[#e8f5e9] hover:text-[#4caf50]"
                                                         onClick={() => handleStartTimer(entry.task_id, taskName)}
                                                         title="Bắt đầu lại"
                                                     >

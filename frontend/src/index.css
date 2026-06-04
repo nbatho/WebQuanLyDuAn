@@ -94,4 +94,93 @@
   .markdown-content h1 { font-size: var(--text-h2); }
   .markdown-content h2 { font-size: var(--text-h3); }
   .markdown-content h3 { font-size: var(--text-h4); }
+  .markdown-content code {
+    background: var(--color-surface-container-high);
+    color: var(--color-on-surface);
+    border-radius: 4px;
+    padding: 0.1em 0.4em;
+    font-size: 0.875em;
+    font-family: 'Fira Code', 'Courier New', monospace;
+  }
+  .markdown-content pre {
+    background: var(--color-surface-container-high);
+    border: 1px solid var(--color-border-light);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  .markdown-content pre code {
+    background: transparent;
+    padding: 0;
+    font-size: 0.8125rem;
+    color: var(--color-on-surface);
+  }
+  .markdown-content blockquote {
+    border-left: 3px solid var(--color-accent);
+    padding-left: 1rem;
+    margin-left: 0;
+    color: var(--color-text-secondary);
+  }
+  .markdown-content a {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+  .markdown-content hr {
+    border: none;
+    border-top: 1px solid var(--color-border-light);
+    margin: 1rem 0;
+  }
+  .markdown-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+  }
+  .markdown-content th,
+  .markdown-content td {
+    border: 1px solid var(--color-border-light);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .markdown-content th {
+    background: var(--color-surface-container-low);
+    font-weight: 700;
+    color: var(--color-on-surface);
+  }
+  .markdown-content tr:hover td {
+    background: var(--color-surface-hover);
+  }
+
+  /* ─── Ant Design dark mode overrides ─── */
+  .dark .ant-popover-inner {
+    background-color: var(--color-surface-container) !important;
+    border: 1px solid var(--color-border) !important;
+  }
+  .dark .ant-tooltip-inner {
+    background-color: var(--color-surface-container-high) !important;
+    color: var(--color-on-surface) !important;
+  }
+  .dark .ant-select-dropdown {
+    background-color: var(--color-surface-container) !important;
+    border: 1px solid var(--color-border) !important;
+  }
+  .dark .ant-select-item:hover {
+    background-color: var(--color-surface-hover) !important;
+  }
+  .dark .ant-select-item-option-selected {
+    background-color: var(--color-primary-bg) !important;
+  }
+  .dark .ant-input,
+  .dark .ant-input-affix-wrapper {
+    background-color: var(--color-surface-container) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-on-surface) !important;
+  }
+  .dark .ant-input::placeholder {
+    color: var(--color-text-tertiary) !important;
+  }
+  .dark .ant-spin-dot-item {
+    background-color: var(--color-primary) !important;
+  }
 }

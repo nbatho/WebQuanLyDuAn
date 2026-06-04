@@ -333,7 +333,7 @@ export default function AuthPage() {
                                     size="large"
                                     block
                                     onClick={() => navigate('/google-login')}
-                                    className="h-12! bg-[var(--color-surface-container-low)]! text-[var(--color-on-surface)]! rounded-lg! font-bold! text-body! border-0! flex! items-center! justify-center! gap-3! hover:bg-[var(--color-surface-container-high)]!"
+                                    className="h-12! bg-[var(--color-surface-container-low)]! text-[var(--color-on-surface)]! rounded-lg! font-bold! text-body! border-0! flex! items-center! justify-center! gap-3! hover:bg-[var(--color-surface-hover)]!"
                                 >
                                     <svg className="w-6 h-6" viewBox="0 0 24 24">
                                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -448,7 +448,7 @@ export default function AuthPage() {
                                     size="middle"
                                     block
                                     onClick={() => navigate('/google-login')}
-                                    className="h-10! bg-[var(--color-surface-container-low)]! rounded-lg! font-bold! border-0! flex! items-center! justify-center! gap-2! hover:bg-[var(--color-surface-container-high)]! text-[var(--color-on-surface)]"
+                                    className="h-10! bg-[var(--color-surface-container-low)]! rounded-lg! font-bold! border-0! flex! items-center! justify-center! gap-2! hover:bg-[var(--color-surface-hover)]! text-[var(--color-on-surface)]"
                                 >
                                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />

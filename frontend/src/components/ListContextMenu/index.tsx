@@ -42,7 +42,7 @@ export default function ListContextMenu({
     const left = Math.min(position.x, typeof window !== 'undefined' ? window.innerWidth - 230 : position.x);
 
     const itemCls =
-        'flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[#1e1f21] hover:bg-[#f3f4f8]';
+        'flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[var(--color-inverse-surface)] hover:bg-[#f3f4f8]';
     const iconCls = 'text-[#6b6f76]';
     const divider = <div className="my-1 mx-2.5 h-px bg-[#eef0f3]" />;
 

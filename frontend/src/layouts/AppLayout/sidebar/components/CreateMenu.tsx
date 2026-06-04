@@ -87,7 +87,7 @@ export const CreateMenu = ({ position, onClose, spaceId, spaceName }: CreateMenu
                 <button
                     key={i}
                     type="button"
-                    className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.75 text-left text-[13px] text-[#1e1f21] transition-all hover:bg-[#f3f4f8]"
+                    className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.75 text-left text-[13px] text-[var(--color-inverse-surface)] transition-all hover:bg-[#f3f4f8]"
                     onClick={item.onClick}
                 >
                     <span className="shrink-0 text-[#6b6f76]">{item.icon}</span>
@@ -108,7 +108,7 @@ export const CreateMenu = ({ position, onClose, spaceId, spaceName }: CreateMenu
                 <button
                     key={i}
                     type="button"
-                    className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[#1e1f21] transition-all hover:bg-[#f3f4f8]"
+                    className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[var(--color-inverse-surface)] transition-all hover:bg-[#f3f4f8]"
                     onClick={item.onClick || (() => {})}
                 >
                     <span className="shrink-0 text-[#6b6f76]">{item.icon}</span>
@@ -119,12 +119,12 @@ export const CreateMenu = ({ position, onClose, spaceId, spaceName }: CreateMenu
             <div className="my-1 mx-2.5 h-px bg-[#eef0f3]" />
 
             {/* Bottom: Imports & Templates */}
-            <button type="button" className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[#1e1f21] transition-all hover:bg-[#f3f4f8]">
+            <button type="button" className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[var(--color-inverse-surface)] transition-all hover:bg-[#f3f4f8]">
                 <Import size={15} className="text-[#6b6f76]" />
                 <span className="flex-1 font-medium">Imports</span>
                 <ChevronRightIcon size={13} className="text-[#9b9ea4]" />
             </button>
-            <button type="button" className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[#1e1f21] transition-all hover:bg-[#f3f4f8]">
+            <button type="button" className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[var(--color-inverse-surface)] transition-all hover:bg-[#f3f4f8]">
                 <LayoutTemplate size={15} className="text-[#6b6f76]" />
                 <span className="flex-1 font-medium">Templates</span>
                 <ChevronRightIcon size={13} className="text-[#9b9ea4]" />
