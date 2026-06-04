@@ -208,7 +208,7 @@ export default function ListViewPage() {
     }, [listTasks]);
 
     if (!parentSpace || !listInfo) {
-        return <div className="flex h-full items-center justify-center text-[#5f6368]"><p>List not found</p></div>;
+        return <div className="flex h-full items-center justify-center text-[var(--color-text-secondary)]"><p>List not found</p></div>;
     }
 
     const contextValue: TaskViewContextType = {
@@ -221,7 +221,7 @@ export default function ListViewPage() {
 
     return (
         <TaskViewContext.Provider value={contextValue}>
-            <div className="flex h-full flex-col overflow-hidden bg-white" style={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}>
+            <div className="flex h-full flex-col overflow-hidden bg-[var(--color-surface-container-lowest)]" style={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}>
 
                 <PageHeader
                     parentSpace={parentSpace}
@@ -234,7 +234,7 @@ export default function ListViewPage() {
                     ]}
                 />
 
-                <div className="flex shrink-0 items-center justify-between border-b border-[#eef0f5] bg-white px-5 py-2">
+                <div className="flex shrink-0 items-center justify-between border-b border-[var(--color-border-light)] bg-[var(--color-surface-container-lowest)] px-5 py-2">
                     <div className="flex items-center gap-1.5">
                         <button type="button" className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-[#1e1f21] px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-black"
                             onClick={() => setIsCreateTaskOpen(true)}

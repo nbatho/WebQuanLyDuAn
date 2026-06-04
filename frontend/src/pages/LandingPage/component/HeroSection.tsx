@@ -12,7 +12,7 @@ export default function HeroSection() {
         <section className="relative px-10 pt-24 pb-32 max-w-7xl mx-auto">
             <div className="text-center max-w-3xl mx-auto mb-16">
 
-                <h1 className="text-5xl md:text-[68px] leading-[1.05] font-extrabold tracking-tight text-[#141b2b] mb-6">
+                <h1 className="text-5xl md:text-[68px] leading-[1.05] font-extrabold tracking-tight text-[var(--color-on-surface)] mb-6">
                     <span className="whitespace-nowrap">Một không gian duy nhất.</span>
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7c5cfc] via-[#e84393] to-[#ffaa4c]"> Cho mọi dự án của bạn.</span>
                 </h1>
@@ -34,7 +34,7 @@ export default function HeroSection() {
                     <Button
                         size="large"
                         href="/register"
-                        className="!bg-white !text-[#141b2b] !border-2 !border-[#e9edff] !rounded-xl !font-bold !text-base !px-8 !h-14 hover:!border-[#7c5cfc] hover:!text-[#7c5cfc] transition-all"
+                        className="!bg-[var(--color-surface-container-lowest)] !text-[var(--color-on-surface)] !border-2 !border-[var(--color-surface-container)] !rounded-xl !font-bold !text-base !px-8 !h-14 hover:!border-[var(--color-accent)] hover:!text-[var(--color-accent)] transition-all"
                     >
                         Đăng ký ngay
                     </Button>
@@ -45,7 +45,7 @@ export default function HeroSection() {
             {/* Benefit pills */}
             <div className="flex flex-wrap justify-center gap-6 mb-16">
                 {benefits.map((b) => (
-                    <div key={b} className="flex items-center gap-2 text-[#141b2b] font-semibold text-sm">
+                    <div key={b} className="flex items-center gap-2 text-[var(--color-on-surface)] font-semibold text-sm">
                         <CheckCircle size={18} className="text-[#006c49]" />
                         {b}
                     </div>
@@ -54,10 +54,10 @@ export default function HeroSection() {
 
             {/* Dashboard Mockup — represents the product */}
             <div className="relative max-w-4xl mx-auto">
-                <div className="bg-white p-3 rounded-2xl border-2 border-[#e9edff]">
+                <div className="bg-[var(--color-surface-container-lowest)] p-3 rounded-2xl border-2 border-[var(--color-surface-container)]">
                     <div className="bg-[#f1f3ff] rounded-xl overflow-hidden">
                         {/* Window chrome */}
-                        <div className="h-10 bg-white border-b border-[#e9edff] flex items-center px-4 gap-2">
+                        <div className="h-10 bg-[var(--color-surface-container-lowest)] border-b border-[var(--color-surface-container)] flex items-center px-4 gap-2">
                             <div className="w-3 h-3 rounded-full bg-[#ba1a1a]" />
                             <div className="w-3 h-3 rounded-full bg-[#825100]" />
                             <div className="w-3 h-3 rounded-full bg-[#006c49]" />
@@ -71,7 +71,7 @@ export default function HeroSection() {
                             {/* Top bar */}
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex gap-3">
-                                    <div className="h-8 w-24 bg-[#0058be] rounded-lg" />
+                                    <div className="h-8 w-24 bg-[var(--color-primary)] rounded-lg" />
                                     <div className="h-8 w-20 bg-[#e9edff] rounded-lg" />
                                     <div className="h-8 w-20 bg-[#e9edff] rounded-lg" />
                                 </div>
@@ -87,14 +87,14 @@ export default function HeroSection() {
                                         <div className="h-3 w-16 bg-[#dce2f7] rounded" />
                                         <span className="text-xs text-[#727785] font-bold">3</span>
                                     </div>
-                                    <div className="bg-white p-3 rounded-lg border border-[#e9edff]">
+                                    <div className="bg-[var(--color-surface-container-lowest)] p-3 rounded-lg border border-[var(--color-surface-container)]">
                                         <div className="h-2.5 w-full bg-[#e9edff] rounded mb-2" />
                                         <div className="h-2 w-3/4 bg-[#f1f3ff] rounded mb-3" />
                                         <div className="flex gap-1">
                                             <div className="h-5 w-14 bg-[#ffddb8] rounded text-[6px] flex items-center justify-center font-bold text-[#825100]">Urgent</div>
                                         </div>
                                     </div>
-                                    <div className="bg-white p-3 rounded-lg border border-[#e9edff]">
+                                    <div className="bg-[var(--color-surface-container-lowest)] p-3 rounded-lg border border-[var(--color-surface-container)]">
                                         <div className="h-2.5 w-full bg-[#e9edff] rounded mb-2" />
                                         <div className="h-2 w-1/2 bg-[#f1f3ff] rounded" />
                                     </div>
@@ -103,18 +103,18 @@ export default function HeroSection() {
                                 {/* In Progress */}
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <div className="w-3 h-3 rounded bg-[#0058be]" />
+                                        <div className="w-3 h-3 rounded bg-[var(--color-primary)]" />
                                         <div className="h-3 w-20 bg-[#d8e2ff] rounded" />
                                         <span className="text-xs text-[#727785] font-bold">2</span>
                                     </div>
-                                    <div className="bg-white p-3 rounded-lg border-l-4 border-l-[#0058be] border border-[#e9edff]">
+                                    <div className="bg-[var(--color-surface-container-lowest)] p-3 rounded-lg border-l-4 border-l-[#0058be] border border-[var(--color-surface-container)]">
                                         <div className="h-2.5 w-full bg-[#e9edff] rounded mb-2" />
                                         <div className="h-2 w-2/3 bg-[#f1f3ff] rounded mb-3" />
                                         <div className="w-full bg-[#f1f3ff] rounded-full h-1.5">
-                                            <div className="bg-[#0058be] h-1.5 rounded-full w-3/5" />
+                                            <div className="bg-[var(--color-primary)] h-1.5 rounded-full w-3/5" />
                                         </div>
                                     </div>
-                                    <div className="bg-white p-3 rounded-lg border border-[#e9edff]">
+                                    <div className="bg-[var(--color-surface-container-lowest)] p-3 rounded-lg border border-[var(--color-surface-container)]">
                                         <div className="h-2.5 w-3/4 bg-[#e9edff] rounded mb-2" />
                                         <div className="h-2 w-full bg-[#f1f3ff] rounded" />
                                     </div>
@@ -127,11 +127,11 @@ export default function HeroSection() {
                                         <div className="h-3 w-16 bg-[#ffddb8] rounded" />
                                         <span className="text-xs text-[#727785] font-bold">1</span>
                                     </div>
-                                    <div className="bg-white p-3 rounded-lg border border-[#e9edff]">
+                                    <div className="bg-[var(--color-surface-container-lowest)] p-3 rounded-lg border border-[var(--color-surface-container)]">
                                         <div className="h-2.5 w-full bg-[#e9edff] rounded mb-2" />
                                         <div className="h-2 w-1/2 bg-[#f1f3ff] rounded mb-3" />
                                         <div className="flex gap-1">
-                                            <div className="h-5 w-14 bg-[#d8e2ff] rounded text-[6px] flex items-center justify-center font-bold text-[#0058be]">Design</div>
+                                            <div className="h-5 w-14 bg-[#d8e2ff] rounded text-[6px] flex items-center justify-center font-bold text-[var(--color-primary)]">Design</div>
                                         </div>
                                     </div>
                                 </div>
@@ -143,11 +143,11 @@ export default function HeroSection() {
                                         <div className="h-3 w-14 bg-[#6ffbbe] rounded" />
                                         <span className="text-xs text-[#727785] font-bold">5</span>
                                     </div>
-                                    <div className="bg-white p-3 rounded-lg border border-[#e9edff] opacity-60">
+                                    <div className="bg-[var(--color-surface-container-lowest)] p-3 rounded-lg border border-[var(--color-surface-container)] opacity-60">
                                         <div className="h-2.5 w-full bg-[#e9edff] rounded mb-2" />
                                         <div className="h-2 w-2/3 bg-[#f1f3ff] rounded" />
                                     </div>
-                                    <div className="bg-white p-3 rounded-lg border border-[#e9edff] opacity-60">
+                                    <div className="bg-[var(--color-surface-container-lowest)] p-3 rounded-lg border border-[var(--color-surface-container)] opacity-60">
                                         <div className="h-2.5 w-3/4 bg-[#e9edff] rounded mb-2" />
                                         <div className="h-2 w-1/2 bg-[#f1f3ff] rounded" />
                                     </div>

@@ -202,7 +202,7 @@ export const SpaceNode = ({ space }: { space: SpaceItem }) => {
             </div>
 
             {expanded && (
-                <div className="ml-3.5 border-l border-[#e2e4e9] pl-1.5 mt-0.5">
+                <div className="ml-3.5 border-l border-[var(--color-border)] pl-1.5 mt-0.5">
                     {folders.map((folder) => (
                         <FolderNode key={folder.id} folder={folder} spaceId={space.id} spaceName={space.name} />
                     ))}
@@ -220,7 +220,7 @@ export const SpaceNode = ({ space }: { space: SpaceItem }) => {
                     {/* Sprints Section */}
                     {sprints.length > 0 && (
                         <>
-                            <div className="mt-1.5 mb-0.5 px-2 text-[10px] font-bold uppercase tracking-wider text-[#9aa0a6]">
+                            <div className="mt-1.5 mb-0.5 px-2 text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-tertiary)]">
                                 Sprints
                             </div>
                             {sprints.map((sprint) => (

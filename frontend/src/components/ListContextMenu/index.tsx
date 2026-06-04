@@ -49,7 +49,7 @@ export default function ListContextMenu({
     return (
         <div
             ref={menuRef}
-            className="fixed z-9999 w-55 rounded-lg border border-[#e2e4e9] bg-white py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)]"
+            className="fixed z-9999 w-55 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-container-lowest)] py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)]"
             style={{ top, left }}
             onClick={(e) => e.stopPropagation()}
         >

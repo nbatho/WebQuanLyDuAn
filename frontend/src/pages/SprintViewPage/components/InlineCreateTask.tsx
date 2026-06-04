@@ -27,7 +27,7 @@ export default function InlineCreateTask({ isActive, text, onChangeText, onActiv
 
     if (isActive) {
         return (
-            <div className="flex min-h-9.5 items-center bg-white border-b border-[#f3f4f6]">
+            <div className="flex min-h-9.5 items-center bg-[var(--color-surface-container-lowest)] border-b border-[#f3f4f6]">
                 <div className="flex w-13 shrink-0 items-center justify-center"><div className="h-3.5 w-3.5 rounded-full border-2 border-dashed border-[#9ca3af]" /></div>
                 <div className="flex min-w-0 flex-1 items-center pr-2">
                     <input ref={inlineRef} className="min-w-0 flex-1 border-none bg-transparent py-2 text-[13px] outline-none" value={text} onChange={(e) => onChangeText(e.target.value)} placeholder="Task Name..." onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit(); if (e.key === 'Escape') onCancel(); }} />

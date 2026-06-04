@@ -48,11 +48,11 @@ export default function ContextMenu({ x, y, isOpen, onClose, onAction, taskTitle
     return (
         <div
             ref={menuRef}
-            className="fixed z-3000 min-w-50 rounded-[10px] border border-[#eef0f5] bg-white p-1 shadow-[0_8px_28px_rgba(0,0,0,0.15)]"
+            className="fixed z-3000 min-w-50 rounded-[10px] border border-[var(--color-border-light)] bg-[var(--color-surface-container-lowest)] p-1 shadow-[0_8px_28px_rgba(0,0,0,0.15)]"
             style={{ top: y, left: x }}
         >
             {taskTitle && (
-                <div className="mb-0.5 border-b border-[#f0f2f5] px-3 py-1.5 pb-1 text-[11px] font-bold uppercase tracking-[0.04em] text-[#9aa0a6]">
+                <div className="mb-0.5 border-b border-[#f0f2f5] px-3 py-1.5 pb-1 text-[11px] font-bold uppercase tracking-[0.04em] text-[var(--color-text-tertiary)]">
                     {taskTitle.length > 30 ? taskTitle.slice(0, 30) + '...' : taskTitle}
                 </div>
             )}
@@ -61,7 +61,7 @@ export default function ContextMenu({ x, y, isOpen, onClose, onAction, taskTitle
                     <button
                         className={`flex w-full cursor-pointer items-center gap-2 rounded-md border-none bg-transparent px-3 py-1.75 text-left text-[13px] font-medium transition-colors ${item.danger
                                 ? 'text-[#e74c3c] hover:bg-[#fff5f5] hover:text-[#c0392b]'
-                                : 'text-[#141b2b] hover:bg-[#f0f4ff] hover:text-[#0058be]'
+                                : 'text-[var(--color-on-surface)] hover:bg-[var(--color-primary-bg)] hover:text-[var(--color-primary)]'
                             }`}
                         onClick={() => { onAction(item.id); onClose(); }}
                     >

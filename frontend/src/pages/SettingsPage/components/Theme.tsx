@@ -31,7 +31,7 @@ export default function Theme() {
             label: t('appearance.light'),
             icon: <Sun size={14} />,
             preview: 'bg-[#f5f7ff]',
-            previewInner: 'bg-white',
+            previewInner: 'bg-[var(--color-surface-container-lowest)]',
         },
         {
             id: 'dark' as ThemeMode,

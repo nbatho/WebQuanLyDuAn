@@ -19,7 +19,7 @@ export default function PriorityPopover({ priority_name, onSave, onClose }: Prio
     };
 
     return (
-        <div className="flex w-56 flex-col overflow-hidden rounded-xl bg-white py-2 shadow-[0_8px_32px_rgba(0,0,0,0.14)]">
+        <div className="flex w-56 flex-col overflow-hidden rounded-xl bg-[var(--color-surface-container-lowest)] py-2 shadow-[0_8px_32px_rgba(0,0,0,0.14)]">
             <div className="mb-1 px-3 pt-1 text-[11px] font-semibold text-[#9ca3af] uppercase tracking-wide">Priority</div>
             <div className="flex flex-col">
                 {PRIORITIES.map((p) => {

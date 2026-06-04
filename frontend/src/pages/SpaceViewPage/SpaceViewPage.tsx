@@ -20,7 +20,7 @@ export default function SpaceViewPage() {
     }, [spaceId, spaces, navigate]);
 
     return (
-        <div className="flex h-full flex-col overflow-hidden bg-white" style={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}>
+        <div className="flex h-full flex-col overflow-hidden bg-[var(--color-surface-container-lowest)]" style={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}>
             <SpaceHeader currentSpace={currentSpace} activeView={'overview'} onViewChange={() => { }} />
 
             <main className="flex flex-1 flex-col overflow-hidden">

@@ -57,7 +57,7 @@ export default function Notifications() {
                             onClick={item.onChange}
                         >
                             <span
-                                className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.2)] transition-transform duration-200 ${item.value ? 'translate-x-5' : ''
+                                className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-[var(--color-surface-container-lowest)] shadow-[0_1px_3px_rgba(0,0,0,0.2)] transition-transform duration-200 ${item.value ? 'translate-x-5' : ''
                                     }`}
                             />
                         </button>

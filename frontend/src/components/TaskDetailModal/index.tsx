@@ -172,7 +172,7 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
                 className={`${isMaximized
                     ? 'h-screen max-h-screen w-screen max-w-screen rounded-none'
                     : 'max-h-[88vh] w-220 max-w-[95vw] rounded-[14px]'
-                    } flex flex-col overflow-hidden bg-white shadow-2xl transition-all duration-300`}
+                    } flex flex-col overflow-hidden bg-[var(--color-surface-container-lowest)] shadow-2xl transition-all duration-300`}
                 onClick={(e) => e.stopPropagation()}
             >
                 <TaskDetailHeader
@@ -188,8 +188,8 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
                 <div className="flex flex-1 overflow-hidden">
                     <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-5">
                         {isChanged && (
-                            <div className="flex items-center justify-between rounded-lg bg-[#f0f4ff] p-3 border border-[#d6e4ff]">
-                                <span className="text-[13px] font-medium text-[#0058be]">Bạn có thay đổi chưa lưu</span>
+                            <div className="flex items-center justify-between rounded-lg bg-[var(--color-primary-bg)] p-3 border border-[#d6e4ff]">
+                                <span className="text-[13px] font-medium text-[var(--color-primary)]">Bạn có thay đổi chưa lưu</span>
                                 <Button type="primary" size="small" icon={<Save size={14} />} onClick={handleUpdate} className="bg-[#7c68ee] hover:bg-[#6b56db] border-none">
                                     Update
                                 </Button>

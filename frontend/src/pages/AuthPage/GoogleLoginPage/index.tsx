@@ -12,9 +12,9 @@ const GOOGLE_CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID as string | unde
 
 function GoogleBrandPanel() {
     return (
-        <section className="relative flex min-h-[40vh] w-full flex-col justify-between overflow-hidden bg-[#0058be] p-8 md:min-h-screen md:w-[52%] md:p-14">
-            <div className="pointer-events-none absolute -left-20 -top-20 h-100 w-100 rounded-full bg-white opacity-5" />
-            <div className="pointer-events-none absolute -right-16 top-1/3 h-48 w-48 rotate-12 bg-white opacity-[0.08]" />
+        <section className="relative flex min-h-[40vh] w-full flex-col justify-between overflow-hidden bg-[var(--color-primary)] p-8 md:min-h-screen md:w-[52%] md:p-14">
+            <div className="pointer-events-none absolute -left-20 -top-20 h-100 w-100 rounded-full bg-[var(--color-surface-container-lowest)] opacity-5" />
+            <div className="pointer-events-none absolute -right-16 top-1/3 h-48 w-48 rotate-12 bg-[var(--color-surface-container-lowest)] opacity-[0.08]" />
             <div className="relative z-10">
                 <Link to="/" className="inline-flex items-end gap-1 no-underline">
                     <span className="text-3xl font-extrabold tracking-tighter text-white">Flowise</span>
@@ -69,27 +69,27 @@ function GoogleLoginContent() {
                     <button
                         type="button"
                         onClick={() => navigate('/login')}
-                        className="mb-6 inline-flex cursor-pointer items-center gap-2 border-0 bg-transparent text-sm font-bold text-[#0058be] hover:underline"
+                        className="mb-6 inline-flex cursor-pointer items-center gap-2 border-0 bg-transparent text-sm font-bold text-[var(--color-primary)] hover:underline"
                     >
                         <ArrowLeft size={18} strokeWidth={2.5} aria-hidden />
                         Back to sign in
                     </button>
 
-                    <div className="rounded-2xl border border-[#dadce0] bg-white px-8 py-9 shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
+                    <div className="rounded-2xl border border-[#dadce0] bg-[var(--color-surface-container-lowest)] px-8 py-9 shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
                         <div className="mb-6 flex justify-center">
                             <Link to="/" className="inline-flex items-end gap-1 no-underline">
-                                <span className="text-2xl font-extrabold tracking-tight text-[#141b2b]">Flowise</span>
+                                <span className="text-2xl font-extrabold tracking-tight text-[var(--color-on-surface)]">Flowise</span>
                                 <span className="mb-1 h-2 w-2 rounded-full bg-[#825100]" aria-hidden />
                             </Link>
                         </div>
 
                         <h1 className="text-center text-2xl font-normal text-[#202124]">Choose an account</h1>
-                        <p className="mt-1 text-center text-[15px] text-[#5f6368]">
+                        <p className="mt-1 text-center text-[15px] text-[var(--color-text-secondary)]">
                             to continue to <span className="font-medium text-[#202124]">Flowise</span>
                         </p>
 
                         <div className="mt-8 flex flex-col items-center border-t border-[#e8eaed] pt-8">
-                            <p className="mb-4 max-w-[320px] text-center text-sm leading-snug text-[#5f6368]">
+                            <p className="mb-4 max-w-[320px] text-center text-sm leading-snug text-[var(--color-text-secondary)]">
                                 Use the button below. Google will open a secure window where you pick your account.
                             </p>
                             <div className="flex w-full max-w-[320px] justify-center [&_iframe]:!w-full">
@@ -111,38 +111,38 @@ function GoogleLoginContent() {
                                 />
                             </div>
                             {isLoading ? (
-                                <p className="mt-4 text-center text-sm text-[#5f6368]">Signing you in…</p>
+                                <p className="mt-4 text-center text-sm text-[var(--color-text-secondary)]">Signing you in…</p>
                             ) : null}
                             {error ? (
                                 <p className="mt-4 text-center text-sm font-medium text-[#d93025]">{error}</p>
                             ) : null}
                         </div>
 
-                        <p className="mt-8 border-t border-[#e8eaed] pt-6 text-center text-xs leading-relaxed text-[#5f6368]">
+                        <p className="mt-8 border-t border-[#e8eaed] pt-6 text-center text-xs leading-relaxed text-[var(--color-text-secondary)]">
                             To continue, Google will share your name, email address, language preference, and profile
                             picture with{' '}
                             <span className="font-medium text-[#202124]">Flowise</span>. See our{' '}
-                            <a href="#" className="font-medium text-[#0058be] no-underline hover:underline">
+                            <a href="#" className="font-medium text-[var(--color-primary)] no-underline hover:underline">
                                 Privacy Policy
                             </a>{' '}
                             and{' '}
-                            <a href="#" className="font-medium text-[#0058be] no-underline hover:underline">
+                            <a href="#" className="font-medium text-[var(--color-primary)] no-underline hover:underline">
                                 Terms of Service
                             </a>
                             .
                         </p>
                     </div>
 
-                    <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[11px] font-semibold uppercase tracking-wide text-[#5f6368]">
+                    <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
                         <span>English (US)</span>
                         <span className="text-[#dadce0]">·</span>
-                        <a href="#" className="text-[#5f6368] no-underline hover:text-[#202124]">
+                        <a href="#" className="text-[var(--color-text-secondary)] no-underline hover:text-[#202124]">
                             Help
                         </a>
-                        <a href="#" className="text-[#5f6368] no-underline hover:text-[#202124]">
+                        <a href="#" className="text-[var(--color-text-secondary)] no-underline hover:text-[#202124]">
                             Privacy
                         </a>
-                        <a href="#" className="text-[#5f6368] no-underline hover:text-[#202124]">
+                        <a href="#" className="text-[var(--color-text-secondary)] no-underline hover:text-[#202124]">
                             Terms
                         </a>
                     </div>
@@ -157,37 +157,37 @@ function UnconfiguredPanel() {
         <div className="flex min-h-screen flex-col bg-[#eceff3] md:flex-row">
             <GoogleBrandPanel />
             <main className="flex w-full flex-1 items-center justify-center px-5 py-10 md:w-[48%] md:px-12">
-                <div className="w-full max-w-md rounded-2xl border border-[#dadce0] bg-white p-8 shadow-sm">
-                    <h2 className="mb-2 text-lg font-bold text-[#141b2b]">Google sign-in is not configured</h2>
-                    <p className="mb-3 text-sm text-[#5f6368]">
-                        Add your OAuth 2.0 Web Client ID to <code className="text-[#141b2b]">frontend/.env</code>:
+                <div className="w-full max-w-md rounded-2xl border border-[#dadce0] bg-[var(--color-surface-container-lowest)] p-8 shadow-sm">
+                    <h2 className="mb-2 text-lg font-bold text-[var(--color-on-surface)]">Google sign-in is not configured</h2>
+                    <p className="mb-3 text-sm text-[var(--color-text-secondary)]">
+                        Add your OAuth 2.0 Web Client ID to <code className="text-[var(--color-on-surface)]">frontend/.env</code>:
                     </p>
-                    <pre className="mb-3 rounded-lg bg-[#f5f7fa] p-3 text-left text-xs text-[#141b2b]">
+                    <pre className="mb-3 rounded-lg bg-[#f5f7fa] p-3 text-left text-xs text-[var(--color-on-surface)]">
                         VITE_GOOGLE_CLIENT_ID=xxxxx.apps.googleusercontent.com
                     </pre>
-                    <p className="mb-2 text-sm text-[#5f6368]">
-                        And the same value in <code className="text-[#141b2b]">backend/.env</code>:
+                    <p className="mb-2 text-sm text-[var(--color-text-secondary)]">
+                        And the same value in <code className="text-[var(--color-on-surface)]">backend/.env</code>:
                     </p>
-                    <pre className="mb-4 rounded-lg bg-[#f5f7fa] p-3 text-left text-xs text-[#141b2b]">
+                    <pre className="mb-4 rounded-lg bg-[#f5f7fa] p-3 text-left text-xs text-[var(--color-on-surface)]">
                         GOOGLE_CLIENT_ID=xxxxx.apps.googleusercontent.com
                     </pre>
-                    <p className="text-sm text-[#5f6368]">
+                    <p className="text-sm text-[var(--color-text-secondary)]">
                         Create credentials in{' '}
                         <a
                             href="https://console.cloud.google.com/apis/credentials"
                             target="_blank"
                             rel="noreferrer"
-                            className="font-semibold text-[#0058be] hover:underline"
+                            className="font-semibold text-[var(--color-primary)] hover:underline"
                         >
                             Google Cloud Console
                         </a>
-                        . Add <code className="text-[#141b2b]">http://localhost:5173</code> under Authorized JavaScript
-                        origins. Restart <code className="text-[#141b2b]">npm run dev</code> after editing{' '}
-                        <code className="text-[#141b2b]">.env</code>.
+                        . Add <code className="text-[var(--color-on-surface)]">http://localhost:5173</code> under Authorized JavaScript
+                        origins. Restart <code className="text-[var(--color-on-surface)]">npm run dev</code> after editing{' '}
+                        <code className="text-[var(--color-on-surface)]">.env</code>.
                     </p>
                     <Link
                         to="/login"
-                        className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[#0058be] no-underline hover:underline"
+                        className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[var(--color-primary)] no-underline hover:underline"
                     >
                         <ArrowLeft size={16} strokeWidth={2.5} aria-hidden />
                         Back to sign in

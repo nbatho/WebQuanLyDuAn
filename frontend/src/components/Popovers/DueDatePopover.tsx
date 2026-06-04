@@ -25,7 +25,7 @@ export default function DueDatePopover({ date, onSave, onClose }: DueDatePopover
     ];
 
     return (
-        <div className="flex w-65 flex-col overflow-hidden rounded-xl bg-white p-3 shadow-[0_8px_32px_rgba(0,0,0,0.15)]">
+        <div className="flex w-65 flex-col overflow-hidden rounded-xl bg-[var(--color-surface-container-lowest)] p-3 shadow-[0_8px_32px_rgba(0,0,0,0.15)]">
             <div className="mb-2 flex items-center justify-between">
                 <span className="text-[13px] font-semibold text-[#374151]">{currentMonth.format('MMMM YYYY')}</span>
                 <div className="flex items-center gap-1">

@@ -24,7 +24,7 @@ export default function ListView() {
         setGroups(prev => prev.map(g => g.id === groupId ? { ...g, isExpanded: !g.isExpanded } : g));
 
     return (
-        <div className="flex flex-1 flex-col overflow-hidden bg-white font-sans">
+        <div className="flex flex-1 flex-col overflow-hidden bg-[var(--color-surface-container-lowest)] font-sans">
             <div className="flex-1 overflow-y-auto p-6">
                 {groups.map((group) => (
                     <div key={group.id} className="mb-8">
@@ -32,7 +32,7 @@ export default function ListView() {
                         <div className="group flex cursor-pointer items-center gap-2 py-1 mb-2">
                             <button
                                 onClick={(e) => { e.stopPropagation(); toggleGroup(group.id); }}
-                                className="flex h-5 w-5 items-center justify-center text-[#9ca3af] hover:text-[#5f6368]"
+                                className="flex h-5 w-5 items-center justify-center text-[#9ca3af] hover:text-[var(--color-text-secondary)]"
                             >
                                 {group.isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                             </button>

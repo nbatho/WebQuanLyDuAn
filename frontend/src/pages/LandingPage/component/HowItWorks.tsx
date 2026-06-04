@@ -5,7 +5,7 @@ const steps = [
         icon: FolderKanban,
         number: '01',
         numberColor: 'text-[#adc6ff]',
-        iconBg: 'bg-[#0058be]',
+        iconBg: 'bg-[var(--color-primary)]',
         title: 'Tạo dự án',
         description: 'Tập trung toàn bộ công việc vào một nơi. Tạo dự án, chia nhỏ thành các công việc cụ thể và thiết lập deadline rõ ràng.',
     },
@@ -32,7 +32,7 @@ export default function HowItWorks() {
         <section id="how-it-works" className="py-24 bg-[#f1f3ff]">
             <div className="max-w-7xl mx-auto px-10">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-4xl font-extrabold text-[#141b2b] mb-4">
+                    <h2 className="text-3xl md:text-4xl font-extrabold text-[var(--color-on-surface)] mb-4">
                         Đơn giản để bắt đầu. Mạnh mẽ để mở rộng.
                     </h2>
                     <p className="text-[#424754] text-lg max-w-xl mx-auto">
@@ -46,7 +46,7 @@ export default function HowItWorks() {
                         return (
                             <div
                                 key={step.number}
-                                className="bg-white p-10 rounded-2xl border-2 border-transparent hover:border-[#0058be] transition-all group cursor-pointer"
+                                className="bg-[var(--color-surface-container-lowest)] p-10 rounded-2xl border-2 border-transparent hover:border-[var(--color-primary)] transition-all group cursor-pointer"
                             >
                                 <div className="flex items-center justify-between mb-6">
                                     <div className={`w-12 h-12 ${step.iconBg} flex items-center justify-center rounded-xl group-hover:rotate-6 transition-transform`}>
@@ -56,7 +56,7 @@ export default function HowItWorks() {
                                         {step.number}
                                     </span>
                                 </div>
-                                <h3 className="text-xl font-bold mb-3 text-[#141b2b]">{step.title}</h3>
+                                <h3 className="text-xl font-bold mb-3 text-[var(--color-on-surface)]">{step.title}</h3>
                                 <p className="text-[#424754] leading-relaxed text-sm">{step.description}</p>
                             </div>
                         );

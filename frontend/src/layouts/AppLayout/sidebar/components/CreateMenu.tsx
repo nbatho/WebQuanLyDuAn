@@ -75,7 +75,7 @@ export const CreateMenu = ({ position, onClose, spaceId, spaceName }: CreateMenu
     return (
         <div
             ref={ref}
-            className="fixed z-9999 w-60 rounded-lg bg-white py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)] border border-[#e2e4e9]"
+            className="fixed z-9999 w-60 rounded-lg bg-[var(--color-surface-container-lowest)] py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)] border border-[var(--color-border)]"
             style={{ top, left }}
             onClick={(e) => e.stopPropagation()}
         >

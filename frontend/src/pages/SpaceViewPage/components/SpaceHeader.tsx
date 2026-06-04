@@ -5,7 +5,7 @@ import type { SpaceHeaderProps } from '@/types/spaces';
 
 export default function SpaceHeader({ currentSpace }: SpaceHeaderProps) {
     return (
-        <header className="shrink-0 border-b border-(--color-border-light) bg-white">
+        <header className="shrink-0 border-b border-(--color-border-light) bg-[var(--color-surface-container-lowest)]">
             <div className="flex items-center justify-between px-5 pb-2 pt-2.5">
                 <div className="flex items-center gap-2">
                     <div

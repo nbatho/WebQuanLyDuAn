@@ -35,7 +35,7 @@ export default function AssigneePopover({ allMembers = [], assignees = [], onSav
     };
 
     return (
-        <div className="flex w-60 flex-col overflow-hidden rounded-xl bg-white shadow-[0_8px_32px_rgba(0,0,0,0.14)]">
+        <div className="flex w-60 flex-col overflow-hidden rounded-xl bg-[var(--color-surface-container-lowest)] shadow-[0_8px_32px_rgba(0,0,0,0.14)]">
             <div className="p-2 pb-1">
                 <div className="relative">
                     <Search size={13} className="absolute left-2.5 top-2.5 text-[#9ca3af]" />

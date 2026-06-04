@@ -29,7 +29,7 @@ export const ContextMenu = ({ items, position, onClose, footer }: ContextMenuPro
     return (
         <div
             ref={ref}
-            className="fixed z-9999 w-60 rounded-lg bg-white py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)] border border-[#e2e4e9]"
+            className="fixed z-9999 w-60 rounded-lg bg-[var(--color-surface-container-lowest)] py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)] border border-[var(--color-border)]"
             style={{ top, left }}
             onClick={(e) => e.stopPropagation()}
         >
@@ -76,7 +76,7 @@ export const ContextMenu = ({ items, position, onClose, footer }: ContextMenuPro
                         {/* Submenu flyout */}
                         {item.hasSubmenu && hoveredSubmenu === i && item.submenuItems && (
                             <div
-                                className="absolute left-full top-0 z-10 ml-0.5 w-56 rounded-lg bg-white py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)] border border-[#e2e4e9]"
+                                className="absolute left-full top-0 z-10 ml-0.5 w-56 rounded-lg bg-[var(--color-surface-container-lowest)] py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)] border border-[var(--color-border)]"
                                 onMouseEnter={() => setHoveredSubmenu(i)}
                                 onMouseLeave={() => setHoveredSubmenu(null)}
                             >

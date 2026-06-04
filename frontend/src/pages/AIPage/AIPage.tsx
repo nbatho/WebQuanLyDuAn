@@ -189,31 +189,31 @@ export default function AIPage() {
     };
 
     return (
-        <div className="relative flex h-screen w-full bg-[#f6f7f9] font-['Plus_Jakarta_Sans',sans-serif]">
+        <div className="relative flex h-screen w-full bg-[var(--color-surface-hover)] font-['Plus_Jakarta_Sans',sans-serif]">
             
             <div 
                 className={`flex shrink-0 flex-col bg-[#fafbfc] transition-all duration-300 ease-in-out z-30 ${
-                    isSidebarOpen ? 'w-60 border-r border-[#eef0f5] opacity-100' : 'w-0 border-none opacity-0 overflow-hidden'
+                    isSidebarOpen ? 'w-60 border-r border-[var(--color-border-light)] opacity-100' : 'w-0 border-none opacity-0 overflow-hidden'
                 }`}
             >
                 <div className="flex h-12 w-60 items-center justify-between px-4 pb-2 pt-4">
-                    <span className="text-[14px] font-extrabold text-[#141b2b]">AI</span>
+                    <span className="text-[14px] font-extrabold text-[var(--color-on-surface)]">AI</span>
                     <div className="flex items-center gap-1.5">
                         <button 
-                            className="flex h-6 w-6 items-center justify-center rounded text-[#9aa0a6] hover:bg-[#eef0f5] hover:text-[#5f6368] transition-colors"
+                            className="flex h-6 w-6 items-center justify-center rounded text-[var(--color-text-tertiary)] hover:bg-[#eef0f5] hover:text-[var(--color-text-secondary)] transition-colors"
                             onClick={() => setIsSidebarOpen(false)}
                             title="Close sidebar"
                         >
                             <PanelLeftClose size={14} />
                         </button>
-                        <button className="flex h-6 w-6 items-center justify-center rounded border border-[#eef0f5] bg-white text-[#5f6368] hover:bg-[#f6f7f9]">
+                        <button className="flex h-6 w-6 items-center justify-center rounded border border-[var(--color-border-light)] bg-[var(--color-surface-container-lowest)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]">
                             <Edit size={13} />
                         </button>
                     </div>
                 </div>
 
                 <div className="flex w-60 flex-col gap-0.5 px-2 mt-2">
-                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg bg-[#f0f4ff] px-2.5 py-1.5 text-[13px] font-semibold text-[#0058be]">
+                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg bg-[var(--color-primary-bg)] px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-primary)]">
                         <div className="flex items-center justify-center">
                             <Sparkles size={14} className="text-[#e84393]" />
                         </div>
@@ -222,34 +222,34 @@ export default function AIPage() {
                 </div>
 
                 <div className="mt-6 flex w-60 flex-col px-2">
-                    <div className="mb-1 px-2.5 text-[11px] font-extrabold text-[#9aa0a6] uppercase tracking-[0.05em]">
+                    <div className="mb-1 px-2.5 text-[11px] font-extrabold text-[var(--color-text-tertiary)] uppercase tracking-[0.05em]">
                         Super Agents
                     </div>
-                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[#5f6368] hover:bg-[#eef0f5] transition-colors">
+                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[#eef0f5] transition-colors">
                         <Blocks size={14} className="text-[#3498db]" />
                         <span>Create Agent</span>
                     </div>
-                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[#5f6368] hover:bg-[#eef0f5] transition-colors">
+                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[#eef0f5] transition-colors">
                         <Users2 size={14} className="text-[#e67e22]" />
                         <span>All Agents</span>
                     </div>
-                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[#5f6368] hover:bg-[#eef0f5] transition-colors">
+                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[#eef0f5] transition-colors">
                         <UserCircle size={14} className="text-[#2c3e50]" />
                         <span>My Agents</span>
                     </div>
-                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[#5f6368] hover:bg-[#eef0f5] transition-colors">
+                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[#eef0f5] transition-colors">
                         <History size={14} className="text-[#95a5a6]" />
                         <span>Activity</span>
                     </div>
                 </div>
 
                 <div className="mt-6 flex flex-1 flex-col px-2 overflow-y-auto scrollbar-thin">
-                    <div className="mb-1 px-2.5 text-[11px] font-extrabold text-[#9aa0a6] uppercase tracking-[0.05em]">
+                    <div className="mb-1 px-2.5 text-[11px] font-extrabold text-[var(--color-text-tertiary)] uppercase tracking-[0.05em]">
                         Recent Chats
                     </div>
                     <button 
                         onClick={handleNewChat}
-                        className="mb-2 flex cursor-pointer items-center gap-2.5 rounded-lg border border-dashed border-[#d0d4d9] px-2.5 py-1.5 text-[13px] font-semibold text-[#5f6368] hover:bg-[#eef0f5] hover:border-[#7c5cfc] hover:text-[#7c5cfc] transition-all"
+                        className="mb-2 flex cursor-pointer items-center gap-2.5 rounded-lg border border-dashed border-[#d0d4d9] px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[#eef0f5] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-all"
                     >
                         <Plus size={14} />
                         <span>New Conversation</span>
@@ -264,8 +264,8 @@ export default function AIPage() {
                                     onClick={() => setActiveSessionId(session.id)}
                                     className={`group relative flex items-center justify-between rounded-lg px-2.5 py-1.5 transition-all cursor-pointer ${
                                         activeSessionId === session.id 
-                                        ? 'bg-[#eef0f5] text-[#141b2b]' 
-                                        : 'text-[#5f6368] hover:bg-[#eef0f5] hover:text-[#141b2b]'
+                                        ? 'bg-[#eef0f5] text-[var(--color-on-surface)]' 
+                                        : 'text-[var(--color-text-secondary)] hover:bg-[#eef0f5] hover:text-[var(--color-on-surface)]'
                                     }`}
                                 >
                                 <div className="flex items-center gap-2 overflow-hidden">
@@ -275,7 +275,7 @@ export default function AIPage() {
                                 
                                 <button 
                                     onClick={(e) => handleDeleteSession(session.id, e)}
-                                    className={`flex h-6 w-6 items-center justify-center rounded text-[#9aa0a6] hover:bg-red-50 hover:text-red-500 transition-all ${
+                                    className={`flex h-6 w-6 items-center justify-center rounded text-[var(--color-text-tertiary)] hover:bg-red-50 hover:text-red-500 transition-all ${
                                         activeSessionId === session.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                                     }`}
                                     title="Delete chat"
@@ -289,12 +289,12 @@ export default function AIPage() {
             </div>
 
             {/* Main Area */}
-            <div className="relative flex flex-1 w-full flex-col bg-white overflow-hidden items-center group/main">
+            <div className="relative flex flex-1 w-full flex-col bg-[var(--color-surface-container-lowest)] overflow-hidden items-center group/main">
                 
                 {/* Floating Open Sidebar Button (visible when sidebar is closed) */}
                 {!isSidebarOpen && (
                     <button 
-                        className="absolute left-4 top-4 z-50 flex h-7 w-7 items-center justify-center rounded-md bg-white border border-[#eef0f5] text-[#5f6368] opacity-60 shadow-sm transition-all hover:bg-[#f6f7f9] hover:opacity-100"
+                        className="absolute left-4 top-4 z-50 flex h-7 w-7 items-center justify-center rounded-md bg-[var(--color-surface-container-lowest)] border border-[var(--color-border-light)] text-[var(--color-text-secondary)] opacity-60 shadow-sm transition-all hover:bg-[var(--color-surface-hover)] hover:opacity-100"
                         onClick={() => setIsSidebarOpen(true)}
                         title="Open sidebar"
                     >
@@ -314,22 +314,22 @@ export default function AIPage() {
                             {/* Giant Brain Logo */}
                             <div className="flex items-center justify-center gap-3 mb-10 w-full animate-in fade-in zoom-in duration-500">
                                 <Sparkles size={40} className="text-[#e84393]" fill="#e84393" strokeWidth={1} />
-                                <span className="text-[40px] font-bold text-[#141b2b] tracking-tight">FlowiseAI<sup className="text-lg text-[#9aa0a6] font-medium ml-1">™</sup></span>
+                                <span className="text-[40px] font-bold text-[var(--color-on-surface)] tracking-tight">FlowiseAI<sup className="text-lg text-[var(--color-text-tertiary)] font-medium ml-1">™</sup></span>
                             </div>
 
                             {/* Centered Composer */}
                             <div className="relative w-full rounded-3xl p-0.5 bg-linear-to-r from-[#e3e8f8] via-[#fdecf5] to-[#f0ebff] shadow-[0_8px_30px_rgb(0,0,0,0.06)]">
                                 {/* floating tabs */}
                                 <div className="absolute -top-7.5 left-6 flex">
-                                    <div className="flex h-8 items-center gap-1.5 rounded-t-xl bg-white px-4 text-[13px] font-bold text-[#0058be] shadow-[0_-2px_10px_rgb(0,0,0,0.02)]">
+                                    <div className="flex h-8 items-center gap-1.5 rounded-t-xl bg-[var(--color-surface-container-lowest)] px-4 text-[13px] font-bold text-[var(--color-primary)] shadow-[0_-2px_10px_rgb(0,0,0,0.02)]">
                                         <Sparkles size={12} className="text-[#e84393]" fill="#e84393" /> Ask
                                     </div>
-                                    <div className="flex h-8 items-center gap-1.5 rounded-t-xl px-4 text-[13px] font-semibold text-[#9aa0a6] hover:text-[#5f6368] cursor-pointer">
+                                    <div className="flex h-8 items-center gap-1.5 rounded-t-xl px-4 text-[13px] font-semibold text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] cursor-pointer">
                                         <Blocks size={12} /> Agents
                                     </div>
                                 </div>
 
-                                <div className="flex flex-col rounded-[22px] bg-white pt-4 pb-2 px-3">
+                                <div className="flex flex-col rounded-[22px] bg-[var(--color-surface-container-lowest)] pt-4 pb-2 px-3">
                                     <textarea
                                         value={inputValue}
                                         onChange={(e) => setInputValue(e.target.value)}
@@ -341,23 +341,23 @@ export default function AIPage() {
                                         }}
                                         placeholder="Get instant answers, insights, and ideas."
                                         autoFocus
-                                        className="min-h-17.5 max-h-50 w-full resize-none border-none bg-transparent px-3 py-1 text-[15px] font-medium text-[#141b2b] outline-none placeholder:text-[#b0b5c1] scrollbar-hide"
+                                        className="min-h-17.5 max-h-50 w-full resize-none border-none bg-transparent px-3 py-1 text-[15px] font-medium text-[var(--color-on-surface)] outline-none placeholder:text-[#b0b5c1] scrollbar-hide"
                                     />
                                     
                                     <div className="mt-3 flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <button className="flex h-7 w-7 items-center justify-center rounded bg-[#f6f7f9] text-[#5f6368] transition-colors hover:bg-[#eef0f5]">
+                                            <button className="flex h-7 w-7 items-center justify-center rounded bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] transition-colors hover:bg-[#eef0f5]">
                                                 <Plus size={14} />
                                             </button>
-                                            <div className="flex cursor-pointer items-center gap-1.5 px-2 rounded hover:bg-[#f6f7f9] py-1 transition-colors">
+                                            <div className="flex cursor-pointer items-center gap-1.5 px-2 rounded hover:bg-[var(--color-surface-hover)] py-1 transition-colors">
                                                 <Sparkles size={14} className="text-[#e84393]" fill="#e84393" strokeWidth={1} />
-                                                <span className="text-[13px] font-bold text-[#5f6368]">FlowiseAI</span>
-                                                <ArrowRight size={10} className="rotate-90 ml-0.5 text-[#9aa0a6]" />
+                                                <span className="text-[13px] font-bold text-[var(--color-text-secondary)]">FlowiseAI</span>
+                                                <ArrowRight size={10} className="rotate-90 ml-0.5 text-[var(--color-text-tertiary)]" />
                                             </div>
                                         </div>
 
                                         <div className="flex items-center gap-2">
-                                            <button className="flex items-center gap-1.5 px-2 py-1.5 rounded text-[#9aa0a6] hover:text-[#5f6368] transition-colors">
+                                            <button className="flex items-center gap-1.5 px-2 py-1.5 rounded text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
                                                 <Globe size={14} />
                                             </button>
                                             
@@ -366,8 +366,8 @@ export default function AIPage() {
                                                 disabled={!inputValue.trim() || isGenerating}
                                                 className={`flex h-8 w-8 items-center justify-center rounded-full transition-all ${
                                                     inputValue.trim() 
-                                                        ? 'bg-[#eef0f5] text-[#141b2b] hover:bg-[#dcdfe4]' 
-                                                        : 'bg-[#f6f7f9] text-[#c2c9e0]'
+                                                        ? 'bg-[#eef0f5] text-[var(--color-on-surface)] hover:bg-[#dcdfe4]' 
+                                                        : 'bg-[var(--color-surface-hover)] text-[#c2c9e0]'
                                                 }`}
                                             >
                                                 <ArrowRight size={14} strokeWidth={2.5} />
@@ -378,25 +378,25 @@ export default function AIPage() {
                             </div>
 
                             <div className="mt-6 flex w-full gap-3 justify-center text-left">
-                                <button className="flex flex-1 flex-col justify-start rounded-xl border border-[#eef0f5] bg-white p-3 shadow-sm hover:border-[#dcdfe4] hover:-translate-y-0.5 transition-all" onClick={() => handleSendMessage("Create Task")}>
-                                    <Sun size={14} className="mb-2 text-[#5f6368]" />
-                                    <span className="text-[12px] font-extrabold text-[#141b2b] mb-0.5">Create Task</span>
-                                    <span className="text-[11px] font-medium text-[#9aa0a6]">Add new action item</span>
+                                <button className="flex flex-1 flex-col justify-start rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface-container-lowest)] p-3 shadow-sm hover:border-[var(--color-border)] hover:-translate-y-0.5 transition-all" onClick={() => handleSendMessage("Create Task")}>
+                                    <Sun size={14} className="mb-2 text-[var(--color-text-secondary)]" />
+                                    <span className="text-[12px] font-extrabold text-[var(--color-on-surface)] mb-0.5">Create Task</span>
+                                    <span className="text-[11px] font-medium text-[var(--color-text-tertiary)]">Add new action item</span>
                                 </button>
-                                <button className="flex flex-1 flex-col justify-start rounded-xl border border-[#eef0f5] bg-white p-3 shadow-sm hover:border-[#dcdfe4] hover:-translate-y-0.5 transition-all" onClick={() => handleSendMessage("Set Reminder")}>
-                                    <Bell size={14} className="mb-2 text-[#5f6368]" />
-                                    <span className="text-[12px] font-extrabold text-[#141b2b] mb-0.5">Set Reminder</span>
-                                    <span className="text-[11px] font-medium text-[#9aa0a6]">Remind about task</span>
+                                <button className="flex flex-1 flex-col justify-start rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface-container-lowest)] p-3 shadow-sm hover:border-[var(--color-border)] hover:-translate-y-0.5 transition-all" onClick={() => handleSendMessage("Set Reminder")}>
+                                    <Bell size={14} className="mb-2 text-[var(--color-text-secondary)]" />
+                                    <span className="text-[12px] font-extrabold text-[var(--color-on-surface)] mb-0.5">Set Reminder</span>
+                                    <span className="text-[11px] font-medium text-[var(--color-text-tertiary)]">Remind about task</span>
                                 </button>
-                                <button className="flex flex-1 flex-col justify-start rounded-xl border border-[#eef0f5] bg-white p-3 shadow-sm hover:border-[#dcdfe4] hover:-translate-y-0.5 transition-all" onClick={() => handleSendMessage("Brainstorm Ideas")}>
-                                    <Lightbulb size={14} className="mb-2 text-[#5f6368]" />
-                                    <span className="text-[12px] font-extrabold text-[#141b2b] mb-0.5">Brainstorm Ideas</span>
-                                    <span className="text-[11px] font-medium text-[#9aa0a6]">Generate new concepts</span>
+                                <button className="flex flex-1 flex-col justify-start rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface-container-lowest)] p-3 shadow-sm hover:border-[var(--color-border)] hover:-translate-y-0.5 transition-all" onClick={() => handleSendMessage("Brainstorm Ideas")}>
+                                    <Lightbulb size={14} className="mb-2 text-[var(--color-text-secondary)]" />
+                                    <span className="text-[12px] font-extrabold text-[var(--color-on-surface)] mb-0.5">Brainstorm Ideas</span>
+                                    <span className="text-[11px] font-medium text-[var(--color-text-tertiary)]">Generate new concepts</span>
                                 </button>
-                                <button className="flex flex-1 flex-col justify-start rounded-xl border border-[#eef0f5] bg-white p-3 shadow-sm hover:border-[#dcdfe4] hover:-translate-y-0.5 transition-all" onClick={() => handleSendMessage("Find Tasks")}>
-                                    <Search size={14} className="mb-2 text-[#5f6368]" />
-                                    <span className="text-[12px] font-extrabold text-[#141b2b] mb-0.5">Find Tasks</span>
-                                    <span className="text-[11px] font-medium text-[#9aa0a6]">Search for overdue tasks</span>
+                                <button className="flex flex-1 flex-col justify-start rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface-container-lowest)] p-3 shadow-sm hover:border-[var(--color-border)] hover:-translate-y-0.5 transition-all" onClick={() => handleSendMessage("Find Tasks")}>
+                                    <Search size={14} className="mb-2 text-[var(--color-text-secondary)]" />
+                                    <span className="text-[12px] font-extrabold text-[var(--color-on-surface)] mb-0.5">Find Tasks</span>
+                                    <span className="text-[11px] font-medium text-[var(--color-text-tertiary)]">Search for overdue tasks</span>
                                 </button>
                             </div>
                         </div>
@@ -413,20 +413,20 @@ export default function AIPage() {
                                         className={`flex w-full ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                                     >
                                         {message.role === 'user' ? (
-                                            <div className="max-w-[70%] rounded-2xl bg-[#eef0f5] px-4 py-2.5 text-[14px] font-medium text-[#141b2b]">
+                                            <div className="max-w-[70%] rounded-2xl bg-[#eef0f5] px-4 py-2.5 text-[14px] font-medium text-[var(--color-on-surface)]">
                                                 {message.content}
                                             </div>
                                         ) : (
                                             <div className="flex w-full max-w-[85%] flex-col">
                                                 <div className="mb-2 flex items-center gap-1.5">
                                                     <Sparkles size={16} className="text-[#e84393]" fill="#e84393" strokeWidth={1} />
-                                                    <span className="text-[14px] font-bold text-[#141b2b]">FlowiseAI</span>
+                                                    <span className="text-[14px] font-bold text-[var(--color-on-surface)]">FlowiseAI</span>
                                                 </div>
                                                 
                                                 {message.isSearching ? (
                                                     <div className="flex items-center gap-2 rounded-lg bg-linear-to-r from-[#e3e8f8]/30 to-transparent py-2 px-3 animate-pulse w-max">
-                                                        <Search size={14} className="text-[#7c5cfc] animate-spin-slow" />
-                                                        <span className="text-[13px] font-semibold text-[#7c5cfc]">Flowise thinking...</span>
+                                                        <Search size={14} className="text-[var(--color-accent)] animate-spin-slow" />
+                                                        <span className="text-[13px] font-semibold text-[var(--color-accent)]">Flowise thinking...</span>
                                                     </div>
                                                 ) : (
                                                     <div className="text-[14px] font-medium leading-[1.6] text-[#3a3f47] markdown-content overflow-hidden">
@@ -438,13 +438,13 @@ export default function AIPage() {
                                                 
                                                 {!message.isStreaming && !message.isSearching && (
                                                     <div className="mt-3 flex items-center gap-1">
-                                                        <button className="flex h-7 w-7 items-center justify-center rounded text-[#9aa0a6] hover:bg-[#eef0f5] hover:text-[#5f6368] transition-colors">
+                                                        <button className="flex h-7 w-7 items-center justify-center rounded text-[var(--color-text-tertiary)] hover:bg-[#eef0f5] hover:text-[var(--color-text-secondary)] transition-colors">
                                                             <Copy size={13} />
                                                         </button>
-                                                        <button className="flex h-7 w-7 items-center justify-center rounded text-[#9aa0a6] hover:bg-[#eef0f5] hover:text-[#5f6368] transition-colors">
+                                                        <button className="flex h-7 w-7 items-center justify-center rounded text-[var(--color-text-tertiary)] hover:bg-[#eef0f5] hover:text-[var(--color-text-secondary)] transition-colors">
                                                             <CheckSquare size={13} />
                                                         </button>
-                                                        <button className="flex h-7 w-7 items-center justify-center rounded text-[#9aa0a6] hover:bg-[#eef0f5] hover:text-[#5f6368] transition-colors">
+                                                        <button className="flex h-7 w-7 items-center justify-center rounded text-[var(--color-text-tertiary)] hover:bg-[#eef0f5] hover:text-[var(--color-text-secondary)] transition-colors">
                                                             <FileText size={13} />
                                                         </button>
                                                     </div>
@@ -458,7 +458,7 @@ export default function AIPage() {
                                                                 <button 
                                                                     key={idx}
                                                                     onClick={() => handleSendMessage(prompt)}
-                                                                    className="flex items-center gap-1.5 rounded-full border border-[#eef0f5] bg-white px-3 py-1.5 text-left text-[13px] font-medium text-[#5f6368] shadow-[0_2px_4px_rgb(0,0,0,0.02)] transition-all hover:border-[#7c5cfc] hover:text-[#7c5cfc] hover:shadow-sm"
+                                                                    className="flex items-center gap-1.5 rounded-full border border-[var(--color-border-light)] bg-[var(--color-surface-container-lowest)] px-3 py-1.5 text-left text-[13px] font-medium text-[var(--color-text-secondary)] shadow-[0_2px_4px_rgb(0,0,0,0.02)] transition-all hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] hover:shadow-sm"
                                                                 >
                                                                     <span className="text-[#b0b5c1]">↳</span> {prompt}
                                                                 </button>
@@ -477,7 +477,7 @@ export default function AIPage() {
                         {/* Floating Input Composer at Bottom */}
                         <div className="absolute bottom-6 left-0 right-0 z-20 flex justify-center w-full px-8">
                             <div className="w-full max-w-4xl relative rounded-3xl p-0.5 bg-linear-to-r from-[#e3e8f8] via-[#fdecf5] to-[#f0ebff] shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-                                <div className="flex flex-col rounded-[22px] bg-white pt-2.5 pb-2 px-3">
+                                <div className="flex flex-col rounded-[22px] bg-[var(--color-surface-container-lowest)] pt-2.5 pb-2 px-3">
                                     <textarea
                                         value={inputValue}
                                         onChange={(e) => setInputValue(e.target.value)}
@@ -488,22 +488,22 @@ export default function AIPage() {
                                             }
                                         }}
                                         placeholder="Tell AI what to do next"
-                                        className="min-h-11 max-h-50 w-full resize-none border-none bg-transparent px-2 py-1 text-[14px] font-medium text-[#141b2b] outline-none placeholder:text-[#b0b5c1] scrollbar-hide"
+                                        className="min-h-11 max-h-50 w-full resize-none border-none bg-transparent px-2 py-1 text-[14px] font-medium text-[var(--color-on-surface)] outline-none placeholder:text-[#b0b5c1] scrollbar-hide"
                                     />
                                     
                                     <div className="mt-2 flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <button className="flex h-7 w-7 items-center justify-center rounded bg-[#f6f7f9] text-[#5f6368] transition-colors hover:bg-[#eef0f5]">
+                                            <button className="flex h-7 w-7 items-center justify-center rounded bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] transition-colors hover:bg-[#eef0f5]">
                                                 <Plus size={14} />
                                             </button>
                                             <div className="flex items-center gap-1.5 px-2">
                                                 <Sparkles size={14} className="text-[#e84393]" fill="#e84393" strokeWidth={1} />
-                                                <span className="text-[13px] font-bold text-[#5f6368]">FlowiseAI</span>
+                                                <span className="text-[13px] font-bold text-[var(--color-text-secondary)]">FlowiseAI</span>
                                             </div>
                                         </div>
 
                                         <div className="flex items-center gap-2">
-                                            <button className="flex items-center gap-1.5 px-2 py-1.5 rounded hover:bg-[#f6f7f9] text-[#5f6368] transition-colors">
+                                            <button className="flex items-center gap-1.5 px-2 py-1.5 rounded hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] transition-colors">
                                                 <Globe size={13} />
                                                 <span className="text-[12px] font-semibold">All sources</span>
                                                 <ArrowRight size={10} className="rotate-90 ml-0.5" />
@@ -514,8 +514,8 @@ export default function AIPage() {
                                                 disabled={!inputValue.trim() || isGenerating}
                                                 className={`flex h-7 w-7 items-center justify-center rounded-full transition-all ${
                                                     inputValue.trim() 
-                                                        ? 'bg-[#eef0f5] text-[#141b2b] hover:bg-[#dcdfe4]' 
-                                                        : 'bg-[#f6f7f9] text-[#c2c9e0]'
+                                                        ? 'bg-[#eef0f5] text-[var(--color-on-surface)] hover:bg-[#dcdfe4]' 
+                                                        : 'bg-[var(--color-surface-hover)] text-[#c2c9e0]'
                                                 }`}
                                             >
                                                 <ArrowRight size={14} strokeWidth={2.5} />

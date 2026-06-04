@@ -144,7 +144,7 @@ export const FolderNode = ({ folder, spaceId, spaceName }: { folder: FolderItem;
             </div>
 
             {expanded && folder.lists.length > 0 && (
-                <div className="ml-4.5 border-l border-[#e2e4e9] pl-2">
+                <div className="ml-4.5 border-l border-[var(--color-border)] pl-2">
                     {folder.lists.map((list) => (
                         <ListNode
                             key={list.id}

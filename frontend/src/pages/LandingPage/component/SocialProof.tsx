@@ -35,7 +35,7 @@ export default function SocialProof() {
             <div className="max-w-7xl mx-auto px-10">
                 {/* Section label */}
                 <div className="text-center mb-16">
-                    <div className="inline-flex items-center gap-2 bg-white/10 text-[#adc6ff] font-bold text-xs uppercase tracking-widest px-4 py-2 rounded-full mb-6">
+                    <div className="inline-flex items-center gap-2 bg-[var(--color-surface-container-lowest)]/10 text-[#adc6ff] font-bold text-xs uppercase tracking-widest px-4 py-2 rounded-full mb-6">
                         Kết quả thực tế
                     </div>
                     <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
@@ -49,7 +49,7 @@ export default function SocialProof() {
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
                     {stats.map((stat) => (
-                        <div key={stat.label} className="bg-white/5 rounded-2xl p-8 text-center border border-white/5 hover:border-white/10 transition-colors">
+                        <div key={stat.label} className="bg-[var(--color-surface-container-lowest)]/5 rounded-2xl p-8 text-center border border-white/5 hover:border-white/10 transition-colors">
                             <div className={`text-4xl md:text-5xl font-extrabold ${stat.color} mb-2`}>{stat.value}</div>
                             <div className="text-sm font-semibold uppercase tracking-wider text-slate-400">
                                 {stat.label}
@@ -63,7 +63,7 @@ export default function SocialProof() {
                     {testimonials.map((t) => (
                         <div
                             key={t.name}
-                            className={`bg-white/5 p-8 rounded-2xl border border-white/5 ${t.accent ? 'border-t-4 border-t-[#0058be]' : ''}`}
+                            className={`bg-[var(--color-surface-container-lowest)]/5 p-8 rounded-2xl border border-white/5 ${t.accent ? 'border-t-4 border-t-[#0058be]' : ''}`}
                         >
                             <p className="text-base italic mb-8 leading-relaxed text-slate-300">{t.quote}</p>
                             <div className="flex items-center gap-4">

@@ -31,7 +31,7 @@ export default function ListView() {
     const [newStatusColor, setNewStatusColor] = useState(STATUS_COLORS[0]);
 
     return (
-        <div className="flex flex-1 flex-col overflow-hidden bg-white font-sans">
+        <div className="flex flex-1 flex-col overflow-hidden bg-[var(--color-surface-container-lowest)] font-sans">
             <div className="flex-1 overflow-y-auto p-6">
                 {groups.map((group) => (
                     <div key={group.id} className="mb-8">
@@ -39,7 +39,7 @@ export default function ListView() {
                         <div className="group flex cursor-pointer items-center gap-2 py-1 mb-2">
                             <button
                                 onClick={(e) => { e.stopPropagation(); toggleGroup(group.id); }}
-                                className="flex h-5 w-5 items-center justify-center text-[#9ca3af] hover:text-[#5f6368]"
+                                className="flex h-5 w-5 items-center justify-center text-[#9ca3af] hover:text-[var(--color-text-secondary)]"
                             >
                                 {group.isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                             </button>
@@ -167,7 +167,7 @@ export default function ListView() {
                                     }
                                 }}
                                 placeholder="Status name..."
-                                className="flex-1 rounded-md border border-[#e5e7eb] bg-white px-2.5 py-1.5 text-[13px] font-medium text-[#292d34] outline-none focus:border-[#7c68ee] transition-colors"
+                                className="flex-1 rounded-md border border-[#e5e7eb] bg-[var(--color-surface-container-lowest)] px-2.5 py-1.5 text-[13px] font-medium text-[#292d34] outline-none focus:border-[#7c68ee] transition-colors"
                             />
                         </div>
                         <div className="flex items-center gap-1.5 mb-3">
@@ -200,7 +200,7 @@ export default function ListView() {
                             </button>
                             <button
                                 onClick={() => { setShowAddStatus(false); setNewStatusName(''); }}
-                                className="rounded-md border border-[#e5e7eb] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#5f6368] cursor-pointer transition-colors hover:bg-[#f3f4f6]"
+                                className="rounded-md border border-[#e5e7eb] bg-[var(--color-surface-container-lowest)] px-3 py-1.5 text-[12px] font-semibold text-[var(--color-text-secondary)] cursor-pointer transition-colors hover:bg-[#f3f4f6]"
                             >
                                 Cancel
                             </button>

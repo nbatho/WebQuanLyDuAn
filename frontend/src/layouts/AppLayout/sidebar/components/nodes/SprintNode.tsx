@@ -73,7 +73,7 @@ export const SprintNode = ({ sprint, spaceId, onDelete }: SprintNodeProps) => {
             {/* Context menu */}
             {showMenu && (
                 <div
-                    className="absolute right-0 top-full z-50 w-40 rounded-lg border border-[#e2e4e9] bg-white py-1 shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
+                    className="absolute right-0 top-full z-50 w-40 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-container-lowest)] py-1 shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
                     onClick={(e) => e.stopPropagation()}
                 >
                     <button

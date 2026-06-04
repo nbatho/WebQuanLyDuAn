@@ -22,7 +22,7 @@ export default function CTABanner() {
                         </Button>
                         <Button
                             size="large"
-                            className="!bg-white/10 !text-white !border-0 !rounded-xl !font-bold !text-base !px-10 !h-14 hover:!bg-white/20 transition-all"
+                            className="!bg-[var(--color-surface-container-lowest)]/10 !text-white !border-0 !rounded-xl !font-bold !text-base !px-10 !h-14 hover:!bg-[var(--color-surface-container-lowest)]/20 transition-all"
                         >
                             Xem Demo
                         </Button>
@@ -31,7 +31,7 @@ export default function CTABanner() {
                 </div>
 
                 {/* Geometric decorations */}
-                <div className="absolute top-0 right-0 w-72 h-72 bg-[#0058be]/15 -translate-y-1/3 translate-x-1/3 rounded-full" />
+                <div className="absolute top-0 right-0 w-72 h-72 bg-[var(--color-primary)]/15 -translate-y-1/3 translate-x-1/3 rounded-full" />
                 <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#006c49]/10 translate-y-1/2 -translate-x-1/3 rounded-full" />
                 <div className="absolute top-1/2 right-8 w-20 h-20 bg-[#ffddb8]/10 rounded-xl rotate-45" />
             </div>

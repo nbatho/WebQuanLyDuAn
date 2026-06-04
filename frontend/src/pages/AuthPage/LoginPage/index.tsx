@@ -123,9 +123,9 @@ export default function AuthPage() {
             {/* ═══════ LEFT PANEL: Brand Visual (55%) ═══════ */}
             <section className="relative flex min-h-100 w-full flex-col justify-between overflow-hidden bg-[var(--color-primary)] p-10 md:h-screen md:w-[55%] md:p-14">
                 {/* Decorative Geometric Shapes */}
-                <div className="pointer-events-none absolute -left-20 -top-20 h-100 w-100 rounded-full bg-white opacity-5" />
-                <div className="pointer-events-none absolute -right-20 top-1/2 h-62.5 w-62.5 rotate-15 bg-white opacity-[0.08]" />
-                <div className="pointer-events-none absolute bottom-20 left-1/4 h-30 w-30 rounded-full bg-white opacity-10" />
+                <div className="pointer-events-none absolute -left-20 -top-20 h-100 w-100 rounded-full bg-[var(--color-surface-container-lowest)] opacity-5" />
+                <div className="pointer-events-none absolute -right-20 top-1/2 h-62.5 w-62.5 rotate-15 bg-[var(--color-surface-container-lowest)] opacity-[0.08]" />
+                <div className="pointer-events-none absolute bottom-20 left-1/4 h-30 w-30 rounded-full bg-[var(--color-surface-container-lowest)] opacity-10" />
 
                 {/* Logo */}
                 <div className="relative z-10">
@@ -153,19 +153,19 @@ export default function AuthPage() {
                                 </p>
                                 <div className="space-y-5">
                                     <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 bg-white/15 rounded-lg flex items-center justify-center">
+                                        <div className="h-10 w-10 bg-[var(--color-surface-container-lowest)]/15 rounded-lg flex items-center justify-center">
                                             <CheckCircle size={20} className="text-[var(--color-on-primary)]" strokeWidth={2.5} />
                                         </div>
                                         <span className="text-[var(--color-on-primary)] font-semibold text-body">{t('marketing.login.feature1')}</span>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 bg-white/15 rounded-lg flex items-center justify-center">
+                                        <div className="h-10 w-10 bg-[var(--color-surface-container-lowest)]/15 rounded-lg flex items-center justify-center">
                                             <Users size={20} className="text-[var(--color-on-primary)]" strokeWidth={2.5} />
                                         </div>
                                         <span className="text-[var(--color-on-primary)] font-semibold text-body">{t('marketing.login.feature2')}</span>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 bg-white/15 rounded-lg flex items-center justify-center">
+                                        <div className="h-10 w-10 bg-[var(--color-surface-container-lowest)]/15 rounded-lg flex items-center justify-center">
                                             <BarChart3 size={20} className="text-[var(--color-on-primary)]" strokeWidth={2.5} />
                                         </div>
                                         <span className="text-[var(--color-on-primary)] font-semibold text-body">{t('marketing.login.feature3')}</span>
