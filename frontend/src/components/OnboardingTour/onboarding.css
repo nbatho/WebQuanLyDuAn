@@ -114,65 +114,6 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   DARK MODE OVERRIDES
-   Dùng đúng design tokens — không phải chỉ reverse of light
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ── Dark Base ────────────────────────────────────────────── */
-.dark .flowise-tour-popover {
-  background: #1e2030 !important;
-  border-color: #3a3d52 !important;
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(110, 168, 255, 0.15) !important;
-}
-
-/* ── Dark Title ───────────────────────────────────────────── */
-.dark .flowise-tour-popover .driver-popover-title {
-  color: #e8eaf6 !important;
-}
-
-/* ── Dark Description ─────────────────────────────────────── */
-.dark .flowise-tour-popover .driver-popover-description {
-  color: #a0a4b8 !important;
-}
-
-/* ── Dark Progress ────────────────────────────────────────── */
-.dark .flowise-tour-popover .driver-popover-progress-text {
-  color: #6b6f85 !important;
-}
-
-/* ── Dark Next/Done Button — sáng trên nền tối ───────────── */
-.dark .flowise-tour-popover .driver-popover-next-btn {
-  background: linear-gradient(135deg, #6ea8ff, #8ab8ff) !important;
-  color: #0f1119 !important;
-}
-.dark .flowise-tour-popover .driver-popover-next-btn:hover {
-  background: linear-gradient(135deg, #8ab8ff, #a8c8ff) !important;
-  box-shadow: 0 4px 12px rgba(110, 168, 255, 0.35) !important;
-}
-
-/* ── Dark Prev Button ─────────────────────────────────────── */
-.dark .flowise-tour-popover .driver-popover-prev-btn {
-  color: #a0a4b8 !important;
-  border-color: #3a3d52 !important;
-}
-.dark .flowise-tour-popover .driver-popover-prev-btn:hover {
-  background: #152240 !important;
-  border-color: #6ea8ff !important;
-  color: #6ea8ff !important;
-}
-
-/* ── Dark Close Button ────────────────────────────────────── */
-.dark .flowise-tour-popover .driver-popover-close-btn {
-  color: #6b6f85 !important;
-}
-.dark .flowise-tour-popover .driver-popover-close-btn:hover {
-  background: #252838 !important;
-  color: #e8eaf6 !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════
    DRIVER OVERLAY & HIGHLIGHT RING
    ═══════════════════════════════════════════════════════════════ */
 
@@ -180,16 +121,10 @@
 .driver-overlay {
   opacity: 0.65 !important;
 }
-.dark .driver-overlay {
-  opacity: 0.75 !important;
-}
 
 /* Highlighted element ring */
 .driver-active-element {
   outline: 2px solid #0058be !important;
   outline-offset: 3px !important;
   border-radius: 8px !important;
-}
-.dark .driver-active-element {
-  outline-color: #6ea8ff !important;
 }

@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════
-   OverviewView — Fully Themed Dashboard Styles
-   Uses CSS Variables for Dark/Light mode support
+   OverviewView — Dashboard Styles
+   Uses CSS Variables for consistent theming
    ═══════════════════════════════════════════════ */
 
 /* ── Root Container ── */
@@ -31,9 +31,7 @@
     transition: all 0.25s ease;
 }
 
-.dark .overview-stat-card {
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-}
+
 
 .overview-stat-card:hover {
     transform: translateY(-2px);
@@ -41,9 +39,7 @@
     border-color: var(--color-border);
 }
 
-.dark .overview-stat-card:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-}
+
 
 .stat-icon {
     display: flex;
@@ -101,18 +97,14 @@
     transition: all 0.25s ease;
 }
 
-.dark .overview-widget {
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-}
+
 
 .overview-widget:hover {
     box-shadow: 0 4px 16px rgba(20, 27, 43, 0.07);
     border-color: var(--color-border);
 }
 
-.dark .overview-widget:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-}
+
 
 /* ── Widget Header ── */
 .widget-header {
@@ -248,10 +240,7 @@
     color: #27ae60;
 }
 
-.dark .sprint-status--active {
-    background: rgba(39, 174, 96, 0.2);
-    color: #6fcf97;
-}
+
 
 .sprint-status--planning {
     background: var(--color-primary-bg);
@@ -289,9 +278,7 @@
     color: #27ae60;
 }
 
-.dark .sprint-progress-pct {
-    color: #6fcf97;
-}
+
 
 .sprint-progress-bar-track {
     height: 8px;

@@ -65,7 +65,7 @@ export default function TaskDetailHeader({
                         </button>
                     </Tooltip>
                     <button
-                        className="flex cursor-pointer items-center rounded-md border-none bg-transparent p-1.5 text-[var(--color-text-tertiary)] hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950 transition-colors"
+                        className="flex cursor-pointer items-center rounded-md border-none bg-transparent p-1.5 text-[var(--color-text-tertiary)] hover:bg-red-50 hover:text-red-500 transition-colors"
                         onClick={onClose}
                     >
                         <X size={18} />

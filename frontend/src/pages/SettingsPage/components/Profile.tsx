@@ -144,7 +144,7 @@ export default function Profile() {
                         type="button"
                         title={t('profile.changeAvatar')}
                         disabled
-                        className="absolute bottom-0 right-0 flex h-[26px] w-[26px] cursor-not-allowed items-center justify-center rounded-full border-2 border-white bg-[var(--color-primary)] text-white opacity-60 dark:border-[var(--color-surface-subtle)]"
+                        className="absolute bottom-0 right-0 flex h-[26px] w-[26px] cursor-not-allowed items-center justify-center rounded-full border-2 border-white bg-[var(--color-primary)] text-white opacity-60"
                     >
                         <Camera size={14} />
                     </button>
@@ -223,13 +223,13 @@ export default function Profile() {
                 </div>
 
                 {updateProfileSuccess && (
-                    <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2.5 text-body-sm text-green-700 dark:border-green-900 dark:bg-green-950 dark:text-green-400">
+                    <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2.5 text-body-sm text-green-700">
                         <CheckCircle2 className="h-4 w-4 shrink-0" />
                         {t('profile.updateSuccess')}
                     </div>
                 )}
                 {updateProfileError && !isUpdatingProfile && (
-                    <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-body-sm text-red-600 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+                    <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-body-sm text-red-600">
                         <AlertCircle className="h-4 w-4 shrink-0" />
                         {updateProfileError}
                     </div>

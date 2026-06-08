@@ -159,13 +159,13 @@ export default function Workspace() {
                 </div>
 
                 {successMsg && (
-                    <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2.5 text-body-sm text-green-700 dark:border-green-900 dark:bg-green-950 dark:text-green-400">
+                    <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2.5 text-body-sm text-green-700">
                         <CheckCircle2 className="h-4 w-4 shrink-0" />
                         {successMsg}
                     </div>
                 )}
                 {updateWorkspaceError && !isUpdatingWorkspace && (
-                    <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-body-sm text-red-600 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+                    <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-body-sm text-red-600">
                         <AlertCircle className="h-4 w-4 shrink-0" />
                         {updateWorkspaceError}
                     </div>

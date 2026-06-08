@@ -52,7 +52,7 @@ export default function Notifications() {
                             </span>
                         </div>
                         <button
-                            className={`relative h-6 w-11 shrink-0 rounded-xl border-none transition-colors duration-200 ${item.value ? 'bg-[var(--color-primary)]' : 'bg-[#dcdfe4] dark:bg-[#3a3d52]'
+                            className={`relative h-6 w-11 shrink-0 rounded-xl border-none transition-colors duration-200 ${item.value ? 'bg-[var(--color-primary)]' : 'bg-[#dcdfe4]'
                                 }`}
                             onClick={item.onChange}
                         >

@@ -189,7 +189,7 @@ export default function AppSidebar() {
                     <span>{t('sidebar.settings')}</span>
                 </div>
                 <div
-                    className="flex cursor-pointer select-none items-center gap-2.5 rounded-md px-2.5 py-1.75 text-body-sm font-medium text-[var(--color-error)] transition-all hover:bg-[#fef2f2] dark:hover:bg-[#2a1515]"
+                    className="flex cursor-pointer select-none items-center gap-2.5 rounded-md px-2.5 py-1.75 text-body-sm font-medium text-[var(--color-error)] transition-all hover:bg-[#fef2f2]"
                     onClick={handleLogout}
                 >
                     <LogOut size={18} strokeWidth={1.8} />

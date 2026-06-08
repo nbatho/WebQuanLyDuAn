@@ -165,7 +165,7 @@ export default function Security() {
       <p className="mb-6 text-body-sm text-[var(--color-text-tertiary)]">{t('security.subtitle')}</p>
 
       {changePasswordSuccess && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-body-sm text-green-700 dark:border-green-900 dark:bg-green-950 dark:text-green-400">
+        <div className="mb-4 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-body-sm text-green-700">
           <Check size={16} className="shrink-0" />
           <span>{t('security.changeSuccess')}</span>
         </div>
@@ -176,7 +176,7 @@ export default function Security() {
           {!otpRequested ? (
             <form onSubmit={handleSendOtp} className="flex max-w-120 flex-col gap-4">
               {(clientError || errorRequestOtp) && (
-                <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-body-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+                <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-body-sm text-red-700">
                   <AlertCircle size={16} className="shrink-0" />
                   <span>{clientError || errorRequestOtp}</span>
                 </div>
@@ -253,7 +253,7 @@ export default function Security() {
             </form>
           ) : (
             <form onSubmit={handleVerifyOtp} className="flex max-w-120 flex-col gap-5">
-              <div className="rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface-subtle)] px-5 py-4 dark:bg-[var(--color-surface-container)]">
+              <div className="rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface-subtle)] px-5 py-4">
                 <div className="mb-1 flex items-center gap-2">
                   <Mail size={16} className="text-[var(--color-primary)]" />
                   <span className="text-body font-bold text-[var(--color-on-surface)]">{t('security.otpSent')}</span>
@@ -264,7 +264,7 @@ export default function Security() {
               </div>
 
               {(clientError || errorVerifyOtp) && (
-                <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-body-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+                <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-body-sm text-red-700">
                   <AlertCircle size={16} className="shrink-0" />
                   <span>{clientError || errorVerifyOtp}</span>
                 </div>

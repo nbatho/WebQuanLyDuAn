@@ -28,7 +28,6 @@
     color: var(--color-on-surface);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transition: background-color var(--transition-normal), color var(--transition-normal);
   }
 
   body {
@@ -39,10 +38,6 @@
     min-height: 100vh;
   }
 
-  /* ─── Dark mode transitions ─── */
-  .dark {
-    color-scheme: dark;
-  }
 }
 
 @layer components {
@@ -150,37 +145,5 @@
   }
   .markdown-content tr:hover td {
     background: var(--color-surface-hover);
-  }
-
-  /* ─── Ant Design dark mode overrides ─── */
-  .dark .ant-popover-inner {
-    background-color: var(--color-surface-container) !important;
-    border: 1px solid var(--color-border) !important;
-  }
-  .dark .ant-tooltip-inner {
-    background-color: var(--color-surface-container-high) !important;
-    color: var(--color-on-surface) !important;
-  }
-  .dark .ant-select-dropdown {
-    background-color: var(--color-surface-container) !important;
-    border: 1px solid var(--color-border) !important;
-  }
-  .dark .ant-select-item:hover {
-    background-color: var(--color-surface-hover) !important;
-  }
-  .dark .ant-select-item-option-selected {
-    background-color: var(--color-primary-bg) !important;
-  }
-  .dark .ant-input,
-  .dark .ant-input-affix-wrapper {
-    background-color: var(--color-surface-container) !important;
-    border-color: var(--color-border) !important;
-    color: var(--color-on-surface) !important;
-  }
-  .dark .ant-input::placeholder {
-    color: var(--color-text-tertiary) !important;
-  }
-  .dark .ant-spin-dot-item {
-    background-color: var(--color-primary) !important;
   }
 }
