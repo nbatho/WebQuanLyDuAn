@@ -63,5 +63,6 @@
     "mismatch": "New password and confirmation do not match",
     "changeSuccess": "Password updated successfully!"
   },
-  "restartTour": "Restart guided tour"
+  "restartTour": "Restart guided tour",
+  "restartTourDesc": "Replay the step-by-step onboarding tour from the beginning. Useful when you want to revisit the main features."
 }

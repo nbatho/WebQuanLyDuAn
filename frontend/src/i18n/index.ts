@@ -1,5 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+// Kích hoạt TypeScript type augmentation cho translation keys
+import './types';
 
 // Vietnamese locale imports
 import viCommon from './locales/vi/common.json';

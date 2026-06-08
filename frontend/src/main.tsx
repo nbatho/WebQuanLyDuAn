@@ -32,8 +32,40 @@ const antdLocaleMap: Record<string, typeof viVN> = {
     en: enUS,
 };
 
+/* ─── Shared base tokens ─── */
+const baseTokens = {
+    borderRadius: 8,
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    boxShadow: 'none',
+    boxShadowSecondary: 'none',
+    boxShadowTertiary: 'none',
+    // ── Typography Scale — mirror của CSS vars trong GlobalStyles.css ──
+    // --text-body: 14px (base)
+    fontSize: 14,
+    // --text-body-sm: 13px
+    fontSizeSM: 13,
+    // --text-body-lg: 15px
+    fontSizeLG: 15,
+    // --text-h3: 17px
+    fontSizeXL: 17,
+    // Heading scale
+    fontSizeHeading1: 24,  // --text-h1
+    fontSizeHeading2: 20,  // --text-h2
+    fontSizeHeading3: 17,  // --text-h3
+    fontSizeHeading4: 15,  // --text-h4
+    fontSizeHeading5: 14,  // --text-body
+    // Line heights
+    lineHeight: 1.571,          // ~22px at 14px
+    lineHeightLG: 1.6,
+    lineHeightSM: 1.538,        // ~20px at 13px
+    lineHeightHeading1: 1.333,
+    lineHeightHeading2: 1.4,
+    lineHeightHeading3: 1.412,
+};
+
 /* ─── Light theme tokens ─── */
 const lightTokens = {
+    ...baseTokens,
     colorPrimary: '#0058be',
     colorError: '#ba1a1a',
     colorText: '#141b2b',
@@ -44,16 +76,11 @@ const lightTokens = {
     colorBgContainer: '#ffffff',
     colorBgElevated: '#ffffff',
     colorBgLayout: '#f9f9ff',
-    borderRadius: 8,
-    fontFamily: "'Plus Jakarta Sans', sans-serif",
-    boxShadow: 'none',
-    boxShadowSecondary: 'none',
-    boxShadowTertiary: 'none',
 };
 
 /* ─── Dark theme tokens ─── */
 const darkTokens = {
-    ...lightTokens,
+    ...baseTokens,
     colorPrimary: '#6ea8ff',
     colorError: '#ff6b6b',
     colorText: '#e8eaf6',

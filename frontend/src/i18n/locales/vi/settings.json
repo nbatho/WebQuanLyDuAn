@@ -63,5 +63,6 @@
     "mismatch": "Mật khẩu mới và xác nhận không khớp",
     "changeSuccess": "Cập nhật mật khẩu thành công!"
   },
-  "restartTour": "Xem lại hướng dẫn sử dụng"
+  "restartTour": "Xem lại hướng dẫn sử dụng",
+  "restartTourDesc": "Xem lại tour hướng dẫn từng bước từ đầu. Hữu ích khi bạn muốn ôn lại các tính năng chính."
 }
