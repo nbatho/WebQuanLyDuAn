@@ -16,7 +16,14 @@ export const createSpaces = async (
   description,
   workspace_id,
   is_private = false,
+  options = {},
 ) => {
+  const {
+    createdBy = null,
+    addCreatorAsMember = false,
+    createDefaultList = false,
+    defaultListName = 'General',
+  } = options;
   const client = await con.connect();
   try {
     await client.query('BEGIN');
@@ -39,6 +46,23 @@ export const createSpaces = async (
         `;
 
     await client.query(statusQuery, [spaceId]);
+
+    if (addCreatorAsMember && createdBy) {
+      await client.query(
+        `INSERT INTO space_members (space_id, user_id)
+         VALUES ($1, $2)
+         ON CONFLICT (space_id, user_id) DO UPDATE SET deleted_at = NULL`,
+        [spaceId, createdBy]
+      );
+    }
+
+    if (createDefaultList && createdBy) {
+      await client.query(
+        `INSERT INTO lists (space_id, name, created_by)
+         VALUES ($1, $2, $3)`,
+        [spaceId, defaultListName, createdBy]
+      );
+    }
 
     await client.query('COMMIT');
 

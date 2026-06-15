@@ -1,5 +1,5 @@
 import {
-    getProfile, 
+    getProfile,
     updateProfile,
     findUserById,
     getPasswordHash,
@@ -10,10 +10,17 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// In-memory OTP store: Map<user_id, { otp, newPasswordHash, expiresAt, attempts }>
 const otpStore = new Map();
-const OTP_TTL_MS = 10 * 60 * 1000; // 10 phút
-const MAX_OTP_ATTEMPTS = 5;          // tối đa 5 lần thử
+const OTP_TTL_MS = 10 * 60 * 1000;
+const MAX_OTP_ATTEMPTS = 5;
+const OTP_CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
+
+setInterval(() => {
+    const now = Date.now();
+    for (const [userId, value] of otpStore) {
+        if (now > value.expiresAt) otpStore.delete(userId);
+    }
+}, OTP_CLEANUP_INTERVAL_MS).unref?.();
 
 export const authMe = async (req, res) => {
     try {
@@ -26,7 +33,7 @@ export const authMe = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: 'Loi server', error: error.message });
     }
-}
+};
 
 export const getProfiles = async (req, res) => {
     try {
@@ -34,12 +41,13 @@ export const getProfiles = async (req, res) => {
         const userProfile = await getProfile(user_id);
         return res.status(200).json({
             message: 'Thong tin nguoi dung',
-            users : userProfile
+            users: userProfile
         });
     } catch (error) {
         return res.status(500).json({ message: 'Loi server khi lay thong tin nguoi dung', error: error.message });
     }
-}
+};
+
 export const updateProfiles = async (req, res) => {
     try {
         const user_id = req.user.user_id;
@@ -51,84 +59,46 @@ export const updateProfiles = async (req, res) => {
         if (sdt) updateData.sdt = sdt;
 
         if (Object.keys(updateData).length === 0) {
-            return res.status(400).json({ message: 'Không có thông tin nào để cập nhật' });
+            return res.status(400).json({ message: 'Khong co thong tin nao de cap nhat' });
         }
 
-        await updateProfile(user_id, updateData); 
+        await updateProfile(user_id, updateData);
 
-        return res.status(200).json({ message: 'Thông tin người dùng đã được cập nhật' });
+        return res.status(200).json({ message: 'Thong tin nguoi dung da duoc cap nhat' });
     } catch (error) {
-        return res.status(500).json({ message: 'Lỗi server', error: error.message });
+        return res.status(500).json({ message: 'Loi server', error: error.message });
     }
-}
+};
 
-export const changePassword = async (req, res) => {
-    try {
-        const user_id = req.user.user_id;
-        const { currentPassword, newPassword, confirmPassword } = req.body;
-
-        if (!currentPassword || !newPassword || !confirmPassword) {
-            return res.status(400).json({ message: 'Vui lòng nhập đầy đủ mật khẩu hiện tại, mật khẩu mới và xác nhận mật khẩu' });
-        }
-
-        if (newPassword.length < 6) {
-            return res.status(400).json({ message: 'Mật khẩu mới phải có ít nhất 6 ký tự' });
-        }
-
-        if (newPassword !== confirmPassword) {
-            return res.status(400).json({ message: 'Mật khẩu mới và xác nhận mật khẩu không khớp' });
-        }
-
-        const currentHash = await getPasswordHash(user_id);
-        if (!currentHash) {
-            return res.status(404).json({ message: 'Không tìm thấy người dùng' });
-        }
-
-        const isMatch = await bcrypt.compare(currentPassword, currentHash);
-        if (!isMatch) {
-            return res.status(401).json({ message: 'Mật khẩu hiện tại không đúng' });
-        }
-
-        const newHash = await bcrypt.hash(newPassword, 10);
-        await updatePassword(user_id, newHash);
-
-        return res.status(200).json({ message: 'Cập nhật mật khẩu thành công' });
-    } catch (error) {
-        return res.status(500).json({ message: 'Lỗi server khi cập nhật mật khẩu', error: error.message });
-    }
-}
-
-// Bước 1: Xác thực mật khẩu hiện tại + gửi OTP email
 export const requestPasswordChangeOtp = async (req, res) => {
     try {
         const user_id = req.user.user_id;
         const { currentPassword, newPassword, confirmPassword } = req.body;
 
         if (!currentPassword || !newPassword || !confirmPassword) {
-            return res.status(400).json({ message: 'Vui lòng nhập đầy đủ mật khẩu hiện tại, mật khẩu mới và xác nhận mật khẩu' });
+            return res.status(400).json({ message: 'Vui long nhap day du mat khau hien tai, mat khau moi va xac nhan mat khau' });
         }
         if (newPassword.length < 6) {
-            return res.status(400).json({ message: 'Mật khẩu mới phải có ít nhất 6 ký tự' });
+            return res.status(400).json({ message: 'Mat khau moi phai co it nhat 6 ky tu' });
         }
         if (newPassword !== confirmPassword) {
-            return res.status(400).json({ message: 'Mật khẩu mới và xác nhận mật khẩu không khớp' });
+            return res.status(400).json({ message: 'Mat khau moi va xac nhan mat khau khong khop' });
         }
 
         const currentHash = await getPasswordHash(user_id);
         if (!currentHash) {
-            return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+            return res.status(404).json({ message: 'Khong tim thay nguoi dung' });
         }
         const isMatch = await bcrypt.compare(currentPassword, currentHash);
         if (!isMatch) {
-            return res.status(401).json({ message: 'Mật khẩu hiện tại không đúng' });
+            return res.status(401).json({ message: 'Mat khau hien tai khong dung' });
         }
 
         const user = await findUserById(user_id);
         if (!user?.email) {
-            return res.status(404).json({ message: 'Không tìm thấy email người dùng' });
+            return res.status(404).json({ message: 'Khong tim thay email nguoi dung' });
         }
 
-        // Tạo OTP 6 chữ số
         const otp = String(Math.floor(100000 + Math.random() * 900000));
         const newPasswordHash = await bcrypt.hash(newPassword, 10);
         otpStore.set(user_id, {
@@ -138,17 +108,16 @@ export const requestPasswordChangeOtp = async (req, res) => {
             attempts: 0,
         });
 
-        // Gửi email OTP qua Resend
         const { error } = await resend.emails.send({
             from: 'Flowise <noreply@contact.flowise.id.vn>',
             to: [user.email],
-            subject: 'Mã xác thực đổi mật khẩu Flowise',
+            subject: 'Ma xac thuc doi mat khau Flowise',
             html: `
                 <div style="font-family: sans-serif; max-width: 480px; margin: auto; padding: 32px; border: 1px solid #e2e8f0; border-radius: 12px;">
-                    <h2 style="color: #0058be; margin-bottom: 8px;">Xác thực đổi mật khẩu</h2>
-                    <p style="color: #5f6368; margin-bottom: 24px;">Bạn vừa yêu cầu đổi mật khẩu trên Flowise. Nhập mã OTP bên dưới để xác nhận:</p>
+                    <h2 style="color: #0058be; margin-bottom: 8px;">Xac thuc doi mat khau</h2>
+                    <p style="color: #5f6368; margin-bottom: 24px;">Ban vua yeu cau doi mat khau tren Flowise. Nhap ma OTP ben duoi de xac nhan:</p>
                     <div style="font-size: 36px; font-weight: 800; letter-spacing: 10px; color: #141b2b; text-align: center; background: #f0f4ff; border-radius: 8px; padding: 16px 0; margin-bottom: 24px;">${otp}</div>
-                    <p style="color: #9aa0a6; font-size: 13px;">Mã có hiệu lực trong <strong>10 phút</strong>. Nếu bạn không thực hiện yêu cầu này, hãy bỏ qua email này.</p>
+                    <p style="color: #9aa0a6; font-size: 13px;">Ma co hieu luc trong <strong>10 phut</strong>. Neu ban khong thuc hien yeu cau nay, hay bo qua email nay.</p>
                 </div>
             `,
         });
@@ -156,51 +125,49 @@ export const requestPasswordChangeOtp = async (req, res) => {
         if (error) {
             console.error('Resend error:', error);
             otpStore.delete(user_id);
-            return res.status(500).json({ message: 'Không thể gửi email OTP lúc này, vui lòng thử lại' });
+            return res.status(500).json({ message: 'Khong the gui email OTP luc nay, vui long thu lai' });
         }
 
-        // Che bớt email để hiển thị ở frontend
         const maskedEmail = user.email.replace(/(.{2})[^@]+(@.+)/, '$1***$2');
-        return res.status(200).json({ message: 'OTP đã được gửi tới email của bạn', maskedEmail });
+        return res.status(200).json({ message: 'OTP da duoc gui toi email cua ban', maskedEmail });
     } catch (error) {
-        return res.status(500).json({ message: 'Lỗi server', error: error.message });
+        return res.status(500).json({ message: 'Loi server', error: error.message });
     }
 };
 
-// Bước 2: Xác thực OTP và thực hiện đổi mật khẩu
 export const verifyAndChangePassword = async (req, res) => {
     try {
         const user_id = req.user.user_id;
         const { otp } = req.body;
 
         if (!otp) {
-            return res.status(400).json({ message: 'Vui lòng nhập mã OTP' });
+            return res.status(400).json({ message: 'Vui long nhap ma OTP' });
         }
 
         const stored = otpStore.get(user_id);
         if (!stored) {
-            return res.status(400).json({ message: 'Không tìm thấy yêu cầu đổi mật khẩu, vui lòng thử lại' });
+            return res.status(400).json({ message: 'Khong tim thay yeu cau doi mat khau, vui long thu lai' });
         }
         if (Date.now() > stored.expiresAt) {
             otpStore.delete(user_id);
-            return res.status(400).json({ message: 'Mã OTP đã hết hạn, vui lòng yêu cầu mã mới' });
+            return res.status(400).json({ message: 'Ma OTP da het han, vui long yeu cau ma moi' });
         }
         if (stored.otp !== otp.trim()) {
             stored.attempts = (stored.attempts || 0) + 1;
             if (stored.attempts >= MAX_OTP_ATTEMPTS) {
                 otpStore.delete(user_id);
-                return res.status(400).json({ message: 'Quá nhiều lần nhập sai OTP. Vui lòng yêu cầu mã mới.' });
+                return res.status(400).json({ message: 'Qua nhieu lan nhap sai OTP. Vui long yeu cau ma moi.' });
             }
-            return res.status(400).json({ 
-                message: `Mã OTP không đúng. Còn ${MAX_OTP_ATTEMPTS - stored.attempts} lần thử.` 
+            return res.status(400).json({
+                message: `Ma OTP khong dung. Con ${MAX_OTP_ATTEMPTS - stored.attempts} lan thu.`
             });
         }
 
         await updatePassword(user_id, stored.newPasswordHash);
         otpStore.delete(user_id);
 
-        return res.status(200).json({ message: 'Cập nhật mật khẩu thành công' });
+        return res.status(200).json({ message: 'Cap nhat mat khau thanh cong' });
     } catch (error) {
-        return res.status(500).json({ message: 'Lỗi server khi cập nhật mật khẩu', error: error.message });
+        return res.status(500).json({ message: 'Loi server khi cap nhat mat khau', error: error.message });
     }
 };

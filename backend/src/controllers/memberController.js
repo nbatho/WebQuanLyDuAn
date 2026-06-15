@@ -1,10 +1,9 @@
 import { Resend } from "resend";
-import express from "express";
-import dotenv from "dotenv";
 const resend = new Resend(process.env.RESEND_API_KEY);
 import { createInvitations, checkExistingInvitation, deleteInvitation, updateInvitationStatus, addMemberToWorkspace } from "../models/Member.js";
 import jwt from 'jsonwebtoken';
 import { findWorkspaceById } from "../models/Workspaces.js";
+import { removeWorkspaceMember } from "../models/Workspaces.js";
 import { findUserById } from "../models/Users.js";
 export const InviteMember = async (req, res) => {
     try {
@@ -149,7 +148,6 @@ export const RespondToInvitation = async (req, res) => {
             return res.status(404).json({ message: "Lời mời không tồn tại hoặc đã được xử lý" });
         }
 
-        console.log(invitation);
         if (action === 'accept') {
             await addMemberToWorkspace(workspace_id, req.user.user_id, invitation.role_id);
             await updateInvitationStatus(invitation.invitation_id, 'accepted');
@@ -166,4 +164,27 @@ export const RespondToInvitation = async (req, res) => {
     }
 };
 
-export const RemoveMember = async (req, res) => { }
+export const RemoveMember = async (req, res) => {
+    try {
+        const workspaceId = req.body.workspaceId || req.body.workspace_id;
+        const userId = req.body.userId || req.body.user_id;
+
+        if (!workspaceId || !userId) {
+            return res.status(400).json({ message: "workspaceId va userId la bat buoc" });
+        }
+
+        if (Number(userId) === Number(req.user?.user_id)) {
+            return res.status(400).json({ message: "Khong the tu xoa chinh ban khoi Workspace" });
+        }
+
+        const removedMember = await removeWorkspaceMember(workspaceId, userId);
+        if (!removedMember) {
+            return res.status(404).json({ message: "Thanh vien khong ton tai trong Workspace" });
+        }
+
+        return res.status(200).json({ message: "Da xoa thanh vien khoi Workspace", data: removedMember });
+    } catch (error) {
+        console.error("Error removing member:", error);
+        return res.status(500).json({ message: "Loi Server noi bo" });
+    }
+};

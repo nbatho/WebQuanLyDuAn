@@ -24,7 +24,6 @@ import {
 import { protectedRoute } from "./middlewares/authMiddlewares.js";
 import { globalErrorHandler, notFoundHandler } from "./middlewares/errorMiddleware.js";
 import { generalLimiter } from "./middlewares/rateLimitMiddleware.js";
-import { ensureMessagingTables } from "./models/Messages.js";
 
 dotenv.config();
 const app = express();
@@ -98,5 +97,4 @@ app.use(globalErrorHandler);
 
 app.listen(PORT, HOST, () => {
   console.log(`Server is running on ${HOST}:${PORT}`);
-  ensureMessagingTables();
 });

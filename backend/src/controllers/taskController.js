@@ -37,6 +37,52 @@ const FIELD_TO_ACTION = {
     is_archived:  'archived',
 };
 
+const formatTaskForBoard = (task) => ({
+    ...task,
+    assignees: task.assignees || [],
+    subtask_count: 0,
+    subtask_done_count: 0,
+    comment_count: Number(task.comment_count) || 0,
+    attachment_count: Number(task.attachment_count) || 0,
+});
+
+const groupTasksByStatus = (statuses, rawTasks) => {
+    const groupedTaskIds = new Set();
+
+    const groupedData = statuses.map((status) => {
+        const tasksInStatus = rawTasks
+            .filter(task => Number(task.status_id) === Number(status.status_id))
+            .map(task => {
+                groupedTaskIds.add(task.task_id);
+                return formatTaskForBoard(task);
+            });
+
+        return {
+            id: status.status_id,
+            name: status.status_name,
+            color: status.color || '#d3d3d3',
+            isExpanded: true,
+            tasks: tasksInStatus
+        };
+    });
+
+    const orphanedTasks = rawTasks
+        .filter(task => !groupedTaskIds.has(task.task_id))
+        .map(formatTaskForBoard);
+
+    if (orphanedTasks.length > 0) {
+        groupedData.push({
+            id: 0,
+            name: 'No Status',
+            color: '#9ca3af',
+            isExpanded: true,
+            tasks: orphanedTasks
+        });
+    }
+
+    return groupedData;
+};
+
 export const getTasksByListId = async (req, res) => {
     try {
         const { listId } = req.params;
@@ -48,52 +94,7 @@ export const getTasksByListId = async (req, res) => {
         const statuses = await findStatusesByListId(listId);
         const rawTasks = await findAllTasksByListId(listId);
 
-        const groupedTaskIds = new Set();
-
-        const groupedData = statuses.map((status) => {
-            const tasksInStatus = rawTasks
-                .filter(task => Number(task.status_id) === Number(status.status_id))
-                .map(task => {
-                    groupedTaskIds.add(task.task_id);
-                    return {
-                        ...task,
-                        assignees: task.assignees || [],
-                        subtask_count: 0,
-                        subtask_done_count: 0,
-                        comment_count: Number(task.comment_count) || 0,
-                        attachment_count: Number(task.attachment_count) || 0,
-                    };
-                });
-
-            return {
-                id: status.status_id,
-                name: status.status_name,
-                color: status.color || '#d3d3d3',
-                isExpanded: true,
-                tasks: tasksInStatus
-            };
-        });
-
-        const orphanedTasks = rawTasks
-            .filter(task => !groupedTaskIds.has(task.task_id))
-            .map(task => ({
-                ...task,
-                assignees: task.assignees || [],
-                subtask_count: 0,
-                subtask_done_count: 0,
-                comment_count: Number(task.comment_count) || 0,
-                attachment_count: Number(task.attachment_count) || 0,
-            }));
-
-        if (orphanedTasks.length > 0) {
-            groupedData.push({
-                id: 0,
-                name: 'No Status',
-                color: '#9ca3af',
-                isExpanded: true,
-                tasks: orphanedTasks
-            });
-        }
+        const groupedData = groupTasksByStatus(statuses, rawTasks);
 
         res.status(200).json(groupedData);
 
@@ -114,52 +115,7 @@ export const getTasksBySprintId = async (req, res) => {
         const statuses = await findStatusesBySprintId(sprintId);
         const rawTasks = await findAllTasksBySprintId(sprintId);
 
-        const groupedTaskIds = new Set();
-
-        const groupedData = statuses.map((status) => {
-            const tasksInStatus = rawTasks
-                .filter(task => Number(task.status_id) === Number(status.status_id))
-                .map(task => {
-                    groupedTaskIds.add(task.task_id);
-                    return {
-                        ...task,
-                        assignees: task.assignees || [],
-                        subtask_count: 0,
-                        subtask_done_count: 0,
-                        comment_count: Number(task.comment_count) || 0,
-                        attachment_count: Number(task.attachment_count) || 0,
-                    };
-                });
-
-            return {
-                id: status.status_id,
-                name: status.status_name,
-                color: status.color || '#d3d3d3',
-                isExpanded: true,
-                tasks: tasksInStatus
-            };
-        });
-
-        const orphanedTasks = rawTasks
-            .filter(task => !groupedTaskIds.has(task.task_id))
-            .map(task => ({
-                ...task,
-                assignees: task.assignees || [],
-                subtask_count: 0,
-                subtask_done_count: 0,
-                comment_count: Number(task.comment_count) || 0,
-                attachment_count: Number(task.attachment_count) || 0,
-            }));
-
-        if (orphanedTasks.length > 0) {
-            groupedData.push({
-                id: 0,
-                name: 'No Status',
-                color: '#9ca3af',
-                isExpanded: true,
-                tasks: orphanedTasks
-            });
-        }
+        const groupedData = groupTasksByStatus(statuses, rawTasks);
 
         res.status(200).json(groupedData);
 

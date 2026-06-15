@@ -1,88 +1,50 @@
 import con from '../config/connect.js';
+import { getDirectSpaceId, resolveSpaceIdFromParams } from '../utils/resolveSpace.js';
 
-// ================================================================
-// MEMBERSHIP MIDDLEWARE
-// Kiểm tra user có thuộc workspace/space chứa resource hay không.
-// Dùng cho các GET routes để ngăn IDOR (xem dữ liệu người khác).
-// ================================================================
-
-/**
- * Kiểm tra user có phải member của workspace hay không.
- * Tìm workspaceId từ: req.params.workspaceId
- */
 export const requireWorkspaceMembership = async (req, res, next) => {
     try {
         const userId = req.user?.user_id;
-        if (!userId) return res.status(401).json({ message: 'Chưa xác thực.' });
+        if (!userId) return res.status(401).json({ message: 'Chua xac thuc.' });
 
         const workspaceId = req.params.workspaceId || req.params.workspace_id;
-        if (!workspaceId) return res.status(400).json({ message: 'Thiếu workspaceId.' });
+        if (!workspaceId) return res.status(400).json({ message: 'Thieu workspaceId.' });
 
         const result = await con.query(
-            `SELECT 1 FROM workspace_members 
+            `SELECT 1 FROM workspace_members
              WHERE workspace_id = $1 AND user_id = $2 AND deleted_at IS NULL`,
             [workspaceId, userId]
         );
 
         if (result.rows.length === 0) {
-            return res.status(403).json({ message: 'Bạn không phải thành viên của Workspace này.' });
+            return res.status(403).json({ message: 'Ban khong phai thanh vien cua Workspace nay.' });
         }
 
         next();
     } catch (error) {
-        console.error('[requireWorkspaceMembership] Lỗi:', error);
-        return res.status(500).json({ message: 'Lỗi máy chủ khi kiểm tra quyền truy cập.' });
+        console.error('[requireWorkspaceMembership] Error:', error);
+        return res.status(500).json({ message: 'Loi may chu khi kiem tra quyen truy cap.' });
     }
 };
 
-/**
- * Kiểm tra user có thuộc space chứa resource hay không.
- * Tự động dò ngược spaceId từ các param: spaceId, listId, taskId.
- */
 export const requireSpaceMembership = async (req, res, next) => {
     try {
         const userId = req.user?.user_id;
-        if (!userId) return res.status(401).json({ message: 'Chưa xác thực.' });
+        if (!userId) return res.status(401).json({ message: 'Chua xac thuc.' });
 
-        let spaceId = req.params.spaceId || req.params.space_id || null;
+        let spaceId = getDirectSpaceId(req);
 
-        // Dò ngược spaceId từ listId
-        if (!spaceId && (req.params.listId || req.params.list_id)) {
-            const listId = req.params.listId || req.params.list_id;
-            const result = await con.query(
-                'SELECT space_id FROM lists WHERE list_id = $1 AND deleted_at IS NULL',
-                [listId]
-            );
-            spaceId = result.rows[0]?.space_id;
-        }
-
-        // Dò ngược spaceId từ taskId
-        if (!spaceId && req.params.taskId) {
-            const result = await con.query(
-                `SELECT l.space_id FROM tasks t 
-                 JOIN lists l ON t.list_id = l.list_id 
-                 WHERE t.task_id = $1 AND t.deleted_at IS NULL`,
-                [req.params.taskId]
-            );
-            spaceId = result.rows[0]?.space_id;
-        }
-
-        // Dò ngược spaceId từ sprintId
-        if (!spaceId && req.params.sprintId) {
-            const result = await con.query(
-                'SELECT space_id FROM sprints WHERE sprint_id = $1 AND deleted_at IS NULL',
-                [req.params.sprintId]
-            );
-            spaceId = result.rows[0]?.space_id;
+        if (!spaceId) {
+            const lookup = await resolveSpaceIdFromParams(req.params);
+            if (lookup.error) return res.status(404).json({ message: lookup.error });
+            spaceId = lookup.spaceId;
         }
 
         if (!spaceId) {
-            return res.status(404).json({ message: 'Không tìm thấy resource hoặc đã bị xóa.' });
+            return res.status(404).json({ message: 'Khong tim thay resource hoac da bi xoa.' });
         }
 
-        // Kiểm tra membership: space_members HOẶC workspace_members (kế thừa)
         const result = await con.query(
-            `SELECT 1 FROM space_members 
+            `SELECT 1 FROM space_members
              WHERE space_id = $1 AND user_id = $2 AND deleted_at IS NULL
              UNION
              SELECT 1 FROM workspace_members wm
@@ -92,42 +54,38 @@ export const requireSpaceMembership = async (req, res, next) => {
         );
 
         if (result.rows.length === 0) {
-            return res.status(403).json({ message: 'Bạn không có quyền truy cập resource này.' });
+            return res.status(403).json({ message: 'Ban khong co quyen truy cap resource nay.' });
         }
 
         req.resolvedSpaceId = spaceId;
         next();
     } catch (error) {
-        console.error('[requireSpaceMembership] Lỗi:', error);
-        return res.status(500).json({ message: 'Lỗi máy chủ khi kiểm tra quyền truy cập.' });
+        console.error('[requireSpaceMembership] Error:', error);
+        return res.status(500).json({ message: 'Loi may chu khi kiem tra quyen truy cap.' });
     }
 };
 
-/**
- * Kiểm tra user có phải member của conversation hay không.
- * Dùng cho messaging API.
- */
 export const requireConversationMembership = async (req, res, next) => {
     try {
         const userId = req.user?.user_id;
-        if (!userId) return res.status(401).json({ message: 'Chưa xác thực.' });
+        if (!userId) return res.status(401).json({ message: 'Chua xac thuc.' });
 
         const conversationId = req.params.conversationId || req.params.id;
-        if (!conversationId) return res.status(400).json({ message: 'Thiếu conversationId.' });
+        if (!conversationId) return res.status(400).json({ message: 'Thieu conversationId.' });
 
         const result = await con.query(
-            `SELECT 1 FROM conversation_members 
+            `SELECT 1 FROM conversation_members
              WHERE conversation_id = $1 AND user_id = $2`,
             [conversationId, userId]
         );
 
         if (result.rows.length === 0) {
-            return res.status(403).json({ message: 'Bạn không phải thành viên của cuộc trò chuyện này.' });
+            return res.status(403).json({ message: 'Ban khong phai thanh vien cua cuoc tro chuyen nay.' });
         }
 
         next();
     } catch (error) {
-        console.error('[requireConversationMembership] Lỗi:', error);
-        return res.status(500).json({ message: 'Lỗi máy chủ khi kiểm tra quyền truy cập.' });
+        console.error('[requireConversationMembership] Error:', error);
+        return res.status(500).json({ message: 'Loi may chu khi kiem tra quyen truy cap.' });
     }
 };

@@ -1,60 +1,5 @@
 import con from '../config/connect.js';
 
-// ══════════════════════════════════════════════════
-// DB MIGRATION — Create messaging tables if not exist
-// ══════════════════════════════════════════════════
-
-export async function ensureMessagingTables() {
-    try {
-        await con.query(`
-            CREATE TABLE IF NOT EXISTS conversations (
-                conversation_id   SERIAL       PRIMARY KEY,
-                workspace_id      INT          NOT NULL REFERENCES workspaces(workspace_id) ON DELETE CASCADE,
-                type              VARCHAR(20)  NOT NULL DEFAULT 'DIRECT'
-                                               CHECK (type IN ('DIRECT','CHANNEL','SPACE')),
-                name              VARCHAR(100),
-                space_id          INT          REFERENCES spaces(space_id) ON DELETE CASCADE,
-                created_by        INT          REFERENCES users(user_id) ON DELETE SET NULL,
-                created_at        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS conversation_members (
-                conversation_id   INT NOT NULL REFERENCES conversations(conversation_id) ON DELETE CASCADE,
-                user_id           INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-                joined_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                PRIMARY KEY (conversation_id, user_id)
-            );
-
-            CREATE TABLE IF NOT EXISTS messages (
-                message_id        SERIAL      PRIMARY KEY,
-                conversation_id   INT         NOT NULL REFERENCES conversations(conversation_id) ON DELETE CASCADE,
-                sender_id         INT         NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-                content           TEXT        NOT NULL DEFAULT '',
-                file_url          TEXT,
-                file_name         TEXT,
-                file_type         VARCHAR(100),
-                created_at        TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP
-            );
-
-            ALTER TABLE messages ADD COLUMN IF NOT EXISTS file_url TEXT;
-            ALTER TABLE messages ADD COLUMN IF NOT EXISTS file_name TEXT;
-            ALTER TABLE messages ADD COLUMN IF NOT EXISTS file_type VARCHAR(100);
-            ALTER TABLE messages ALTER COLUMN content SET DEFAULT '';
-
-            CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id, created_at DESC);
-            CREATE INDEX IF NOT EXISTS idx_conv_members_user ON conversation_members(user_id);
-        `);
-        console.log('✅ Messaging tables ready');
-    } catch (err) {
-        console.error('❌ Messaging migration failed:', err.message);
-    }
-}
-
-// ══════════════════════════════════════════════════
-// CONVERSATIONS
-// ══════════════════════════════════════════════════
-
-/** Get all conversations the user is a member of */
 export async function getUserConversations(userId, workspaceId) {
     const result = await con.query(`
         SELECT c.*,
@@ -81,9 +26,7 @@ export async function getUserConversations(userId, workspaceId) {
     return result.rows;
 }
 
-/** Find or create a direct conversation between two users */
 export async function findOrCreateDirect(workspaceId, userId1, userId2) {
-    // Check if direct conversation already exists
     const existing = await con.query(`
         SELECT c.conversation_id FROM conversations c
         WHERE c.type = 'DIRECT' AND c.workspace_id = $1
@@ -95,7 +38,6 @@ export async function findOrCreateDirect(workspaceId, userId1, userId2) {
         return existing.rows[0].conversation_id;
     }
 
-    // Create new direct conversation
     const client = await con.connect();
     try {
         await client.query('BEGIN');
@@ -118,7 +60,6 @@ export async function findOrCreateDirect(workspaceId, userId1, userId2) {
     }
 }
 
-/** Create a channel */
 export async function createChannel(workspaceId, name, createdBy, memberIds = []) {
     const client = await con.connect();
     try {
@@ -145,7 +86,6 @@ export async function createChannel(workspaceId, name, createdBy, memberIds = []
     }
 }
 
-/** Create or get a space conversation */
 export async function findOrCreateSpaceConversation(workspaceId, spaceId, spaceName) {
     const existing = await con.query(
         `SELECT conversation_id FROM conversations WHERE type = 'SPACE' AND space_id = $1`,
@@ -161,7 +101,6 @@ export async function findOrCreateSpaceConversation(workspaceId, spaceId, spaceN
             [workspaceId, spaceName, spaceId]
         );
         const convId = convRes.rows[0].conversation_id;
-        // Add all workspace members to space chat
         const members = await client.query(`SELECT user_id FROM workspace_members WHERE workspace_id = $1`, [workspaceId]);
         for (const m of members.rows) {
             await client.query(
@@ -179,7 +118,6 @@ export async function findOrCreateSpaceConversation(workspaceId, spaceId, spaceN
     }
 }
 
-/** Add member to conversation */
 export async function addMemberToConversation(conversationId, userId) {
     await con.query(
         `INSERT INTO conversation_members (conversation_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
@@ -187,7 +125,6 @@ export async function addMemberToConversation(conversationId, userId) {
     );
 }
 
-/** Remove member from conversation */
 export async function removeMemberFromConversation(conversationId, userId) {
     await con.query(
         `DELETE FROM conversation_members WHERE conversation_id = $1 AND user_id = $2`,
@@ -195,11 +132,6 @@ export async function removeMemberFromConversation(conversationId, userId) {
     );
 }
 
-// ══════════════════════════════════════════════════
-// MESSAGES
-// ══════════════════════════════════════════════════
-
-/** Get messages for a conversation (paginated) */
 export async function getMessages(conversationId, limit = 50, before = null) {
     let query = `
         SELECT m.*, u.name AS sender_name, u.username AS sender_username, u.avatar_url AS sender_avatar
@@ -218,15 +150,14 @@ export async function getMessages(conversationId, limit = 50, before = null) {
     }
 
     const result = await con.query(query, params);
-    return result.rows.reverse(); // oldest first
+    return result.rows.reverse();
 }
 
-/** Send a message */
 export async function sendMessage(conversationId, senderId, content, fileUrl = null, fileName = null, fileType = null) {
     const result = await con.query(`
         INSERT INTO messages (conversation_id, sender_id, content, file_url, file_name, file_type)
         VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING *, 
+        RETURNING *,
             (SELECT name FROM users WHERE user_id = $2) AS sender_name,
             (SELECT username FROM users WHERE user_id = $2) AS sender_username
     `, [conversationId, senderId, content || '', fileUrl, fileName, fileType]);

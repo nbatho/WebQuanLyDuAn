@@ -2,7 +2,6 @@ import { Calendar, Flag, MoreHorizontal } from 'lucide-react';
 import { Avatar, Tooltip } from 'antd';
 import { useRef, useState, type DragEvent } from 'react';
 import type { Task, Assignee } from '@/types/tasks';
-import { familyTaskIds, rootTasks } from '@/utils/taskFamily';
 import TaskDetailModal from '@/components/TaskDetailModal';
 
 import { useTaskView } from '../ListViewPage';
@@ -53,9 +52,8 @@ export default function BoardView({
             const toG = prev.find((g) => g.id === toGroupId);
             if (!fromG || !toG) return prev;
 
-            const moveIds = new Set(familyTaskIds(fromG.tasks, taskId));
-            const moving = fromG.tasks.filter((t) => moveIds.has(t.task_id));
-            const restFrom = fromG.tasks.filter((t) => !moveIds.has(t.task_id));
+            const moving = fromG.tasks.filter((t) => t.task_id === taskId);
+            const restFrom = fromG.tasks.filter((t) => t.task_id !== taskId);
 
             const updatedMoving = moving.map((t) => ({
                 ...t,
@@ -81,7 +79,6 @@ export default function BoardView({
         <div className="flex flex-1 flex-col overflow-hidden">
             <div className="flex flex-1 items-start gap-3 overflow-x-auto px-5 py-4">
                 {displayGroups.map((group) => {
-                    const columnRoots = rootTasks(group.tasks);
                     return (
                         <div
                             key={group.id}
@@ -95,7 +92,7 @@ export default function BoardView({
                                 <div className="flex items-center gap-1.75">
                                     <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: group.color || '#ccc' }} />
                                     <span className="text-xs font-extrabold uppercase tracking-[0.04em] text-[var(--color-on-surface)]">{group.name}</span>
-                                    <span className="rounded-full bg-[var(--color-surface-container-high)] px-1.25 py-px text-[11px] font-bold text-[var(--color-text-secondary)]">{columnRoots.length}</span>
+                                    <span className="rounded-full bg-[var(--color-surface-container-high)] px-1.25 py-px text-[11px] font-bold text-[var(--color-text-secondary)]">{group.tasks.length}</span>
                                 </div>
                                 <div className="flex gap-0.5">
                                     <button className="rounded p-0.75 text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-hover)]"><MoreHorizontal size={14} /></button>
@@ -103,7 +100,7 @@ export default function BoardView({
                             </div>
 
                             <div className="flex max-h-[calc(100vh-260px)] flex-col gap-1.5 overflow-y-auto px-2 pb-2">
-                                {columnRoots.map((task) => (
+                                {group.tasks.map((task) => (
                                     <div
                                         key={task.task_id}
                                         className="cursor-pointer rounded-lg border border-[var(--color-border-light)] bg-[var(--color-surface-container-lowest)] px-3.5 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
