@@ -238,12 +238,12 @@ export const fetchAttachmentsByTask = createAsyncThunk<TaskAttachment[], number>
 
 export const fetchCreateAttachment = createAsyncThunk<
     TaskAttachment,
-    { task_id: number; url: string; description?: string }
+    { task_id: number; file_name: string; file_url: string; file_size?: number; mime_type?: string }
 >(
     'tasks/createAttachment',
-    async ({ task_id, url, description }, { rejectWithValue }) => {
+    async ({ task_id, file_name, file_url, file_size, mime_type }, { rejectWithValue }) => {
         try {
-            const response = await createAttachment(task_id, url, description);
+            const response = await createAttachment(task_id, file_name, file_url, file_size, mime_type);
             return response;
         } catch (error: unknown) { 
             return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to create attachment');

@@ -20,6 +20,7 @@ import {
   memberRoutes,
   aiRoutes,
   messageRoutes,
+  uploadRoutes,
 } from "./routes/index.js";
 import { protectedRoute } from "./middlewares/authMiddlewares.js";
 import { globalErrorHandler, notFoundHandler } from "./middlewares/errorMiddleware.js";
@@ -67,6 +68,7 @@ app.use('/api/v1/members', memberRoutes);
 
 //private route
 app.use(protectedRoute);
+app.use("/api/v1/upload", uploadRoutes);
 app.use("/api/v1/ai", aiRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/workspaces", workspacesRoutes);

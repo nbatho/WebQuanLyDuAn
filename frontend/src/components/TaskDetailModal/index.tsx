@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Paperclip, MessageSquare, Activity, Save, Clock, User, Tag, Flag, Calendar } from 'lucide-react';
 import { Button, Input, Avatar, Spin } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,6 +9,8 @@ import TaskDetailHeader from './TaskDetailHeader';
 import TaskDetailSidebar from './TaskDetailSidebar';
 import { fetchCommentsByTask, fetchCreateComment } from '@/store/modules/comments';
 import { fetchActivitiesByTask, clearActivities } from '@/store/modules/activityLogs';
+import { fetchAttachmentsByTask, fetchCreateAttachment, fetchDeleteAttachment } from '@/store/modules/tasks';
+import { uploadFile } from '@/api/upload';
 import ShareTaskModal from '../ShareTaskModal';
 
 export interface TaskDetailModalProps {
@@ -109,6 +111,11 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
     const listActivities = useSelector((state: RootState) => state.activityLogs.listActivities);
     const isLoadingActivities = useSelector((state: RootState) => state.activityLogs.isLoadingActivities);
 
+    // Attachments selectors
+    const listAttachments = useSelector((state: RootState) => state.tasks.attachments);
+    const isUploadingAttachment = useSelector((state: RootState) => state.tasks.isCreatingAttachment);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
     const statusOptions = useMemo(() => {
         return groups.map(g => ({ id: g.id, name: g.name, color: g.color }));
     }, [groups]);
@@ -126,10 +133,11 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
         return taskTitle !== task.name || taskDesc !== (task.description || '');
     }, [taskTitle, taskDesc, task]);
 
-    // Fetch comments when task opens
+    // Fetch comments and attachments when task opens
     useEffect(() => {
         if (task?.task_id) {
             dispatch(fetchCommentsByTask(task.task_id));
+            dispatch(fetchAttachmentsByTask(task.task_id));
         }
     }, [task?.task_id, dispatch]);
 
@@ -164,6 +172,46 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
             content: commentContent
         }));
         setCommentContent('');
+    };
+
+    const handleFileUpload = async (file: File) => {
+        if (!task?.task_id) return;
+        try {
+            const uploadRes = await uploadFile(file);
+            const { file_name, file_url, file_size, mime_type } = uploadRes.file;
+            await dispatch(fetchCreateAttachment({
+                task_id: task.task_id,
+                file_name,
+                file_url,
+                file_size,
+                mime_type
+            }));
+        } catch (error) {
+            console.error('Lỗi upload:', error);
+            // Có thể thêm toast thông báo lỗi ở đây
+        }
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) handleFileUpload(file);
+        if (fileInputRef.current) fileInputRef.current.value = ''; // reset
+    };
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files?.[0];
+        if (file) handleFileUpload(file);
+    };
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+    };
+
+    const handleDeleteAttachment = async (attachmentId: number) => {
+        if (window.confirm("Bạn có chắc chắn muốn xóa tài liệu này?")) {
+            await dispatch(fetchDeleteAttachment(attachmentId));
+        }
     };
 
     return (
@@ -216,9 +264,47 @@ export default function TaskDetailModal({ isOpen, onClose, task, updateTask }: T
                         {/* Attachments */}
                         <div className="mt-1">
                             <h3 className="mb-2 text-[13px] font-bold uppercase tracking-[0.04em] text-[#6b7280]">Attachments</h3>
-                            <div className="flex cursor-pointer flex-col items-center gap-1.5 rounded-[10px] border-2 border-dashed border-[#e5e7eb] p-6 text-center text-[13px] text-[#9ca3af] transition-all hover:border-[#7c68ee] hover:bg-[#f0f0ff] hover:text-[#6b7280]">
-                                <Paperclip size={20} className="opacity-50" />
-                                <p>Drag &amp; drop files or click to upload</p>
+                            
+                            <div className="flex flex-col gap-2 mb-3">
+                                {listAttachments && listAttachments.map(att => (
+                                    <div key={att.attachment_id} className="flex items-center justify-between p-2 rounded-lg border border-[#e5e7eb] hover:bg-gray-50 group">
+                                        <div className="flex items-center gap-2 overflow-hidden">
+                                            <Paperclip size={14} className="text-[#6b7280] shrink-0" />
+                                            <a href={`${import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:5001'}${att.file_url}`} target="_blank" rel="noreferrer" className="text-[13px] text-[#292d34] truncate hover:text-[#7c68ee] hover:underline">
+                                                {att.file_name}
+                                            </a>
+                                            {att.file_size && <span className="text-[11px] text-[#9ca3af] shrink-0">({Math.round(att.file_size / 1024)} KB)</span>}
+                                        </div>
+                                        <button 
+                                            onClick={() => handleDeleteAttachment(att.attachment_id)}
+                                            className="text-[#ef4444] opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            <span className="text-xs font-medium">Delete</span>
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <input 
+                                type="file" 
+                                ref={fileInputRef} 
+                                className="hidden" 
+                                onChange={handleFileChange}
+                            />
+                            <div 
+                                onClick={() => fileInputRef.current?.click()}
+                                onDrop={handleDrop}
+                                onDragOver={handleDragOver}
+                                className={`flex cursor-pointer flex-col items-center gap-1.5 rounded-[10px] border-2 border-dashed border-[#e5e7eb] p-6 text-center text-[13px] text-[#9ca3af] transition-all hover:border-[#7c68ee] hover:bg-[#f0f0ff] hover:text-[#6b7280] ${isUploadingAttachment ? 'opacity-50 pointer-events-none' : ''}`}
+                            >
+                                {isUploadingAttachment ? (
+                                    <Spin size="small" />
+                                ) : (
+                                    <>
+                                        <Paperclip size={20} className="opacity-50" />
+                                        <p>Drag &amp; drop files or click to upload</p>
+                                    </>
+                                )}
                             </div>
                         </div>
 

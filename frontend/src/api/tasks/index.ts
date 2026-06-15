@@ -45,10 +45,12 @@ export const getAttachmentsByTask = async (task_id: number): Promise<TaskAttachm
 
 export const createAttachment = async (
     task_id: number,
-    url: string,
-    description?: string
+    file_name: string,
+    file_url: string,
+    file_size?: number,
+    mime_type?: string
 ): Promise<TaskAttachment> => {
-    return beApi.post(`/tasks/${task_id}/attachments`, { url, description });
+    return beApi.post(`/tasks/${task_id}/attachments`, { file_name, file_url, file_size, mime_type });
 };
 
 export const deleteAttachment = async (attachment_id: number): Promise<void> => {
