@@ -138,7 +138,7 @@ export default function CreateSpaceModal({ isOpen, onClose, onCreate }: CreateSp
                             onClick={() => setIsPrivate(!isPrivate)}
                         >
                             <span
-                                className={`absolute top-0.5 h-4.5 w-4.5 rounded-full bg-white shadow-sm transition-transform duration-200 ${isPrivate ? 'left-5' : 'left-0.5'}`}
+                                className={`absolute top-0.5 h-4.5 w-4.5 rounded-full bg-[var(--color-surface-container-lowest)] shadow-sm transition-transform duration-200 ${isPrivate ? 'left-5' : 'left-0.5'}`}
                             />
                         </button>
                     </div>

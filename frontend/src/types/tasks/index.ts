@@ -29,6 +29,7 @@ export interface Task {
 
     // Extended fields from API (optional)
     space_name?: string;
+    list_name?: string;
     space_color?: string | null;
     completed_at?: string | null;
     created_by?: number | null;
@@ -106,4 +107,4 @@ export interface InlineCreateTaskProps {
         priority_name?: string | null;
         priority_color?: string | null;
     }) => void;
-}
+}

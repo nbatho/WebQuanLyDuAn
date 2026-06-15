@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Hash, Plus, Send, MessageSquare, X, FileText, Cloud, Paperclip } from 'lucide-react';
 import { message, Spin } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../../hooks';
 import * as msgApi from '../../api/messages';
 import { uploadFile } from '../../api/upload';
@@ -8,23 +9,24 @@ import type { ConversationData, MessageData } from '../../api/messages';
 import { fetchWorkspaceMembers } from '../../store/modules/workspaces';
 import { useAppDispatch } from '../../hooks';
 
-function timeAgo(iso: string) {
+function timeAgo(iso: string, locale: string) {
     const d = new Date(iso);
     const now = new Date();
-    if (d.toDateString() === now.toDateString()) return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    if (d.toDateString() === now.toDateString()) return d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
     const y = new Date(now); y.setDate(y.getDate() - 1);
-    if (d.toDateString() === y.toDateString()) return 'Hôm qua';
-    return d.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short' });
+    if (d.toDateString() === y.toDateString()) return locale === 'vi' ? 'Hôm qua' : 'Yesterday';
+    return d.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
 }
 
 function initials(name: string) {
     return name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
 }
 
-const COLORS = ['#0058be', '#7c5cfc', '#00b894', '#e84393', '#fdcb6e', '#e74c3c', '#00cec9', '#6c5ce7'];
+const COLORS = ['var(--color-primary)', 'var(--color-tertiary)', '#00b894', '#e84393', '#fdcb6e', '#e74c3c', '#00cec9', '#6c5ce7'];
 function colorFor(id: number) { return COLORS[id % COLORS.length]; }
 
 export default function InboxPage() {
+    const { t, i18n } = useTranslation('common');
     const dispatch = useAppDispatch();
     const currentWsId = useAppSelector(s => s.workspaces.currentWorkspaceId);
     const wsMembers = useAppSelector(s => s.workspaces.listWorkspaceMembers);
@@ -97,7 +99,7 @@ export default function InboxPage() {
             setInput('');
             setAttachedFile(null);
             loadConvos(); // refresh sidebar last_message
-        } catch { message.error('Gửi thất bại'); }
+        } catch { message.error(t('errors.genericError')); }
     };
 
     // Local file upload handler
@@ -133,7 +135,7 @@ export default function InboxPage() {
             setShowNewDM(false);
             await loadConvos();
             setActiveId(conversation_id);
-        } catch { message.error('Không thể tạo cuộc trò chuyện'); }
+        } catch { message.error(t('errors.genericError')); }
     };
 
     // Create channel
@@ -145,8 +147,8 @@ export default function InboxPage() {
             setChannelName('');
             setSelectedMembers([]);
             await loadConvos();
-            message.success('Đã tạo kênh');
-        } catch { message.error('Không thể tạo kênh'); }
+            message.success(t('buttons.submit'));
+        } catch { message.error(t('errors.genericError')); }
     };
 
     // Helpers
@@ -162,21 +164,21 @@ export default function InboxPage() {
     }
 
     return (
-        <div className="flex h-full overflow-hidden bg-white font-['Plus_Jakarta_Sans',sans-serif]">
+        <div className="flex h-full overflow-hidden bg-[var(--color-surface-container-lowest)] font-['Plus_Jakarta_Sans',sans-serif]">
             {/* ═══ Sidebar ═══ */}
-            <div className="flex w-64 shrink-0 flex-col border-r border-[#eef0f5] bg-[#fafbfc]">
-                <div className="flex items-center justify-between border-b border-[#eef0f5] px-4 py-4">
-                    <h2 className="m-0 text-xl font-black text-[#141b2b]">Chat</h2>
+            <div className="flex w-64 shrink-0 flex-col border-r border-[var(--color-surface-container-highest)] bg-[var(--color-surface-container-low)]">
+                <div className="flex items-center justify-between border-b border-[var(--color-surface-container-highest)] px-4 py-4">
+                    <h2 className="m-0 text-h2 font-black text-[var(--color-on-surface)]">Chat</h2>
                 </div>
                 <div className="flex-1 overflow-y-auto px-2 py-3">
                     {/* Space Chats */}
                     {spaceChats.length > 0 && (
                         <>
-                            <div className="mb-1 flex items-center justify-between px-3 text-[11px] font-extrabold tracking-widest text-[#9aa0a6]">SPACES</div>
+                            <div className="mb-1 flex items-center justify-between px-3 text-micro font-extrabold tracking-widest text-[var(--color-text-tertiary)]">SPACES</div>
                             {spaceChats.map(c => (
                                 <button key={c.conversation_id} onClick={() => setActiveId(c.conversation_id)}
-                                    className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg border-none px-3 py-2 text-[13px] font-bold transition-all ${activeId === c.conversation_id ? 'bg-[#f0f4ff] text-[#0058be]' : 'bg-transparent text-[#5f6368] hover:bg-[#f0f4ff]'}`}>
-                                    <Hash size={15} className={activeId === c.conversation_id ? 'text-[#0058be]' : 'text-[#b0b5c1]'} />
+                                    className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg border-none px-3 py-2 text-body-sm font-bold transition-all ${activeId === c.conversation_id ? 'bg-[var(--color-primary-bg)] text-[var(--color-primary)]' : 'bg-transparent text-[var(--color-text-secondary)] hover:bg-[var(--color-primary-bg)]'}`}>
+                                    <Hash size={15} className={activeId === c.conversation_id ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-tertiary)]'} />
                                     <span className="truncate">{c.name}</span>
                                 </button>
                             ))}
@@ -184,87 +186,86 @@ export default function InboxPage() {
                     )}
 
                     {/* Channels */}
-                    <div className="mb-1 mt-4 flex items-center justify-between px-3 text-[11px] font-extrabold tracking-widest text-[#9aa0a6]">
+                    <div className="mb-1 mt-4 flex items-center justify-between px-3 text-micro font-extrabold tracking-widest text-[var(--color-text-tertiary)]">
                         <span>CHANNELS</span>
-                        <Plus size={14} className="cursor-pointer hover:text-[#0058be]" onClick={() => setShowNewChannel(true)} />
+                        <Plus size={14} className="cursor-pointer hover:text-[var(--color-primary)] text-[var(--color-text-tertiary)]" onClick={() => setShowNewChannel(true)} />
                     </div>
-                    {channels.length === 0 && <div className="px-3 py-2 text-[12px] text-[#b0b5c1]">Chưa có kênh</div>}
+                    {channels.length === 0 && <div className="px-3 py-2 text-caption text-[var(--color-text-tertiary)]">{t('workspace.noWorkspace')}</div>}
                     {channels.map(c => (
                         <button key={c.conversation_id} onClick={() => setActiveId(c.conversation_id)}
-                            className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg border-none px-3 py-2 text-[13px] font-bold transition-all ${activeId === c.conversation_id ? 'bg-[#f0f4ff] text-[#0058be]' : 'bg-transparent text-[#5f6368] hover:bg-[#f0f4ff]'}`}>
-                            <Hash size={15} className={activeId === c.conversation_id ? 'text-[#0058be]' : 'text-[#b0b5c1]'} />
+                            className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg border-none px-3 py-2 text-body-sm font-bold transition-all ${activeId === c.conversation_id ? 'bg-[var(--color-primary-bg)] text-[var(--color-primary)]' : 'bg-transparent text-[var(--color-text-secondary)] hover:bg-[var(--color-primary-bg)]'}`}>
+                            <Hash size={15} className={activeId === c.conversation_id ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-tertiary)]'} />
                             <span className="truncate">{c.name}</span>
-                            {(c.message_count || 0) > 0 && <span className="ml-auto text-[10px] text-[#9aa0a6]">{c.message_count}</span>}
+                            {(c.message_count || 0) > 0 && <span className="ml-auto text-[10px] text-[var(--color-text-tertiary)]">{c.message_count}</span>}
                         </button>
                     ))}
 
                     {/* Direct Messages */}
-                    <div className="mb-1 mt-4 flex items-center justify-between px-3 text-[11px] font-extrabold tracking-widest text-[#9aa0a6]">
+                    <div className="mb-1 mt-4 flex items-center justify-between px-3 text-micro font-extrabold tracking-widest text-[var(--color-text-tertiary)]">
                         <span>DIRECT MESSAGES</span>
-                        <Plus size={14} className="cursor-pointer hover:text-[#0058be]" onClick={() => setShowNewDM(true)} />
+                        <Plus size={14} className="cursor-pointer hover:text-[var(--color-primary)] text-[var(--color-text-tertiary)]" onClick={() => setShowNewDM(true)} />
                     </div>
-                    {directs.length === 0 && <div className="px-3 py-2 text-[12px] text-[#b0b5c1]">Chưa có tin nhắn</div>}
+                    {directs.length === 0 && <div className="px-3 py-2 text-caption text-[var(--color-text-tertiary)]">No messages</div>}
                     {directs.map(c => {
                         const other = c.members?.find(m => m.user_id !== currentUser?.user_id);
                         const name = other?.name || 'User';
                         return (
                             <button key={c.conversation_id} onClick={() => setActiveId(c.conversation_id)}
-                                className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg border-none px-3 py-1.5 text-[13px] font-bold transition-all ${activeId === c.conversation_id ? 'bg-[#f0f4ff] text-[#0058be]' : 'bg-transparent text-[#5f6368] hover:bg-[#f0f4ff]'}`}>
+                                className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg border-none px-3 py-1.5 text-body-sm font-bold transition-all ${activeId === c.conversation_id ? 'bg-[var(--color-primary-bg)] text-[var(--color-primary)]' : 'bg-transparent text-[var(--color-text-secondary)] hover:bg-[var(--color-primary-bg)]'}`}>
                                 <div className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white" style={{ backgroundColor: colorFor(other?.user_id || 0) }}>
                                     {initials(name)}
                                 </div>
                                 <span className="truncate flex-1">{name}</span>
-                                {c.last_message && <span className="text-[10px] text-[#b0b5c1]">{timeAgo(c.last_message.created_at)}</span>}
+                                {c.last_message && <span className="text-[10px] text-[var(--color-text-tertiary)]">{timeAgo(c.last_message.created_at, i18n.language)}</span>}
                             </button>
                         );
                     })}
 
                     {/* Init space chats */}
                     {spaces && spaces.length > 0 && spaceChats.length === 0 && currentWsId && (
-                        <button className="mt-4 flex w-full cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#d0d4d9] bg-transparent px-3 py-2 text-[12px] font-semibold text-[#9aa0a6] hover:border-[#0058be] hover:text-[#0058be]"
+                        <button className="mt-4 flex w-full cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[var(--color-outline)] bg-transparent px-3 py-2 text-caption font-semibold text-[var(--color-text-tertiary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
                             onClick={async () => {
                                 for (const sp of spaces) {
                                     await msgApi.getOrCreateSpaceChat(currentWsId, sp.spaceId, sp.name);
                                 }
                                 loadConvos();
                             }}>
-                            <Hash size={14} /> Tạo chat cho Spaces
+                            <Hash size={14} /> Create Space Chat
                         </button>
                     )}
                 </div>
             </div>
 
             {/* ═══ Main Chat ═══ */}
-            <div className="flex min-w-0 flex-1 flex-col bg-white">
+            <div className="flex min-w-0 flex-1 flex-col bg-[var(--color-surface-container-lowest)]">
                 {!activeConvo ? (
                     <div className="flex flex-1 items-center justify-center">
                         <div className="text-center">
-                            <MessageSquare size={48} className="mx-auto mb-3 text-[#d0d4d9]" />
-                            <p className="text-[15px] font-bold text-[#5f6368]">Chọn cuộc trò chuyện</p>
-                            <p className="mt-1 text-[13px] text-[#9aa0a6]">Chọn từ sidebar hoặc tạo mới</p>
+                            <MessageSquare size={48} className="mx-auto mb-3 text-[var(--color-text-tertiary)] opacity-50" />
+                            <p className="text-body font-bold text-[var(--color-text-secondary)]">Select a conversation</p>
                         </div>
                     </div>
                 ) : (
                     <>
                         {/* Header */}
-                        <div className="flex h-14 shrink-0 items-center justify-between border-b border-[#eef0f5] px-6">
+                        <div className="flex h-14 shrink-0 items-center justify-between border-b border-[var(--color-surface-container-highest)] px-6 bg-[var(--color-surface-container-lowest)]">
                             <div className="flex items-center gap-3">
                                 {activeConvo.type === 'DIRECT' ? (
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-bold text-white" style={{ backgroundColor: colorFor(activeConvo.conversation_id) }}>
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-full text-caption font-bold text-white" style={{ backgroundColor: colorFor(activeConvo.conversation_id) }}>
                                         {initials(convoName(activeConvo))}
                                     </div>
                                 ) : (
-                                    <div className="flex h-8 w-8 items-center justify-center rounded bg-[#f0f4ff]"><Hash size={18} className="text-[#0058be]" /></div>
+                                    <div className="flex h-8 w-8 items-center justify-center rounded bg-[var(--color-primary-bg)]"><Hash size={18} className="text-[var(--color-primary)]" /></div>
                                 )}
                                 <div>
-                                    <h3 className="m-0 text-[15px] font-extrabold text-[#141b2b]">{activeConvo.type === 'DIRECT' ? convoName(activeConvo) : `# ${activeConvo.name}`}</h3>
-                                    <div className="text-[11px] font-semibold text-[#9aa0a6]">{activeConvo.members?.length || 0} thành viên</div>
+                                    <h3 className="m-0 text-body font-extrabold text-[var(--color-on-surface)]">{activeConvo.type === 'DIRECT' ? convoName(activeConvo) : `# ${activeConvo.name}`}</h3>
+                                    <div className="text-[11px] font-semibold text-[var(--color-text-tertiary)]">{activeConvo.members?.length || 0} members</div>
                                 </div>
                             </div>
                             <div className="flex items-center gap-1">
                                 <div className="flex -space-x-1.5">
                                     {activeConvo.members?.slice(0, 4).map(m => (
-                                        <div key={m.user_id} className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white text-[9px] font-bold text-white" style={{ backgroundColor: colorFor(m.user_id) }}>
+                                        <div key={m.user_id} className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-[var(--color-surface-container-lowest)] text-micro font-bold text-white" style={{ backgroundColor: colorFor(m.user_id) }}>
                                             {initials(m.name)}
                                         </div>
                                     ))}
@@ -275,40 +276,40 @@ export default function InboxPage() {
                         {/* Messages */}
                         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
                             {messages.length === 0 && (
-                                <div className="flex items-center justify-center py-20 text-[13px] text-[#9aa0a6]">Chưa có tin nhắn. Hãy gửi tin nhắn đầu tiên!</div>
+                                <div className="flex items-center justify-center py-20 text-body-sm text-[var(--color-text-tertiary)]">No messages yet. Send the first one!</div>
                             )}
                             {messages.map((msg, i) => {
                                 const showAvatar = i === 0 || messages[i - 1].sender_id !== msg.sender_id;
                                 return (
                                     <div key={msg.message_id} className={`group flex gap-3 ${showAvatar ? 'mt-3' : 'mt-0.5'}`}>
                                         {showAvatar ? (
-                                            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold text-white" style={{ backgroundColor: colorFor(msg.sender_id) }}>
+                                            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-caption font-bold text-white" style={{ backgroundColor: colorFor(msg.sender_id) }}>
                                                 {initials(msg.sender_name)}
                                             </div>
                                         ) : <div className="w-8" />}
                                         <div className="min-w-0 flex-1">
                                             {showAvatar && (
                                                 <div className="mb-0.5 flex items-baseline gap-2">
-                                                    <span className="text-[13px] font-bold text-[#141b2b]">{msg.sender_name}</span>
-                                                    <span className="text-[11px] font-semibold text-[#9aa0a6]">{timeAgo(msg.created_at)}</span>
+                                                    <span className="text-body-sm font-bold text-[var(--color-on-surface)]">{msg.sender_name}</span>
+                                                    <span className="text-[11px] font-semibold text-[var(--color-text-tertiary)]">{timeAgo(msg.created_at, i18n.language)}</span>
                                                 </div>
                                             )}
-                                            {msg.content && <div className="text-[14px] font-medium leading-relaxed text-[#3a3f47] whitespace-pre-wrap">{msg.content}</div>}
+                                            {msg.content && <div className="text-body font-medium leading-relaxed text-[var(--color-text-secondary)] whitespace-pre-wrap">{msg.content}</div>}
                                             {msg.file_url && (
                                                 <div className="mt-2">
                                                     {(() => {
                                                         const isExternal = msg.file_url.startsWith('http');
                                                         const fileUrl = isExternal ? msg.file_url : `http://localhost:5001${msg.file_url}`;
-                                                        const isImage = msg.file_type?.startsWith('image/') && !isExternal; // Drive files are usually documents even if image
+                                                        const isImage = msg.file_type?.startsWith('image/') && !isExternal; 
                                                         
                                                         return isImage ? (
                                                             <a href={fileUrl} target="_blank" rel="noreferrer">
-                                                                <img src={fileUrl} alt={msg.file_name || 'image'} className="max-w-[300px] max-h-[250px] object-cover rounded-lg border border-[#eef0f5]" />
+                                                                <img src={fileUrl} alt={msg.file_name || 'image'} className="max-w-[300px] max-h-[250px] object-cover rounded-lg border border-[var(--color-surface-container-highest)]" />
                                                             </a>
                                                         ) : (
-                                                            <a href={fileUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 w-max rounded-lg border border-[#eef0f5] bg-[#fafbfc] px-3 py-2 text-[#0058be] hover:bg-[#f0f4ff] no-underline">
+                                                            <a href={fileUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 w-max rounded-lg border border-[var(--color-surface-container-highest)] bg-[var(--color-surface-container-low)] px-3 py-2 text-[var(--color-primary)] hover:bg-[var(--color-primary-bg)] no-underline">
                                                                 {isExternal ? <Cloud size={18} /> : <FileText size={18} />}
-                                                                <span className="text-[13px] font-semibold max-w-[200px] truncate">{msg.file_name}</span>
+                                                                <span className="text-body-sm font-semibold max-w-[200px] truncate">{msg.file_name}</span>
                                                             </a>
                                                         );
                                                     })()}
@@ -323,16 +324,16 @@ export default function InboxPage() {
 
                         {/* Composer */}
                         <div className="px-6 pb-5 pt-2">
-                            <div className="rounded-xl border border-[#dcdfe4] bg-white shadow-sm transition-all focus-within:border-[#0058be] focus-within:shadow-md">
+                            <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-container-lowest)] shadow-sm transition-all focus-within:border-[var(--color-primary)] focus-within:shadow-md">
                                 <textarea
                                     value={input}
                                     onChange={e => setInput(e.target.value)}
                                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-                                    placeholder={`Nhắn tin ${activeConvo.type === 'DIRECT' ? convoName(activeConvo) : '#' + activeConvo.name}...`}
-                                    className="w-full resize-none bg-transparent px-4 py-3 text-[14px] font-medium text-[#141b2b] outline-none min-h-[44px]"
+                                    placeholder={`Message ${activeConvo.type === 'DIRECT' ? convoName(activeConvo) : '#' + activeConvo.name}...`}
+                                    className="w-full resize-none bg-transparent px-4 py-3 text-body font-medium text-[var(--color-on-surface)] outline-none min-h-[44px] placeholder-[var(--color-text-tertiary)]"
                                     rows={1}
                                 />
-                                <div className="flex items-center justify-between rounded-b-xl bg-[#fafbfc] px-3 py-2 border-t border-[#eef0f5]">
+                                <div className="flex items-center justify-between rounded-b-xl bg-[var(--color-surface-container-low)] px-3 py-2 border-t border-[var(--color-border)]">
                                     <div className="flex items-center gap-2">
                                         <input 
                                             type="file" 
@@ -341,7 +342,7 @@ export default function InboxPage() {
                                             onChange={handleFileChange}
                                         />
                                         <button 
-                                            className={`cursor-pointer border-none bg-transparent p-1.5 text-[#5f6368] hover:bg-[#e2e6f0] hover:text-[#0058be] rounded-md transition-colors ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}
+                                            className={`cursor-pointer border-none bg-transparent p-1.5 text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-primary)] rounded-md transition-colors ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}
                                             onClick={() => fileInputRef.current?.click()}
                                             title="Đính kèm tài liệu"
                                         >
@@ -349,16 +350,16 @@ export default function InboxPage() {
                                         </button>
 
                                         {attachedFile && (
-                                            <div className="flex items-center gap-1.5 px-3 py-1 bg-[#f0f4ff] rounded-full text-[12px] font-semibold text-[#0058be] border border-[#d8e2ff]">
+                                            <div className="flex items-center gap-1.5 px-3 py-1 bg-[var(--color-primary-bg)] rounded-full text-caption font-semibold text-[var(--color-primary)] border border-[var(--color-primary-border)]">
                                                 <Paperclip size={12} />
                                                 <span className="max-w-[150px] truncate">{attachedFile.name}</span>
-                                                <X size={14} className="cursor-pointer hover:text-red-500" onClick={() => setAttachedFile(null)} />
+                                                <X size={14} className="cursor-pointer hover:text-[var(--color-error)]" onClick={() => setAttachedFile(null)} />
                                             </div>
                                         )}
                                     </div>
                                     <button onClick={handleSend}
-                                        className={`flex cursor-pointer items-center gap-1.5 rounded-lg border-none px-4 py-1.5 text-[13px] font-bold transition-all ${(input.trim() || attachedFile) ? 'bg-[#0058be] text-white hover:bg-[#004aa0]' : 'bg-[#e2e6f0] text-[#9aa0a6] pointer-events-none'}`}>
-                                        Gửi <Send size={14} />
+                                        className={`flex cursor-pointer items-center gap-1.5 rounded-lg border-none px-4 py-1.5 text-body-sm font-bold transition-all ${(input.trim() || attachedFile) ? 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)]' : 'bg-[var(--color-surface-variant)] text-[var(--color-text-tertiary)] pointer-events-none'}`}>
+                                        {t('buttons.submit')} <Send size={14} />
                                     </button>
                                 </div>
                             </div>
@@ -370,22 +371,22 @@ export default function InboxPage() {
             {/* ═══ Modal: New DM ═══ */}
             {showNewDM && (
                 <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/30" onClick={() => setShowNewDM(false)}>
-                    <div className="w-96 rounded-xl bg-white p-5 shadow-2xl" onClick={e => e.stopPropagation()}>
+                    <div className="w-96 rounded-xl bg-[var(--color-surface-container-lowest)] p-5 shadow-2xl" onClick={e => e.stopPropagation()}>
                         <div className="mb-4 flex items-center justify-between">
-                            <h3 className="m-0 text-[15px] font-bold text-[#141b2b]">Tin nhắn mới</h3>
-                            <button className="cursor-pointer border-none bg-transparent text-[#9aa0a6] hover:text-[#141b2b]" onClick={() => setShowNewDM(false)}><X size={18} /></button>
+                            <h3 className="m-0 text-body font-bold text-[var(--color-on-surface)]">New Message</h3>
+                            <button className="cursor-pointer border-none bg-transparent text-[var(--color-text-tertiary)] hover:text-[var(--color-on-surface)]" onClick={() => setShowNewDM(false)}><X size={18} /></button>
                         </div>
-                        <p className="mb-3 text-[13px] text-[#5f6368]">Chọn thành viên để nhắn tin:</p>
+                        <p className="mb-3 text-body-sm text-[var(--color-text-secondary)]">Select a member:</p>
                         <div className="max-h-60 overflow-y-auto space-y-1">
                             {(wsMembers || []).filter(m => m.user_id !== currentUser?.user_id).map(m => (
                                 <button key={m.user_id} onClick={() => handleStartDM(m.user_id)}
-                                    className="flex w-full cursor-pointer items-center gap-3 rounded-lg border-none bg-transparent px-3 py-2.5 text-left transition-colors hover:bg-[#f0f4ff]">
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-bold text-white" style={{ backgroundColor: colorFor(m.user_id) }}>
+                                    className="flex w-full cursor-pointer items-center gap-3 rounded-lg border-none bg-transparent px-3 py-2.5 text-left transition-colors hover:bg-[var(--color-primary-bg)]">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-full text-caption font-bold text-white" style={{ backgroundColor: colorFor(m.user_id) }}>
                                         {initials(m.name)}
                                     </div>
                                     <div>
-                                        <div className="text-[13px] font-semibold text-[#141b2b]">{m.name}</div>
-                                        <div className="text-[11px] text-[#9aa0a6]">{m.email}</div>
+                                        <div className="text-body-sm font-semibold text-[var(--color-on-surface)]">{m.name}</div>
+                                        <div className="text-[11px] text-[var(--color-text-tertiary)]">{m.email}</div>
                                     </div>
                                 </button>
                             ))}
@@ -397,30 +398,30 @@ export default function InboxPage() {
             {/* ═══ Modal: New Channel ═══ */}
             {showNewChannel && (
                 <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/30" onClick={() => setShowNewChannel(false)}>
-                    <div className="w-[420px] rounded-xl bg-white p-5 shadow-2xl" onClick={e => e.stopPropagation()}>
+                    <div className="w-[420px] rounded-xl bg-[var(--color-surface-container-lowest)] p-5 shadow-2xl" onClick={e => e.stopPropagation()}>
                         <div className="mb-4 flex items-center justify-between">
-                            <h3 className="m-0 text-[15px] font-bold text-[#141b2b]">Tạo kênh mới</h3>
-                            <button className="cursor-pointer border-none bg-transparent text-[#9aa0a6] hover:text-[#141b2b]" onClick={() => setShowNewChannel(false)}><X size={18} /></button>
+                            <h3 className="m-0 text-body font-bold text-[var(--color-on-surface)]">Create Channel</h3>
+                            <button className="cursor-pointer border-none bg-transparent text-[var(--color-text-tertiary)] hover:text-[var(--color-on-surface)]" onClick={() => setShowNewChannel(false)}><X size={18} /></button>
                         </div>
                         <input value={channelName} onChange={e => setChannelName(e.target.value)}
-                            placeholder="Tên kênh..." className="mb-3 w-full rounded-lg border border-[#eef0f5] px-3 py-2.5 text-[13px] outline-none focus:border-[#0058be]" />
-                        <p className="mb-2 text-[12px] font-bold text-[#9aa0a6]">Thêm thành viên:</p>
+                            placeholder="Channel name..." className="mb-3 w-full rounded-lg border border-[var(--color-border)] bg-transparent text-[var(--color-on-surface)] px-3 py-2.5 text-body-sm outline-none focus:border-[var(--color-primary)]" />
+                        <p className="mb-2 text-caption font-bold text-[var(--color-text-tertiary)]">Add members:</p>
                         <div className="max-h-48 overflow-y-auto space-y-1 mb-4">
                             {(wsMembers || []).filter(m => m.user_id !== currentUser?.user_id).map(m => (
-                                <label key={m.user_id} className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 hover:bg-[#f0f4ff]">
+                                <label key={m.user_id} className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 hover:bg-[var(--color-primary-bg)] text-[var(--color-on-surface)]">
                                     <input type="checkbox" checked={selectedMembers.includes(m.user_id)}
                                         onChange={() => setSelectedMembers(prev => prev.includes(m.user_id) ? prev.filter(id => id !== m.user_id) : [...prev, m.user_id])}
-                                        className="h-4 w-4 accent-[#0058be]" />
-                                    <div className="flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold text-white" style={{ backgroundColor: colorFor(m.user_id) }}>
+                                        className="h-4 w-4 accent-[var(--color-primary)]" />
+                                    <div className="flex h-7 w-7 items-center justify-center rounded-full text-micro font-bold text-white" style={{ backgroundColor: colorFor(m.user_id) }}>
                                         {initials(m.name)}
                                     </div>
-                                    <span className="text-[13px] font-semibold text-[#141b2b]">{m.name}</span>
+                                    <span className="text-body-sm font-semibold">{m.name}</span>
                                 </label>
                             ))}
                         </div>
                         <button onClick={handleCreateChannel} disabled={!channelName.trim()}
-                            className="w-full cursor-pointer rounded-lg border-none bg-[#0058be] py-2.5 text-[13px] font-bold text-white transition-colors hover:bg-[#004aa0] disabled:cursor-not-allowed disabled:bg-[#d0d4d9]">
-                            Tạo kênh
+                            className="w-full cursor-pointer rounded-lg border-none bg-[var(--color-primary)] py-2.5 text-body-sm font-bold text-white transition-colors hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:bg-[var(--color-surface-variant)]">
+                            {t('buttons.create')}
                         </button>
                     </div>
                 </div>

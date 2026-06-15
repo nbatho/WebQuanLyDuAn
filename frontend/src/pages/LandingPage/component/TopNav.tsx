@@ -12,10 +12,10 @@ export default function TopNav() {
     const [mobileOpen, setMobileOpen] = useState(false);
 
     return (
-        <header className="w-full sticky top-0 z-50 bg-[#f9f9ff]/90 backdrop-blur-md border-b border-[#e9edff]">
+        <header className="w-full sticky top-0 z-50 bg-[#f9f9ff]/90 backdrop-blur-md border-b border-[var(--color-surface-container)]">
             <nav className="flex justify-between items-center px-10 py-4 max-w-7xl mx-auto">
                 {/* Logo */}
-                <Link to="/" className="text-2xl font-extrabold text-[#141b2b] tracking-tight no-underline">
+                <Link to="/" className="text-2xl font-extrabold text-[var(--color-on-surface)] tracking-tight no-underline">
                     Flowise
                 </Link>
 
@@ -25,7 +25,7 @@ export default function TopNav() {
                         <a
                             key={link.label}
                             href={link.href}
-                            className="text-[#424754] font-semibold text-sm no-underline hover:text-[#0058be] transition-colors"
+                            className="text-[#424754] font-semibold text-sm no-underline hover:text-[var(--color-primary)] transition-colors"
                         >
                             {link.label}
                         </a>
@@ -36,7 +36,7 @@ export default function TopNav() {
                 <div className="hidden md:flex items-center gap-4">
                     <Link
                         to="/register"
-                        className="text-[#424754] font-semibold text-sm hover:text-[#7c5cfc] transition-colors no-underline"
+                        className="text-[#424754] font-semibold text-sm hover:text-[var(--color-accent)] transition-colors no-underline"
                     >
                         Đăng ký
                     </Link>
@@ -53,7 +53,7 @@ export default function TopNav() {
 
                 {/* Mobile Hamburger */}
                 <button
-                    className="md:hidden p-2 text-[#141b2b] bg-transparent border-0 cursor-pointer"
+                    className="md:hidden p-2 text-[var(--color-on-surface)] bg-transparent border-0 cursor-pointer"
                     onClick={() => setMobileOpen(true)}
                 >
                     <Menu size={24} strokeWidth={2.5} />
@@ -71,14 +71,14 @@ export default function TopNav() {
                             <a
                                 key={link.label}
                                 href={link.href}
-                                className="text-[#141b2b] font-semibold text-base py-2 no-underline hover:text-[#0058be] transition-colors"
+                                className="text-[var(--color-on-surface)] font-semibold text-base py-2 no-underline hover:text-[var(--color-primary)] transition-colors"
                                 onClick={() => setMobileOpen(false)}
                             >
                                 {link.label}
                             </a>
                         ))}
-                        <hr className="border-[#e9edff] my-4" />
-                        <Link to="/register" className="text-[#141b2b] font-semibold text-base no-underline hover:text-[#7c5cfc]">Đăng ký</Link>
+                        <hr className="border-[var(--color-surface-container)] my-4" />
+                        <Link to="/register" className="text-[var(--color-on-surface)] font-semibold text-base no-underline hover:text-[var(--color-accent)]">Đăng ký</Link>
                         <Link to="/login" className="w-full">
                             <Button type="primary" size="large" className="!rounded-xl !font-bold !border-0 !h-11 w-full mt-2 !bg-[#7c5cfc]">
                                 Đăng nhập

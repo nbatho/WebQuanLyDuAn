@@ -86,7 +86,7 @@ export default function BoardView({
                     return (
                         <div
                             key={group.id}
-                            className={`w-70 shrink-0 overflow-hidden rounded-[10px] border-2 transition-colors ${dragOverGroup === group.id ? 'border-[#0058be] bg-[#f0f4ff]' : 'border-transparent bg-[#f8fafb]'
+                            className={`w-70 shrink-0 overflow-hidden rounded-[10px] border-2 transition-colors ${dragOverGroup === group.id ? 'border-[var(--color-primary)] bg-[var(--color-primary-bg)]' : 'border-transparent bg-[var(--color-surface-container-low)]'
                                 }`}
                             onDragOver={(e) => { e.preventDefault(); setDragOverGroup(group.id); }}
                             onDragLeave={() => setDragOverGroup(null)}
@@ -95,11 +95,11 @@ export default function BoardView({
                             <div className="flex items-center justify-between px-3.5 py-2.5">
                                 <div className="flex items-center gap-1.75">
                                     <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: group.color || '#ccc' }} />
-                                    <span className="text-xs font-extrabold uppercase tracking-[0.04em] text-[#141b2b]">{group.name}</span>
-                                    <span className="rounded-full bg-[#eef0f5] px-1.25 py-px text-[11px] font-bold text-[#5f6368]">{columnRoots.length}</span>
+                                    <span className="text-xs font-extrabold uppercase tracking-[0.04em] text-[var(--color-on-surface)]">{group.name}</span>
+                                    <span className="rounded-full bg-[var(--color-surface-container-high)] px-1.25 py-px text-[11px] font-bold text-[var(--color-text-secondary)]">{columnRoots.length}</span>
                                 </div>
                                 <div className="flex gap-0.5">
-                                    <button className="rounded p-0.75 text-[#9aa0a6] hover:bg-[#eef0f5]"><MoreHorizontal size={14} /></button>
+                                    <button className="rounded p-0.75 text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-hover)]"><MoreHorizontal size={14} /></button>
                                 </div>
                             </div>
 
@@ -107,19 +107,19 @@ export default function BoardView({
                                 {columnRoots.map((task) => (
                                     <div
                                         key={task.task_id}
-                                        className="cursor-pointer rounded-lg border border-[#eef0f5] bg-white px-3.5 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
+                                        className="cursor-pointer rounded-lg border border-[var(--color-border-light)] bg-[var(--color-surface-container-lowest)] px-3.5 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
                                         draggable
                                         onDragStart={(e) => onDragStart(e, group.id, task.task_id)}
                                         onDragEnd={onDragEnd}
                                         onClick={() => setSelectedTask(task)}
                                         onContextMenu={(e) => onContextMenu(e, task)}
                                     >
-                                        <div className="mb-1.5 text-[13px] font-semibold text-[#141b2b]">{task.name}</div>
+                                        <div className="mb-1.5 text-[13px] font-semibold text-[var(--color-on-surface)]">{task.name}</div>
                                         <div className="mb-2 text-[15px] text-[#dcdfe4]"><span>≡</span></div>
 
                                         <div className="flex flex-wrap items-center gap-2">
                                             {task.due_date && (
-                                                <span className="flex items-center gap-1 rounded bg-[#f8fafb] px-1.5 py-0.5 text-[11px] text-[#5f6368]">
+                                                <span className="flex items-center gap-1 rounded bg-[var(--color-surface-container-low)] px-1.5 py-0.5 text-[11px] text-[var(--color-text-secondary)]">
                                                     <Calendar size={11} /> {new Date(task.due_date).toLocaleDateString()}
                                                 </span>
                                             )}

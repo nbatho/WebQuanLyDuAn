@@ -8,7 +8,7 @@ import Footer from "./component/Footer";
 
 export default function LandingPage() {
     return (
-        <div className="min-h-screen bg-[#f9f9ff] text-[#141b2b]">
+        <div className="min-h-screen bg-[#f9f9ff] text-[var(--color-on-surface)]">
             <TopNav />
             <main>
                 <HeroSection />

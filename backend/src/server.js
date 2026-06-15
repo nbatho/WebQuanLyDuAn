@@ -33,8 +33,16 @@ const PORT = process.env.PORT || 5001;
 const HOST = process.env.HOST || "0.0.0.0";
 
 //middleware
+const allowedOrigins = [process.env.CLIENT_URL, 'http://localhost:5173'];
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Blocked by CORS'));
+    }
+  },
   credentials: true,
 }));
 app.use(express.json());

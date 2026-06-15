@@ -7,6 +7,7 @@ import type { NewTaskData, NewMilestoneData } from '@/types/tasks';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '@/store/configureStore';
 import { fetchCreateMilestone } from '@/store/modules/milestones';
+import { useTranslation } from 'react-i18next';
 
 interface CreateTaskModalProps {
     isOpen: boolean;
@@ -47,6 +48,8 @@ export default function CreateTaskModal({
     spaceId,
 }: CreateTaskModalProps) {
     const dispatch = useDispatch<AppDispatch>();
+    const { t } = useTranslation('tasks');
+    const { t: tc } = useTranslation('common');
 
     const [itemType, setItemType] = useState<ItemType>('task');
     const [name, setName] = useState('');
@@ -133,43 +136,43 @@ export default function CreateTaskModal({
     };
 
     const isMilestone = itemType === 'milestone';
-    const namePlaceholder = isMilestone ? 'Tên milestone...' : 'Tên công việc...';
-    const descPlaceholder = isMilestone ? 'Mô tả milestone...' : 'Thêm mô tả chi tiết...';
-    const submitLabel = isMilestone ? 'Tạo Milestone' : 'Tạo công việc';
+    const namePlaceholder = isMilestone ? 'Milestone name...' : 'Task name...';
+    const descPlaceholder = isMilestone ? 'Milestone description...' : 'Add description...';
+    const submitLabel = isMilestone ? t('create.createMilestone') : t('create.createTask');
     const submitDisabled = isMilestone
         ? !name.trim() || !spaceId || isCreatingMilestone
         : !name.trim() || !listId || !statusId;
 
     return (
         <div className="fixed inset-0 z-2000 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="flex w-145 max-w-[95vw] flex-col rounded-xl bg-white shadow-2xl" onClick={e => { e.stopPropagation(); setActiveDropdown(null); }}>
+            <div className="flex w-145 max-w-[95vw] flex-col rounded-xl bg-[var(--color-surface-container-lowest)] shadow-2xl font-['Plus_Jakarta_Sans',sans-serif]" onClick={e => { e.stopPropagation(); setActiveDropdown(null); }}>
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-[#eef0f5] px-5 py-4">
+                <div className="flex items-center justify-between border-b border-[var(--color-surface-container-highest)] px-5 py-4">
                     <div className="flex items-center gap-2">
-                        <div className="flex h-6 w-6 items-center justify-center rounded bg-[#f0f4ff] text-[#0058be]">
+                        <div className="flex h-6 w-6 items-center justify-center rounded bg-[var(--color-primary-bg)] text-[var(--color-primary)]">
                             {isMilestone ? <Milestone size={14} /> : <Hash size={14} />}
                         </div>
-                        <span className="text-sm font-bold text-[#141b2b]">
-                            {isMilestone ? 'Tạo Milestone Mới' : 'Tạo Task Mới'}
+                        <span className="text-body-sm font-bold text-[var(--color-on-surface)]">
+                            {isMilestone ? t('create.createMilestoneNew') : t('create.title')}
                         </span>
                     </div>
-                    <button onClick={onClose} className="text-[#9aa0a6] hover:text-[#5f6368] cursor-pointer"><X size={20} /></button>
+                    <button onClick={onClose} className="text-[var(--color-text-tertiary)] hover:text-[var(--color-on-surface)] cursor-pointer bg-transparent border-0"><X size={20} /></button>
                 </div>
 
                 {/* Toolbar: list selector + type selector */}
-                <div className="flex items-center gap-2 border-b border-[#f8f9fc] bg-[#fcfdfe] px-5 py-2.5">
+                <div className="flex items-center gap-2 border-b border-[var(--color-surface-container-highest)] bg-[var(--color-surface-container-low)] px-5 py-2.5">
                     {/* List selector — only for task */}
                     {!isMilestone && (
                         <div className="relative" onClick={e => e.stopPropagation()}>
-                            <button className="flex items-center gap-1.5 rounded-md border border-[#eef0f5] bg-white px-2.5 py-1 text-xs font-semibold text-[#141b2b] hover:border-[#dcdfe4]" onClick={() => setActiveDropdown(activeDropdown === 'list' ? null : 'list')}>
-                                <FolderOpen size={13} className="text-[#0058be]" />
-                                {lists.find(l => l.id === listId)?.name || 'Chọn danh sách'}
+                            <button className="flex items-center gap-1.5 rounded-md border border-[var(--color-border)] bg-transparent px-2.5 py-1 text-caption font-semibold text-[var(--color-on-surface)] hover:border-[var(--color-primary)] cursor-pointer" onClick={() => setActiveDropdown(activeDropdown === 'list' ? null : 'list')}>
+                                <FolderOpen size={13} className="text-[var(--color-primary)]" />
+                                {lists.find(l => l.id === listId)?.name || 'Select List'}
                                 <ChevronDown size={12} />
                             </button>
                             {activeDropdown === 'list' && (
-                                <div className="absolute left-0 top-full z-20 mt-1 w-48 rounded-lg border border-[#eef0f5] bg-white p-1 shadow-xl">
+                                <div className="absolute left-0 top-full z-20 mt-1 w-48 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-container-lowest)] p-1 shadow-xl">
                                     {lists.map(l => (
-                                        <button key={l.id} className={`flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-xs font-medium hover:bg-[#f0f4ff] ${listId === l.id ? 'bg-[#f0f4ff] text-[#0058be]' : ''}`} onClick={() => { setListId(l.id); setActiveDropdown(null); }}>
+                                        <button key={l.id} className={`flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-caption font-medium hover:bg-[var(--color-primary-bg)] cursor-pointer border-0 bg-transparent text-[var(--color-on-surface)] ${listId === l.id ? 'bg-[var(--color-primary-bg)] text-[var(--color-primary)]' : ''}`} onClick={() => { setListId(l.id); setActiveDropdown(null); }}>
                                             {l.name}
                                         </button>
                                     ))}
@@ -181,26 +184,26 @@ export default function CreateTaskModal({
                     {/* Type dropdown: Task / Milestone */}
                     <div className="relative" onClick={e => e.stopPropagation()}>
                         <button
-                            className="flex items-center gap-1.5 rounded-md border border-[#eef0f5] bg-white px-2.5 py-1 text-xs font-semibold text-[#141b2b] hover:border-[#dcdfe4]"
+                            className="flex items-center gap-1.5 rounded-md border border-[var(--color-border)] bg-transparent px-2.5 py-1 text-caption font-semibold text-[var(--color-on-surface)] hover:border-[var(--color-primary)] cursor-pointer"
                             onClick={() => setActiveDropdown(activeDropdown === 'type' ? null : 'type')}
                         >
-                            {isMilestone ? <Milestone size={13} className="text-[#7c68ee]" /> : <ListTodo size={13} className="text-[#0058be]" />}
+                            {isMilestone ? <Milestone size={13} className="text-[var(--color-tertiary)]" /> : <ListTodo size={13} className="text-[var(--color-primary)]" />}
                             {isMilestone ? 'Milestone' : 'Task'}
                             <ChevronDown size={12} />
                         </button>
                         {activeDropdown === 'type' && (
-                            <div className="absolute left-0 top-full z-20 mt-1 w-40 rounded-lg border border-[#eef0f5] bg-white p-1 shadow-xl">
+                            <div className="absolute left-0 top-full z-20 mt-1 w-40 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-container-lowest)] p-1 shadow-xl">
                                 <button
-                                    className={`flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-xs font-medium hover:bg-[#f0f4ff] ${itemType === 'task' ? 'bg-[#f0f4ff] text-[#0058be]' : ''}`}
+                                    className={`flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-caption font-medium hover:bg-[var(--color-primary-bg)] cursor-pointer border-0 bg-transparent text-[var(--color-on-surface)] ${itemType === 'task' ? 'bg-[var(--color-primary-bg)] text-[var(--color-primary)]' : ''}`}
                                     onClick={() => { setItemType('task'); setActiveDropdown(null); }}
                                 >
-                                    <ListTodo size={13} className="text-[#0058be]" /> Task
+                                    <ListTodo size={13} className="text-[var(--color-primary)]" /> Task
                                 </button>
                                 <button
-                                    className={`flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-xs font-medium hover:bg-[#f0f4ff] ${itemType === 'milestone' ? 'bg-[#f0f4ff] text-[#7c68ee]' : ''}`}
+                                    className={`flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-caption font-medium hover:bg-[var(--color-primary-bg)] cursor-pointer border-0 bg-transparent text-[var(--color-on-surface)] ${itemType === 'milestone' ? 'bg-[var(--color-primary-bg)] text-[var(--color-tertiary)]' : ''}`}
                                     onClick={() => { setItemType('milestone'); setActiveDropdown(null); }}
                                 >
-                                    <Milestone size={13} className="text-[#7c68ee]" /> Milestone
+                                    <Milestone size={13} className="text-[var(--color-tertiary)]" /> Milestone
                                 </button>
                             </div>
                         )}
@@ -209,27 +212,27 @@ export default function CreateTaskModal({
 
                 {/* Main input area */}
                 <div className="px-6 py-4">
-                    <input ref={titleRef} className="mb-2 w-full border-none text-xl font-bold text-[#141b2b] outline-none placeholder:text-[#c2c9e0]" value={name} onChange={e => setName(e.target.value)} placeholder={namePlaceholder} />
+                    <input ref={titleRef} className="mb-2 w-full border-none bg-transparent text-h2 font-bold text-[var(--color-on-surface)] outline-none placeholder-[var(--color-text-tertiary)]" value={name} onChange={e => setName(e.target.value)} placeholder={namePlaceholder} />
                     <div className="flex items-start gap-2">
-                        <AlignLeft size={16} className="mt-1 text-[#c2c9e0]" />
-                        <textarea className="w-full resize-none border-none text-[13px] leading-6 text-[#5f6368] outline-none placeholder:text-[#c2c9e0]" value={description} onChange={e => setDescription(e.target.value)} placeholder={descPlaceholder} rows={3} />
+                        <AlignLeft size={16} className="mt-1 text-[var(--color-text-tertiary)]" />
+                        <textarea className="w-full resize-none border-none bg-transparent text-body-sm leading-6 text-[var(--color-text-secondary)] outline-none placeholder-[var(--color-text-tertiary)]" value={description} onChange={e => setDescription(e.target.value)} placeholder={descPlaceholder} rows={3} />
                     </div>
                 </div>
 
                 {/* Action pills */}
-                <div className="flex flex-wrap items-center gap-2 border-t border-[#f8f9fc] px-6 py-3">
+                <div className="flex flex-wrap items-center gap-2 border-t border-[var(--color-surface-container-highest)] px-6 py-3">
                     {isMilestone ? (
                         <>
                             {/* Milestone status */}
                             <div className="relative" onClick={e => e.stopPropagation()}>
-                                <button className="flex items-center gap-1.5 rounded-full border border-[#eef0f5] px-3 py-1.5 text-xs font-semibold text-[#5f6368] hover:bg-[#f8fafb]" onClick={() => setActiveDropdown('milestoneStatus')}>
+                                <button className="flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] cursor-pointer" onClick={() => setActiveDropdown('milestoneStatus')}>
                                     <div className="h-2 w-2 rounded-full" style={{ backgroundColor: currentMilestoneStatus.color }} />
                                     {currentMilestoneStatus.label}
                                 </button>
                                 {activeDropdown === 'milestoneStatus' && (
-                                    <div className="absolute bottom-full left-0 mb-1 w-40 rounded-lg border border-[#eef0f5] bg-white p-1 shadow-xl">
+                                    <div className="absolute bottom-full left-0 mb-1 w-40 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-container-lowest)] p-1 shadow-xl">
                                         {MILESTONE_STATUS_OPTIONS.map(s => (
-                                            <button key={s.value} className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs font-medium hover:bg-[#f0f4ff]" onClick={() => { setMilestoneStatus(s.value); setActiveDropdown(null); }}>
+                                            <button key={s.value} className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-caption font-medium border-0 bg-transparent text-[var(--color-on-surface)] hover:bg-[var(--color-primary-bg)] cursor-pointer" onClick={() => { setMilestoneStatus(s.value); setActiveDropdown(null); }}>
                                                 <div className="h-2 w-2 rounded-full" style={{ backgroundColor: s.color }} /> {s.label}
                                             </button>
                                         ))}
@@ -238,9 +241,9 @@ export default function CreateTaskModal({
                             </div>
 
                             {/* Milestone color */}
-                            <div className="relative flex items-center gap-1.5 rounded-full border border-[#eef0f5] px-3 py-1.5 text-xs font-semibold text-[#5f6368] hover:bg-[#f8fafb]">
+                            <div className="relative flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] cursor-pointer">
                                 <div className="h-3 w-3 rounded-full border border-gray-200" style={{ backgroundColor: milestoneColor }} />
-                                Màu
+                                Color
                                 <input
                                     type="color"
                                     className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
@@ -250,24 +253,24 @@ export default function CreateTaskModal({
                             </div>
 
                             {/* Milestone due date */}
-                            <div className="relative flex items-center gap-1.5 rounded-full border border-[#eef0f5] px-3 py-1.5 text-xs font-semibold text-[#5f6368] hover:bg-[#f8fafb]">
+                            <div className="relative flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] cursor-pointer">
                                 <Calendar size={14} />
                                 <input type="date" className="absolute inset-0 opacity-0 cursor-pointer" onChange={e => setMilestoneDueDate(e.target.value)} />
-                                {milestoneDueDate || 'Ngày kết thúc'}
+                                {milestoneDueDate || 'Due date'}
                             </div>
                         </>
                     ) : (
                         <>
                             {/* Task status */}
                             <div className="relative" onClick={e => e.stopPropagation()}>
-                                <button className="flex items-center gap-1.5 rounded-full border border-[#eef0f5] px-3 py-1.5 text-xs font-semibold text-[#5f6368] hover:bg-[#f8fafb]" onClick={() => setActiveDropdown('status')}>
+                                <button className="flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] cursor-pointer" onClick={() => setActiveDropdown('status')}>
                                     <div className="h-2 w-2 rounded-full" style={{ backgroundColor: currentStatus.color }} />
                                     {currentStatus.name}
                                 </button>
                                 {activeDropdown === 'status' && (
-                                    <div className="absolute bottom-full left-0 mb-1 w-40 rounded-lg border border-[#eef0f5] bg-white p-1 shadow-xl">
+                                    <div className="absolute bottom-full left-0 mb-1 w-40 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-container-lowest)] p-1 shadow-xl">
                                         {groups.map(s => (
-                                            <button key={s.id} className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs font-medium hover:bg-[#f0f4ff]" onClick={() => { setStatusId(s.id); setActiveDropdown(null); }}>
+                                            <button key={s.id} className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-caption font-medium border-0 bg-transparent text-[var(--color-on-surface)] hover:bg-[var(--color-primary-bg)] cursor-pointer" onClick={() => { setStatusId(s.id); setActiveDropdown(null); }}>
                                                 <div className="h-2 w-2 rounded-full" style={{ backgroundColor: s.color }} /> {s.name}
                                             </button>
                                         ))}
@@ -277,15 +280,15 @@ export default function CreateTaskModal({
 
                             {/* Task assignee */}
                             <div className="relative" onClick={e => e.stopPropagation()}>
-                                <button className="flex items-center gap-1.5 rounded-full border border-[#eef0f5] px-3 py-1.5 text-xs font-semibold text-[#5f6368] hover:bg-[#f8fafb]" onClick={() => setActiveDropdown('assignee')}>
-                                    <User size={14} /> {assigneeIds.length > 0 ? `${assigneeIds.length} người` : 'Giao cho'}
+                                <button className="flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] cursor-pointer" onClick={() => setActiveDropdown('assignee')}>
+                                    <User size={14} /> {assigneeIds.length > 0 ? `${assigneeIds.length} members` : 'Assignee'}
                                 </button>
                                 {activeDropdown === 'assignee' && (
-                                    <div className="absolute bottom-full left-0 mb-1 w-52 rounded-lg border border-[#eef0f5] bg-white p-1 shadow-xl">
+                                    <div className="absolute bottom-full left-0 mb-1 w-52 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-container-lowest)] p-1 shadow-xl">
                                         {listMembers.map(m => (
-                                            <button key={m.user_id} className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-xs font-medium hover:bg-[#f0f4ff]" onClick={() => toggleAssignee(m.user_id)}>
-                                                <span className="flex h-5 w-5 items-center justify-center rounded-full text-[9px] text-white" style={{ backgroundColor: 'black' }}>{m.user_id}</span>
-                                                {m.username} {assigneeIds.includes(m.user_id) && <span className="ml-auto text-[#0058be]">✓</span>}
+                                            <button key={m.user_id} className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-caption font-medium border-0 bg-transparent text-[var(--color-on-surface)] hover:bg-[var(--color-primary-bg)] cursor-pointer" onClick={() => toggleAssignee(m.user_id)}>
+                                                <span className="flex h-5 w-5 items-center justify-center rounded-full text-micro text-white" style={{ backgroundColor: 'black' }}>{m.user_id}</span>
+                                                {m.username} {assigneeIds.includes(m.user_id) && <span className="ml-auto text-[var(--color-primary)]">✓</span>}
                                             </button>
                                         ))}
                                     </div>
@@ -294,13 +297,13 @@ export default function CreateTaskModal({
 
                             {/* Task priority */}
                             <div className="relative" onClick={e => e.stopPropagation()}>
-                                <button className="flex items-center gap-1.5 rounded-full border border-[#eef0f5] px-3 py-1.5 text-xs font-semibold hover:bg-[#f8fafb]" style={{ color: currentPriority.color }} onClick={() => setActiveDropdown('priority')}>
+                                <button className="flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold hover:bg-[var(--color-surface-hover)] cursor-pointer" style={{ color: currentPriority.color }} onClick={() => setActiveDropdown('priority')}>
                                     <Flag size={14} fill={priority !== 'Clear' ? currentPriority.color : 'none'} /> {currentPriority.label}
                                 </button>
                                 {activeDropdown === 'priority' && (
-                                    <div className="absolute bottom-full left-0 mb-1 w-40 rounded-lg border border-[#eef0f5] bg-white p-1 shadow-xl">
+                                    <div className="absolute bottom-full left-0 mb-1 w-40 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-container-lowest)] p-1 shadow-xl">
                                         {PRIORITY_OPTIONS.map(p => (
-                                            <button key={p.value} className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs font-medium hover:bg-[#f0f4ff]" onClick={() => { setPriority(p.value); setActiveDropdown(null); }}>
+                                            <button key={p.value} className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-caption font-medium border-0 bg-transparent text-[var(--color-on-surface)] hover:bg-[var(--color-primary-bg)] cursor-pointer" onClick={() => { setPriority(p.value); setActiveDropdown(null); }}>
                                                 <Flag size={13} color={p.color} fill={p.value !== 'Clear' ? p.color : 'none'} /> {p.label}
                                             </button>
                                         ))}
@@ -309,29 +312,29 @@ export default function CreateTaskModal({
                             </div>
 
                             {/* Task due date */}
-                            <div className="relative flex items-center gap-1.5 rounded-full border border-[#eef0f5] px-3 py-1.5 text-xs font-semibold text-[#5f6368] hover:bg-[#f8fafb]">
+                            <div className="relative flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-caption font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] cursor-pointer">
                                 <Calendar size={14} />
                                 <input type="date" className="absolute inset-0 opacity-0 cursor-pointer" onChange={e => setDueDate(e.target.value)} />
-                                {dueDate || 'Hạn chót'}
+                                {dueDate || 'Due Date'}
                             </div>
                         </>
                     )}
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-between border-t border-[#eef0f5] bg-[#fcfdfe] px-6 py-4">
-                    <button className="flex items-center gap-1.5 text-xs font-bold text-[#9aa0a6] hover:text-[#5f6368] cursor-pointer">
-                        <Paperclip size={14} /> Đính kèm file
+                <div className="flex items-center justify-between border-t border-[var(--color-surface-container-highest)] bg-[var(--color-surface-container-low)] px-6 py-4 rounded-b-xl">
+                    <button className="flex items-center gap-1.5 text-caption font-bold text-[var(--color-text-tertiary)] hover:text-[var(--color-on-surface)] cursor-pointer bg-transparent border-0">
+                        <Paperclip size={14} /> Attach File
                     </button>
                     <div className="flex gap-2">
-                        <button onClick={onClose} className="rounded-md border border-[#eef0f5] px-4 py-2 text-[13px] font-bold text-[#5f6368] hover:bg-[#f8fafb] cursor-pointer">Hủy</button>
+                        <button onClick={onClose} className="rounded-md border border-[var(--color-border)] bg-transparent px-4 py-2 text-body-sm font-bold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] cursor-pointer">{tc('buttons.cancel')}</button>
                         <button
                             onClick={handleCreate}
                             disabled={submitDisabled}
-                            className="rounded-md bg-[#0058be] px-6 py-2 text-[13px] font-bold text-white shadow-lg shadow-blue-100 hover:bg-[#004aab] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                            style={isMilestone ? { background: '#7c68ee' } : {}}
+                            className="rounded-md bg-[var(--color-primary)] px-6 py-2 text-body-sm font-bold text-[var(--color-on-primary)] shadow-lg hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-0"
+                            style={isMilestone ? { background: 'var(--color-tertiary)' } : {}}
                         >
-                            {isCreatingMilestone ? 'Đang tạo...' : submitLabel}
+                            {isCreatingMilestone ? tc('buttons.saving') : submitLabel}
                         </button>
                     </div>
                 </div>

@@ -42,14 +42,14 @@ export default function ListContextMenu({
     const left = Math.min(position.x, typeof window !== 'undefined' ? window.innerWidth - 230 : position.x);
 
     const itemCls =
-        'flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[#1e1f21] hover:bg-[#f3f4f8]';
+        'flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[var(--color-inverse-surface)] hover:bg-[#f3f4f8]';
     const iconCls = 'text-[#6b6f76]';
     const divider = <div className="my-1 mx-2.5 h-px bg-[#eef0f3]" />;
 
     return (
         <div
             ref={menuRef}
-            className="fixed z-9999 w-55 rounded-lg border border-[#e2e4e9] bg-white py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)]"
+            className="fixed z-9999 w-55 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-container-lowest)] py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)]"
             style={{ top, left }}
             onClick={(e) => e.stopPropagation()}
         >

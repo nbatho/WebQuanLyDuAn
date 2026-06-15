@@ -55,38 +55,38 @@ export default function WorkspaceSetupPage() {
     return (
         <div className="flex min-h-screen flex-col bg-[#f5f7ff] lg:flex-row">
             {/* ═══════ LEFT — Form ═══════ */}
-            <section className="flex flex-1 items-center justify-center bg-white px-6 py-8 lg:px-14 lg:py-12">
+            <section className="flex flex-1 items-center justify-center bg-[var(--color-surface-container-lowest)] px-6 py-8 lg:px-14 lg:py-12">
                 <div className="w-full max-w-115">
-                    <h1 className="mb-2.5 text-[34px] leading-[1.15] font-black tracking-[-0.03em] text-[#141b2b]">
+                    <h1 className="mb-2.5 text-[34px] leading-[1.15] font-black tracking-[-0.03em] text-[var(--color-on-surface)]">
                         What's the name of<br />your workspace?
                     </h1>
-                    <p className="mb-8 text-[15px] font-medium text-[#6b7280]">
+                    <p className="mb-8 text-[15px] font-medium text-[var(--color-text-secondary)]">
                         This is where your team works and collaborates.
                     </p>
 
                     {/* Workspace Name */}
                     <div className="mb-5">
-                        <label className="mb-2 block text-[11px] font-extrabold tracking-[0.08em] text-[#141b2b] uppercase">WORKSPACE NAME</label>
+                        <label className="mb-2 block text-[11px] font-extrabold tracking-[0.08em] text-[var(--color-on-surface)] uppercase">WORKSPACE NAME</label>
                         <Input
                             size="large"
                             value={name}
                             onChange={(e) => handleNameChange(e.target.value)}
                             placeholder="Acme Corp"
-                            className="!h-11.5 !rounded-[10px] !border-2 !border-[#e2e6f0] !text-[15px] !font-medium !text-[#141b2b] hover:!border-[#0058be] focus:!border-[#0058be]"
+                            className="!h-11.5 !rounded-[10px] !border-2 !border-[#e2e6f0] !text-[15px] !font-medium !text-[var(--color-on-surface)] hover:!border-[var(--color-primary)] focus:!border-[var(--color-primary)]"
                         />
                     </div>
 
                     {/* Workspace URL */}
                     <div className="mb-5">
-                        <label className="mb-2 block text-[11px] font-extrabold tracking-[0.08em] text-[#141b2b] uppercase">WORKSPACE URL</label>
-                        <div className="flex items-stretch overflow-hidden rounded-[10px] border-2 border-[#e2e6f0] transition-colors focus-within:border-[#0058be]">
-                            <span className="flex select-none items-center whitespace-nowrap border-r-2 border-[#e2e6f0] bg-[#f5f7ff] px-3.5 text-[14px] font-bold text-[#6b7280]">flowise.app/</span>
+                        <label className="mb-2 block text-[11px] font-extrabold tracking-[0.08em] text-[var(--color-on-surface)] uppercase">WORKSPACE URL</label>
+                        <div className="flex items-stretch overflow-hidden rounded-[10px] border-2 border-[#e2e6f0] transition-colors focus-within:border-[var(--color-primary)]">
+                            <span className="flex select-none items-center whitespace-nowrap border-r-2 border-[#e2e6f0] bg-[#f5f7ff] px-3.5 text-[14px] font-bold text-[var(--color-text-secondary)]">flowise.app/</span>
                             <Input
                                 size="large"
                                 value={slug}
                                 onChange={(e) => setSlug(e.target.value)}
                                 placeholder="acme-hq"
-                                className="!h-11.5 !rounded-none !border-none !text-[15px] !font-medium !text-[#141b2b] hover:!border-none focus:!border-none"
+                                className="!h-11.5 !rounded-none !border-none !text-[15px] !font-medium !text-[var(--color-on-surface)] hover:!border-none focus:!border-none"
                             />
                         </div>
                     </div>
@@ -98,7 +98,7 @@ export default function WorkspaceSetupPage() {
                     <div className="flex items-center justify-between">
                         <button
                             type="button"
-                            className="flex cursor-pointer items-center gap-1.5 border-none bg-transparent px-1 py-2 text-[15px] font-bold text-[#5f6368] transition-colors hover:text-[#141b2b]"
+                            className="flex cursor-pointer items-center gap-1.5 border-none bg-transparent px-1 py-2 text-[15px] font-bold text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-on-surface)]"
                             onClick={() => navigate('/login')}
                         >
                             <ArrowLeft size={16} />
@@ -119,24 +119,24 @@ export default function WorkspaceSetupPage() {
             </section>
 
             {/* ═══════ RIGHT — Sidebar Preview ═══════ */}
-            <section className="hidden flex-1 items-center justify-center overflow-hidden bg-[#f0f4ff] px-12 py-8 lg:flex">
+            <section className="hidden flex-1 items-center justify-center overflow-hidden bg-[var(--color-primary-bg)] px-12 py-8 lg:flex">
                 <div className="relative flex flex-col items-center gap-4">
                     {/* Preview Label */}
                     <div className="flex items-center gap-3">
-                        <span className="h-0.5 w-8 rounded-sm bg-[#0058be]" />
-                        <span className="text-[11px] font-extrabold tracking-[0.16em] text-[#0058be] uppercase">SIDEBAR PREVIEW</span>
+                        <span className="h-0.5 w-8 rounded-sm bg-[var(--color-primary)]" />
+                        <span className="text-[11px] font-extrabold tracking-[0.16em] text-[var(--color-primary)] uppercase">SIDEBAR PREVIEW</span>
                     </div>
 
                     {/* Mock Sidebar */}
-                    <div className="relative z-2 flex min-h-90 w-50 flex-col gap-2.5 rounded-l-2xl bg-white px-3 py-4 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_32px_rgba(0,88,190,0.08)]">
+                    <div className="relative z-2 flex min-h-90 w-50 flex-col gap-2.5 rounded-l-2xl bg-[var(--color-surface-container-lowest)] px-3 py-4 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_32px_rgba(0,88,190,0.08)]">
                         {/* Sidebar Header */}
                         <div className="flex items-center gap-2.5 border-b border-[#f0f2f5] px-1 pt-1 pb-3">
                             <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-lg text-[16px] font-extrabold tracking-[-0.02em] text-white transition-colors duration-300" style={{ backgroundColor: '#0058be' }}>
                                 {initial}
                             </div>
                             <div className="flex min-w-0 flex-col">
-                                <span className="truncate text-[13px] font-extrabold text-[#141b2b] transition-all duration-300">{name || 'Workspace'}</span>
-                                <span className="text-[9px] font-bold tracking-[0.08em] text-[#9aa0a6] uppercase">ENTERPRISE PLAN</span>
+                                <span className="truncate text-[13px] font-extrabold text-[var(--color-on-surface)] transition-all duration-300">{name || 'Workspace'}</span>
+                                <span className="text-[9px] font-bold tracking-[0.08em] text-[var(--color-text-tertiary)] uppercase">ENTERPRISE PLAN</span>
                             </div>
                         </div>
 
@@ -148,16 +148,16 @@ export default function WorkspaceSetupPage() {
                                     <line x1="16" y1="16" x2="21" y2="21" stroke="#9aa0a6" strokeWidth="2.5" strokeLinecap="round" />
                                 </svg>
                             </div>
-                            <div className="h-2 w-[70%] rounded bg-[#c2c9e0]" />
+                            <div className="h-2 w-[70%] rounded bg-[var(--color-text-tertiary)]" />
                         </div>
 
                         {/* Nav Items */}
                         <div className="flex flex-1 flex-col gap-1">
                             <div className="flex items-center gap-2.5 rounded-lg bg-[#eef2ff] px-2 py-2">
-                                <div className="flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-md bg-[#0058be]">
+                                <div className="flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-md bg-[var(--color-primary)]">
                                     <svg width="14" height="14" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5" fill="#fff" /><rect x="14" y="3" width="7" height="7" rx="1.5" fill="#fff" /><rect x="3" y="14" width="7" height="7" rx="1.5" fill="#fff" /><rect x="14" y="14" width="7" height="7" rx="1.5" fill="#fff" /></svg>
                                 </div>
-                                <div className="h-2 w-[60%] rounded bg-[#0058be]" />
+                                <div className="h-2 w-[60%] rounded bg-[var(--color-primary)]" />
                             </div>
                             <div className="flex items-center gap-2.5 rounded-lg px-2 py-2">
                                 <div className="flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-md">
@@ -194,16 +194,16 @@ export default function WorkspaceSetupPage() {
                             <div className="h-2.5 w-[70%] rounded-[5px] bg-[#e2e6f0]" />
                         </div>
                         <div className="flex gap-2.5">
-                            <div className="h-20 flex-1 rounded-[10px] bg-white shadow-[0_1px_4px_rgba(0,0,0,0.04)]" />
-                            <div className="h-20 flex-1 rounded-[10px] bg-white shadow-[0_1px_4px_rgba(0,0,0,0.04)]" />
+                            <div className="h-20 flex-1 rounded-[10px] bg-[var(--color-surface-container-lowest)] shadow-[0_1px_4px_rgba(0,0,0,0.04)]" />
+                            <div className="h-20 flex-1 rounded-[10px] bg-[var(--color-surface-container-lowest)] shadow-[0_1px_4px_rgba(0,0,0,0.04)]" />
                         </div>
                         <div className="flex gap-2.5">
-                            <div className="h-30 flex-1 rounded-[10px] bg-white shadow-[0_1px_4px_rgba(0,0,0,0.04)]" />
+                            <div className="h-30 flex-1 rounded-[10px] bg-[var(--color-surface-container-lowest)] shadow-[0_1px_4px_rgba(0,0,0,0.04)]" />
                         </div>
                     </div>
 
                     {/* Caption */}
-                    <p className="mt-10 max-w-85 text-center text-[13px] leading-normal font-medium italic text-[#6b7280]">
+                    <p className="mt-10 max-w-85 text-center text-[13px] leading-normal font-medium italic text-[var(--color-text-secondary)]">
                         "Changes to your workspace name and logo will update across
                         the entire application interface in real-time."
                     </p>

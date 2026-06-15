@@ -29,7 +29,7 @@ export const ContextMenu = ({ items, position, onClose, footer }: ContextMenuPro
     return (
         <div
             ref={ref}
-            className="fixed z-9999 w-60 rounded-lg bg-white py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)] border border-[#e2e4e9]"
+            className="fixed z-9999 w-60 rounded-lg bg-[var(--color-surface-container-lowest)] py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)] border border-[var(--color-border)]"
             style={{ top, left }}
             onClick={(e) => e.stopPropagation()}
         >
@@ -46,7 +46,7 @@ export const ContextMenu = ({ items, position, onClose, footer }: ContextMenuPro
                             className={`flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] transition-all ${
                                 item.danger
                                     ? 'text-[#dc3545] hover:bg-[#fef2f2]'
-                                    : 'text-[#1e1f21] hover:bg-[#f3f4f8]'
+                                    : 'text-[var(--color-inverse-surface)] hover:bg-[#f3f4f8]'
                             }`}
                             onClick={() => {
                                 if (!item.hasSubmenu) {
@@ -76,7 +76,7 @@ export const ContextMenu = ({ items, position, onClose, footer }: ContextMenuPro
                         {/* Submenu flyout */}
                         {item.hasSubmenu && hoveredSubmenu === i && item.submenuItems && (
                             <div
-                                className="absolute left-full top-0 z-10 ml-0.5 w-56 rounded-lg bg-white py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)] border border-[#e2e4e9]"
+                                className="absolute left-full top-0 z-10 ml-0.5 w-56 rounded-lg bg-[var(--color-surface-container-lowest)] py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)] border border-[var(--color-border)]"
                                 onMouseEnter={() => setHoveredSubmenu(i)}
                                 onMouseLeave={() => setHoveredSubmenu(null)}
                             >
@@ -84,7 +84,7 @@ export const ContextMenu = ({ items, position, onClose, footer }: ContextMenuPro
                                     <button
                                         key={si}
                                         type="button"
-                                        className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[#1e1f21] transition-all hover:bg-[#f3f4f8]"
+                                        className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[var(--color-inverse-surface)] transition-all hover:bg-[#f3f4f8]"
                                         onClick={() => {
                                             sub.onClick?.();
                                             onClose();

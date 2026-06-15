@@ -174,22 +174,22 @@ export default function TimeTrackingPage() {
     const runningTaskName = runningTimer?.task_name || 'Task';
 
     return (
-        <div className="flex h-full flex-col overflow-hidden bg-white font-['Plus_Jakarta_Sans','Inter',sans-serif]">
+        <div className="flex h-full flex-col overflow-hidden bg-[var(--color-surface-container-lowest)] font-['Plus_Jakarta_Sans','Inter',sans-serif]">
             {/* ═══ Header ═══ */}
-            <header className="flex shrink-0 items-center justify-between border-b border-[#eef0f5] px-6 py-3.5">
+            <header className="flex shrink-0 items-center justify-between border-b border-[var(--color-border-light)] px-6 py-3.5">
                 <div className="flex items-center gap-2.5">
-                    <Clock size={20} className="text-[#0058be]" />
-                    <h1 className="m-0 text-lg font-extrabold text-[#141b2b]">Time Tracking</h1>
+                    <Clock size={20} className="text-[var(--color-primary)]" />
+                    <h1 className="m-0 text-lg font-extrabold text-[var(--color-on-surface)]">Time Tracking</h1>
                 </div>
                 <div className="flex gap-1">
                     <button
-                        className={`flex cursor-pointer items-center gap-1.25 border-x-0 border-b-2 border-t-0 border-solid bg-transparent px-3 py-1.5 text-[13px] font-semibold transition-all ${activeTab === 'tasks' ? 'border-b-[#0058be] text-[#0058be]' : 'border-b-transparent text-[#5f6368] hover:text-[#141b2b]'}`}
+                        className={`flex cursor-pointer items-center gap-1.25 border-x-0 border-b-2 border-t-0 border-solid bg-transparent px-3 py-1.5 text-[13px] font-semibold transition-all ${activeTab === 'tasks' ? 'border-b-[#0058be] text-[var(--color-primary)]' : 'border-b-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-on-surface)]'}`}
                         onClick={() => setActiveTab('tasks')}
                     >
                         <Play size={14} /> Chọn Task
                     </button>
                     <button
-                        className={`flex cursor-pointer items-center gap-1.25 border-x-0 border-b-2 border-t-0 border-solid bg-transparent px-3 py-1.5 text-[13px] font-semibold transition-all ${activeTab === 'entries' ? 'border-b-[#0058be] text-[#0058be]' : 'border-b-transparent text-[#5f6368] hover:text-[#141b2b]'}`}
+                        className={`flex cursor-pointer items-center gap-1.25 border-x-0 border-b-2 border-t-0 border-solid bg-transparent px-3 py-1.5 text-[13px] font-semibold transition-all ${activeTab === 'entries' ? 'border-b-[#0058be] text-[var(--color-primary)]' : 'border-b-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-on-surface)]'}`}
                         onClick={() => setActiveTab('entries')}
                     >
                         <Timer size={14} /> Lịch sử ({completedEntries.length})
@@ -201,7 +201,7 @@ export default function TimeTrackingPage() {
             {isTimerRunning && (
                 <div className="flex shrink-0 items-center gap-4 border-b-2 border-[#4caf50] bg-gradient-to-r from-[#e8f5e9] to-[#fff] px-6 py-3.5 animate-[tt-slideDown_0.3s_ease-out]">
                     <div className="relative flex h-9 w-9 items-center justify-center rounded-full bg-[#4caf50]">
-                        <div className="h-3 w-3 rounded-full bg-white animate-[tt-pulse_1s_infinite]" />
+                        <div className="h-3 w-3 rounded-full bg-[var(--color-surface-container-lowest)] animate-[tt-pulse_1s_infinite]" />
                     </div>
                     <div className="flex-1 min-w-0">
                         <div className="text-[10px] font-bold uppercase tracking-widest text-[#388e3c]">⏱ Đang theo dõi</div>
@@ -222,26 +222,26 @@ export default function TimeTrackingPage() {
 
             {/* ═══ Summary Cards ═══ */}
             <div className="flex shrink-0 gap-4 px-6 py-3">
-                <div className="flex-1 rounded-xl border border-[#eef0f5] bg-[#f8fafb] px-4 py-3">
-                    <span className="block text-[11px] font-extrabold uppercase tracking-[0.06em] text-[#9aa0a6]">Hôm nay</span>
-                    <span className="my-0.5 block text-[24px] font-black text-[#141b2b]">{todayHrs}h</span>
-                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[#eef0f5]">
-                        <div className="h-full rounded-full bg-[#0058be] transition-[width] duration-500" style={{ width: `${Math.min(100, (parseFloat(todayHrs) / 8) * 100)}%` }} />
+                <div className="flex-1 rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface-container-low)] px-4 py-3">
+                    <span className="block text-[11px] font-extrabold uppercase tracking-[0.06em] text-[var(--color-text-tertiary)]">Hôm nay</span>
+                    <span className="my-0.5 block text-[24px] font-black text-[var(--color-on-surface)]">{todayHrs}h</span>
+                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[var(--color-surface-container-high)]">
+                        <div className="h-full rounded-full bg-[var(--color-primary)] transition-[width] duration-500" style={{ width: `${Math.min(100, (parseFloat(todayHrs) / 8) * 100)}%` }} />
                     </div>
-                    <span className="text-[10px] font-semibold text-[#9aa0a6]">/ 8h mục tiêu</span>
+                    <span className="text-[10px] font-semibold text-[var(--color-text-tertiary)]">/ 8h mục tiêu</span>
                 </div>
-                <div className="flex-1 rounded-xl border border-[#eef0f5] bg-[#f8fafb] px-4 py-3">
-                    <span className="block text-[11px] font-extrabold uppercase tracking-[0.06em] text-[#9aa0a6]">Tuần này</span>
-                    <span className="my-0.5 block text-[24px] font-black text-[#141b2b]">{weekHrs}h</span>
-                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[#eef0f5]">
+                <div className="flex-1 rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface-container-low)] px-4 py-3">
+                    <span className="block text-[11px] font-extrabold uppercase tracking-[0.06em] text-[var(--color-text-tertiary)]">Tuần này</span>
+                    <span className="my-0.5 block text-[24px] font-black text-[var(--color-on-surface)]">{weekHrs}h</span>
+                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[var(--color-surface-container-high)]">
                         <div className="h-full rounded-full bg-[#7c5cfc] transition-[width] duration-500" style={{ width: `${Math.min(100, (parseFloat(weekHrs) / 40) * 100)}%` }} />
                     </div>
-                    <span className="text-[10px] font-semibold text-[#9aa0a6]">/ 40h mục tiêu</span>
+                    <span className="text-[10px] font-semibold text-[var(--color-text-tertiary)]">/ 40h mục tiêu</span>
                 </div>
-                <div className="flex-1 rounded-xl border border-[#eef0f5] bg-[#f8fafb] px-4 py-3">
-                    <span className="block text-[11px] font-extrabold uppercase tracking-[0.06em] text-[#9aa0a6]">Entries</span>
-                    <span className="my-0.5 block text-[24px] font-black text-[#141b2b]">{completedEntries.length}</span>
-                    <span className="text-[10px] font-medium text-[#9aa0a6]">lượt đã ghi nhận</span>
+                <div className="flex-1 rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface-container-low)] px-4 py-3">
+                    <span className="block text-[11px] font-extrabold uppercase tracking-[0.06em] text-[var(--color-text-tertiary)]">Entries</span>
+                    <span className="my-0.5 block text-[24px] font-black text-[var(--color-on-surface)]">{completedEntries.length}</span>
+                    <span className="text-[10px] font-medium text-[var(--color-text-tertiary)]">lượt đã ghi nhận</span>
                 </div>
             </div>
 
@@ -252,11 +252,11 @@ export default function TimeTrackingPage() {
                 {activeTab === 'tasks' && (
                     <div className="px-6 pb-6">
                         {/* Filter bar */}
-                        <div className="sticky top-0 z-10 bg-white pb-2 pt-2">
+                        <div className="sticky top-0 z-10 bg-[var(--color-surface-container-lowest)] pb-2 pt-2">
                             <div className="relative">
-                                <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#9aa0a6]" />
+                                <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]" />
                                 <input
-                                    className="box-border w-full rounded-lg border border-[#eef0f5] bg-[#f8fafb] py-2 pl-9 pr-3 text-[13px] text-[#141b2b] outline-none transition-all focus:border-[#0058be] focus:bg-white focus:shadow-[0_0_0_3px_rgba(0,88,190,0.06)]"
+                                    className="box-border w-full rounded-lg border border-[var(--color-border-light)] bg-[var(--color-surface-container-low)] py-2 pl-9 pr-3 text-[13px] text-[var(--color-on-surface)] outline-none transition-all focus:border-[var(--color-primary)] focus:bg-[var(--color-surface-container-lowest)] focus:shadow-[0_0_0_3px_rgba(0,88,190,0.06)]"
                                     placeholder="Lọc task..."
                                     value={taskFilter}
                                     onChange={e => setTaskFilter(e.target.value)}
@@ -266,9 +266,9 @@ export default function TimeTrackingPage() {
 
                         {filteredSpaces.length === 0 && (
                             <div className="flex flex-col items-center justify-center py-16 text-center">
-                                <Clock size={40} className="mb-3 text-[#d0d4d9]" />
-                                <p className="text-[14px] font-bold text-[#5f6368]">Không có task nào</p>
-                                <p className="mt-1 text-[13px] text-[#9aa0a6]">Hãy tạo task trong Space trước</p>
+                                <Clock size={40} className="mb-3 text-[var(--color-border)]" />
+                                <p className="text-[14px] font-bold text-[var(--color-text-secondary)]">Không có task nào</p>
+                                <p className="mt-1 text-[13px] text-[var(--color-text-tertiary)]">Hãy tạo task trong Space trước</p>
                             </div>
                         )}
 
@@ -281,20 +281,20 @@ export default function TimeTrackingPage() {
                                         className="flex w-full cursor-pointer items-center gap-2 border-none bg-transparent px-1 py-2 text-left"
                                         onClick={() => toggleSpace(sg.spaceName)}
                                     >
-                                        <span className="text-[#9aa0a6] transition-transform" style={{ transform: isCollapsed ? 'rotate(0deg)' : 'rotate(90deg)' }}>
+                                        <span className="text-[var(--color-text-tertiary)] transition-transform" style={{ transform: isCollapsed ? 'rotate(0deg)' : 'rotate(90deg)' }}>
                                             <ChevronRight size={14} />
                                         </span>
                                         <span
                                             className="h-2.5 w-2.5 rounded-full"
                                             style={{ backgroundColor: sg.spaceColor }}
                                         />
-                                        <span className="text-[13px] font-bold text-[#141b2b]">{sg.spaceName}</span>
-                                        <span className="text-[11px] font-semibold text-[#9aa0a6]">{sg.tasks.length} task</span>
+                                        <span className="text-[13px] font-bold text-[var(--color-on-surface)]">{sg.spaceName}</span>
+                                        <span className="text-[11px] font-semibold text-[var(--color-text-tertiary)]">{sg.tasks.length} task</span>
                                     </button>
 
                                     {/* Task list */}
                                     {!isCollapsed && (
-                                        <div className="ml-3 border-l-2 border-[#eef0f5] pl-3">
+                                        <div className="ml-3 border-l-2 border-[var(--color-border-light)] pl-3">
                                             {sg.tasks.map(task => {
                                                 const isRunningThis = runningTimer?.task_id === task.task_id;
                                                 return (
@@ -302,7 +302,7 @@ export default function TimeTrackingPage() {
                                                         key={task.task_id}
                                                         className={`group flex items-center gap-3 rounded-lg px-2.5 py-2 transition-colors ${isRunningThis
                                                                 ? 'bg-[#e8f5e9]'
-                                                                : 'hover:bg-[#f8fafb]'
+                                                                : 'hover:bg-[var(--color-surface-container-low)]'
                                                             }`}
                                                     >
                                                         {/* Play / Running indicator */}
@@ -316,7 +316,7 @@ export default function TimeTrackingPage() {
                                                             </button>
                                                         ) : (
                                                             <button
-                                                                className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 border-[#e0e0e0] bg-transparent text-[#bdc3c7] transition-all hover:border-[#4caf50] hover:bg-[#e8f5e9] hover:text-[#4caf50] group-hover:border-[#c2c9e0]"
+                                                                className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 border-[#e0e0e0] bg-transparent text-[#bdc3c7] transition-all hover:border-[#4caf50] hover:bg-[#e8f5e9] hover:text-[#4caf50] group-hover:border-[var(--color-text-tertiary)]"
                                                                 onClick={() => handleStartTimer(task.task_id, task.name)}
                                                                 title="Bắt đầu timer"
                                                             >
@@ -326,7 +326,7 @@ export default function TimeTrackingPage() {
 
                                                         {/* Task info */}
                                                         <div className="min-w-0 flex-1">
-                                                            <div className="truncate text-[13px] font-semibold text-[#141b2b]">
+                                                            <div className="truncate text-[13px] font-semibold text-[var(--color-on-surface)]">
                                                                 {task.name}
                                                             </div>
                                                             <div className="flex items-center gap-2 mt-0.5">
@@ -342,7 +342,7 @@ export default function TimeTrackingPage() {
                                                                     </span>
                                                                 )}
                                                                 {task.priority_name && (
-                                                                    <span className="text-[10px] font-semibold text-[#9aa0a6]">
+                                                                    <span className="text-[10px] font-semibold text-[var(--color-text-tertiary)]">
                                                                         {task.priority_name}
                                                                     </span>
                                                                 )}
@@ -370,19 +370,19 @@ export default function TimeTrackingPage() {
                 {activeTab === 'entries' && (
                     <div className="px-6 pb-6">
                         {isLoadingTimeLogs && completedEntries.length === 0 && (
-                            <div className="flex items-center justify-center py-20 text-[#9aa0a6]">
-                                <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-[#0058be] border-t-transparent" />
+                            <div className="flex items-center justify-center py-20 text-[var(--color-text-tertiary)]">
+                                <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-[var(--color-primary)] border-t-transparent" />
                                 Đang tải...
                             </div>
                         )}
 
                         {!isLoadingTimeLogs && completedEntries.length === 0 && (
                             <div className="flex flex-col items-center justify-center py-20 text-center">
-                                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[#f0f4ff]">
-                                    <Clock size={36} className="text-[#0058be]" />
+                                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[var(--color-primary-bg)]">
+                                    <Clock size={36} className="text-[var(--color-primary)]" />
                                 </div>
-                                <p className="text-[15px] font-bold text-[#141b2b]">Chưa có lịch sử</p>
-                                <p className="mt-1.5 max-w-xs text-[13px] text-[#9aa0a6]">
+                                <p className="text-[15px] font-bold text-[var(--color-on-surface)]">Chưa có lịch sử</p>
+                                <p className="mt-1.5 max-w-xs text-[13px] text-[var(--color-text-tertiary)]">
                                     Chuyển sang tab "Chọn Task" và bấm ▶ để bắt đầu theo dõi
                                 </p>
                             </div>
@@ -394,11 +394,11 @@ export default function TimeTrackingPage() {
 
                             return (
                                 <div key={date} className="mb-5">
-                                    <div className="flex items-center gap-2 pb-1.5 pt-2 text-[#9aa0a6]">
+                                    <div className="flex items-center gap-2 pb-1.5 pt-2 text-[var(--color-text-tertiary)]">
                                         <Calendar size={13} />
-                                        <span className="text-[13px] font-extrabold text-[#141b2b]">{date}</span>
-                                        <span className="text-xs font-semibold text-[#0058be]">{dayHrs}h tổng</span>
-                                        <div className="ml-2 h-px flex-1 bg-[#eef0f5]" />
+                                        <span className="text-[13px] font-extrabold text-[var(--color-on-surface)]">{date}</span>
+                                        <span className="text-xs font-semibold text-[var(--color-primary)]">{dayHrs}h tổng</span>
+                                        <div className="ml-2 h-px flex-1 bg-[var(--color-surface-container-high)]" />
                                     </div>
                                     <div className="flex flex-col">
                                         {dateEntries.map(entry => {
@@ -415,10 +415,10 @@ export default function TimeTrackingPage() {
                                                 : '';
 
                                             return (
-                                                <div key={entry.time_log_id} className="group flex items-center gap-3 rounded-lg border-b border-[#f5f7fa] px-2 py-2.5 transition-colors hover:bg-[#f8fafb]">
+                                                <div key={entry.time_log_id} className="group flex items-center gap-3 rounded-lg border-b border-[#f5f7fa] px-2 py-2.5 transition-colors hover:bg-[var(--color-surface-container-low)]">
                                                     {/* Re-start */}
                                                     <button
-                                                        className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-[#c2c9e0] opacity-0 transition-all group-hover:opacity-100 hover:bg-[#e8f5e9] hover:text-[#4caf50]"
+                                                        className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-[var(--color-text-tertiary)] opacity-0 transition-all group-hover:opacity-100 hover:bg-[#e8f5e9] hover:text-[#4caf50]"
                                                         onClick={() => handleStartTimer(entry.task_id, taskName)}
                                                         title="Bắt đầu lại"
                                                     >
@@ -427,12 +427,12 @@ export default function TimeTrackingPage() {
 
                                                     {/* Task info */}
                                                     <div className="min-w-0 flex-1">
-                                                        <span className="block text-[13px] font-semibold text-[#141b2b]">{taskName}</span>
-                                                        {note && <span className="mt-0.5 block truncate text-[11px] italic text-[#9aa0a6]">{note}</span>}
+                                                        <span className="block text-[13px] font-semibold text-[var(--color-on-surface)]">{taskName}</span>
+                                                        {note && <span className="mt-0.5 block truncate text-[11px] italic text-[var(--color-text-tertiary)]">{note}</span>}
                                                     </div>
 
                                                     {/* Time range */}
-                                                    <div className="shrink-0 text-[11px] font-medium text-[#9aa0a6]">
+                                                    <div className="shrink-0 text-[11px] font-medium text-[var(--color-text-tertiary)]">
                                                         {startTime} – {endTime}
                                                     </div>
 
@@ -442,13 +442,13 @@ export default function TimeTrackingPage() {
                                                     </Avatar>
 
                                                     {/* Duration */}
-                                                    <div className="min-w-16 text-right text-sm font-extrabold text-[#141b2b]">
+                                                    <div className="min-w-16 text-right text-sm font-extrabold text-[var(--color-on-surface)]">
                                                         {fmtDuration(dur)}
                                                     </div>
 
                                                     {/* Delete */}
                                                     <button
-                                                        className="cursor-pointer rounded border-none bg-transparent p-1 text-[#9aa0a6] opacity-0 transition-all group-hover:opacity-100 hover:bg-[#fff1f0] hover:text-[#e74c3c]"
+                                                        className="cursor-pointer rounded border-none bg-transparent p-1 text-[var(--color-text-tertiary)] opacity-0 transition-all group-hover:opacity-100 hover:bg-[#fff1f0] hover:text-[#e74c3c]"
                                                         onClick={() => handleDeleteEntry(entry.time_log_id)}
                                                         title="Xóa"
                                                     >

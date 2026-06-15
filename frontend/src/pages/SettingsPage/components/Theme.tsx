@@ -1,47 +1,57 @@
-import { useState } from 'react'
-import {
-    Check, Moon, Sun, Monitor
-} from 'lucide-react';
+import { useTranslation } from 'react-i18next'
+import { RotateCcw } from 'lucide-react';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useOnboardingTour } from '@/components/OnboardingTour';
+
+type ThemeMode = 'light' | 'dark' | 'system';
+
 export default function Theme() {
-    const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('light');
+    const { t } = useTranslation('settings');
+    const { restartTour } = useOnboardingTour();
 
     return (
         <div>
-            <h2 className="mb-1 text-xl font-extrabold text-[#141b2b]">Appearance</h2>
-            <p className="mb-6 text-[13px] text-[#9aa0a6]">Customize the look and feel</p>
+            <h2 className="mb-1 text-h2 font-extrabold text-[var(--color-on-surface)]">
+                {t('appearance.title')}
+            </h2>
+            <p className="mb-6 text-body-sm text-[var(--color-text-tertiary)]">
+                {t('appearance.subtitle')}
+            </p>
 
-            <div className="grid max-w-130 grid-cols-3 gap-4">
-                <div className={`cursor-pointer overflow-hidden rounded-xl border-2 transition-all duration-150 ${theme === 'light' ? 'border-[#0058be] shadow-[0_0_0_3px_rgba(0,88,190,0.12)]' : 'border-[#eef0f5] hover:border-[#b0b5c1]'}`}
-                    onClick={() => setTheme('light')}>
-                    <div className="flex h-20 bg-[#f5f7ff] p-1.5">
-                        <div className="mr-1 w-[30%] rounded bg-white" /><div className="flex-1 rounded bg-white" />
+            {/* Language selector */}
+            <div className="max-w-130">
+                <h3 className="mb-1 text-h4 font-bold text-[var(--color-on-surface)]">
+                    {t('appearance.language')}
+                </h3>
+                <p className="mb-3 text-body-sm text-[var(--color-text-tertiary)]">
+                    {t('appearance.languageDesc')}
+                </p>
+                <LanguageSwitcher />
+            </div>
+
+            {/* Restart onboarding tour */}
+            <div className="mt-8 max-w-130 border-t border-[var(--color-border-light)] pt-6">
+                <div className="flex items-start justify-between gap-4 rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface-container-lowest)] px-4 py-3.5">
+                    <div className="min-w-0">
+                        <p className="text-body-sm font-semibold text-[var(--color-on-surface)]">
+                            {t('restartTour')}
+                        </p>
+                        <p className="mt-0.5 text-caption text-[var(--color-text-secondary)]">
+                            {t('restartTourDesc')}
+                        </p>
                     </div>
-                    <div className="flex items-center gap-1.5 px-3 py-2.5 text-[13px] font-bold text-[#141b2b]">
-                        <Sun size={14} /> Light
-                        {theme === 'light' && <Check size={14} className="ml-auto text-[#0058be]" />}
-                    </div>
-                </div>
-                <div className={`cursor-pointer overflow-hidden rounded-xl border-2 transition-all duration-150 ${theme === 'dark' ? 'border-[#0058be] shadow-[0_0_0_3px_rgba(0,88,190,0.12)]' : 'border-[#eef0f5] hover:border-[#b0b5c1]'}`}
-                    onClick={() => setTheme('dark')}>
-                    <div className="flex h-20 bg-[#1a1d23] p-1.5">
-                        <div className="mr-1 w-[30%] rounded bg-[#2a2d35]" /><div className="flex-1 rounded bg-[#2a2d35]" />
-                    </div>
-                    <div className="flex items-center gap-1.5 px-3 py-2.5 text-[13px] font-bold text-[#141b2b]">
-                        <Moon size={14} /> Dark
-                        {theme === 'dark' && <Check size={14} className="ml-auto text-[#0058be]" />}
-                    </div>
-                </div>
-                <div className={`cursor-pointer overflow-hidden rounded-xl border-2 transition-all duration-150 ${theme === 'system' ? 'border-[#0058be] shadow-[0_0_0_3px_rgba(0,88,190,0.12)]' : 'border-[#eef0f5] hover:border-[#b0b5c1]'}`}
-                    onClick={() => setTheme('system')}>
-                    <div className="flex h-20 bg-[linear-gradient(135deg,#f5f7ff_50%,#1a1d23_50%)] p-1.5">
-                        <div className="mr-1 w-[30%] rounded bg-[linear-gradient(135deg,#fff_50%,#2a2d35_50%)]" /><div className="flex-1 rounded bg-[linear-gradient(135deg,#fff_50%,#2a2d35_50%)]" />
-                    </div>
-                    <div className="flex items-center gap-1.5 px-3 py-2.5 text-[13px] font-bold text-[#141b2b]">
-                        <Monitor size={14} /> System
-                        {theme === 'system' && <Check size={14} className="ml-auto text-[#0058be]" />}
-                    </div>
+                    <button
+                        id="restart-tour-btn"
+                        type="button"
+                        className="flex shrink-0 items-center gap-2 rounded-lg border border-[var(--color-border)] bg-transparent px-4 py-2 text-body-sm font-semibold text-[var(--color-text-secondary)] transition-all hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-bg)] hover:text-[var(--color-primary)]"
+                        onClick={restartTour}
+                    >
+                        <RotateCcw size={15} />
+                        {t('restartTour')}
+                    </button>
                 </div>
             </div>
         </div>
     )
 }
+

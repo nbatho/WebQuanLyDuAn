@@ -146,7 +146,7 @@ export const SpaceNode = ({ space }: { space: SpaceItem }) => {
             <div
                 className={`group flex cursor-pointer select-none items-center gap-2 rounded-md px-2 py-1.5 text-[13px] font-semibold transition-all ${isSpaceActive
                         ? 'bg-[#e8f0fe] text-[#1a73e8]'
-                        : 'text-[#1e1f21] hover:bg-[#f3f4f8]'
+                        : 'text-[var(--color-inverse-surface)] hover:bg-[#f3f4f8]'
                     }`}
                 onClick={() => {
                     navigate(`/space/${space.id}`);
@@ -179,7 +179,7 @@ export const SpaceNode = ({ space }: { space: SpaceItem }) => {
 
                 <div className="ml-auto hidden items-center gap-0.5 group-hover:flex">
                     <span
-                        className="flex h-6 w-6 cursor-pointer items-center justify-center rounded text-[#6b6f76] hover:bg-[#e2e4e9] hover:text-[#1e1f21] transition-all"
+                        className="flex h-6 w-6 cursor-pointer items-center justify-center rounded text-[#6b6f76] hover:bg-[#e2e4e9] hover:text-[var(--color-inverse-surface)] transition-all"
                         onClick={(e) => {
                             e.stopPropagation();
                             setCreateMenuPos(null);
@@ -202,7 +202,7 @@ export const SpaceNode = ({ space }: { space: SpaceItem }) => {
             </div>
 
             {expanded && (
-                <div className="ml-3.5 border-l border-[#e2e4e9] pl-1.5 mt-0.5">
+                <div className="ml-3.5 border-l border-[var(--color-border)] pl-1.5 mt-0.5">
                     {folders.map((folder) => (
                         <FolderNode key={folder.id} folder={folder} spaceId={space.id} spaceName={space.name} />
                     ))}
@@ -220,7 +220,7 @@ export const SpaceNode = ({ space }: { space: SpaceItem }) => {
                     {/* Sprints Section */}
                     {sprints.length > 0 && (
                         <>
-                            <div className="mt-1.5 mb-0.5 px-2 text-[10px] font-bold uppercase tracking-wider text-[#9aa0a6]">
+                            <div className="mt-1.5 mb-0.5 px-2 text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-tertiary)]">
                                 Sprints
                             </div>
                             {sprints.map((sprint) => (

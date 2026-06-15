@@ -41,7 +41,7 @@ export const SprintNode = ({ sprint, spaceId, onDelete }: SprintNodeProps) => {
                     <Zap size={11} />
                 </span>
 
-                <span className="flex-1 truncate font-medium text-[#1e1f21]">
+                <span className="flex-1 truncate font-medium text-[var(--color-inverse-surface)]">
                     {sprint.name}
                 </span>
 
@@ -60,7 +60,7 @@ export const SprintNode = ({ sprint, spaceId, onDelete }: SprintNodeProps) => {
 
                 {/* Hover actions */}
                 <span
-                    className="hidden h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded text-[#6b6f76] hover:bg-[#e2e4e9] hover:text-[#1e1f21] group-hover:flex"
+                    className="hidden h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded text-[#6b6f76] hover:bg-[#e2e4e9] hover:text-[var(--color-inverse-surface)] group-hover:flex"
                     onClick={(e) => {
                         e.stopPropagation();
                         setShowMenu(!showMenu);
@@ -73,11 +73,11 @@ export const SprintNode = ({ sprint, spaceId, onDelete }: SprintNodeProps) => {
             {/* Context menu */}
             {showMenu && (
                 <div
-                    className="absolute right-0 top-full z-50 w-40 rounded-lg border border-[#e2e4e9] bg-white py-1 shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
+                    className="absolute right-0 top-full z-50 w-40 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-container-lowest)] py-1 shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
                     onClick={(e) => e.stopPropagation()}
                 >
                     <button
-                        className="flex w-full items-center gap-2 border-none bg-transparent px-3 py-1.5 text-left text-[13px] text-[#1e1f21] hover:bg-[#f3f4f8]"
+                        className="flex w-full items-center gap-2 border-none bg-transparent px-3 py-1.5 text-left text-[13px] text-[var(--color-inverse-surface)] hover:bg-[#f3f4f8]"
                         onClick={() => {
                             setShowMenu(false);
                             // TODO: edit sprint

@@ -85,7 +85,7 @@ export const ListNode = ({
     return (
         <div
             className={`group relative flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.25 text-[12.5px] transition-all ${
-                isActive ? 'bg-[#e8f0fe] text-[#1a73e8] font-semibold' : 'text-[#1e1f21] hover:bg-[#f3f4f8]'
+                isActive ? 'bg-[#e8f0fe] text-[#1a73e8] font-semibold' : 'text-[var(--color-inverse-surface)] hover:bg-[#f3f4f8]'
             }`}
             onClick={() => navigate(`/space/${spaceId}/list/${list.id}`)}
         >
@@ -96,7 +96,7 @@ export const ListNode = ({
             )}
             <div className="ml-auto hidden shrink-0 items-center gap-0.5 group-hover:flex">
                 <span
-                    className="flex h-5 w-5 cursor-pointer items-center justify-center rounded text-[#6b6f76] hover:bg-[#e2e4e9] hover:text-[#1e1f21] transition-all"
+                    className="flex h-5 w-5 cursor-pointer items-center justify-center rounded text-[#6b6f76] hover:bg-[#e2e4e9] hover:text-[var(--color-inverse-surface)] transition-all"
                     onClick={(e) => {
                         e.stopPropagation();
                         setListCreateMenu(null);

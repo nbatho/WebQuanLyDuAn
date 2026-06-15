@@ -39,7 +39,7 @@ export default function PriorityPicker({ value, onChange }: PriorityPickerProps)
             </button>
 
             {open && (
-                <div className="absolute left-0 top-[calc(100%+4px) z-20 min-w-45 rounded-lg border border-(--color-border-light) bg-white p-1 shadow-[0_6px_20px_rgba(0,0,0,0.12)">
+                <div className="absolute left-0 top-[calc(100%+4px) z-20 min-w-45 rounded-lg border border-(--color-border-light) bg-[var(--color-surface-container-lowest)] p-1 shadow-[0_6px_20px_rgba(0,0,0,0.12)">
                     {PRIORITY_OPTIONS.map((p) => (
                         <button
                             key={p.value}

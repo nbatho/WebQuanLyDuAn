@@ -5,7 +5,7 @@ const features = [
         icon: LayoutDashboard,
         title: 'Bảng Kanban',
         description: 'Kéo thả công việc giữa các trạng thái. Trực quan hóa quy trình làm việc của cả đội.',
-        iconBg: 'bg-[#0058be]',
+        iconBg: 'bg-[var(--color-primary)]',
     },
     {
         icon: Zap,
@@ -35,7 +35,7 @@ const features = [
         icon: Bell,
         title: 'Thông báo thông minh',
         description: 'Chỉ nhận thông báo quan trọng. Tự động nhóm và lọc nhiễu để giữ tập trung.',
-        iconBg: 'bg-[#0058be]',
+        iconBg: 'bg-[var(--color-primary)]',
     },
     {
         icon: BarChart3,
@@ -59,7 +59,7 @@ export default function FeaturesSection() {
                     <div className="inline-flex items-center gap-2 bg-[#6ffbbe] text-[#006c49] font-bold text-xs uppercase tracking-widest px-4 py-2 rounded-full mb-6">
                         Tính năng
                     </div>
-                    <h2 className="text-3xl md:text-4xl font-extrabold text-[#141b2b] mb-4">
+                    <h2 className="text-3xl md:text-4xl font-extrabold text-[var(--color-on-surface)] mb-4">
                         Tất cả công cụ bạn cần. Một nền tảng.
                     </h2>
                     <p className="text-[#424754] max-w-2xl mx-auto text-lg">
@@ -80,7 +80,7 @@ export default function FeaturesSection() {
                                 >
                                     <Icon size={20} strokeWidth={2.5} className="text-white" />
                                 </div>
-                                <h4 className="text-base font-bold mb-2 text-[#141b2b]">{feature.title}</h4>
+                                <h4 className="text-base font-bold mb-2 text-[var(--color-on-surface)]">{feature.title}</h4>
                                 <p className="text-[#424754] text-sm leading-relaxed">{feature.description}</p>
                             </div>
                         );

@@ -11,7 +11,7 @@ export default function ViewPicker({ viewOptions, search, onSearchChange, onSele
     const moreViews = filtered.slice(7);
 
     return (
-        <div className="absolute left-0 top-[calc(100%+4px) z-1000 w-125 rounded-xl border border-(--color-border-light) bg-white p-3 shadow-[0_8px_32px_rgba(0,0,0,0.14)">
+        <div className="absolute left-0 top-[calc(100%+4px) z-1000 w-125 rounded-xl border border-(--color-border-light) bg-[var(--color-surface-container-lowest)] p-3 shadow-[0_8px_32px_rgba(0,0,0,0.14)">
             <div className="mb-3.5 flex items-center gap-2 rounded-lg border border-(--color-border) px-3 py-1.5">
                 <Search size={14} className="shrink-0 text-(--color-text-tertiary)" />
                 <input
