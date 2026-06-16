@@ -261,7 +261,6 @@ export default function SprintViewPage() {
                     groups={groups.map(g => ({ id: g.id, name: g.name, color: g.color }))}
                     lists={[]}
                     defaultListId={0}
-                    spaceId={Number(spaceId)}
                 />
             </div>
         </TaskViewContext.Provider>

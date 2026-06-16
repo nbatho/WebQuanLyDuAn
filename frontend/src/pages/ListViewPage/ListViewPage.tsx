@@ -267,7 +267,6 @@ export default function ListViewPage() {
 
                     lists={[{ id: Number(listInfo.id), name: listInfo.name }]}
                     defaultListId={Number(listInfo.id)}
-                    spaceId={Number(spaceId)}
                 />
             </div>
         </TaskViewContext.Provider>

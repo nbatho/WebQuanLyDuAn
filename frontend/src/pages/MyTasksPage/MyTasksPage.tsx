@@ -453,7 +453,6 @@ export default function MyTasksPage() {
                 groups={modalGroups}
                 lists={allLists}
                 defaultListId={allLists.length > 0 ? allLists[0].id : undefined}
-                spaceId={activeSpaceId ?? undefined}
             />
         </div>
     );

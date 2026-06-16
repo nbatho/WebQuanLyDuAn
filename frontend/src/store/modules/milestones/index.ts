@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {
     getMilestonesBySpace,
+    getMilestonesByList,
     getMilestoneById,
-    createMilestone,
+    createMilestoneInList,
     updateMilestone,
     deleteMilestone,
 } from '@/api/milestones';
@@ -10,6 +11,7 @@ import {
 export interface MilestoneData {
     milestone_id: number;
     space_id: number;
+    list_id: number | null;
     name: string;
     description: string | null;
     status: 'on_track' | 'at_risk' | 'completed' | 'cancelled';
@@ -48,6 +50,18 @@ export const fetchMilestonesBySpace = createAsyncThunk<MilestoneData[], number>(
     },
 );
 
+export const fetchMilestonesByList = createAsyncThunk<MilestoneData[], number>(
+    'milestones/fetchMilestonesByList',
+    async (listId, { rejectWithValue }) => {
+        try {
+            const response = await getMilestonesByList(listId);
+            return response;
+        } catch (error: unknown) {
+            return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch milestones');
+        }
+    },
+);
+
 export const fetchMilestoneById = createAsyncThunk<MilestoneData, number>(
     'milestones/fetchMilestoneById',
     async (milestoneId, { rejectWithValue }) => {
@@ -63,18 +77,18 @@ export const fetchMilestoneById = createAsyncThunk<MilestoneData, number>(
 export const fetchCreateMilestone = createAsyncThunk<
     MilestoneData,
     {
-        spaceId: number;
+        listId: number;
         name: string;
-        description?: string;
+        description?: string | null;
         status?: 'on_track' | 'at_risk' | 'completed' | 'cancelled';
         color?: string;
-        dueDate?: string;
+        dueDate?: string | null;
     }
 >(
     'milestones/createMilestone',
-    async ({ spaceId, ...body }, { rejectWithValue }) => {
+    async ({ listId, ...body }, { rejectWithValue }) => {
         try {
-            const response = await createMilestone(spaceId, body);
+            const response = await createMilestoneInList(listId, body);
             return response;
         } catch (error: unknown) { 
             return rejectWithValue((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to create milestone');
@@ -87,10 +101,10 @@ export const fetchUpdateMilestone = createAsyncThunk<
     {
         milestoneId: number;
         name?: string;
-        description?: string;
+        description?: string | null;
         status?: 'on_track' | 'at_risk' | 'completed' | 'cancelled';
         color?: string;
-        dueDate?: string;
+        dueDate?: string | null;
     }
 >(
     'milestones/updateMilestone',
@@ -144,6 +158,19 @@ export const milestonesSlice = createSlice({
                 state.listMilestones = action.payload;
             })
             .addCase(fetchMilestonesBySpace.rejected, (state, action) => {
+                state.isLoadingMilestones = false;
+                state.errorMilestones = action.payload as string;
+            })
+
+            .addCase(fetchMilestonesByList.pending, (state) => {
+                state.isLoadingMilestones = true;
+                state.errorMilestones = null;
+            })
+            .addCase(fetchMilestonesByList.fulfilled, (state, action) => {
+                state.isLoadingMilestones = false;
+                state.listMilestones = action.payload;
+            })
+            .addCase(fetchMilestonesByList.rejected, (state, action) => {
                 state.isLoadingMilestones = false;
                 state.errorMilestones = action.payload as string;
             })
