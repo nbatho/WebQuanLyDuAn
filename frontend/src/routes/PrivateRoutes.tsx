@@ -19,7 +19,13 @@ export default function PrivateRoute({ children }: { children: JSX.Element }) {
 
         const ensureValidAuth = async () => {
             if (!effectiveToken) {
-                if (!isUnmounted) setHasCheckedRefresh(true);
+                try {
+                    await dispatch(fetchRefreshToken()).unwrap();
+                } catch {
+                    await dispatch(fetchSignOut());
+                } finally {
+                    if (!isUnmounted) setHasCheckedRefresh(true);
+                }
                 return;
             }
 

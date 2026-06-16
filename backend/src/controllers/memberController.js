@@ -5,6 +5,15 @@ import jwt from 'jsonwebtoken';
 import { findWorkspaceById } from "../models/Workspaces.js";
 import { removeWorkspaceMember } from "../models/Workspaces.js";
 import { findUserById } from "../models/Users.js";
+
+const escapeHtml = (value = "") =>
+    String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
 export const InviteMember = async (req, res) => {
     try {
         const { email, workspace_id, role } = req.body;
@@ -27,6 +36,8 @@ export const InviteMember = async (req, res) => {
         const workspaceName = workspace?.name || "Workspace";
         const inviterName = inviter?.name || inviter?.username || "Một thành viên";
         const inviterEmail = inviter?.email || "";
+        const safeWorkspaceName = escapeHtml(workspaceName);
+        const safeInviterName = escapeHtml(inviterName);
         // 3. Tạo Token (Nhúng thêm workspaceName và inviterName)
         const inviteToken = jwt.sign(
             {
@@ -55,7 +66,7 @@ export const InviteMember = async (req, res) => {
             html: `
                 <div style="font-family: sans-serif; padding: 20px; color: #333;">
                     <h2>Chào bạn,</h2>
-                    <p><strong>${inviterName}</strong> vừa mời bạn tham gia làm việc trong dự án <strong>${workspaceName}</strong>.</p>
+                    <p><strong>${safeInviterName}</strong> vừa mời bạn tham gia làm việc trong dự án <strong>${safeWorkspaceName}</strong>.</p>
                     <p>Vui lòng click vào nút bên dưới để chấp nhận (Link có hiệu lực trong 24 giờ):</p>
                     <br/>
                     <a href="${invitationLink}" style="display: inline-block; padding: 12px 24px; background-color: #0058be; color: white; font-weight: bold; text-decoration: none; border-radius: 8px;">

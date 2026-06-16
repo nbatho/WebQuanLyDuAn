@@ -1,15 +1,14 @@
 import express from 'express';
 import {
   getActivitiesByTaskId,
-  createActivityLog,
   getMyActivities,
   getActivitiesBySpaceId,
 } from '../controllers/activityLogController.js';
+import { requireSpaceMembership } from '../middlewares/membershipMiddleware.js';
 
 const router = express.Router();
 router.get('/me', getMyActivities);
-router.get('/spaces/:spaceId', getActivitiesBySpaceId);
-router.get('/tasks/:taskId', getActivitiesByTaskId);
-router.post('/tasks/:taskId', createActivityLog);
+router.get('/spaces/:spaceId', requireSpaceMembership, getActivitiesBySpaceId);
+router.get('/tasks/:taskId', requireSpaceMembership, getActivitiesByTaskId);
 
 export default router;

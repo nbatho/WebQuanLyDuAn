@@ -101,7 +101,10 @@ export async function findOrCreateSpaceConversation(workspaceId, spaceId, spaceN
             [workspaceId, spaceName, spaceId]
         );
         const convId = convRes.rows[0].conversation_id;
-        const members = await client.query(`SELECT user_id FROM workspace_members WHERE workspace_id = $1`, [workspaceId]);
+        const members = await client.query(
+            `SELECT user_id FROM workspace_members WHERE workspace_id = $1 AND deleted_at IS NULL`,
+            [workspaceId]
+        );
         for (const m of members.rows) {
             await client.query(
                 `INSERT INTO conversation_members (conversation_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,

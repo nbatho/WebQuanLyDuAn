@@ -9,15 +9,16 @@ import {
 
 // Import Middleware Phân quyền
 import { requirePermission } from '../middlewares/roleMiddlewares.js';
+import { requireSpaceMembership } from '../middlewares/membershipMiddleware.js';
 
 const router = express.Router();
 
-router.get("/spaces/:spaceId/milestones", getMilestonesBySpaceId);
+router.get("/spaces/:spaceId/milestones", requireSpaceMembership, getMilestonesBySpaceId);
 
 // Tạo milestone -> Yêu cầu quyền: SETTING_MANAGE (Admin + Manager)
 router.post("/spaces/:spaceId/milestones", requirePermission('SETTING_MANAGE'), createMilestone);
 
-router.get("/:milestoneId", getMilestoneById);
+router.get("/:milestoneId", requireSpaceMembership, getMilestoneById);
 
 
 // Cập nhật milestone -> Yêu cầu quyền: SETTING_MANAGE (Admin + Manager)

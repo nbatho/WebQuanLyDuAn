@@ -9,13 +9,14 @@ import {
     getTotalTime,
 } from '../controllers/timeLogController.js';
 import { requirePermission } from '../middlewares/roleMiddlewares.js';
+import { requireSpaceMembership } from '../middlewares/membershipMiddleware.js';
 
 const router = express.Router();
 
 router.get('/me', getMyTimeLogs);
 router.get('/running', getRunningTimer);
-router.get('/tasks/:taskId', getTimeLogsByTaskId);
-router.get('/tasks/:taskId/total', getTotalTime);
+router.get('/tasks/:taskId', requireSpaceMembership, getTimeLogsByTaskId);
+router.get('/tasks/:taskId/total', requireSpaceMembership, getTotalTime);
 
 // allowNoSpace: task trên TimeTrackingPage có thể không thuộc space nào
 router.post('/tasks/:taskId/start', requirePermission('TIME_LOG_ADD', { allowNoSpace: true }), startTimerForTask);

@@ -7,6 +7,7 @@ import {
 } from '../models/Users.js';
 import bcrypt from 'bcrypt';
 import { Resend } from 'resend';
+import crypto from 'crypto';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -14,6 +15,8 @@ const otpStore = new Map();
 const OTP_TTL_MS = 10 * 60 * 1000;
 const MAX_OTP_ATTEMPTS = 5;
 const OTP_CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
+
+const hashOtp = (otp) => crypto.createHash('sha256').update(String(otp)).digest('hex');
 
 setInterval(() => {
     const now = Date.now();
@@ -99,10 +102,10 @@ export const requestPasswordChangeOtp = async (req, res) => {
             return res.status(404).json({ message: 'Khong tim thay email nguoi dung' });
         }
 
-        const otp = String(Math.floor(100000 + Math.random() * 900000));
+        const otp = String(crypto.randomInt(100000, 1000000));
         const newPasswordHash = await bcrypt.hash(newPassword, 10);
         otpStore.set(user_id, {
-            otp,
+            otpHash: hashOtp(otp),
             newPasswordHash,
             expiresAt: Date.now() + OTP_TTL_MS,
             attempts: 0,
@@ -152,7 +155,7 @@ export const verifyAndChangePassword = async (req, res) => {
             otpStore.delete(user_id);
             return res.status(400).json({ message: 'Ma OTP da het han, vui long yeu cau ma moi' });
         }
-        if (stored.otp !== otp.trim()) {
+        if (stored.otpHash !== hashOtp(otp.trim())) {
             stored.attempts = (stored.attempts || 0) + 1;
             if (stored.attempts >= MAX_OTP_ATTEMPTS) {
                 otpStore.delete(user_id);

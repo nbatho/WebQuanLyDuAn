@@ -53,6 +53,120 @@ const BASE_TASK_FROM_JOIN = `
   LEFT JOIN task_status ts ON t.status_id = ts.status_id
 `;
 
+const scopedError = (message, statusCode = 400) => {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
+};
+
+const getListScope = async (db, listId) => {
+  const result = await db.query(
+    `SELECT l.space_id, s.workspace_id
+     FROM lists l
+     JOIN spaces s ON l.space_id = s.space_id
+     WHERE l.list_id = $1 AND l.deleted_at IS NULL AND s.deleted_at IS NULL`,
+    [listId]
+  );
+
+  if (result.rows.length === 0) {
+    throw scopedError("List not found", 404);
+  }
+
+  return result.rows[0];
+};
+
+const getTaskScope = async (db, taskId) => {
+  const result = await db.query(
+    `SELECT t.task_id, l.space_id, s.workspace_id
+     FROM tasks t
+     JOIN lists l ON t.list_id = l.list_id
+     JOIN spaces s ON l.space_id = s.space_id
+     WHERE t.task_id = $1
+       AND t.deleted_at IS NULL
+       AND l.deleted_at IS NULL
+       AND s.deleted_at IS NULL`,
+    [taskId]
+  );
+
+  if (result.rows.length === 0) {
+    throw scopedError("Task not found", 404);
+  }
+
+  return result.rows[0];
+};
+
+const ensureStatusInSpace = async (db, statusId, spaceId) => {
+  if (!statusId) return;
+
+  const result = await db.query(
+    'SELECT 1 FROM task_status WHERE status_id = $1 AND space_id = $2',
+    [statusId, spaceId]
+  );
+
+  if (result.rows.length === 0) {
+    throw scopedError("Status does not belong to this space", 400);
+  }
+};
+
+const ensureSprintInSpace = async (db, sprintId, spaceId) => {
+  if (!sprintId) return;
+
+  const result = await db.query(
+    'SELECT 1 FROM sprints WHERE sprint_id = $1 AND space_id = $2 AND deleted_at IS NULL',
+    [sprintId, spaceId]
+  );
+
+  if (result.rows.length === 0) {
+    throw scopedError("Sprint does not belong to this space", 400);
+  }
+};
+
+const ensureListInSpace = async (db, listId, spaceId) => {
+  if (!listId) return;
+
+  const result = await db.query(
+    'SELECT 1 FROM lists WHERE list_id = $1 AND space_id = $2 AND deleted_at IS NULL',
+    [listId, spaceId]
+  );
+
+  if (result.rows.length === 0) {
+    throw scopedError("List does not belong to this space", 400);
+  }
+};
+
+const normalizeUserIds = (userIds = []) => [
+  ...new Set(
+    userIds
+      .map((uid) => (typeof uid === 'object' ? uid.id : uid))
+      .filter((uid) => uid !== undefined && uid !== null)
+      .map((uid) => Number(uid))
+      .filter((uid) => Number.isInteger(uid))
+  )
+];
+
+const ensureWorkspaceMembers = async (db, workspaceId, userIds = []) => {
+  const normalizedIds = normalizeUserIds(userIds);
+  if (normalizedIds.length === 0) return [];
+
+  const result = await db.query(
+    `SELECT user_id
+     FROM workspace_members
+     WHERE workspace_id = $1
+       AND user_id = ANY($2::int[])
+       AND deleted_at IS NULL`,
+    [workspaceId, normalizedIds]
+  );
+
+  const allowedIds = new Set(result.rows.map((row) => Number(row.user_id)));
+  const invalidIds = normalizedIds.filter((uid) => !allowedIds.has(uid));
+
+  if (invalidIds.length > 0) {
+    throw scopedError("One or more users are not members of this workspace", 403);
+  }
+
+  return normalizedIds;
+};
+
 export const findAllTasksByListId = async (list_id) => {
   try {
     const query = `
@@ -155,18 +269,7 @@ export const createTaskForList = async ({
 
   try {
     await client.query('BEGIN');
-    const listRes = await client.query(
-      'SELECT space_id FROM lists WHERE list_id = $1 AND deleted_at IS NULL',
-      [listId]
-    );
-
-    if (listRes.rows.length === 0) {
-      const error = new Error("Không tìm thấy List (List not found)");
-      error.statusCode = 404;
-      throw error;
-    }
-
-    const { space_id } = listRes.rows[0];
+    const { space_id, workspace_id } = await getListScope(client, listId);
     let final_status_id = status_id;
 
     if (!final_status_id) {
@@ -176,6 +279,9 @@ export const createTaskForList = async ({
       );
       final_status_id = statusRes.rows[0]?.status_id || null;
     }
+
+    await ensureStatusInSpace(client, final_status_id, space_id);
+    const validAssigneeIds = await ensureWorkspaceMembers(client, workspace_id, assignee_ids || []);
 
     const taskQuery = `
                     INSERT INTO tasks (
@@ -196,10 +302,9 @@ export const createTaskForList = async ({
     const taskResult = await client.query(taskQuery, taskValues);
     const newTask = taskResult.rows[0];
 
-    if (assignee_ids && Array.isArray(assignee_ids) && assignee_ids.length > 0) {
+    if (validAssigneeIds.length > 0) {
       const assignValues = [];
-      const assignPlaceholders = assignee_ids.map((uid, idx) => {
-        const userId = typeof uid === 'object' ? uid.id : uid;
+      const assignPlaceholders = validAssigneeIds.map((userId, idx) => {
         const taskId = newTask.task_id || newTask.id;
 
         assignValues.push(taskId, userId);
@@ -236,6 +341,18 @@ export const findTaskById = async (task_id) => {
 
 export const updateTask = async (task_id, updateData) => {
   try {
+    const scope = await getTaskScope(con, task_id);
+
+    if (updateData.list_id !== undefined && updateData.list_id !== null) {
+      await ensureListInSpace(con, updateData.list_id, scope.space_id);
+    }
+    if (updateData.status_id !== undefined && updateData.status_id !== null) {
+      await ensureStatusInSpace(con, updateData.status_id, scope.space_id);
+    }
+    if (updateData.sprint_id !== undefined && updateData.sprint_id !== null) {
+      await ensureSprintInSpace(con, updateData.sprint_id, scope.space_id);
+    }
+
     const allowedFields = [
       'name',
       'description',
@@ -353,11 +470,14 @@ export const deleteComment = async (comment_id) => {
 
 export const assignUserToTask = async (task_id, user_id) => {
   try {
+    const scope = await getTaskScope(con, task_id);
+    const [validUserId] = await ensureWorkspaceMembers(con, scope.workspace_id, [user_id]);
+
     const query = `INSERT INTO task_assigns (task_id, user_id) VALUES ($1, $2)
                    ON CONFLICT (task_id, user_id)
                    DO UPDATE SET deleted_at = NULL
                    RETURNING *`;
-    const values = [task_id, user_id];
+    const values = [task_id, validUserId];
     const result = await con.query(query, values);
     return result.rows[0];
   } catch (error) {
@@ -441,8 +561,14 @@ export const createAttachment = async (
 
 export const shareTaskToUsers = async (task_id, user_ids, shared_by) => {
   try {
+    const scope = await getTaskScope(con, task_id);
+    const validUserIds = await ensureWorkspaceMembers(con, scope.workspace_id, user_ids);
+    if (validUserIds.length === 0) {
+      throw scopedError("user_ids must contain at least one valid user id", 400);
+    }
+
     const values = [];
-    const placeholders = user_ids.map((uid, idx) => {
+    const placeholders = validUserIds.map((uid, idx) => {
       const offset = idx * 3;
       values.push(task_id, uid, shared_by);
       return `($${offset + 1}, $${offset + 2}, $${offset + 3})`;

@@ -262,6 +262,9 @@ export const inviteMembersToSpace = async (req, res) => {
     }
     res.status(200).json({ message: "Members invited to space successfully" });
   } catch (error) {
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({ error: error.message });
+    }
     res.status(500).json({ error: "Failed to invite members to space" });
   }
 };
