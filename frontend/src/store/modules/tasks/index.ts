@@ -64,6 +64,10 @@ export interface TaskAttachment {
     attachment_id: number;
     task_id: number;
     url: string;
+    file_url: string;
+    file_name: string;
+    file_size: number | null;
+    mime_type: string | null;
     description: string | null;
     created_at: string;
 }

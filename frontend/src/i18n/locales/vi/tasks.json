@@ -82,6 +82,9 @@
   },
   "addTask": "Thêm Task",
   "dashboard": "Tổng quan",
+  "buttons": {
+    "delete": "Xóa"
+  },
   "activity": {
     "created": "đã tạo task",
     "updated": "đã cập nhật task",

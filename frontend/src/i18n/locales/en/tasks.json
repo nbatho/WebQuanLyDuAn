@@ -82,6 +82,9 @@
   },
   "addTask": "Add Task",
   "dashboard": "Dashboard",
+  "buttons": {
+    "delete": "Delete"
+  },
   "activity": {
     "created": "created the task",
     "updated": "updated the task",
