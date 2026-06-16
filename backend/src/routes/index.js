@@ -14,6 +14,7 @@ import listRoutes from './listRoutes.js';
 import memberRoutes from './memberRoutes.js';
 import aiRoutes from './aiRoutes.js';
 import messageRoutes from './messageRoutes.js';
+import uploadRoutes from './uploadRoutes.js';
 
 export {
     authRoutes,
@@ -32,4 +33,5 @@ export {
     memberRoutes,
     aiRoutes,
     messageRoutes,
+    uploadRoutes,
 }

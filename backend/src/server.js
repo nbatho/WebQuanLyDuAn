@@ -20,19 +20,35 @@ import {
   memberRoutes,
   aiRoutes,
   messageRoutes,
+  uploadRoutes,
 } from "./routes/index.js";
 import { protectedRoute } from "./middlewares/authMiddlewares.js";
 import { globalErrorHandler, notFoundHandler } from "./middlewares/errorMiddleware.js";
 import { generalLimiter } from "./middlewares/rateLimitMiddleware.js";
-import { ensureMessagingTables } from "./models/Messages.js";
 
 dotenv.config();
+
+const requiredEnv = ["ACCESS_TOKEN_SECRET", "EMAIL_TOKEN_SECRET"];
+const missingEnv = requiredEnv.filter((key) => !process.env[key]);
+if (missingEnv.length > 0) {
+  throw new Error(`Missing required environment variables: ${missingEnv.join(", ")}`);
+}
+
 const app = express();
 const PORT = process.env.PORT || 5001;
 const HOST = process.env.HOST || "0.0.0.0";
 
 //middleware
 const allowedOrigins = [process.env.CLIENT_URL, 'http://localhost:5173'];
+
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "no-referrer");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  res.setHeader("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'");
+  next();
+});
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -44,7 +60,7 @@ app.use(cors({
   },
   credentials: true,
 }));
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 app.use(generalLimiter);
 
@@ -75,6 +91,7 @@ app.use('/api/v1/members', memberRoutes);
 
 //private route
 app.use(protectedRoute);
+app.use("/api/v1/upload", uploadRoutes);
 app.use("/api/v1/ai", aiRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/workspaces", workspacesRoutes);
@@ -98,5 +115,4 @@ app.use(globalErrorHandler);
 
 app.listen(PORT, HOST, () => {
   console.log(`Server is running on ${HOST}:${PORT}`);
-  ensureMessagingTables();
 });

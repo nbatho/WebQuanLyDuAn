@@ -44,12 +44,6 @@ export interface RequestOtpResponse {
     maskedEmail: string;
 }
 
-export const changePassword = async (
-    payload: ChangePasswordPayload
-): Promise<ChangePasswordResponse> => {
-    return beApi.put("/users/change-password", payload);
-};
-
 export const requestPasswordOtp = async (
     payload: ChangePasswordPayload
 ): Promise<RequestOtpResponse> => {

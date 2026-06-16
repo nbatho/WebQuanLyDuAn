@@ -3,7 +3,7 @@ import { ChevronDown, ChevronRight, Calendar, Flag, User } from 'lucide-react';
 import { Avatar } from 'antd';
 
 import { useTaskView } from '../SprintViewPage';
-import TaskDetailModal from '@/components/TaskDetailModal';
+import TaskDetailModal from '@/components/TaskDetailModal/TaskDetailModal';
 import InlineCreateTask from './InlineCreateTask';
 
 const getInitials = (name?: string | null) => name ? name.substring(0, 2).toUpperCase() : 'NA';

@@ -37,6 +37,72 @@ const FIELD_TO_ACTION = {
     is_archived:  'archived',
 };
 
+const formatTaskForBoard = (task) => ({
+    ...task,
+    assignees: task.assignees || [],
+    subtask_count: 0,
+    subtask_done_count: 0,
+    comment_count: Number(task.comment_count) || 0,
+    attachment_count: Number(task.attachment_count) || 0,
+});
+
+const groupTasksByStatus = (statuses, rawTasks) => {
+    const groupedTaskIds = new Set();
+
+    const groupedData = statuses.map((status) => {
+        const tasksInStatus = rawTasks
+            .filter(task => Number(task.status_id) === Number(status.status_id))
+            .map(task => {
+                groupedTaskIds.add(task.task_id);
+                return formatTaskForBoard(task);
+            });
+
+        return {
+            id: status.status_id,
+            name: status.status_name,
+            color: status.color || '#d3d3d3',
+            isExpanded: true,
+            tasks: tasksInStatus
+        };
+    });
+
+    const orphanedTasks = rawTasks
+        .filter(task => !groupedTaskIds.has(task.task_id))
+        .map(formatTaskForBoard);
+
+    if (orphanedTasks.length > 0) {
+        groupedData.push({
+            id: 0,
+            name: 'No Status',
+            color: '#9ca3af',
+            isExpanded: true,
+            tasks: orphanedTasks
+        });
+    }
+
+    return groupedData;
+};
+
+const getSafeAttachmentUrl = (value) => {
+    if (!value || typeof value !== 'string') return null;
+    const trimmed = value.trim();
+
+    if (trimmed.startsWith('/uploads/')) return trimmed;
+
+    try {
+        const parsed = new URL(trimmed);
+        if (parsed.protocol !== 'https:') return null;
+        return parsed.toString();
+    } catch {
+        return null;
+    }
+};
+
+const getSafeFileName = (value, fallback = 'attachment') => {
+    const raw = typeof value === 'string' && value.trim() ? value.trim() : fallback;
+    return raw.replace(/[\\/:*?"<>|]/g, '_').slice(0, 255);
+};
+
 export const getTasksByListId = async (req, res) => {
     try {
         const { listId } = req.params;
@@ -48,52 +114,7 @@ export const getTasksByListId = async (req, res) => {
         const statuses = await findStatusesByListId(listId);
         const rawTasks = await findAllTasksByListId(listId);
 
-        const groupedTaskIds = new Set();
-
-        const groupedData = statuses.map((status) => {
-            const tasksInStatus = rawTasks
-                .filter(task => Number(task.status_id) === Number(status.status_id))
-                .map(task => {
-                    groupedTaskIds.add(task.task_id);
-                    return {
-                        ...task,
-                        assignees: task.assignees || [],
-                        subtask_count: 0,
-                        subtask_done_count: 0,
-                        comment_count: Number(task.comment_count) || 0,
-                        attachment_count: Number(task.attachment_count) || 0,
-                    };
-                });
-
-            return {
-                id: status.status_id,
-                name: status.status_name,
-                color: status.color || '#d3d3d3',
-                isExpanded: true,
-                tasks: tasksInStatus
-            };
-        });
-
-        const orphanedTasks = rawTasks
-            .filter(task => !groupedTaskIds.has(task.task_id))
-            .map(task => ({
-                ...task,
-                assignees: task.assignees || [],
-                subtask_count: 0,
-                subtask_done_count: 0,
-                comment_count: Number(task.comment_count) || 0,
-                attachment_count: Number(task.attachment_count) || 0,
-            }));
-
-        if (orphanedTasks.length > 0) {
-            groupedData.push({
-                id: 0,
-                name: 'No Status',
-                color: '#9ca3af',
-                isExpanded: true,
-                tasks: orphanedTasks
-            });
-        }
+        const groupedData = groupTasksByStatus(statuses, rawTasks);
 
         res.status(200).json(groupedData);
 
@@ -114,52 +135,7 @@ export const getTasksBySprintId = async (req, res) => {
         const statuses = await findStatusesBySprintId(sprintId);
         const rawTasks = await findAllTasksBySprintId(sprintId);
 
-        const groupedTaskIds = new Set();
-
-        const groupedData = statuses.map((status) => {
-            const tasksInStatus = rawTasks
-                .filter(task => Number(task.status_id) === Number(status.status_id))
-                .map(task => {
-                    groupedTaskIds.add(task.task_id);
-                    return {
-                        ...task,
-                        assignees: task.assignees || [],
-                        subtask_count: 0,
-                        subtask_done_count: 0,
-                        comment_count: Number(task.comment_count) || 0,
-                        attachment_count: Number(task.attachment_count) || 0,
-                    };
-                });
-
-            return {
-                id: status.status_id,
-                name: status.status_name,
-                color: status.color || '#d3d3d3',
-                isExpanded: true,
-                tasks: tasksInStatus
-            };
-        });
-
-        const orphanedTasks = rawTasks
-            .filter(task => !groupedTaskIds.has(task.task_id))
-            .map(task => ({
-                ...task,
-                assignees: task.assignees || [],
-                subtask_count: 0,
-                subtask_done_count: 0,
-                comment_count: Number(task.comment_count) || 0,
-                attachment_count: Number(task.attachment_count) || 0,
-            }));
-
-        if (orphanedTasks.length > 0) {
-            groupedData.push({
-                id: 0,
-                name: 'No Status',
-                color: '#9ca3af',
-                isExpanded: true,
-                tasks: orphanedTasks
-            });
-        }
+        const groupedData = groupTasksByStatus(statuses, rawTasks);
 
         res.status(200).json(groupedData);
 
@@ -230,6 +206,7 @@ export const createTasks = async (req, res) => {
     try {
         const { spaceId } = req.params;
         const { name, description } = req.body;
+        const created_by = req.user?.user_id || null;
         if (!spaceId) {
             return res.status(400).json({ error: "Space ID is required" });
         }
@@ -237,10 +214,13 @@ export const createTasks = async (req, res) => {
             return res.status(400).json({ error: "Name and description are required" });
         }
         const due_date = req.body.due_date ? new Date(req.body.due_date) : null;
-        const newTask = await createTask(name, description, spaceId, due_date);
+        const newTask = await createTask(name, description, spaceId, due_date, created_by);
         res.status(201).json(newTask);
 
     } catch (error) {
+        if (error.statusCode) {
+            return res.status(error.statusCode).json({ error: error.message });
+        }
         res.status(500).json({ error: error.message });
     }
 };
@@ -370,6 +350,9 @@ export const getTaskById = async (req, res) => {
         res.status(200).json(task);
 
     } catch (error) {
+        if (error.statusCode) {
+            return res.status(error.statusCode).json({ error: error.message });
+        }
         res.status(500).json({ error: error.message });
     }
 };
@@ -385,13 +368,17 @@ export const getCommentsByTaskIds = async (req, res) => {
         const comments = await getCommentsByTaskId(taskId);
         res.status(200).json(comments);
     } catch (error) {
+        if (error.statusCode) {
+            return res.status(error.statusCode).json({ error: error.message });
+        }
         res.status(500).json({ error: error.message });
     }
 };
 
 export const createComments = async (req, res) => {
     try {
-        const { taskId, content } = req.body;
+        const { taskId } = req.params;
+        const { content } = req.body;
         const userId = req.user?.user_id;
         if (!taskId) {
             return res.status(400).json({ error: "Task ID is required" });
@@ -428,13 +415,17 @@ export const getAttachmentsByTaskIds = async (req, res) => {
 export const createAttachments = async (req, res) => {
     try {
         const { taskId } = req.params;
-        const { file_name, file_url, file_size, mime_type } = req.body;
+        const { file_size, mime_type } = req.body;
+        const rawFileUrl = req.body.file_url || req.body.url;
+        const rawFileName = req.body.file_name || req.body.description || rawFileUrl;
+        const file_url = getSafeAttachmentUrl(rawFileUrl);
+        const file_name = getSafeFileName(rawFileName);
         const uploaded_by = req.user?.user_id;
         if (!taskId) {
             return res.status(400).json({ error: "Task ID is required" });
         }
-        if (!file_name || !file_url) {
-            return res.status(400).json({ error: "file_name and file_url are required" });
+        if (!file_url) {
+            return res.status(400).json({ error: "A valid https file_url or /uploads/ path is required" });
         }
         // Model signature: createAttachment(task_id, file_name, file_url, file_size, mime_type, uploaded_by)
         const newAttachment = await createAttachment(
@@ -494,8 +485,7 @@ export const addAssigneeToTasks = async (req, res) => {
 
 export const removeAssigneeFromTasks = async (req, res) => {
     try {
-        const { taskId } = req.params;
-        const { userId } = req.body;
+        const { taskId, userId } = req.params;
         const actorId = req.user?.user_id;
         if (!taskId) {
             return res.status(400).json({ error: "Task ID is required" });
@@ -537,7 +527,8 @@ export const shareTask = async (req, res) => {
 
         // Log activity + tạo notification cho từng user được chia sẻ (fire-and-forget)
         const taskName = task?.name || `Task #${taskId}`;
-        for (const userId of user_ids) {
+        for (const result of results) {
+            const userId = result.user_id;
             createActivity(taskId, sharedBy, 'assigned', null, { user_id: userId })
                 .catch((err) => console.error('[activity log] share task error:', err));
 
@@ -554,6 +545,9 @@ export const shareTask = async (req, res) => {
         });
     } catch (error) {
         console.error("[shareTask] Error:", error);
+        if (error.statusCode) {
+            return res.status(error.statusCode).json({ error: error.message });
+        }
         res.status(500).json({ error: error.message });
     }
 };

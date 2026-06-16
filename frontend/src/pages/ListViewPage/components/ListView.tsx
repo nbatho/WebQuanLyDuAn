@@ -1,12 +1,23 @@
 import { useState } from 'react';
+import { useEffect } from 'react';
 import { ChevronDown, ChevronRight, Calendar, Flag, User, Plus } from 'lucide-react';
 import { Avatar } from 'antd';
 import { useTaskView } from '../ListViewPage';
-import TaskDetailModal from '@/components/TaskDetailModal';
+import TaskDetailModal from '@/components/TaskDetailModal/TaskDetailModal';
+import CreateMilestoneModal from '@/components/Modal/CreateMilestoneModal';
+import { useAppDispatch, useAppSelector } from '@/hooks';
+import { fetchMilestonesByList, type MilestoneData } from '@/store/modules/milestones';
 
 const getInitials = (name?: string | null) => name ? name.substring(0, 2).toUpperCase() : 'NA';
 const formatDate = (dateString: string | null) =>
     dateString ? new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : null;
+
+const MILESTONE_STATUS_LABELS: Record<MilestoneData['status'], string> = {
+    on_track: 'On Track',
+    at_risk: 'At Risk',
+    completed: 'Completed',
+    cancelled: 'Cancelled',
+};
 
 const STATUS_COLORS = [
     '#6b7280', '#ef4444', '#f97316', '#eab308', '#22c55e',
@@ -14,9 +25,13 @@ const STATUS_COLORS = [
 ];
 
 export default function ListView() {
-    const { groups, setGroups, columns, updateTask, handleCreateStatus, onContextMenu } = useTaskView();
+    const { groups, setGroups, columns, updateTask, handleCreateStatus, onContextMenu, listId } = useTaskView();
+    const dispatch = useAppDispatch();
+    const milestones = useAppSelector((state) => state.milestones.listMilestones);
+    const loadingMilestones = useAppSelector((state) => state.milestones.isLoadingMilestones);
 
     const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
+    const [editingMilestone, setEditingMilestone] = useState<MilestoneData | null>(null);
 
     const selectedTask = selectedTaskId != null
         ? groups.flatMap(g => g.tasks).find(t => t.task_id === selectedTaskId) ?? null
@@ -24,6 +39,11 @@ export default function ListView() {
 
     const toggleGroup = (groupId: number) =>
         setGroups(prev => prev.map(g => g.id === groupId ? { ...g, isExpanded: !g.isExpanded } : g));
+
+    useEffect(() => {
+        if (!listId) return;
+        void dispatch(fetchMilestonesByList(listId));
+    }, [dispatch, listId]);
 
     // Add Status state
     const [showAddStatus, setShowAddStatus] = useState(false);
@@ -33,6 +53,85 @@ export default function ListView() {
     return (
         <div className="flex flex-1 flex-col overflow-hidden bg-[var(--color-surface-container-lowest)] font-sans">
             <div className="flex-1 overflow-y-auto p-6">
+                {(loadingMilestones || milestones.length > 0) && (
+                    <div className="mb-8">
+                        <div className="group mb-2 flex items-center gap-2 py-1">
+                            <div className="flex h-5 w-5 items-center justify-center" />
+                            <div className="flex items-center gap-1.5 rounded-md bg-[var(--color-surface-hover)] px-2 py-1">
+                                <div className="h-3.5 w-3.5 rotate-45 border-[1.5px] border-solid border-[var(--color-tertiary)] bg-transparent" />
+                                <span className="text-[12px] font-semibold text-[var(--color-on-surface)]">Milestones</span>
+                            </div>
+                            <span className="ml-1 text-[12px] text-[var(--color-text-tertiary)]">{milestones.length}</span>
+                        </div>
+
+                        <div className="flex flex-col">
+                            <div className="flex items-center border-b border-[var(--color-border-light)] py-2 pl-8 pr-4">
+                                <div className="flex-1 pr-4"><span className="text-[12px] font-semibold text-[#7c828d]">Name</span></div>
+                                {columns.dueDate && <div className="w-32.5 shrink-0 pl-2"><span className="text-[12px] font-semibold text-[#7c828d]">Due date</span></div>}
+                                <div className="w-30 shrink-0 pl-2"><span className="text-[12px] font-semibold text-[#7c828d]">Status</span></div>
+                                <div className="w-27.5 shrink-0 pl-2"><span className="text-[12px] font-semibold text-[#7c828d]">Progress</span></div>
+                                <div className="w-8 shrink-0" />
+                            </div>
+
+                            {loadingMilestones ? (
+                                <div className="border-b border-[var(--color-surface-hover)] py-3 pl-8 pr-4 text-[13px] font-medium text-[var(--color-text-tertiary)]">
+                                    Loading milestones...
+                                </div>
+                            ) : milestones.map((milestone) => {
+                                const totalTasks = Number(milestone.total_tasks) || 0;
+                                const doneTasks = Number(milestone.done_tasks) || 0;
+                                const progress = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+
+                                return (
+                                    <div
+                                        key={milestone.milestone_id}
+                                        className="group/row flex cursor-pointer items-center border-b border-[var(--color-surface-hover)] py-1.5 pl-8 pr-4 transition-colors hover:bg-[var(--color-surface-container-low)]"
+                                        onClick={() => setEditingMilestone(milestone)}
+                                    >
+                                        <div className="flex min-w-0 flex-1 items-center gap-3 pr-4">
+                                            <div
+                                                className="h-3.5 w-3.5 shrink-0 rotate-45 border-[1.5px] border-solid"
+                                                style={{ borderColor: milestone.color ?? 'var(--color-tertiary)' }}
+                                            />
+                                            <span className="truncate text-[13px] font-medium text-[var(--color-on-surface)] transition-colors group-hover/row:text-[var(--color-accent)]">
+                                                {milestone.name}
+                                            </span>
+                                        </div>
+
+                                        {columns.dueDate && (
+                                            <div className="flex min-h-6 w-32.5 shrink-0 items-center pl-2">
+                                                {milestone.due_date ? (
+                                                    <span className="text-[12px] font-medium text-[#ef4444]">
+                                                        {formatDate(milestone.due_date)}
+                                                    </span>
+                                                ) : (
+                                                    <Calendar size={13} className="text-[var(--color-border)]" />
+                                                )}
+                                            </div>
+                                        )}
+
+                                        <div className="flex min-h-6 w-30 shrink-0 items-center pl-2">
+                                            <span className="rounded-full px-2 py-0.5 text-[11px] font-bold" style={{
+                                                backgroundColor: `${milestone.color ?? '#00D4AA'}22`,
+                                                color: milestone.color ?? '#00D4AA',
+                                            }}>
+                                                {MILESTONE_STATUS_LABELS[milestone.status]}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex min-h-6 w-27.5 shrink-0 items-center pl-2">
+                                            <span className="text-[12px] font-semibold text-[var(--color-text-secondary)]">
+                                                {doneTasks}/{totalTasks} ({progress}%)
+                                            </span>
+                                        </div>
+                                        <div className="w-8 shrink-0" />
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
                 {groups.map((group) => (
                     <div key={group.id} className="mb-8">
                         {/* ── Group Header ── */}
@@ -214,6 +313,12 @@ export default function ListView() {
                 task={selectedTask || null}
                 onClose={() => setSelectedTaskId(null)}
                 updateTask={updateTask}
+            />
+            <CreateMilestoneModal
+                isOpen={!!editingMilestone}
+                onClose={() => setEditingMilestone(null)}
+                listId={listId}
+                milestone={editingMilestone}
             />
         </div>
     );

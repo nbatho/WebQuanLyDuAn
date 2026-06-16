@@ -155,6 +155,7 @@ CREATE TABLE task_status (
 CREATE TABLE milestones (
     milestone_id SERIAL       PRIMARY KEY,
     space_id     INT          NOT NULL REFERENCES spaces(space_id) ON DELETE RESTRICT,
+    list_id      INT          REFERENCES lists(list_id) ON DELETE RESTRICT,
     name         VARCHAR(255) NOT NULL,
     description  TEXT,
     status       VARCHAR(20)  NOT NULL DEFAULT 'on_track' CHECK (status IN ('on_track','at_risk','completed','cancelled')),
@@ -293,6 +294,7 @@ CREATE INDEX idx_tasks_list_id       ON tasks(list_id) WHERE deleted_at IS NULL;
 CREATE INDEX idx_tasks_status_id     ON tasks(status_id) WHERE deleted_at IS NULL;
 CREATE INDEX idx_tasks_archived      ON tasks(is_archived) WHERE deleted_at IS NULL;
 CREATE INDEX idx_tasks_position      ON tasks(list_id, status_id, position) WHERE deleted_at IS NULL;
+CREATE INDEX idx_milestones_list_id  ON milestones(list_id) WHERE deleted_at IS NULL;
 
 CREATE INDEX idx_comments_task_id    ON comments(task_id) WHERE deleted_at IS NULL;
 CREATE INDEX idx_notifications_user  ON notifications(user_id, is_read) WHERE deleted_at IS NULL;

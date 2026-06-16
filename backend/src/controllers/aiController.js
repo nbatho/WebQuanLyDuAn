@@ -1,5 +1,8 @@
 import Groq from "groq-sdk";
 import con from "../config/connect.js";
+import { checkInheritedWorkspacePermission, checkSpacePermission, checkWorkspacePermission } from "../models/Permission.js";
+import { createSpaces } from "../models/Spaces.js";
+import { createTaskForList } from "../models/Task.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -99,7 +102,8 @@ async function handleListTasks(userId, args) {
            ts.status_name AS status, t.priority,
            s.name AS space_name
     FROM tasks t
-    JOIN spaces s ON t.space_id = s.space_id
+    JOIN lists l ON t.list_id = l.list_id
+    JOIN spaces s ON l.space_id = s.space_id
     JOIN space_members sm ON s.space_id = sm.space_id AND sm.user_id = $1
     LEFT JOIN task_status ts ON t.status_id = ts.status_id
     WHERE t.deleted_at IS NULL AND s.deleted_at IS NULL AND sm.deleted_at IS NULL
@@ -134,7 +138,8 @@ async function handleCountByStatus(userId, args) {
   let query = `
     SELECT COALESCE(ts.status_name, 'Không có trạng thái') AS status, COUNT(*)::int AS count
     FROM tasks t
-    JOIN spaces s ON t.space_id = s.space_id
+    JOIN lists l ON t.list_id = l.list_id
+    JOIN spaces s ON l.space_id = s.space_id
     JOIN space_members sm ON s.space_id = sm.space_id AND sm.user_id = $1
     LEFT JOIN task_status ts ON t.status_id = ts.status_id
     WHERE t.deleted_at IS NULL AND s.deleted_at IS NULL AND sm.deleted_at IS NULL
@@ -159,7 +164,8 @@ async function handleFindOverdue(userId, args) {
            ts.status_name AS status, t.priority,
            s.name AS space_name
     FROM tasks t
-    JOIN spaces s ON t.space_id = s.space_id
+    JOIN lists l ON t.list_id = l.list_id
+    JOIN spaces s ON l.space_id = s.space_id
     JOIN space_members sm ON s.space_id = sm.space_id AND sm.user_id = $1
     LEFT JOIN task_status ts ON t.status_id = ts.status_id
     WHERE t.deleted_at IS NULL AND s.deleted_at IS NULL AND sm.deleted_at IS NULL
@@ -264,52 +270,31 @@ export const chatWithAI = async (req, res) => {
                     return res.status(200).json({ response: "Bạn chưa thuộc về Workspace nào để tạo Space.", suggestions: [] });
                 }
                 const workspaceId = wsResult.rows[0].workspace_id;
-
-                const dbClient = await con.connect();
-                try {
-                    await dbClient.query('BEGIN');
-
-                    // 1. Tạo Space
-                    const spaceInsert = await dbClient.query(
-                        "INSERT INTO spaces (workspace_id, name, description) VALUES ($1, $2, $3) RETURNING space_id",
-                        [workspaceId, functionArgs.name, functionArgs.description || ""]
-                    );
-                    const newSpaceId = spaceInsert.rows[0].space_id;
-
-                    // 2. Gán admin (user hiện tại) vào space_members
-                    await dbClient.query(
-                        "INSERT INTO space_members (space_id, user_id) VALUES ($1, $2) ON CONFLICT (space_id, user_id) DO UPDATE SET deleted_at = NULL",
-                        [newSpaceId, userId]
-                    );
-
-                    // 3. Tạo các trạng thái mặc định cho Space
-                    await dbClient.query(
-                        `INSERT INTO task_status (space_id, status_name, color, position, is_done_state, is_default) VALUES 
-                            ($1, 'TO DO', '#9CA3AF', 0, false, true),
-                            ($1, 'IN PROGRESS', '#2563EB', 1, false, false),
-                            ($1, 'COMPLETE', '#22C55E', 2, true, false)`,
-                        [newSpaceId]
-                    );
-
-                    // 4. Tạo List mặc định "General" (bắt buộc để tạo task)
-                    await dbClient.query(
-                        "INSERT INTO lists (space_id, name, created_by) VALUES ($1, $2, $3)",
-                        [newSpaceId, 'General', userId]
-                    );
-
-                    await dbClient.query('COMMIT');
-
-                    return res.status(200).json({
-                        response: `✅ **Đã tạo Space "${functionArgs.name}" thành công!**\nHệ thống đã tự động gán bạn làm thành viên và tạo danh sách mặc định. Bạn có muốn tạo task đầu tiên cho nó không?`,
-                        suggestions: ["Tạo task mới", "Xem danh sách Space"],
-                        suggestedTitle: safeHistory.length === 0 ? `Tạo: ${functionArgs.name}` : null
+                const canCreateSpace = await checkWorkspacePermission(workspaceId, userId, "SPACE_CREATE");
+                if (!canCreateSpace) {
+                    return res.status(403).json({
+                        response: "Ban khong co quyen tao Space trong Workspace nay.",
+                        suggestions: []
                     });
-                } catch (err) {
-                    await dbClient.query('ROLLBACK');
-                    throw err;
-                } finally {
-                    dbClient.release();
                 }
+
+                await createSpaces(
+                    functionArgs.name,
+                    functionArgs.description || "",
+                    workspaceId,
+                    false,
+                    {
+                        createdBy: userId,
+                        addCreatorAsMember: true,
+                        createDefaultList: true,
+                    }
+                );
+
+                return res.status(200).json({
+                    response: `Da tao Space "${functionArgs.name}" thanh cong. He thong da gan ban lam thanh vien va tao danh sach mac dinh. Ban co muon tao task dau tien cho no khong?`,
+                    suggestions: ["Tao task moi", "Xem danh sach Space"],
+                    suggestedTitle: safeHistory.length === 0 ? `Tao: ${functionArgs.name}` : null
+                });
             }
             
             // ── HANDLER: create_task ──────────────────────────────────────────
@@ -326,6 +311,15 @@ export const chatWithAI = async (req, res) => {
                 }
 
                 // Query danh sách thành viên trong workspace (để gán task)
+                const canCreateTask = await checkSpacePermission(spaceMatch.space_id, userId, "TASK_CREATE")
+                    || await checkInheritedWorkspacePermission(spaceMatch.space_id, userId, "TASK_CREATE");
+                if (!canCreateTask) {
+                    return res.status(403).json({
+                        response: `Ban khong co quyen tao task trong Space "${functionArgs.space_name}".`,
+                        suggestions: []
+                    });
+                }
+
                 const spaceDetailRes = await con.query(
                     "SELECT workspace_id FROM spaces WHERE space_id = $1 AND deleted_at IS NULL",
                     [spaceMatch.space_id]
@@ -374,35 +368,19 @@ export const chatWithAI = async (req, res) => {
                 const listId = listRes.rows[0].list_id;
 
                 // Tìm status mặc định
-                const statusRes = await con.query(
-                    'SELECT status_id FROM task_status WHERE space_id = $1 AND is_default = true LIMIT 1',
-                    [spaceMatch.space_id]
-                );
-                const statusId = statusRes.rows[0]?.status_id || null;
-
-                // INSERT task
-                const taskInsert = await con.query(
-                    `INSERT INTO tasks (name, list_id, status_id, priority, due_date, start_date, created_by)
-                     VALUES ($1, $2, $3, $4, $5, NOW(), $6) RETURNING task_id, name`,
-                    [
-                        functionArgs.title,
-                        listId,
-                        statusId,
-                        functionArgs.priority || 'Normal',
-                        functionArgs.due_date || null,
-                        userId
-                    ]
-                );
-                const newTask = taskInsert.rows[0];
+                const newTask = await createTaskForList({
+                    listId,
+                    name: functionArgs.title,
+                    description: null,
+                    priority: functionArgs.priority || 'Normal',
+                    assignee_ids: assignee ? [assignee.user_id] : [],
+                    due_date: functionArgs.due_date || null,
+                    created_by: userId
+                });
 
                 // Gán assignee nếu tìm thấy
                 let assignMsg = '';
                 if (assignee) {
-                    await con.query(
-                        `INSERT INTO task_assigns (task_id, user_id, assigned_by) VALUES ($1, $2, $3)
-                         ON CONFLICT (task_id, user_id) DO UPDATE SET deleted_at = NULL`,
-                        [newTask.task_id, assignee.user_id, userId]
-                    );
                     assignMsg = `\n👤 Đã gán cho: **${assignee.name || assignee.username}**`;
                 } else if (assigneeName !== 'không' && assigneeName !== 'không gán') {
                     assignMsg = `\n⚠️ Không tìm thấy thành viên "${functionArgs.assignee_name}". Task đã được tạo nhưng chưa gán cho ai.`;

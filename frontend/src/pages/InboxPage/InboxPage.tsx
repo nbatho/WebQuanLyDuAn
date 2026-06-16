@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Hash, Plus, Send, MessageSquare, X, FileText, Cloud } from 'lucide-react';
-import useDrivePicker from 'react-google-drive-picker';
-import { message } from 'antd';
+import { Hash, Plus, Send, MessageSquare, X, FileText, Cloud, Paperclip } from 'lucide-react';
+import { message, Spin } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../../hooks';
 import * as msgApi from '../../api/messages';
+import { uploadFile } from '../../api/upload';
 import type { ConversationData, MessageData } from '../../api/messages';
 import { fetchWorkspaceMembers } from '../../store/modules/workspaces';
 import { useAppDispatch } from '../../hooks';
@@ -37,8 +37,11 @@ export default function InboxPage() {
     const [activeId, setActiveId] = useState<number | null>(null);
     const [messages, setMessages] = useState<MessageData[]>([]);
     const [input, setInput] = useState('');
-    const [driveFile, setDriveFile] = useState<{url: string, name: string, mimeType: string} | null>(null);
-    const [openPicker] = useDrivePicker();
+    
+    // Local File Upload State
+    const [attachedFile, setAttachedFile] = useState<{url: string, name: string, mimeType: string} | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Modals
     const [showNewDM, setShowNewDM] = useState(false);
@@ -89,37 +92,39 @@ export default function InboxPage() {
 
     // Send message
     const handleSend = async () => {
-        if ((!input.trim() && !driveFile) || !activeId) return;
+        if ((!input.trim() && !attachedFile) || !activeId) return;
         try {
-            const msg = await msgApi.sendMessage(activeId, input.trim(), driveFile);
+            const msg = await msgApi.sendMessage(activeId, input.trim(), attachedFile);
             setMessages(prev => [...prev, msg]);
             setInput('');
-            setDriveFile(null);
+            setAttachedFile(null);
             loadConvos(); // refresh sidebar last_message
         } catch { message.error(t('errors.genericError')); }
     };
 
-    // Google Drive Picker
-    const handleOpenDrive = () => {
-        openPicker({
-            clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-            developerKey: import.meta.env.VITE_GOOGLE_API_KEY,
-            viewId: 'DOCS',
-            showUploadView: true,
-            showUploadFolders: true,
-            supportDrives: true,
-            multiselect: false,
-            callbackFunction: (data) => {
-                if (data.action === 'picked' && data.docs.length > 0) {
-                    const doc = data.docs[0];
-                    setDriveFile({
-                        url: doc.url,
-                        name: doc.name,
-                        mimeType: doc.mimeType
-                    });
-                }
-            },
-        });
+    // Local file upload handler
+    const handleFileUpload = async (file: File) => {
+        try {
+            setIsUploading(true);
+            const uploadRes = await uploadFile(file);
+            const { file_name, file_url, mime_type } = uploadRes.file;
+            setAttachedFile({
+                name: file_name,
+                url: file_url,
+                mimeType: mime_type || 'application/octet-stream'
+            });
+        } catch (error) {
+            console.error('Lỗi upload:', error);
+            message.error('Không thể tải file lên');
+        } finally {
+            setIsUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) handleFileUpload(file);
     };
 
     // Start DM
@@ -330,24 +335,30 @@ export default function InboxPage() {
                                 />
                                 <div className="flex items-center justify-between rounded-b-xl bg-[var(--color-surface-container-low)] px-3 py-2 border-t border-[var(--color-border)]">
                                     <div className="flex items-center gap-2">
+                                        <input 
+                                            type="file" 
+                                            ref={fileInputRef} 
+                                            className="hidden" 
+                                            onChange={handleFileChange}
+                                        />
                                         <button 
-                                            className="cursor-pointer border-none bg-transparent p-1.5 text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-primary)] rounded-md transition-colors"
-                                            onClick={handleOpenDrive}
-                                            title="Attach from Google Drive"
+                                            className={`cursor-pointer border-none bg-transparent p-1.5 text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-primary)] rounded-md transition-colors ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}
+                                            onClick={() => fileInputRef.current?.click()}
+                                            title="Đính kèm tài liệu"
                                         >
-                                            <Cloud size={18} />
+                                            {isUploading ? <Spin size="small" /> : <Paperclip size={18} />}
                                         </button>
 
-                                        {driveFile && (
+                                        {attachedFile && (
                                             <div className="flex items-center gap-1.5 px-3 py-1 bg-[var(--color-primary-bg)] rounded-full text-caption font-semibold text-[var(--color-primary)] border border-[var(--color-primary-border)]">
-                                                <Cloud size={12} />
-                                                <span className="max-w-[150px] truncate">{driveFile.name}</span>
-                                                <X size={14} className="cursor-pointer hover:text-[var(--color-error)]" onClick={() => setDriveFile(null)} />
+                                                <Paperclip size={12} />
+                                                <span className="max-w-[150px] truncate">{attachedFile.name}</span>
+                                                <X size={14} className="cursor-pointer hover:text-[var(--color-error)]" onClick={() => setAttachedFile(null)} />
                                             </div>
                                         )}
                                     </div>
                                     <button onClick={handleSend}
-                                        className={`flex cursor-pointer items-center gap-1.5 rounded-lg border-none px-4 py-1.5 text-body-sm font-bold transition-all ${(input.trim() || driveFile) ? 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)]' : 'bg-[var(--color-surface-variant)] text-[var(--color-text-tertiary)] pointer-events-none'}`}>
+                                        className={`flex cursor-pointer items-center gap-1.5 rounded-lg border-none px-4 py-1.5 text-body-sm font-bold transition-all ${(input.trim() || attachedFile) ? 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)]' : 'bg-[var(--color-surface-variant)] text-[var(--color-text-tertiary)] pointer-events-none'}`}>
                                         {t('buttons.submit')} <Send size={14} />
                                     </button>
                                 </div>

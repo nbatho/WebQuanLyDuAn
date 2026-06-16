@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronRightIcon } from 'lucide-react';
 import type { ContextMenuProps } from '../types';
 
@@ -23,13 +24,18 @@ export const ContextMenu = ({ items, position, onClose, footer }: ContextMenuPro
         };
     }, [onClose]);
 
-    const top = Math.min(position.y, window.innerHeight - 520);
-    const left = Math.min(position.x, window.innerWidth - 260);
+    if (typeof document === 'undefined') return null;
 
-    return (
+    const menuWidth = 240;
+    const menuMaxHeight = 520;
+    const viewportPadding = 8;
+    const top = Math.max(viewportPadding, Math.min(position.y, window.innerHeight - menuMaxHeight - viewportPadding));
+    const left = Math.max(viewportPadding, Math.min(position.x, window.innerWidth - menuWidth - viewportPadding));
+
+    return createPortal(
         <div
             ref={ref}
-            className="fixed z-9999 w-60 rounded-lg bg-[var(--color-surface-container-lowest)] py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)] border border-[var(--color-border)]"
+            className="fixed z-[9999] w-60 rounded-lg bg-[var(--color-surface-container-lowest)] py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)] border border-[var(--color-border)]"
             style={{ top, left }}
             onClick={(e) => e.stopPropagation()}
         >
@@ -113,6 +119,7 @@ export const ContextMenu = ({ items, position, onClose, footer }: ContextMenuPro
                     {footer}
                 </div>
             )}
-        </div>
+        </div>,
+        document.body,
     );
 };
