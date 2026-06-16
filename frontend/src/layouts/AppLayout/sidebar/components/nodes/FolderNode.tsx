@@ -6,11 +6,7 @@ import {
     FolderClosed,
     MoreHorizontal,
     Plus,
-    Pencil,
-    Link2,
     ListTodo,
-    Copy,
-    Archive,
     Trash2,
 } from 'lucide-react';
 import { useSpaceTree } from '../../../SpaceTreeContext';
@@ -34,9 +30,6 @@ export const FolderNode = ({ folder, spaceId, spaceName }: { folder: FolderItem;
     }, [isFolderActive]);
 
     const folderMenuItems: MenuEntry[] = [
-        { icon: <Pencil size={14} />, label: 'Rename', onClick: () => {} },
-        { icon: <Link2 size={14} />, label: 'Copy link', onClick: () => {} },
-        'divider',
         {
             icon: <ListTodo size={14} />,
             label: 'Add List',
@@ -52,8 +45,6 @@ export const FolderNode = ({ folder, spaceId, spaceName }: { folder: FolderItem;
             },
         },
         'divider',
-        { icon: <Copy size={14} />, label: 'Duplicate', onClick: () => {} },
-        { icon: <Archive size={14} />, label: 'Archive', onClick: () => {} },
         {
             icon: <Trash2 size={14} />,
             label: 'Delete',

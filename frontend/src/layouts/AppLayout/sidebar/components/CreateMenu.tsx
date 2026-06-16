@@ -1,14 +1,9 @@
 import { useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
     ListTodo,
     FolderClosed,
-    FileText,
     LayoutDashboard,
-    PenTool,
-    FileSpreadsheet,
-    Import,
-    LayoutTemplate,
-    ChevronRightIcon,
 } from 'lucide-react';
 import { useSpaceTree } from '../../SpaceTreeContext';
 import type { CreateMenuProps } from '../types';
@@ -34,9 +29,6 @@ export const CreateMenu = ({ position, onClose, spaceId, spaceName }: CreateMenu
         };
     }, [onClose]);
 
-    const top = Math.min(position.y, window.innerHeight - 350);
-    const left = Math.min(position.x, window.innerWidth - 260);
-
     const items = [
         {
             icon: <ListTodo size={16} />,
@@ -58,24 +50,27 @@ export const CreateMenu = ({ position, onClose, spaceId, spaceName }: CreateMenu
         },
     ];
 
-    const extraItems = [
-        { icon: <FileText size={16} />, label: 'Doc' },
-        {
-            icon: <LayoutDashboard size={16} />,
-            label: 'Sprint',
-            onClick: () => {
-                tree.setCreateSprintTarget({ spaceId, spaceName });
-                onClose();
-            },
+    const sprintItem = {
+        icon: <LayoutDashboard size={16} />,
+        label: 'Sprint',
+        onClick: () => {
+            tree.setCreateSprintTarget({ spaceId, spaceName });
+            onClose();
         },
-        { icon: <PenTool size={16} />, label: 'Whiteboard' },
-        { icon: <FileSpreadsheet size={16} />, label: 'Form' },
-    ];
+    };
 
-    return (
+    if (typeof document === 'undefined') return null;
+
+    const menuWidth = 240;
+    const menuMaxHeight = 350;
+    const viewportPadding = 8;
+    const top = Math.max(viewportPadding, Math.min(position.y, window.innerHeight - menuMaxHeight - viewportPadding));
+    const left = Math.max(viewportPadding, Math.min(position.x, window.innerWidth - menuWidth - viewportPadding));
+
+    return createPortal(
         <div
             ref={ref}
-            className="fixed z-9999 w-60 rounded-lg bg-[var(--color-surface-container-lowest)] py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)] border border-[var(--color-border)]"
+            className="fixed z-[9999] w-60 rounded-lg bg-[var(--color-surface-container-lowest)] py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.15)] border border-[var(--color-border)]"
             style={{ top, left }}
             onClick={(e) => e.stopPropagation()}
         >
@@ -104,31 +99,15 @@ export const CreateMenu = ({ position, onClose, spaceId, spaceName }: CreateMenu
 
             <div className="my-1 mx-2.5 h-px bg-[#eef0f3]" />
 
-            {extraItems.map((item, i) => (
-                <button
-                    key={i}
-                    type="button"
-                    className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[var(--color-inverse-surface)] transition-all hover:bg-[#f3f4f8]"
-                    onClick={item.onClick || (() => {})}
-                >
-                    <span className="shrink-0 text-[#6b6f76]">{item.icon}</span>
-                    <span className="font-medium">{item.label}</span>
-                </button>
-            ))}
-
-            <div className="my-1 mx-2.5 h-px bg-[#eef0f3]" />
-
-            {/* Bottom: Imports & Templates */}
-            <button type="button" className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[var(--color-inverse-surface)] transition-all hover:bg-[#f3f4f8]">
-                <Import size={15} className="text-[#6b6f76]" />
-                <span className="flex-1 font-medium">Imports</span>
-                <ChevronRightIcon size={13} className="text-[#9b9ea4]" />
+            <button
+                type="button"
+                className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[var(--color-inverse-surface)] transition-all hover:bg-[#f3f4f8]"
+                onClick={sprintItem.onClick}
+            >
+                <span className="shrink-0 text-[#6b6f76]">{sprintItem.icon}</span>
+                <span className="font-medium">{sprintItem.label}</span>
             </button>
-            <button type="button" className="flex w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-3.5 py-1.5 text-left text-[13px] text-[var(--color-inverse-surface)] transition-all hover:bg-[#f3f4f8]">
-                <LayoutTemplate size={15} className="text-[#6b6f76]" />
-                <span className="flex-1 font-medium">Templates</span>
-                <ChevronRightIcon size={13} className="text-[#9b9ea4]" />
-            </button>
-        </div>
+        </div>,
+        document.body,
     );
 };

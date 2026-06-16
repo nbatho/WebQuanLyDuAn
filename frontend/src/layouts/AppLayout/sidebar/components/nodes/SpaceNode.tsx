@@ -3,26 +3,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
     ChevronDown,
     ChevronRight,
-    Star,
-    Pencil,
-    Link2,
     Plus,
     ListTodo,
     FolderClosed,
     FileText,
-    LayoutDashboard,
-    PenTool,
-    FileSpreadsheet,
-    Palette,
     Zap,
-    Columns3,
-    MoreHorizontalIcon,
-    EyeOff,
-    Copy,
-    Archive,
     Trash2,
     MoreHorizontal,
-    Shield,
 } from 'lucide-react';
 import { useSpaceTree } from '../../../SpaceTreeContext';
 import { ContextMenu } from '../ContextMenu';
@@ -65,16 +52,6 @@ export const SpaceNode = ({ space }: { space: SpaceItem }) => {
 
     const settingsItems: MenuEntry[] = [
         {
-            icon: <Star size={15} />,
-            label: 'Favorite',
-            hasSubmenu: true,
-            submenuItems: [],
-            onClick: () => { },
-        },
-        { icon: <Pencil size={15} />, label: 'Rename', onClick: () => { } },
-        { icon: <Link2 size={15} />, label: 'Copy link', onClick: () => { } },
-        'divider',
-        {
             icon: <Plus size={15} />,
             label: 'Create new',
             hasSubmenu: true,
@@ -95,44 +72,15 @@ export const SpaceNode = ({ space }: { space: SpaceItem }) => {
                         tree.setCreateFolderTarget({ spaceId: space.id, spaceName: space.name });
                     },
                 },
-                { icon: <FileText size={15} />, label: 'Doc', onClick: () => { } },
                 {
                     icon: <Zap size={15} />, label: 'Sprint', sublabel: 'Scrum sprint planning',
                     onClick: () => {
                         tree.setCreateSprintTarget({ spaceId: space.id, spaceName: space.name });
                     },
                 },
-                { icon: <LayoutDashboard size={15} />, label: 'Dashboard', onClick: () => { } },
-                { icon: <PenTool size={15} />, label: 'Whiteboard', onClick: () => { } },
-                { icon: <FileSpreadsheet size={15} />, label: 'Form', onClick: () => { } },
             ],
         },
-        {
-            icon: <Palette size={15} />,
-            label: 'Color & Icon',
-            hasSubmenu: true,
-            submenuItems: [],
-            onClick: () => { },
-        },
-        { icon: <Zap size={15} />, label: 'Automations', onClick: () => { } },
-        { icon: <Columns3 size={15} />, label: 'Custom Fields', onClick: () => { } },
-        {
-            icon: <MoreHorizontalIcon size={15} />,
-            label: 'More',
-            hasSubmenu: true,
-            submenuItems: [],
-            onClick: () => { },
-        },
         'divider',
-        {
-            icon: <EyeOff size={15} />,
-            label: 'Hide Space',
-            sublabel: "You'll retain access to this Space, but it won't show in your sidebar",
-            onClick: () => { },
-        },
-        'divider',
-        { icon: <Copy size={15} />, label: 'Duplicate', onClick: () => { } },
-        { icon: <Archive size={15} />, label: 'Archive', onClick: () => { } },
         {
             icon: <Trash2 size={15} />,
             label: 'Delete',
@@ -241,12 +189,6 @@ export const SpaceNode = ({ space }: { space: SpaceItem }) => {
                     items={settingsItems}
                     position={settingsMenu}
                     onClose={() => setSettingsMenu(null)}
-                    footer={
-                        <button type="button" className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-md border-none bg-[#7b68ee] px-4 py-2 text-[13px] font-semibold text-white transition-all hover:bg-[#6c5ce7]">
-                            <Shield size={14} />
-                            Sharing & Permissions
-                        </button>
-                    }
                 />
             )}
 
