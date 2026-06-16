@@ -5,12 +5,6 @@ import {
     Plus,
     ListTodo,
     FolderClosed,
-    Pencil,
-    Link2,
-    Palette,
-    Columns3,
-    Copy,
-    Archive,
     Trash2,
 } from 'lucide-react';
 import { useSpaceTree } from '../../../SpaceTreeContext';
@@ -38,14 +32,6 @@ export const ListNode = ({
     const isActive = location.pathname === `/space/${spaceId}/list/${list.id}`;
 
     const listMenuItems: MenuEntry[] = [
-        { icon: <Pencil size={14} />, label: 'Rename', onClick: () => {} },
-        { icon: <Link2 size={14} />, label: 'Copy link', onClick: () => {} },
-        'divider',
-        { icon: <Palette size={14} />, label: 'Color & Icon', onClick: () => {} },
-        { icon: <Columns3 size={14} />, label: 'Custom Fields', onClick: () => {} },
-        'divider',
-        { icon: <Copy size={14} />, label: 'Duplicate', onClick: () => {} },
-        { icon: <Archive size={14} />, label: 'Archive', onClick: () => {} },
         {
             icon: <Trash2 size={14} />,
             label: 'Delete',

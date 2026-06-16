@@ -5,9 +5,9 @@ import {
 } from 'lucide-react';
 
 import { useSpaceTree } from '../../layouts/AppLayout/SpaceTreeContext';
-import PageHeader, { LIST_TABS } from '../../components/PageHeader';
-import ContextMenu from '../../components/ContextMenu';
-import CreateTaskModal from '../../components/Modal/CreateTaskModal/CreateTaskModal';
+import PageHeader, { LIST_TABS } from '../../components/PageHeader/PageHeader';
+import ContextMenu from '../../components/ContextMenu/ContextMenu';
+import CreateTaskModal from '../../components/Modal/CreateTaskModal';
 import BoardView from './components/BoardView';
 import ListView from './components/ListView';
 import { useDispatch, useSelector } from 'react-redux';
@@ -198,7 +198,7 @@ export default function ListViewPage() {
         dispatch(fetchTasksForList(Number(listId)));
     }, [dispatch, listId]);
 
-     
+
     useEffect(() => {
         if (listTasks.length > 0) {
             setGroups(listTasks);
@@ -239,7 +239,7 @@ export default function ListViewPage() {
                         <button type="button" className="flex cursor-pointer items-center gap-1 rounded-md border-none bg-[var(--color-inverse-surface)] px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-black"
                             onClick={() => setIsCreateTaskOpen(true)}
                         >
-                            <Plus size={14} /> Add Task 
+                            <Plus size={14} /> Add Task
                         </button>
                     </div>
                 </div>
@@ -267,7 +267,6 @@ export default function ListViewPage() {
 
                     lists={[{ id: Number(listInfo.id), name: listInfo.name }]}
                     defaultListId={Number(listInfo.id)}
-                    spaceId={Number(spaceId)}
                 />
             </div>
         </TaskViewContext.Provider>

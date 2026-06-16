@@ -4,8 +4,8 @@ import PrivateRoute from "./PrivateRoutes";
 
 
 const LandingPage = lazy(() => import("../pages/LandingPage"));
-const LoginPage = lazy(() => import("../pages/AuthPage/LoginPage"));
-const GoogleLoginPage = lazy(() => import("../pages/AuthPage/GoogleLoginPage"));
+const LoginPage = lazy(() => import("../pages/AuthPage/LoginPage/LoginPage"));
+const GoogleLoginPage = lazy(() => import("../pages/AuthPage/GoogleLoginPage/GoogleLoginPage"));
 const WorkspaceSetupPage = lazy(() => import("../pages/WorkspaceSetupPage"));
 const InviteTeamPage = lazy(() => import("../pages/InviteTeamPage"));
 const InboxPage = lazy(() => import("../pages/InboxPage"));

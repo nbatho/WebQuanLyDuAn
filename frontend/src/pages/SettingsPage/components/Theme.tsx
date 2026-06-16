@@ -1,9 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { RotateCcw } from 'lucide-react';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
+import LanguageSwitcher from '@/components/LanguageSwitcher/LanguageSwitcher';
 import { useOnboardingTour } from '@/components/OnboardingTour';
-
-type ThemeMode = 'light' | 'dark' | 'system';
 
 export default function Theme() {
     const { t } = useTranslation('settings');

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    Zap, MoreHorizontal, Trash2, Pencil,
+    Zap, MoreHorizontal, Trash2,
     Play, CheckCircle2, XCircle, Clock
 } from 'lucide-react';
 import type { SprintData } from '@/store/modules/sprints';
@@ -45,7 +45,6 @@ export const SprintNode = ({ sprint, spaceId, onDelete }: SprintNodeProps) => {
                     {sprint.name}
                 </span>
 
-                {/* Progress badge */}
                 {sprint.total_tasks > 0 && (
                     <span
                         className="rounded-full px-1.5 py-px text-[10px] font-bold"
@@ -58,7 +57,6 @@ export const SprintNode = ({ sprint, spaceId, onDelete }: SprintNodeProps) => {
                     </span>
                 )}
 
-                {/* Hover actions */}
                 <span
                     className="hidden h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded text-[#6b6f76] hover:bg-[#e2e4e9] hover:text-[var(--color-inverse-surface)] group-hover:flex"
                     onClick={(e) => {
@@ -70,22 +68,11 @@ export const SprintNode = ({ sprint, spaceId, onDelete }: SprintNodeProps) => {
                 </span>
             </div>
 
-            {/* Context menu */}
             {showMenu && (
                 <div
                     className="absolute right-0 top-full z-50 w-40 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-container-lowest)] py-1 shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <button
-                        className="flex w-full items-center gap-2 border-none bg-transparent px-3 py-1.5 text-left text-[13px] text-[var(--color-inverse-surface)] hover:bg-[#f3f4f8]"
-                        onClick={() => {
-                            setShowMenu(false);
-                            // TODO: edit sprint
-                        }}
-                    >
-                        <Pencil size={13} className="text-[#6b6f76]" /> Đổi tên
-                    </button>
-                    <div className="mx-2 my-1 h-px bg-[#eef0f3]" />
                     <button
                         className="flex w-full items-center gap-2 border-none bg-transparent px-3 py-1.5 text-left text-[13px] text-[#e74c3c] hover:bg-[#fff5f5]"
                         onClick={() => {
@@ -93,7 +80,7 @@ export const SprintNode = ({ sprint, spaceId, onDelete }: SprintNodeProps) => {
                             onDelete(sprint.sprint_id);
                         }}
                     >
-                        <Trash2 size={13} /> Xóa Sprint
+                        <Trash2 size={13} /> Xoa Sprint
                     </button>
                 </div>
             )}

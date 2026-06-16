@@ -1,11 +1,19 @@
 import { Resend } from "resend";
-import express from "express";
-import dotenv from "dotenv";
 const resend = new Resend(process.env.RESEND_API_KEY);
 import { createInvitations, checkExistingInvitation, deleteInvitation, updateInvitationStatus, addMemberToWorkspace } from "../models/Member.js";
 import jwt from 'jsonwebtoken';
 import { findWorkspaceById } from "../models/Workspaces.js";
+import { removeWorkspaceMember } from "../models/Workspaces.js";
 import { findUserById } from "../models/Users.js";
+
+const escapeHtml = (value = "") =>
+    String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
 export const InviteMember = async (req, res) => {
     try {
         const { email, workspace_id, role } = req.body;
@@ -28,6 +36,8 @@ export const InviteMember = async (req, res) => {
         const workspaceName = workspace?.name || "Workspace";
         const inviterName = inviter?.name || inviter?.username || "Một thành viên";
         const inviterEmail = inviter?.email || "";
+        const safeWorkspaceName = escapeHtml(workspaceName);
+        const safeInviterName = escapeHtml(inviterName);
         // 3. Tạo Token (Nhúng thêm workspaceName và inviterName)
         const inviteToken = jwt.sign(
             {
@@ -56,7 +66,7 @@ export const InviteMember = async (req, res) => {
             html: `
                 <div style="font-family: sans-serif; padding: 20px; color: #333;">
                     <h2>Chào bạn,</h2>
-                    <p><strong>${inviterName}</strong> vừa mời bạn tham gia làm việc trong dự án <strong>${workspaceName}</strong>.</p>
+                    <p><strong>${safeInviterName}</strong> vừa mời bạn tham gia làm việc trong dự án <strong>${safeWorkspaceName}</strong>.</p>
                     <p>Vui lòng click vào nút bên dưới để chấp nhận (Link có hiệu lực trong 24 giờ):</p>
                     <br/>
                     <a href="${invitationLink}" style="display: inline-block; padding: 12px 24px; background-color: #0058be; color: white; font-weight: bold; text-decoration: none; border-radius: 8px;">
@@ -149,7 +159,6 @@ export const RespondToInvitation = async (req, res) => {
             return res.status(404).json({ message: "Lời mời không tồn tại hoặc đã được xử lý" });
         }
 
-        console.log(invitation);
         if (action === 'accept') {
             await addMemberToWorkspace(workspace_id, req.user.user_id, invitation.role_id);
             await updateInvitationStatus(invitation.invitation_id, 'accepted');
@@ -166,4 +175,27 @@ export const RespondToInvitation = async (req, res) => {
     }
 };
 
-export const RemoveMember = async (req, res) => { }
+export const RemoveMember = async (req, res) => {
+    try {
+        const workspaceId = req.body.workspaceId || req.body.workspace_id;
+        const userId = req.body.userId || req.body.user_id;
+
+        if (!workspaceId || !userId) {
+            return res.status(400).json({ message: "workspaceId va userId la bat buoc" });
+        }
+
+        if (Number(userId) === Number(req.user?.user_id)) {
+            return res.status(400).json({ message: "Khong the tu xoa chinh ban khoi Workspace" });
+        }
+
+        const removedMember = await removeWorkspaceMember(workspaceId, userId);
+        if (!removedMember) {
+            return res.status(404).json({ message: "Thanh vien khong ton tai trong Workspace" });
+        }
+
+        return res.status(200).json({ message: "Da xoa thanh vien khoi Workspace", data: removedMember });
+    } catch (error) {
+        console.error("Error removing member:", error);
+        return res.status(500).json({ message: "Loi Server noi bo" });
+    }
+};

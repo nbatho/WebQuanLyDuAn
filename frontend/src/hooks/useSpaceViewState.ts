@@ -12,7 +12,6 @@ export function useSpaceViewState(
     const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; task: Task } | null>(null);
 
     const [groupBy, setGroupBy] = useState('status');
-    const [subtaskMode, setSubtaskMode] = useState('collapsed');
     const [showClosed, setShowClosed] = useState(true);
     const [columns, setColumns] = useState<Record<string, boolean>>({
         assignee: true,
@@ -49,8 +48,6 @@ export function useSpaceViewState(
         setCtxMenu,
         groupBy,
         setGroupBy,
-        subtaskMode,
-        setSubtaskMode,
         showClosed,
         setShowClosed,
         columns,

@@ -7,8 +7,8 @@ import { Avatar, Popover, message } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import TaskDetailModal from '@/components/TaskDetailModal';
-import CreateTaskModal from '@/components/Modal/CreateTaskModal/CreateTaskModal';
+import TaskDetailModal from '@/components/TaskDetailModal/TaskDetailModal';
+import CreateTaskModal from '@/components/Modal/CreateTaskModal';
 import AssigneePopover from '@/components/Popovers/AssigneePopover';
 import DueDatePopover from '@/components/Popovers/DueDatePopover';
 import PriorityPopover from '@/components/Popovers/PriorityPopover';
@@ -90,7 +90,7 @@ export default function MyTasksPage() {
         }
     }, [dispatch, activeTab]);
 
-     
+
     useEffect(() => {
         if (listSpaces.length > 0 && activeSpaceId == null) {
             setActiveSpaceId(listSpaces[0].spaceId);
@@ -265,7 +265,7 @@ export default function MyTasksPage() {
                         {/* Loading state */}
                         {isLoadingMentions && (
                             <div className="flex flex-col gap-2">
-                                {[1,2,3].map(i => (
+                                {[1, 2, 3].map(i => (
                                     <div key={i} className="h-16 animate-pulse rounded-lg bg-[var(--color-surface-container-low)]" />
                                 ))}
                             </div>
@@ -286,11 +286,10 @@ export default function MyTasksPage() {
                         {!isLoadingMentions && mentionNotifications.map((notif) => (
                             <div
                                 key={notif.notification_id}
-                                className={`mb-2 flex cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 transition-all hover:border-[var(--color-primary-border)] hover:bg-[var(--color-primary-bg)] ${
-                                    notif.is_read
-                                        ? 'border-[var(--color-border)] bg-[var(--color-surface-container-lowest)]'
-                                        : 'border-[var(--color-primary-border)] bg-[var(--color-primary-bg)]'
-                                }`}
+                                className={`mb-2 flex cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 transition-all hover:border-[var(--color-primary-border)] hover:bg-[var(--color-primary-bg)] ${notif.is_read
+                                    ? 'border-[var(--color-border)] bg-[var(--color-surface-container-lowest)]'
+                                    : 'border-[var(--color-primary-border)] bg-[var(--color-primary-bg)]'
+                                    }`}
                                 onClick={() => {
                                     if (!notif.is_read) {
                                         dispatch(fetchMarkNotificationAsRead(notif.notification_id));
@@ -298,19 +297,17 @@ export default function MyTasksPage() {
                                 }}
                             >
                                 {/* Icon */}
-                                <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg ${
-                                    notif.type === 'task_deadline'
-                                        ? 'bg-[#fef3c7]'
-                                        : 'bg-[var(--color-tertiary-bg)]'
-                                }`}>
+                                <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg ${notif.type === 'task_deadline'
+                                    ? 'bg-[#fef3c7]'
+                                    : 'bg-[var(--color-tertiary-bg)]'
+                                    }`}>
                                     {notif.type === 'task_deadline' ? '⏰' : '🔔'}
                                 </div>
 
                                 {/* Content */}
                                 <div className="flex-1 min-w-0">
-                                    <p className={`text-body-sm leading-snug ${
-                                        notif.is_read ? 'text-[var(--color-text-secondary)]' : 'font-semibold text-[var(--color-on-surface)]'
-                                    }`}>
+                                    <p className={`text-body-sm leading-snug ${notif.is_read ? 'text-[var(--color-text-secondary)]' : 'font-semibold text-[var(--color-on-surface)]'
+                                        }`}>
                                         {notif.content}
                                     </p>
                                     {notif.actor_name && (
@@ -456,7 +453,6 @@ export default function MyTasksPage() {
                 groups={modalGroups}
                 lists={allLists}
                 defaultListId={allLists.length > 0 ? allLists[0].id : undefined}
-                spaceId={activeSpaceId ?? undefined}
             />
         </div>
     );

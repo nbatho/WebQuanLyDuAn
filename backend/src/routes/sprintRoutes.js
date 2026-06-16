@@ -9,12 +9,13 @@ import {
 
 // Import Middleware Phân quyền
 import { requirePermission } from '../middlewares/roleMiddlewares.js';
+import { requireSpaceMembership } from '../middlewares/membershipMiddleware.js';
 
 const router = express.Router();
 
 
 
-router.get("/spaces/:spaceId/sprints", getSprintsBySpaceId);
+router.get("/spaces/:spaceId/sprints", requireSpaceMembership, getSprintsBySpaceId);
 
 
 // Tạo sprint -> Yêu cầu quyền: SETTING_MANAGE (Admin + Manager)
@@ -22,7 +23,7 @@ router.post("/spaces/:spaceId/sprints", requirePermission('SETTING_MANAGE'), cre
 
 
 
-router.get("/:sprintId", getSprintById);
+router.get("/:sprintId", requireSpaceMembership, getSprintById);
 
 
 // Cập nhật sprint -> Yêu cầu quyền: SETTING_MANAGE (Admin + Manager)

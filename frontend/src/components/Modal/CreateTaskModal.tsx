@@ -19,8 +19,6 @@ interface CreateTaskModalProps {
     lists: { id: number; name: string }[];
     defaultListId?: number;
 
-    /** spaceId is required for milestone creation */
-    spaceId?: number;
 }
 
 const PRIORITY_OPTIONS = [
@@ -45,7 +43,6 @@ export default function CreateTaskModal({
     groups = [],
     lists = [],
     defaultListId,
-    spaceId,
 }: CreateTaskModalProps) {
     const dispatch = useDispatch<AppDispatch>();
     const { t } = useTranslation('tasks');
@@ -114,10 +111,10 @@ export default function CreateTaskModal({
             onClose();
         } else {
             // Milestone
-            if (!spaceId) return;
+            if (!listId) return;
             try {
                 await dispatch(fetchCreateMilestone({
-                    spaceId,
+                    listId,
                     name: name.trim(),
                     description: description.trim() || undefined,
                     status: milestoneStatus,
@@ -140,7 +137,7 @@ export default function CreateTaskModal({
     const descPlaceholder = isMilestone ? 'Milestone description...' : 'Add description...';
     const submitLabel = isMilestone ? t('create.createMilestone') : t('create.createTask');
     const submitDisabled = isMilestone
-        ? !name.trim() || !spaceId || isCreatingMilestone
+        ? !name.trim() || !listId || isCreatingMilestone
         : !name.trim() || !listId || !statusId;
 
     return (

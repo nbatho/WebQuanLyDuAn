@@ -303,6 +303,11 @@ export const refreshToken = async (req, res) => {
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: ACCESS_TOKEN_TTL },
     );
+    const newRefreshToken = crypto.randomBytes(64).toString("hex");
+    await deleteSessionByRefreshToken(token);
+    await createSession(user.user_id, newRefreshToken);
+    res.cookie("refreshToken", newRefreshToken, refreshCookieOptions);
+
     return res.status(200).json({
       message: "Refresh token thanh cong",
       user: {

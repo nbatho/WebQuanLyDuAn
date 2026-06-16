@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { signIn, signUp,signOut, refreshToken } from "../../../api/auth";
 import type { SignInRequest, SignInResponse, SignUpRequest,SignUpResponse, AuthState } from "../../../types/auth";
-import { getAccessToken } from "@/utils/localStorage";
+import { getAccessToken, removeAccessToken, setAccessToken as storeAccessToken } from "@/utils/localStorage";
 export const fetchSignIn = createAsyncThunk<SignInResponse, SignInRequest, { rejectValue: string }>(
     "auth/fetchSignIn",
     async ({ email, password }, { rejectWithValue }) => {
@@ -72,7 +72,7 @@ const authSlice = createSlice({
     reducers: {
         setAccessToken(state, action: import('@reduxjs/toolkit').PayloadAction<string>) {
             state.access_token = action.payload;
-            localStorage.setItem('access_token', action.payload);
+            storeAccessToken(action.payload);
         },
     },
     extraReducers: (builder) => {
@@ -92,7 +92,7 @@ const authSlice = createSlice({
             }
 
             state.access_token = access_token;
-            localStorage.setItem('access_token', access_token);
+            storeAccessToken(access_token);
         });
         builder.addCase(fetchSignIn.rejected, (state, action) => {
             state.isLoadingSignIn = false;
@@ -119,7 +119,7 @@ const authSlice = createSlice({
             state.signIn = null;
             state.signUp = null;
             state.access_token = null;
-            localStorage.removeItem('access_token');
+            removeAccessToken();
         });
         builder.addCase(fetchSignOut.rejected, (state, action) => {
             state.isLoadingSignOut = false;
@@ -141,7 +141,7 @@ const authSlice = createSlice({
 
             state.signIn = action.payload; // LƯU TOÀN BỘ DATA USER
             state.access_token = access_token;
-            localStorage.setItem('access_token', access_token);
+            storeAccessToken(access_token);
         });
         builder.addCase(fetchRefreshToken.rejected, (state, action) => {
             state.isLoadingSignIn = false;
