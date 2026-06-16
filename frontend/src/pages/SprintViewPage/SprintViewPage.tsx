@@ -7,9 +7,9 @@ import {
 } from 'lucide-react';
 
 import { useSpaceTree } from '../../layouts/AppLayout/SpaceTreeContext';
-import PageHeader, { LIST_TABS } from '../../components/PageHeader';
-import ContextMenu from '../../components/ContextMenu';
-import CreateTaskModal from '../../components/Modal/CreateTaskModal/CreateTaskModal';
+import PageHeader, { LIST_TABS } from '../../components/PageHeader/PageHeader';
+import ContextMenu from '../../components/ContextMenu/ContextMenu';
+import CreateTaskModal from '../../components/Modal/CreateTaskModal';
 import BoardView from './components/BoardView';
 import ListView from './components/ListView';
 import { useDispatch, useSelector } from 'react-redux';
@@ -196,7 +196,7 @@ export default function SprintViewPage() {
         }
     }, [dispatch, spaceId, sprintId]);
 
-     
+
     useEffect(() => {
         if (listTasks.length > 0) {
             setGroups(listTasks);

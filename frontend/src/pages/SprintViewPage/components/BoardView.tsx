@@ -2,7 +2,7 @@ import { Calendar, Flag, MoreHorizontal } from 'lucide-react';
 import { Avatar, Tooltip } from 'antd';
 import { useRef, useState, type DragEvent } from 'react';
 import type { Task, Assignee } from '@/types/tasks';
-import TaskDetailModal from '@/components/TaskDetailModal';
+import TaskDetailModal from '@/components/TaskDetailModal/TaskDetailModal';
 
 import { useTaskView } from '../SprintViewPage';
 
@@ -14,7 +14,7 @@ export default function BoardView({
     const {
         groups,
         setGroups,
-        updateTask,      
+        updateTask,
         onContextMenu,
     } = useTaskView();
 

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ChevronDown, ChevronRight, Calendar, Flag, User, Plus } from 'lucide-react';
 import { Avatar } from 'antd';
 import { useTaskView } from '../ListViewPage';
-import TaskDetailModal from '@/components/TaskDetailModal';
+import TaskDetailModal from '@/components/TaskDetailModal/TaskDetailModal';
 
 const getInitials = (name?: string | null) => name ? name.substring(0, 2).toUpperCase() : 'NA';
 const formatDate = (dateString: string | null) =>
