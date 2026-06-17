@@ -44,12 +44,29 @@ export const requireSpaceMembership = async (req, res, next) => {
         }
 
         const result = await con.query(
-            `SELECT 1 FROM space_members
-             WHERE space_id = $1 AND user_id = $2 AND deleted_at IS NULL
-             UNION
-             SELECT 1 FROM workspace_members wm
-             JOIN spaces s ON s.workspace_id = wm.workspace_id
-             WHERE s.space_id = $1 AND wm.user_id = $2 AND wm.deleted_at IS NULL`,
+            `SELECT 1
+             FROM spaces s
+             WHERE s.space_id = $1
+               AND s.deleted_at IS NULL
+               AND (
+                 EXISTS (
+                   SELECT 1
+                   FROM space_members sm
+                   WHERE sm.space_id = s.space_id
+                     AND sm.user_id = $2
+                     AND sm.deleted_at IS NULL
+                 )
+                 OR (
+                   s.is_private = FALSE
+                   AND EXISTS (
+                     SELECT 1
+                     FROM workspace_members wm
+                     WHERE wm.workspace_id = s.workspace_id
+                       AND wm.user_id = $2
+                       AND wm.deleted_at IS NULL
+                   )
+                 )
+               )`,
             [spaceId, userId]
         );
 

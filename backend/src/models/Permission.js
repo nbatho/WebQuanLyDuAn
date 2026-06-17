@@ -139,7 +139,12 @@ export const checkSpacePermission = async (spaceId, userId, permissionName) => {
     const result = await pool.query(`
         SELECT 1 
         FROM space_members sm
-        JOIN role_permissions rp ON sm.role_id = rp.role_id
+        JOIN spaces s ON s.space_id = sm.space_id
+        LEFT JOIN workspace_members wm
+          ON wm.workspace_id = s.workspace_id
+         AND wm.user_id = sm.user_id
+         AND wm.deleted_at IS NULL
+        JOIN role_permissions rp ON COALESCE(sm.role_id, wm.role_id) = rp.role_id
         JOIN permissions p ON rp.permission_id = p.permission_id
         WHERE sm.space_id = $1 
           AND sm.user_id = $2 
@@ -166,6 +171,7 @@ export const checkInheritedWorkspacePermission = async (spaceId, userId, permiss
           AND wm.user_id = $2 
           AND p.permission_name = $3
           AND wm.deleted_at IS NULL
+          AND s.is_private = FALSE
     `, [spaceId, userId, permissionName]);
     
     return result.rows.length > 0;
@@ -201,7 +207,12 @@ export const getUserPermissionsInSpace = async (spaceId, userId) => {
             -- Quyền trực tiếp từ space_members
             SELECT rp.permission_id
             FROM space_members sm
-            JOIN role_permissions rp ON sm.role_id = rp.role_id
+            JOIN spaces s ON s.space_id = sm.space_id
+            LEFT JOIN workspace_members wm
+              ON wm.workspace_id = s.workspace_id
+             AND wm.user_id = sm.user_id
+             AND wm.deleted_at IS NULL
+            JOIN role_permissions rp ON COALESCE(sm.role_id, wm.role_id) = rp.role_id
             WHERE sm.space_id = $1 AND sm.user_id = $2 AND sm.deleted_at IS NULL
 
             UNION
@@ -211,7 +222,10 @@ export const getUserPermissionsInSpace = async (spaceId, userId) => {
             FROM spaces s
             JOIN workspace_members wm ON s.workspace_id = wm.workspace_id
             JOIN role_permissions rp ON wm.role_id = rp.role_id
-            WHERE s.space_id = $1 AND wm.user_id = $2 AND wm.deleted_at IS NULL
+            WHERE s.space_id = $1
+              AND wm.user_id = $2
+              AND wm.deleted_at IS NULL
+              AND s.is_private = FALSE
         ) AS combined
         JOIN permissions p ON combined.permission_id = p.permission_id
     `, [spaceId, userId]);

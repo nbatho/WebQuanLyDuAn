@@ -11,7 +11,7 @@ export const getSpacesByWorkspaceId = async (req, res) => {
       return res.status(400).json({ error: "Workspace ID is required" });
     }
 
-    const spaces = await findAllSpacesByWorkspaceId(workspaceId);
+    const spaces = await findAllSpacesByWorkspaceId(workspaceId, req.user?.user_id);
 
     if (!spaces || spaces.length === 0) {
       return res.status(200).json({ status: "success", data: [] });
@@ -103,6 +103,10 @@ export const createSpace = async (req, res) => {
       description,
       workspaceId,
       normalizedIsPrivate,
+      {
+        createdBy: req.user?.user_id,
+        addCreatorAsMember: normalizedIsPrivate,
+      },
     );
 
     res.status(201).json({
@@ -152,6 +156,11 @@ export const updateSpaces = async (req, res) => {
     if (!updatedSpace) {
       return res.status(404).json({ error: "Space not found" });
     }
+
+    if (normalizedIsPrivate) {
+      await addSpaceMember(spaceId, req.user?.user_id);
+    }
+
     res.status(200).json(updatedSpace);
   } catch (error) {
     res.status(500).json({ error: "Failed to update space" });

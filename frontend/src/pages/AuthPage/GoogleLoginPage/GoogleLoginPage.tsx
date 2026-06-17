@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { ArrowLeft } from 'lucide-react';
@@ -34,19 +34,27 @@ function GoogleBrandPanel() {
 
 function GoogleLoginContent() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const dispatch = useDispatch<AppDispatch>();
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const inviteToken = searchParams.get('inviteToken');
+    const loginPath = inviteToken ? `/login?inviteToken=${encodeURIComponent(inviteToken)}` : '/login';
 
     const handleCredential = async (credential: string) => {
         setError(null);
         setIsLoading(true);
         try {
-            const result = await signInWithGoogle(credential);
+            const result = await signInWithGoogle(credential, inviteToken || undefined);
             const accessToken = result?.user?.access_token;
             if (!accessToken) throw new Error('Could not receive access token');
             // Dispatch vào Redux store để trigger useEffect trong AppSidebar (fetchWorkspaces)
             dispatch(setAccessToken(accessToken));
+            if (inviteToken) {
+                navigate(result.acceptedInvitation ? '/home' : `/join-workspace?token=${encodeURIComponent(inviteToken)}`);
+                return;
+            }
+
             const workspaces = await getWorkspaces();
             if (Array.isArray(workspaces) && workspaces.length > 0) {
                 navigate('/home');
@@ -68,7 +76,7 @@ function GoogleLoginContent() {
                 <div className="mx-auto w-full max-w-105">
                     <button
                         type="button"
-                        onClick={() => navigate('/login')}
+                        onClick={() => navigate(loginPath)}
                         className="mb-6 inline-flex cursor-pointer items-center gap-2 border-0 bg-transparent text-sm font-bold text-[var(--color-primary)] hover:underline"
                     >
                         <ArrowLeft size={18} strokeWidth={2.5} aria-hidden />

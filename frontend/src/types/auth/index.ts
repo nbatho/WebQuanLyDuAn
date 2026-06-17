@@ -6,12 +6,14 @@ export interface UserData {
 }
 export interface SignInResponse {
     message: string;
+    acceptedInvitation?: boolean;
     user : UserData & {
         access_token : string;
     }
 }
 export interface SignUpResponse {
     message: string;
+    acceptedInvitation?: boolean;
     user: UserData;
 }
 export interface AuthState {
