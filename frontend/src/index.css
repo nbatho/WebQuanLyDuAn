@@ -46,6 +46,30 @@
     box-shadow: none !important;
   }
 
+  .ant-message {
+    left: auto !important;
+    right: 24px !important;
+    top: 24px !important;
+    width: min(420px, calc(100vw - 48px)) !important;
+  }
+
+  .ant-message .ant-message-notice-wrapper {
+    text-align: right !important;
+  }
+
+  .ant-message .ant-message-notice-content {
+    max-width: 100%;
+    text-align: left;
+  }
+
+  @media (max-width: 640px) {
+    .ant-message {
+      right: 16px !important;
+      top: 16px !important;
+      width: calc(100vw - 32px) !important;
+    }
+  }
+
   /* ─── Poster Card ─── */
   .poster-card {
     background-color: var(--color-surface-container-lowest);

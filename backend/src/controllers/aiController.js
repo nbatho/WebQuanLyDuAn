@@ -1,6 +1,14 @@
 import Groq from "groq-sdk";
-import con from "../config/connect.js";
 import { checkInheritedWorkspacePermission, checkSpacePermission, checkWorkspacePermission } from "../models/Permission.js";
+import {
+    countTasksByStatusForAi,
+    findAssignableMembersForSpace,
+    findDefaultListIdForSpace,
+    findOverdueTasksForAi,
+    findTasksForAi,
+    getAccessibleSpacesForUser,
+    getFirstWorkspaceForUser,
+} from "../models/AI.js";
 import { createSpaces } from "../models/Spaces.js";
 import { createTaskForList } from "../models/Task.js";
 import dotenv from "dotenv";
@@ -96,95 +104,6 @@ const tools = [
 // TOOL HANDLERS
 // ═══════════════════════════════════════════════
 
-async function handleListTasks(userId, args) {
-  let query = `
-    SELECT t.task_id, t.name, t.due_date, t.completed_at,
-           ts.status_name AS status, t.priority,
-           s.name AS space_name
-    FROM tasks t
-    JOIN lists l ON t.list_id = l.list_id
-    JOIN spaces s ON l.space_id = s.space_id
-    JOIN space_members sm ON s.space_id = sm.space_id AND sm.user_id = $1
-    LEFT JOIN task_status ts ON t.status_id = ts.status_id
-    WHERE t.deleted_at IS NULL AND s.deleted_at IS NULL AND sm.deleted_at IS NULL
-  `;
-  const params = [userId];
-  let idx = 2;
-
-  if (args.space_name) {
-    query += ` AND LOWER(s.name) LIKE LOWER($${idx})`;
-    params.push(`%${args.space_name}%`);
-    idx++;
-  }
-  if (args.status) {
-    query += ` AND LOWER(ts.status_name) = LOWER($${idx})`;
-    params.push(args.status);
-    idx++;
-  }
-  if (args.priority) {
-    query += ` AND LOWER(t.priority) = LOWER($${idx})`;
-    params.push(args.priority);
-    idx++;
-  }
-
-  query += ` ORDER BY t.created_at DESC LIMIT $${idx}`;
-  params.push(args.limit || 20);
-
-  const result = await con.query(query, params);
-  return result.rows;
-}
-
-async function handleCountByStatus(userId, args) {
-  let query = `
-    SELECT COALESCE(ts.status_name, 'Không có trạng thái') AS status, COUNT(*)::int AS count
-    FROM tasks t
-    JOIN lists l ON t.list_id = l.list_id
-    JOIN spaces s ON l.space_id = s.space_id
-    JOIN space_members sm ON s.space_id = sm.space_id AND sm.user_id = $1
-    LEFT JOIN task_status ts ON t.status_id = ts.status_id
-    WHERE t.deleted_at IS NULL AND s.deleted_at IS NULL AND sm.deleted_at IS NULL
-  `;
-  const params = [userId];
-  let idx = 2;
-
-  if (args.space_name) {
-    query += ` AND LOWER(s.name) LIKE LOWER($${idx})`;
-    params.push(`%${args.space_name}%`);
-    idx++;
-  }
-
-  query += ` GROUP BY ts.status_name ORDER BY count DESC`;
-  const result = await con.query(query, params);
-  return result.rows;
-}
-
-async function handleFindOverdue(userId, args) {
-  let query = `
-    SELECT t.task_id, t.name, t.due_date,
-           ts.status_name AS status, t.priority,
-           s.name AS space_name
-    FROM tasks t
-    JOIN lists l ON t.list_id = l.list_id
-    JOIN spaces s ON l.space_id = s.space_id
-    JOIN space_members sm ON s.space_id = sm.space_id AND sm.user_id = $1
-    LEFT JOIN task_status ts ON t.status_id = ts.status_id
-    WHERE t.deleted_at IS NULL AND s.deleted_at IS NULL AND sm.deleted_at IS NULL
-      AND t.completed_at IS NULL
-      AND t.due_date < NOW()
-  `;
-  const params = [userId];
-  let idx = 2;
-
-  if (args.space_name) {
-    query += ` AND LOWER(s.name) LIKE LOWER($${idx})`;
-    params.push(`%${args.space_name}%`);
-    idx++;
-  }
-
-  query += ` ORDER BY t.due_date ASC LIMIT 30`;
-  const result = await con.query(query, params);
-  return result.rows;
-}
 
 // ═══════════════════════════════════════════════
 // MAIN CHAT ENDPOINT
@@ -205,11 +124,7 @@ export const chatWithAI = async (req, res) => {
         const safeHistory = Array.isArray(history) ? history.slice(-50) : [];
 
         // Lấy danh sách Space thật
-        const spaceResult = await con.query(
-            "SELECT s.space_id, s.name FROM spaces s JOIN space_members sm ON s.space_id = sm.space_id WHERE sm.user_id = $1 AND s.deleted_at IS NULL AND sm.deleted_at IS NULL",
-            [userId]
-        );
-        const realSpaces = spaceResult.rows;
+        const realSpaces = await getAccessibleSpacesForUser(userId);
         const realSpaceNames = realSpaces.map(r => r.name).join(", ");
 
         const messages = [
@@ -261,15 +176,12 @@ export const chatWithAI = async (req, res) => {
 
             // ── HANDLER: create_space ─────────────────────────────
             if (functionName === "create_space") {
-                const wsResult = await con.query(
-                    "SELECT workspace_id FROM workspace_members WHERE user_id = $1 AND deleted_at IS NULL LIMIT 1",
-                    [userId]
-                );
+                const workspace = await getFirstWorkspaceForUser(userId);
 
-                if (wsResult.rows.length === 0) {
+                if (!workspace) {
                     return res.status(200).json({ response: "Bạn chưa thuộc về Workspace nào để tạo Space.", suggestions: [] });
                 }
-                const workspaceId = wsResult.rows[0].workspace_id;
+                const workspaceId = workspace.workspace_id;
                 const canCreateSpace = await checkWorkspacePermission(workspaceId, userId, "SPACE_CREATE");
                 if (!canCreateSpace) {
                     return res.status(403).json({
@@ -319,21 +231,7 @@ export const chatWithAI = async (req, res) => {
                         suggestions: []
                     });
                 }
-
-                const spaceDetailRes = await con.query(
-                    "SELECT workspace_id FROM spaces WHERE space_id = $1 AND deleted_at IS NULL",
-                    [spaceMatch.space_id]
-                );
-                const wsId = spaceDetailRes.rows[0]?.workspace_id;
-                const membersRes = await con.query(
-                    `SELECT u.user_id, u.username, u.name, u.email 
-                     FROM workspace_members wm 
-                     JOIN users u ON wm.user_id = u.user_id AND u.deleted_at IS NULL
-                     WHERE wm.workspace_id = $1 AND wm.deleted_at IS NULL
-                     ORDER BY u.name ASC`,
-                    [wsId]
-                );
-                const members = membersRes.rows;
+                const members = await findAssignableMembersForSpace(spaceMatch.space_id);
 
                 // Nếu chưa chỉ định assignee → hiển thị danh sách thành viên và hỏi
                 if (!functionArgs.assignee_name) {
@@ -355,17 +253,13 @@ export const chatWithAI = async (req, res) => {
                 );
 
                 // Tạo task bằng model (tự tìm list_id + status_id mặc định)
-                const listRes = await con.query(
-                    'SELECT list_id FROM lists WHERE space_id = $1 AND deleted_at IS NULL ORDER BY position ASC LIMIT 1',
-                    [spaceMatch.space_id]
-                );
-                if (listRes.rows.length === 0) {
+                const listId = await findDefaultListIdForSpace(spaceMatch.space_id);
+                if (!listId) {
                     return res.status(200).json({
                         response: `⚠️ Space "${functionArgs.space_name}" chưa có danh sách (List) nào. Vui lòng tạo List trước.`,
                         suggestions: ["Tạo Space mới"]
                     });
                 }
-                const listId = listRes.rows[0].list_id;
 
                 // Tìm status mặc định
                 const newTask = await createTaskForList({
@@ -395,7 +289,7 @@ export const chatWithAI = async (req, res) => {
 
             // ── HANDLER: list_tasks ──────────────────────────────
             if (functionName === "list_tasks") {
-                const tasks = await handleListTasks(userId, functionArgs);
+                const tasks = await findTasksForAi(userId, functionArgs);
                 
                 if (tasks.length === 0) {
                     const filterDesc = functionArgs.space_name ? ` trong Space "${functionArgs.space_name}"` : '';
@@ -422,7 +316,7 @@ export const chatWithAI = async (req, res) => {
 
             // ── HANDLER: count_tasks_by_status ───────────────────
             if (functionName === "count_tasks_by_status") {
-                const counts = await handleCountByStatus(userId, functionArgs);
+                const counts = await countTasksByStatusForAi(userId, functionArgs);
                 
                 if (counts.length === 0) {
                     return res.status(200).json({
@@ -447,7 +341,7 @@ export const chatWithAI = async (req, res) => {
 
             // ── HANDLER: find_overdue_tasks ──────────────────────
             if (functionName === "find_overdue_tasks") {
-                const overdue = await handleFindOverdue(userId, functionArgs);
+                const overdue = await findOverdueTasksForAi(userId, functionArgs);
                 
                 if (overdue.length === 0) {
                     return res.status(200).json({

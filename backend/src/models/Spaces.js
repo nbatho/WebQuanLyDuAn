@@ -1,9 +1,24 @@
 import con from "../config/connect.js";
 
-export const findAllSpacesByWorkspaceId = async (workspace_id) => {
+export const findAllSpacesByWorkspaceId = async (workspace_id, user_id) => {
   try {
-    const query = `SELECT * FROM spaces WHERE workspace_id = $1 AND deleted_at IS NULL`;
-    const values = [workspace_id];
+    const query = `
+      SELECT *
+      FROM spaces s
+      WHERE s.workspace_id = $1
+        AND s.deleted_at IS NULL
+        AND (
+          s.is_private = FALSE
+          OR EXISTS (
+            SELECT 1
+            FROM space_members sm
+            WHERE sm.space_id = s.space_id
+              AND sm.user_id = $2
+              AND sm.deleted_at IS NULL
+          )
+        )
+      ORDER BY s.created_at, s.space_id`;
+    const values = [workspace_id, user_id];
     const result = await con.query(query, values);
     return result.rows;
   } catch (error) {
@@ -49,10 +64,15 @@ export const createSpaces = async (
 
     if (addCreatorAsMember && createdBy) {
       await client.query(
-        `INSERT INTO space_members (space_id, user_id)
-         VALUES ($1, $2)
-         ON CONFLICT (space_id, user_id) DO UPDATE SET deleted_at = NULL`,
-        [spaceId, createdBy]
+        `INSERT INTO space_members (space_id, user_id, role_id)
+         SELECT $1, $2, wm.role_id
+         FROM workspace_members wm
+         WHERE wm.workspace_id = $3
+           AND wm.user_id = $2
+           AND wm.deleted_at IS NULL
+         ON CONFLICT (space_id, user_id)
+         DO UPDATE SET deleted_at = NULL, role_id = EXCLUDED.role_id`,
+        [spaceId, createdBy, workspace_id]
       );
     }
 
@@ -135,9 +155,16 @@ export const addSpaceMember = async (space_id, user_id) => {
       throw error;
     }
 
-    const query = `INSERT INTO space_members (space_id, user_id) VALUES ($1, $2)
+    const query = `INSERT INTO space_members (space_id, user_id, role_id)
+                   SELECT $1, $2, wm.role_id
+                   FROM workspace_members wm
+                   JOIN spaces s ON s.workspace_id = wm.workspace_id
+                   WHERE s.space_id = $1
+                     AND wm.user_id = $2
+                     AND wm.deleted_at IS NULL
+                     AND s.deleted_at IS NULL
                    ON CONFLICT (space_id, user_id)
-                   DO UPDATE SET deleted_at = NULL
+                   DO UPDATE SET deleted_at = NULL, role_id = EXCLUDED.role_id
                    RETURNING *`;
     const values = [space_id, user_id];
     const result = await con.query(query, values);

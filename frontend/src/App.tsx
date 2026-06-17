@@ -6,7 +6,10 @@ import { Toaster } from 'sonner';
 const router = createBrowserRouter(routes);
 const App = () => {
     return (
-        <AntdApp>
+        <AntdApp
+            message={{ top: 24, maxCount: 4 }}
+            notification={{ placement: 'topRight', top: 24, maxCount: 4 }}
+        >
             <Toaster
                 position="top-right"
                 richColors
