@@ -53,6 +53,7 @@ export const signUp = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await createUser(username, hashedPassword, email, name);
+    let acceptedInvitation = false;
 
     // Xử lý tự động accept lời mời nếu có inviteToken
     if (inviteToken) {
@@ -61,12 +62,16 @@ export const signUp = async (req, res) => {
         const { workspace_id, email: inviteEmail } = decoded;
         
         // Kiểm tra xem email đăng ký có khớp với email được mời không
-        if (inviteEmail === email) {
-          const invitation = await checkExistingInvitation(workspace_id, email);
+        if (
+          String(inviteEmail || "").toLowerCase() ===
+          String(email || "").toLowerCase()
+        ) {
+          const invitation = await checkExistingInvitation(workspace_id, inviteEmail);
           if (invitation && invitation.token === inviteToken) {
             // Thêm vào workspace_members và cập nhật trạng thái
             await addMemberToWorkspace(workspace_id, newUser.user_id, invitation.role_id);
             await updateInvitationStatus(invitation.invitation_id, 'accepted');
+            acceptedInvitation = true;
           }
         }
       } catch (err) {
@@ -77,6 +82,7 @@ export const signUp = async (req, res) => {
 
     return res.status(201).json({
       message: "Dang ky thanh cong",
+      acceptedInvitation,
       user: {
         user_id: newUser.user_id,
         username: newUser.username,
@@ -173,7 +179,7 @@ const generateUniqueUsername = async (email, fallbackName = "google_user") => {
 
 export const googleSignIn = async (req, res) => {
   try {
-    const { idToken } = req.body;
+    const { idToken, inviteToken } = req.body;
     if (!idToken) {
       return res.status(400).json({ message: "Khong the thieu idToken" });
     }
@@ -219,8 +225,38 @@ export const googleSignIn = async (req, res) => {
       );
     }
 
+    let acceptedInvitation = false;
+    if (inviteToken) {
+      try {
+        const decoded = jwt.verify(inviteToken, process.env.EMAIL_TOKEN_SECRET);
+        const { workspace_id, email: inviteEmail } = decoded;
+        const inviteEmailMatches =
+          String(inviteEmail || "").toLowerCase() ===
+          String(user.email || "").toLowerCase();
+
+        if (workspace_id && inviteEmailMatches) {
+          const invitation = await checkExistingInvitation(
+            workspace_id,
+            inviteEmail,
+          );
+
+          if (invitation && invitation.token === inviteToken) {
+            await addMemberToWorkspace(
+              workspace_id,
+              user.user_id,
+              invitation.role_id,
+            );
+            await updateInvitationStatus(invitation.invitation_id, "accepted");
+            acceptedInvitation = true;
+          }
+        }
+      } catch (err) {
+        console.error("Loi khi xu ly inviteToken trong Google Sign-In:", err);
+      }
+    }
+
     const access_token = jwt.sign(
-      { user_id: user.user_id },
+      { user_id: user.user_id, email: user.email },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: ACCESS_TOKEN_TTL },
     );
@@ -230,8 +266,12 @@ export const googleSignIn = async (req, res) => {
 
     return res.status(200).json({
       message: "Dang nhap Google thanh cong",
+      acceptedInvitation,
       user: {
         user_id: user.user_id,
+        email: user.email,
+        username: user.username,
+        name: user.name,
         access_token,
       },
     });

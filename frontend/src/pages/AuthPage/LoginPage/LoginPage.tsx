@@ -17,6 +17,7 @@ export default function AuthPage() {
     const location = useLocation();
     const [searchParams] = useSearchParams();
     const inviteToken = searchParams.get('inviteToken');
+    const googleLoginPath = inviteToken ? `/google-login?inviteToken=${encodeURIComponent(inviteToken)}` : '/google-login';
 
     const [isRegister, setIsRegister] = useState(location.pathname === '/register');
 
@@ -93,7 +94,7 @@ export default function AuthPage() {
         }
         setIsRegistering(true);
         try {
-            await dispatch(fetchSignUp({
+            const signUpResult = await dispatch(fetchSignUp({
                 email: regEmail,
                 password: regPass,
                 username: regName,
@@ -106,7 +107,7 @@ export default function AuthPage() {
             await dispatch(fetchSignIn({ email: regEmail, password: regPass })).unwrap();
 
             if (inviteToken) {
-                navigate(`/join-workspace?token=${inviteToken}`);
+                navigate(signUpResult.acceptedInvitation ? '/home' : `/join-workspace?token=${encodeURIComponent(inviteToken)}`);
             } else {
                 navigate('/workspace-setup');
             }
@@ -332,7 +333,7 @@ export default function AuthPage() {
                                 <Button
                                     size="large"
                                     block
-                                    onClick={() => navigate('/google-login')}
+                                    onClick={() => navigate(googleLoginPath)}
                                     className="h-12! bg-[var(--color-surface-container-low)]! text-[var(--color-on-surface)]! rounded-lg! font-bold! text-body! border-0! flex! items-center! justify-center! gap-3! hover:bg-[var(--color-surface-hover)]!"
                                 >
                                     <svg className="w-6 h-6" viewBox="0 0 24 24">
@@ -447,7 +448,7 @@ export default function AuthPage() {
                                 <Button
                                     size="middle"
                                     block
-                                    onClick={() => navigate('/google-login')}
+                                    onClick={() => navigate(googleLoginPath)}
                                     className="h-10! bg-[var(--color-surface-container-low)]! rounded-lg! font-bold! border-0! flex! items-center! justify-center! gap-2! hover:bg-[var(--color-surface-hover)]! text-[var(--color-on-surface)]"
                                 >
                                     <svg className="w-5 h-5" viewBox="0 0 24 24">
