@@ -120,9 +120,9 @@ export default function AuthPage() {
     };
 
     return (
-        <div className="h-screen flex flex-col md:flex-row overflow-hidden bg-[var(--color-surface-container-lowest)] font-['Plus_Jakarta_Sans',sans-serif]">
+        <div className="auth-page flex flex-col md:flex-row overflow-hidden bg-[var(--color-surface-container-lowest)] font-['Plus_Jakarta_Sans',sans-serif]">
             {/* ═══════ LEFT PANEL: Brand Visual (55%) ═══════ */}
-            <section className="relative flex min-h-100 w-full flex-col justify-between overflow-hidden bg-[var(--color-primary)] p-10 md:h-screen md:w-[55%] md:p-14">
+            <section className="auth-brand-panel relative flex w-full flex-col justify-between overflow-hidden bg-[var(--color-primary)] p-10 md:w-[55%] md:p-14">
                 {/* Decorative Geometric Shapes */}
                 <div className="pointer-events-none absolute -left-20 -top-20 h-100 w-100 rounded-full bg-[var(--color-surface-container-lowest)] opacity-5" />
                 <div className="pointer-events-none absolute -right-20 top-1/2 h-62.5 w-62.5 rotate-15 bg-[var(--color-surface-container-lowest)] opacity-[0.08]" />
@@ -139,7 +139,7 @@ export default function AuthPage() {
                 </div>
 
                 {/* Sliding content area */}
-                <div className="relative z-10 flex-1 flex items-center">
+                <div className="auth-brand-content relative z-10 flex-1 flex items-center">
                     <div className="slide-panel-wrapper">
                         {/* ── LOGIN panel content ── */}
                         <div
@@ -218,13 +218,13 @@ export default function AuthPage() {
                 </div>
 
                 {/* Footer copyright */}
-                <div className="relative z-10">
+                <div className="auth-brand-footer relative z-10">
                     <p className="text-[var(--color-on-primary)] opacity-50 text-body-sm font-medium uppercase tracking-widest">© 2026 Flowise</p>
                 </div>
             </section>
 
             {/* ═══════ RIGHT PANEL: Form (45%) ═══════ */}
-            <main className="w-full md:w-[45%] h-screen bg-[var(--color-surface-container-lowest)] flex flex-col p-6 md:p-10 overflow-hidden">
+            <main className="auth-form-panel w-full md:w-[45%] bg-[var(--color-surface-container-lowest)] flex flex-col p-6 md:p-10 overflow-hidden">
                 {/* Header Actions */}
                 <div className="flex justify-end mb-4">
                     {!isRegister ? (
@@ -251,8 +251,8 @@ export default function AuthPage() {
                 </div>
 
                 {/* Form Container */}
-                <div className="mx-auto flex w-full max-w-md grow flex-col justify-center">
-                    <div className="slide-form-wrapper">
+                <div className="auth-form-shell mx-auto flex w-full max-w-md grow flex-col justify-center">
+                    <div className={`slide-form-wrapper ${isRegister ? 'slide-form-wrapper-register' : ''}`}>
                         {/* ── LOGIN FORM ── */}
                         <div
                             className={`slide-form-content ${!isRegister ? 'slide-active' : 'slide-exit-left'}`}
@@ -349,9 +349,9 @@ export default function AuthPage() {
 
                         {/* ── REGISTER FORM ── */}
                         <div
-                            className={`slide-form-content ${isRegister ? 'slide-active' : 'slide-exit-right'}`}
+                            className={`auth-register-form slide-form-content ${isRegister ? 'slide-active' : 'slide-exit-right'}`}
                         >
-                            <header className="mb-3">
+                            <header className="auth-register-header mb-3">
                                 <h2 className="text-h1 font-extrabold text-[var(--color-on-surface)] tracking-tight mb-1">
                                     {t('register.title')}
                                 </h2>
@@ -360,7 +360,7 @@ export default function AuthPage() {
                                 </p>
                             </header>
 
-                            <form className="space-y-3" onSubmit={handleRegister}>
+                            <form className="auth-register-fields space-y-3" onSubmit={handleRegister}>
                                 <div className="space-y-1">
                                     <label className="block text-caption font-bold text-[var(--color-text-secondary)] uppercase tracking-widest">
                                         {t('register.name')}
@@ -443,7 +443,7 @@ export default function AuthPage() {
                             </form>
 
                             {/* Social register */}
-                            <div className="mt-4 pt-3 border-t border-[var(--color-surface-container-highest)] text-center">
+                            <div className="auth-register-social mt-4 pt-3 border-t border-[var(--color-surface-container-highest)] text-center">
                                 <p className="text-caption font-medium text-[var(--color-text-secondary)] mb-2">{t('register.orRegisterWith')}</p>
                                 <Button
                                     size="middle"
