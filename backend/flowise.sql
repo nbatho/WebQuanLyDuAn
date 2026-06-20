@@ -1,6 +1,6 @@
 -- ================================================================
 -- FLOWISE — PostgreSQL Database Schema
--- Phiên bản: 3.3 (Cập nhật: Bỏ bảng task_priority, fix cứng Priority)
+-- Phiên bản: 3.4 (Đã hợp nhất migrations 001-003)
 -- ================================================================
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
@@ -30,9 +30,11 @@ CREATE TABLE roles (
 );
 
 CREATE TABLE permissions (
-    permission_id   SERIAL       PRIMARY KEY,
-    permission_name VARCHAR(100) NOT NULL UNIQUE,
-    category        VARCHAR(50)
+    permission_id   SERIAL      PRIMARY KEY,
+    permission_name VARCHAR(50) UNIQUE NOT NULL,
+    description     TEXT,
+    group_name      VARCHAR(30) NOT NULL,
+    created_at      TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE role_permissions (
@@ -288,8 +290,43 @@ CREATE TABLE notifications (
 );
 
 -- ================================================================
--- 7. INDEXES
+-- 7. MESSAGING
 -- ================================================================
+CREATE TABLE conversations (
+    conversation_id SERIAL      PRIMARY KEY,
+    workspace_id    INT         NOT NULL REFERENCES workspaces(workspace_id) ON DELETE CASCADE,
+    type            VARCHAR(20) NOT NULL DEFAULT 'DIRECT'
+                                CHECK (type IN ('DIRECT', 'CHANNEL', 'SPACE')),
+    name            VARCHAR(100),
+    space_id        INT         REFERENCES spaces(space_id) ON DELETE CASCADE,
+    created_by      INT         REFERENCES users(user_id) ON DELETE SET NULL,
+    created_at      TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE conversation_members (
+    conversation_id INT       NOT NULL REFERENCES conversations(conversation_id) ON DELETE CASCADE,
+    user_id         INT       NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    joined_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (conversation_id, user_id)
+);
+
+CREATE TABLE messages (
+    message_id      SERIAL       PRIMARY KEY,
+    conversation_id INT          NOT NULL REFERENCES conversations(conversation_id) ON DELETE CASCADE,
+    sender_id       INT          NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    content         TEXT         NOT NULL DEFAULT '',
+    file_url        TEXT,
+    file_name       TEXT,
+    file_type       VARCHAR(100),
+    created_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ================================================================
+-- 8. INDEXES
+-- ================================================================
+CREATE INDEX idx_role_permissions_role_id       ON role_permissions(role_id);
+CREATE INDEX idx_role_permissions_permission_id ON role_permissions(permission_id);
+
 CREATE INDEX idx_tasks_list_id       ON tasks(list_id) WHERE deleted_at IS NULL;
 CREATE INDEX idx_tasks_status_id     ON tasks(status_id) WHERE deleted_at IS NULL;
 CREATE INDEX idx_tasks_archived      ON tasks(is_archived) WHERE deleted_at IS NULL;
@@ -305,9 +342,12 @@ CREATE INDEX idx_lists_space_id   ON lists(space_id)   WHERE deleted_at IS NULL;
 
 CREATE INDEX idx_spaces_workspace_id ON spaces(workspace_id) WHERE deleted_at IS NULL;
 
+CREATE INDEX idx_messages_conversation ON messages(conversation_id, created_at DESC);
+CREATE INDEX idx_conv_members_user      ON conversation_members(user_id);
+
 
 -- ================================================================
--- 8. TRIGGERS
+-- 9. TRIGGERS
 -- ================================================================
 CREATE OR REPLACE FUNCTION set_updated_at() RETURNS TRIGGER LANGUAGE plpgsql AS $$
 BEGIN NEW.updated_at = CURRENT_TIMESTAMP; RETURN NEW; END; $$;
@@ -348,9 +388,10 @@ END; $$;
 CREATE TRIGGER trg_tasks_soft_delete_cascade AFTER UPDATE OF deleted_at ON tasks FOR EACH ROW EXECUTE FUNCTION soft_delete_task_cascade();
 
 -- ================================================================
--- 9. VIEWS
+-- 10. VIEWS
 -- ================================================================
-CREATE OR REPLACE VIEW kanban_tasks AS
+CREATE OR REPLACE VIEW kanban_tasks
+WITH (security_invoker = true) AS
 SELECT
     t.task_id, l.space_id, l.folder_id, t.list_id, t.name, t.description, t.story_points,
     t.start_date, t.due_date, t.completed_at, t.position, t.is_archived, t.created_by, t.created_at, t.updated_at,
@@ -379,7 +420,8 @@ LEFT JOIN LATERAL (SELECT COUNT(*) AS cnt FROM attachments WHERE task_id = t.tas
 LEFT JOIN LATERAL (SELECT COALESCE(SUM(duration_secs), 0) AS total_secs FROM time_logs WHERE task_id = t.task_id AND stopped_at IS NOT NULL) tl ON TRUE
 WHERE t.is_archived = FALSE AND t.deleted_at IS NULL;
 
-CREATE OR REPLACE VIEW user_task_summary AS
+CREATE OR REPLACE VIEW user_task_summary
+WITH (security_invoker = true) AS
 SELECT
     ta.user_id, l.space_id,
     COUNT(*) AS total_tasks,
@@ -402,49 +444,43 @@ GROUP BY ta.user_id, l.space_id;
 -- =================================================================
 
 -- 1. Thêm Roles
-INSERT INTO roles (role_id, role_name) VALUES
-(1, 'ADMIN'),
-(2, 'MANAGER'),
-(3, 'MEMBER')
+INSERT INTO roles (role_name) VALUES
+('admin'),
+('manager'),
+('member')
 ON CONFLICT (role_name) DO NOTHING;
 
--- Khôi phục lại sequence cho roles_id
-SELECT setval('roles_role_id_seq', (SELECT MAX(role_id) FROM roles));
-
 -- 2. Thêm Permissions
-INSERT INTO permissions (permission_id, permission_name, category) VALUES
+INSERT INTO permissions (permission_name, description, group_name) VALUES
 -- Workspace
-(1, 'WORKSPACE_UPDATE', 'WORKSPACE'), 
-(2, 'WORKSPACE_DELETE', 'WORKSPACE'),
-(3, 'WORKSPACE_INVITE_MEMBER', 'WORKSPACE'), 
-(4, 'WORKSPACE_MANAGE_ROLES', 'WORKSPACE'),
+('WORKSPACE_UPDATE', 'Cap nhat thong tin workspace', 'workspace'),
+('WORKSPACE_DELETE', 'Xoa workspace', 'workspace'),
+('WORKSPACE_INVITE_MEMBER', 'Moi thanh vien vao workspace', 'workspace'),
+('WORKSPACE_MANAGE_ROLES', 'Quan ly vai tro thanh vien trong workspace', 'workspace'),
 
 -- Space & Structure
-(5, 'SPACE_CREATE', 'SPACE'), 
-(6, 'SPACE_UPDATE', 'SPACE'), 
-(7, 'SPACE_DELETE', 'SPACE'),
-(8, 'SPACE_MANAGE_MEMBERS', 'SPACE'), 
-(9, 'FOLDER_MANAGE', 'STRUCTURE'), 
-(10, 'LIST_MANAGE', 'STRUCTURE'), 
-(11, 'SETTING_MANAGE', 'STRUCTURE'), 
+('SPACE_CREATE', 'Tao space moi trong workspace', 'space'),
+('SPACE_UPDATE', 'Cap nhat thong tin space', 'space'),
+('SPACE_DELETE', 'Xoa space', 'space'),
+('SPACE_MANAGE_MEMBERS', 'Quan ly thanh vien trong space', 'space'),
+('FOLDER_MANAGE', 'Tao, sua, xoa folder', 'structure'),
+('LIST_MANAGE', 'Tao, sua, xoa list', 'structure'),
+('SETTING_MANAGE', 'Quan ly status, milestone va sprint', 'structure'),
 
 -- Task
-(12, 'TASK_CREATE', 'TASK'), 
-(13, 'TASK_UPDATE', 'TASK'), 
-(14, 'TASK_DELETE', 'TASK'),
-(15, 'TASK_CHANGE_STATUS', 'TASK'), 
-(16, 'TASK_ASSIGN', 'TASK'),
+('TASK_CREATE', 'Tao task moi', 'task'),
+('TASK_UPDATE', 'Cap nhat task', 'task'),
+('TASK_DELETE', 'Xoa task', 'task'),
+('TASK_CHANGE_STATUS', 'Thay doi trang thai task', 'task'),
+('TASK_ASSIGN', 'Phan cong nguoi thuc hien task', 'task'),
 
 -- Interaction
-(17, 'COMMENT_CREATE', 'INTERACTION'), 
-(18, 'COMMENT_DELETE_OWN', 'INTERACTION'), 
-(19, 'COMMENT_DELETE_ANY', 'INTERACTION'),
-(20, 'TIME_LOG_ADD', 'INTERACTION'), 
-(21, 'ATTACHMENT_ADD', 'INTERACTION')
+('COMMENT_CREATE', 'Tao binh luan', 'interaction'),
+('COMMENT_DELETE_OWN', 'Xoa binh luan cua chinh minh', 'interaction'),
+('COMMENT_DELETE_ANY', 'Xoa binh luan cua bat ky ai', 'interaction'),
+('TIME_LOG_ADD', 'Ghi nhan thoi gian lam viec', 'interaction'),
+('ATTACHMENT_ADD', 'Them file dinh kem', 'interaction')
 ON CONFLICT (permission_name) DO NOTHING;
-
--- Khôi phục lại sequence cho permissions_id
-SELECT setval('permissions_permission_id_seq', (SELECT MAX(permission_id) FROM permissions));
 
 -- 3. Mapping: Role_Permissions
 -- Xóa data cũ để map lại từ đầu (đảm bảo sạch sẽ khi chạy seed nhiều lần)
