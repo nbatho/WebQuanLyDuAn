@@ -155,21 +155,9 @@ cd WebQuanLyDuAn
 
 #### 2. Thiết lập Database
 
-**Tùy chọn A — Dùng Docker (khuyến nghị):**
+Tạo project trên Supabase, sau đó mở **SQL Editor** và chạy nội dung file `backend/flowise.sql` để khởi tạo schema.
 
-```bash
-cd backend
-docker compose up postgresdb -d
-```
-
-**Tùy chọn B — PostgreSQL local:**
-
-Tạo database và import schema:
-
-```bash
-psql -U postgres -c "CREATE DATABASE TTCS;"
-psql -U postgres -d TTCS -f backend/flowise.sql
-```
+Lấy thông tin kết nối PostgreSQL trong **Project Settings > Database**. Khi chạy trong Docker, nên dùng thông tin Supabase pooler.
 
 #### 3. Cấu hình Backend
 
@@ -182,11 +170,12 @@ Chỉnh sửa file `backend/.env`:
 
 ```env
 PORT=5001
-DB_HOST=localhost
+DB_HOST=<supabase_pooler_host>
 DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=<mật_khẩu_PostgreSQL>
-DB_NAME=TTCS
+DB_USER=postgres.<project_ref>
+DB_PASSWORD=<supabase_database_password>
+DB_NAME=postgres
+DB_SSL=true
 
 RESEND_API_KEY=<resend_api_key>
 ACCESS_TOKEN_SECRET=<chuỗi_bí_mật_ngẫu_nhiên_64_ký_tự>
@@ -232,11 +221,24 @@ npm run dev
 ### Cách 2: Chạy bằng Docker Compose
 
 ```bash
-cd backend
-docker compose up -d
+cp .env.example .env
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+docker compose up --build -d
 ```
 
-Lệnh này sẽ khởi chạy cả PostgreSQL và Backend API.
+Điền thông tin kết nối Supabase PostgreSQL vào `backend/.env` trước khi chạy. Docker Compose chỉ khởi chạy Backend API và Frontend; database được sử dụng trực tiếp từ Supabase.
+
+Các địa chỉ mặc định:
+
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:5001`
+
+Biến cho Docker Compose nằm trong `.env` ở thư mục gốc. Biến backend và frontend lần lượt nằm trong `backend/.env` và `frontend/.env`.
+
+```bash
+docker compose down
+```
 
 ---
 
