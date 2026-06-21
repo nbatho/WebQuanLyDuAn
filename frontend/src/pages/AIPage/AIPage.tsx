@@ -16,8 +16,6 @@ import {
     FileText,
     History,
     Blocks,
-    UserCircle,
-    Users2,
     Edit,
     Search,
     Sun,
@@ -221,29 +219,6 @@ export default function AIPage() {
                         <span>{t('ai.askOrCreate')}</span>
                     </div>
                 </div>
-
-                <div className="mt-6 flex w-60 flex-col px-2">
-                    <div className="mb-1 px-2.5 text-[11px] font-extrabold text-[var(--color-text-tertiary)] uppercase tracking-[0.05em]">
-                        {t('ai.superAgents')}
-                    </div>
-                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] transition-colors">
-                        <Blocks size={14} className="text-[#3498db]" />
-                        <span>{t('ai.createAgent')}</span>
-                    </div>
-                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] transition-colors">
-                        <Users2 size={14} className="text-[#e67e22]" />
-                        <span>{t('ai.allAgents')}</span>
-                    </div>
-                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] transition-colors">
-                        <UserCircle size={14} className="text-[var(--color-text-secondary)]" />
-                        <span>{t('ai.myAgents')}</span>
-                    </div>
-                    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] transition-colors">
-                        <History size={14} className="text-[var(--color-text-tertiary)]" />
-                        <span>{t('ai.activity')}</span>
-                    </div>
-                </div>
-
                 <div className="mt-6 flex flex-1 flex-col px-2 overflow-y-auto scrollbar-thin">
                     <div className="mb-1 px-2.5 text-[11px] font-extrabold text-[var(--color-text-tertiary)] uppercase tracking-[0.05em]">
                         {t('ai.recentChats')}

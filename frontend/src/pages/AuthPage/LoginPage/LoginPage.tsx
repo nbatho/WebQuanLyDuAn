@@ -131,10 +131,10 @@ export default function AuthPage() {
                 {/* Logo */}
                 <div className="relative z-10">
                     <div className="flex items-center gap-1 mb-8">
-                        <Link to="/" className="text-h1 font-extrabold text-[var(--color-on-primary)] tracking-tighter no-underline">
-                            Flowise
+                        <Link to="/" className="inline-flex items-end gap-1 no-underline">
+                            <span className="text-3xl font-extrabold tracking-tighter text-white">Flowise</span>
+                            <span className="mb-1.5 h-2.5 w-2.5 rounded-full bg-[#825100]" aria-hidden />
                         </Link>
-                        <div className="w-3 h-3 bg-[var(--color-tertiary)] rounded-full mt-2" />
                     </div>
                 </div>
 

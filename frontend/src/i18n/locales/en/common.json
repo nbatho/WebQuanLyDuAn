@@ -75,11 +75,6 @@
   "ai": {
     "newConversation": "New Conversation",
     "recentChats": "Recent Chats",
-    "superAgents": "Super Agents",
-    "createAgent": "Create Agent",
-    "allAgents": "All Agents",
-    "myAgents": "My Agents",
-    "activity": "Activity",
     "askOrCreate": "Ask or Create",
     "newChat": "New conversation",
     "thinking": "Flowise thinking...",

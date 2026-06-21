@@ -75,11 +75,6 @@
   "ai": {
     "newConversation": "Cuộc trò chuyện mới",
     "recentChats": "Trò chuyện gần đây",
-    "superAgents": "Super Agents",
-    "createAgent": "Tạo Agent",
-    "allAgents": "Tất cả Agent",
-    "myAgents": "Agent của tôi",
-    "activity": "Hoạt động",
     "askOrCreate": "Hỏi hoặc Tạo",
     "newChat": "Cuộc trò chuyện mới",
     "thinking": "Flowise đang suy nghĩ...",
