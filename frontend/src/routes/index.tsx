@@ -7,7 +7,6 @@ const LandingPage = lazy(() => import("../pages/LandingPage"));
 const LoginPage = lazy(() => import("../pages/AuthPage/LoginPage/LoginPage"));
 const GoogleLoginPage = lazy(() => import("../pages/AuthPage/GoogleLoginPage/GoogleLoginPage"));
 const WorkspaceSetupPage = lazy(() => import("../pages/WorkspaceSetupPage"));
-const InviteTeamPage = lazy(() => import("../pages/InviteTeamPage"));
 const InboxPage = lazy(() => import("../pages/InboxPage"));
 const MyTasksPage = lazy(() => import("../pages/MyTasksPage"));
 const SpaceViewPage = lazy(() => import('../pages/SpaceViewPage'));
@@ -40,10 +39,6 @@ export const routes: RouteConfig[] = [
     {
         path: '/workspace-setup',
         element: <WorkspaceSetupPage />
-    },
-    {
-        path: '/invite-team',
-        element: <InviteTeamPage />
     },
     {
         element: <PrivateRoute><AppLayout /></PrivateRoute>,
