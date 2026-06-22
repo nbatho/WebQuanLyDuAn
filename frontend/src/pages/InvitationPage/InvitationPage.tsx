@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { message } from 'antd';
@@ -18,32 +18,11 @@ export default function InvitationPage() {
     const isVerifying = useSelector((state: RootState) => state.workspaces.isVerifyingInvitation);
     const isResponding = useSelector((state: RootState) => state.workspaces.isRespondingInvitation);
     const invitationInfo = useSelector((state: RootState) => state.workspaces.verifyInvitationData);
+    const invitationError = useSelector((state: RootState) => state.workspaces.verifyInvitationError);
 
-    const { access_token, signIn } = useSelector((state: RootState) => state.auth);
+    const { access_token } = useSelector((state: RootState) => state.auth);
 
     const isAuthenticated = !!access_token;
-    
-    let currentUserEmail = signIn?.user?.email;
-    if (!currentUserEmail && access_token) {
-        try {
-            const payload = access_token.split('.')[1];
-            if (payload) {
-                const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(
-                    atob(base64)
-                        .split('')
-                        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-                        .join('')
-                );
-                const decoded = JSON.parse(jsonPayload);
-                currentUserEmail = decoded.email;
-            }
-        } catch (error) {
-            console.error("Failed to decode token", error);
-        }
-    }
-
-    const hasAutoAccepted = useRef(false);
 
     useEffect(() => {
         if (!token) {
@@ -54,7 +33,7 @@ export default function InvitationPage() {
         dispatch(fetchVerifyInvitation(token));
     }, [dispatch, token, navigate]);
 
-    const handleAccept = useCallback(async () => {
+    const handleAccept = async () => {
         if (!token || !invitationInfo) return;
 
         if (!isAuthenticated) {
@@ -62,12 +41,6 @@ export default function InvitationPage() {
                 ? `/login?inviteToken=${token}`
                 : `/register?inviteToken=${token}`;
             navigate(redirectPath);
-            return;
-        }
-
-        if (currentUserEmail !== invitationInfo.email) {
-            message.warning(`Lời mời này dành cho ${invitationInfo.email}. Vui lòng đổi tài khoản.`);
-            navigate(`/login?inviteToken=${token}`);
             return;
         }
 
@@ -79,30 +52,16 @@ export default function InvitationPage() {
             const msg = typeof error === 'string' ? error : 'Có lỗi xảy ra khi chấp nhận lời mời';
             message.error(msg);
         }
-    }, [token, invitationInfo, isAuthenticated, currentUserEmail, navigate, dispatch]);
+    };
 
     useEffect(() => {
-        if (!invitationInfo || isVerifying) return;
-        if (isAuthenticated) {
-            if (currentUserEmail && currentUserEmail === invitationInfo.email) {
-
-                if (!hasAutoAccepted.current) {
-                    hasAutoAccepted.current = true;
-                    handleAccept(); 
-                }
-
-            } else if (currentUserEmail && currentUserEmail !== invitationInfo.email) {
-                message.warning(`Lời mời này dành cho ${invitationInfo.email}. Vui lòng đổi tài khoản.`);
-                navigate(`/login?inviteToken=${token}`);
-            }
+        if (!invitationInfo || isVerifying || isAuthenticated || !token) return;
+        if (invitationInfo.isUserExists) {
+            navigate(`/login?inviteToken=${encodeURIComponent(token)}`, { replace: true });
         } else {
-            if (invitationInfo.isUserExists) {
-                navigate(`/login?inviteToken=${token}`);
-            } else {
-                navigate(`/register?inviteToken=${token}`);
-            }
+            navigate(`/register?inviteToken=${encodeURIComponent(token)}`, { replace: true });
         }
-    }, [invitationInfo, isAuthenticated, currentUserEmail, navigate, token, isVerifying, handleAccept]);
+    }, [invitationInfo, isAuthenticated, navigate, token, isVerifying]);
 
     const handleReject = async () => {
         if (!token || !invitationInfo) return;
@@ -112,12 +71,6 @@ export default function InvitationPage() {
                 ? `/login?inviteToken=${token}`
                 : `/register?inviteToken=${token}`;
             navigate(redirectPath);
-            return;
-        }
-
-        if (currentUserEmail !== invitationInfo.email) {
-            message.warning(`Lời mời này dành cho ${invitationInfo.email}. Vui lòng đổi tài khoản.`);
-            navigate('/login');
             return;
         }
 
@@ -131,10 +84,8 @@ export default function InvitationPage() {
         }
     };
 
-    const willAutoAccept = isAuthenticated && !!currentUserEmail && currentUserEmail === invitationInfo?.email;
-
     // ── Loading State ──
-    if (isVerifying || !invitationInfo || willAutoAccept || isResponding) {
+    if (isVerifying || (!invitationInfo && !invitationError) || isResponding) {
         return (
             <div className="inv-page">
                 <div className="inv-bg">
@@ -147,6 +98,18 @@ export default function InvitationPage() {
                         {isVerifying ? 'Đang xác thực lời mời...' : 'Đang xử lý tham gia...'}
                     </h2>
                     <p className="inv-loading-sub">Vui lòng chờ trong giây lát</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (invitationError || !invitationInfo) {
+        return (
+            <div className="inv-page">
+                <div className="inv-loading-card">
+                    <XCircle size={40} />
+                    <h2 className="inv-loading-text">Lời mời không hợp lệ</h2>
+                    <p className="inv-loading-sub">{invitationError || 'Không thể tải thông tin lời mời.'}</p>
                 </div>
             </div>
         );

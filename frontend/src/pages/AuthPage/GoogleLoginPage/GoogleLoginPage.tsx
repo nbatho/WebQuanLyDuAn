@@ -51,7 +51,7 @@ function GoogleLoginContent() {
             // Dispatch vào Redux store để trigger useEffect trong AppSidebar (fetchWorkspaces)
             dispatch(setAccessToken(accessToken));
             if (inviteToken) {
-                navigate(result.acceptedInvitation ? '/home' : `/join-workspace?token=${encodeURIComponent(inviteToken)}`);
+                navigate(`/join-workspace?token=${encodeURIComponent(inviteToken)}`);
                 return;
             }
 

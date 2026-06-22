@@ -7,7 +7,7 @@ import './auth.css';
 import { useDispatch } from 'react-redux';
 import type { AppDispatch } from '@/store/configureStore';
 import { fetchSignIn, fetchSignUp } from '@/store/modules/auth';
-import { getWorkspaces } from '@/api/workspaces';
+import { getWorkspaces, verifyInvitation } from '@/api/workspaces';
 
 export default function AuthPage() {
     const navigate = useNavigate();
@@ -38,25 +38,26 @@ export default function AuthPage() {
     const [urlEmail, setUrlEmail] = useState('');
 
     useEffect(() => {
-        if (inviteToken) {
+        if (!inviteToken) return;
+
+        let isActive = true;
+        const loadInvitationEmail = async () => {
             try {
-                const payload = inviteToken.split('.')[1];
-                if (payload) {
-                    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-                    const jsonPayload = decodeURIComponent(
-                        atob(base64).split('').map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
-                    );
-                    const decoded = JSON.parse(jsonPayload);
-                    if (decoded.email) {
-                        setUrlEmail(decoded.email);
-                        setLoginEmail(decoded.email);
-                        setRegEmail(decoded.email);
-                    }
+                const invitation = await verifyInvitation(inviteToken);
+                if (isActive && invitation.email) {
+                    setUrlEmail(invitation.email);
+                    setLoginEmail(invitation.email);
+                    setRegEmail(invitation.email);
                 }
             } catch (error) {
-                console.error("Failed to decode invite token", error);
+                console.error("Failed to verify invite token", error);
             }
-        }
+        };
+
+        void loadInvitationEmail();
+        return () => {
+            isActive = false;
+        };
     }, [inviteToken]);
 
     const handleLogin = async (e: React.FormEvent) => {
@@ -94,7 +95,7 @@ export default function AuthPage() {
         }
         setIsRegistering(true);
         try {
-            const signUpResult = await dispatch(fetchSignUp({
+            await dispatch(fetchSignUp({
                 email: regEmail,
                 password: regPass,
                 username: regName,
@@ -107,7 +108,7 @@ export default function AuthPage() {
             await dispatch(fetchSignIn({ email: regEmail, password: regPass })).unwrap();
 
             if (inviteToken) {
-                navigate(signUpResult.acceptedInvitation ? '/home' : `/join-workspace?token=${encodeURIComponent(inviteToken)}`);
+                navigate(`/join-workspace?token=${encodeURIComponent(inviteToken)}`);
             } else {
                 navigate('/workspace-setup');
             }

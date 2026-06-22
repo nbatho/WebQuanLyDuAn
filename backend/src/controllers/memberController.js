@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
-import { createInvitations, checkExistingInvitation, deleteInvitation, updateInvitationStatus, addMemberToWorkspace } from "../models/Member.js";
+import { createInvitations, checkExistingInvitation, deleteInvitation, respondToInvitation } from "../models/Member.js";
 import jwt from 'jsonwebtoken';
 import { findWorkspaceById } from "../models/Workspaces.js";
 import { removeWorkspaceMember } from "../models/Workspaces.js";
@@ -150,22 +150,28 @@ export const RespondToInvitation = async (req, res) => {
 
         const { email, workspace_id } = decoded;
 
-        if (req.user.email !== email) {
+        if (
+            String(req.user.email || "").toLowerCase() !==
+            String(email || "").toLowerCase()
+        ) {
             return res.status(403).json({ message: "Email đăng nhập không khớp với email được mời!" });
         }
 
-        const invitation = await checkExistingInvitation(workspace_id, email);
+        const invitation = await respondToInvitation({
+            workspaceId: workspace_id,
+            email,
+            token,
+            userId: req.user.user_id,
+            action,
+        });
         if (!invitation) {
             return res.status(404).json({ message: "Lời mời không tồn tại hoặc đã được xử lý" });
         }
 
         if (action === 'accept') {
-            await addMemberToWorkspace(workspace_id, req.user.user_id, invitation.role_id);
-            await updateInvitationStatus(invitation.invitation_id, 'accepted');
             return res.status(200).json({ message: "Bạn đã gia nhập Workspace thành công!" });
         }
-        else if (action === 'reject') {
-            await updateInvitationStatus(invitation.invitation_id, 'rejected'); // Dùng 'rejected' thay vì 'declined'
+        else {
             return res.status(200).json({ message: "Bạn đã từ chối lời mời tham gia Workspace." });
         }
 

@@ -73,7 +73,15 @@ function createAxiosInstance(baseURL: string): AxiosInstance {
             if (status === 401) {
                 removeAccessToken();
                 toast.error(STATUS_TOAST_MAP[401], { id: 'unauthorized' });
-                window.location.href = '/login';
+                const currentParams = new URLSearchParams(window.location.search);
+                const inviteToken =
+                    currentParams.get('inviteToken') ||
+                    (window.location.pathname === '/join-workspace'
+                        ? currentParams.get('token')
+                        : null);
+                window.location.href = inviteToken
+                    ? `/login?inviteToken=${encodeURIComponent(inviteToken)}`
+                    : '/login';
             } else {
                 const toastMessage = STATUS_TOAST_MAP[status] ?? payload.message;
                 toast.error(toastMessage, { id: `err-${status}` });

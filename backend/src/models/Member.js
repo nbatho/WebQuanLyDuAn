@@ -65,3 +65,55 @@ export const updateInvitationStatus = async (invitation_id, status) => {
         throw error;
     }
 };
+
+export const respondToInvitation = async ({
+    workspaceId,
+    email,
+    token,
+    userId,
+    action,
+}) => {
+    const client = await con.connect();
+    try {
+        await client.query("BEGIN");
+        const invitationResult = await client.query(
+            `SELECT *
+             FROM workspace_invitations
+             WHERE workspace_id = $1
+               AND LOWER(email) = LOWER($2)
+               AND token = $3
+               AND status = 'pending'
+             FOR UPDATE`,
+            [workspaceId, email, token],
+        );
+        const invitation = invitationResult.rows[0];
+
+        if (!invitation) {
+            await client.query("ROLLBACK");
+            return null;
+        }
+
+        if (action === "accept") {
+            await client.query(
+                `INSERT INTO workspace_members (workspace_id, user_id, role_id)
+                 VALUES ($1, $2, $3)
+                 ON CONFLICT (workspace_id, user_id)
+                 DO UPDATE SET deleted_at = NULL, role_id = EXCLUDED.role_id`,
+                [workspaceId, userId, invitation.role_id],
+            );
+        }
+
+        await client.query(
+            "UPDATE workspace_invitations SET status = $1 WHERE invitation_id = $2",
+            [action === "accept" ? "accepted" : "rejected", invitation.invitation_id],
+        );
+        await client.query("COMMIT");
+        return invitation;
+    } catch (error) {
+        await client.query("ROLLBACK");
+        console.error("Database Error in respondToInvitation:", error);
+        throw error;
+    } finally {
+        client.release();
+    }
+};
