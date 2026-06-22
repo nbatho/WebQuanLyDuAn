@@ -37,7 +37,7 @@ export default function Footer() {
 
             {/* Bottom bar */}
             <div className="max-w-7xl mx-auto px-10 mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-                <div className="text-slate-500 text-sm">© 2025 Flowise — Dự án bài tập quản lý dự án</div>
+                <div className="text-slate-500 text-sm">© 2026 Flowise — Dự án bài tập quản lý dự án</div>
                 <div className="flex gap-5">
                     <a href="#" className="text-slate-500 hover:text-white transition-colors">
                         <Globe size={18} strokeWidth={2} />

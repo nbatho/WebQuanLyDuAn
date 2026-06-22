@@ -10,11 +10,11 @@ const benefits = [
 export default function HeroSection() {
     return (
         <section className="relative px-10 pt-24 pb-32 max-w-7xl mx-auto">
-            <div className="text-center max-w-3xl mx-auto mb-16">
+            <div className="text-center max-w-6xl mx-auto mb-16">
 
                 <h1 className="text-5xl md:text-[68px] leading-[1.05] font-extrabold tracking-tight text-[var(--color-on-surface)] mb-6">
-                    <span className="whitespace-nowrap">Một không gian duy nhất.</span>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7c5cfc] via-[#e84393] to-[#ffaa4c]"> Cho mọi dự án của bạn.</span>
+                    <span className="block md:whitespace-nowrap">Một không gian duy nhất.</span>
+                    <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#7c5cfc] via-[#e84393] to-[#ffaa4c] md:whitespace-nowrap">Cho mọi dự án của bạn.</span>
                 </h1>
 
                 <p className="text-[#424754] text-lg md:text-xl leading-relaxed mb-10 max-w-2xl mx-auto font-medium">
