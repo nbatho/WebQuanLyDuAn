@@ -13,7 +13,7 @@ import CreateTaskModal from '../../components/Modal/CreateTaskModal';
 import BoardView from './components/BoardView';
 import ListView from './components/ListView';
 import { useDispatch, useSelector } from 'react-redux';
-import { message } from 'antd';
+import { toast } from 'sonner';
 import type { AppDispatch, RootState } from '@/store/configureStore';
 import { fetchTasksForSprint, fetchCreateTask, fetchUpdateTask, fetchDeleteTask, fetchAddAssignee, fetchRemoveAssignee } from '@/store/modules/tasks';
 import { createTaskStatus } from '@/api/statuses';
@@ -170,9 +170,9 @@ export default function SprintViewPage() {
                 isExpanded: true,
                 tasks: [],
             }]);
-            message.success(`Đã tạo status "${name}"`);
+            toast.success(`Đã tạo status "${name}"`);
         } catch {
-            message.error('Không thể tạo status');
+            toast.error('Không thể tạo status');
         }
     }, [spaceId]);
 

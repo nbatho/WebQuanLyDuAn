@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Input, message } from 'antd';
+import { Button, Input } from 'antd';
+import { toast } from 'sonner';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import type { AppDispatch } from '@/store/configureStore';
@@ -26,7 +27,7 @@ export default function WorkspaceSetupPage() {
 
     const handleNext = async () => {
         if (!name.trim()) {
-            message.warning('Vui lòng nhập tên workspace');
+            toast.warning('Vui lòng nhập tên workspace');
             return;
         }
         if (isCreating) return;
@@ -39,11 +40,11 @@ export default function WorkspaceSetupPage() {
                     description: '',
                 }),
             ).unwrap();
-            message.success('Workspace đã được tạo thành công!');
+            toast.success('Workspace đã được tạo thành công!');
             navigate('/home');
         } catch (error: unknown) {
             console.error('Failed to create workspace:', error);
-            message.error(typeof error === 'string' ? error : 'Không thể tạo workspace. Vui lòng thử lại.');
+            toast.error(typeof error === 'string' ? error : 'Không thể tạo workspace. Vui lòng thử lại.');
         } finally {
             setIsCreating(false);
         }

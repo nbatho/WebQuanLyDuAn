@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Button, Input, Checkbox, message } from 'antd';
+import { Button, Input, Checkbox } from 'antd';
+import { toast } from 'sonner';
 import { ArrowRight, Mail, Lock, User, CheckCircle, Users, BarChart3, Blocks, GitBranch, Code } from 'lucide-react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -80,7 +81,7 @@ export default function AuthPage() {
             }
         } catch (error: unknown) {
             console.error('Login failed:', error);
-            message.error(typeof error === 'string' ? error : t('login.loginFailed'));
+            toast.error(typeof error === 'string' ? error : t('login.loginFailed'));
         } finally {
             setIsLoggingIn(false);
         }
@@ -90,7 +91,7 @@ export default function AuthPage() {
         e.preventDefault();
         if (isRegistering) return;
         if (regPass !== regConfirmPass) {
-            message.error(t('security.mismatch', { ns: 'settings', defaultValue: 'Mật khẩu xác nhận không khớp!' }));
+            toast.error(t('security.mismatch', { ns: 'settings', defaultValue: 'Mật khẩu xác nhận không khớp!' }));
             return;
         }
         setIsRegistering(true);
@@ -103,7 +104,7 @@ export default function AuthPage() {
                 inviteToken: inviteToken || undefined
             })).unwrap();
 
-            message.success(t('register.success'));
+            toast.success(t('register.success'));
 
             await dispatch(fetchSignIn({ email: regEmail, password: regPass })).unwrap();
 
@@ -114,7 +115,7 @@ export default function AuthPage() {
             }
         } catch (error: unknown) {
             console.error('Registration failed:', error);
-            message.error(typeof error === 'string' ? error : t('register.failed'));
+            toast.error(typeof error === 'string' ? error : t('register.failed'));
         } finally {
             setIsRegistering(false);
         }

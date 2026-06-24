@@ -3,7 +3,8 @@ import {
     Calendar, ChevronDown, ChevronRight,
     Plus, Search, Flag, User
 } from 'lucide-react';
-import { Avatar, Popover, message } from 'antd';
+import { Avatar, Popover } from 'antd';
+import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
@@ -163,10 +164,10 @@ export default function MyTasksPage() {
         dispatch(fetchCreateTask({ list_id: payload.list_id, taskData: payload }))
             .unwrap()
             .then(() => {
-                message.success(t('create.createSuccess', { defaultValue: 'Đã tạo task!' }));
+                toast.success(t('create.createSuccess', { defaultValue: 'Đã tạo task!' }));
                 dispatch(fetchTasksForUser());
             })
-            .catch(() => message.error(t('create.createFailed', { defaultValue: 'Tạo task thất bại' })));
+            .catch(() => toast.error(t('create.createFailed', { defaultValue: 'Tạo task thất bại' })));
         setIsCreateTaskOpen(false);
     };
 

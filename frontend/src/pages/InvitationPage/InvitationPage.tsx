@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { message } from 'antd';
+import { toast } from 'sonner';
 
 import './InvitationPage.css';
 import type { AppDispatch, RootState } from '@/store/configureStore';
@@ -26,7 +26,7 @@ export default function InvitationPage() {
 
     useEffect(() => {
         if (!token) {
-            message.error('Token không hợp lệ!');
+            toast.error('Token không hợp lệ!');
             navigate('/');
             return;
         }
@@ -46,11 +46,11 @@ export default function InvitationPage() {
 
         try {
             await dispatch(respondToInvitations({ token, action: 'accept' })).unwrap();
-            message.success('Đã tham gia dự án thành công!');
+            toast.success('Đã tham gia dự án thành công!');
             navigate('/home');
         } catch (error: unknown) {
             const msg = typeof error === 'string' ? error : 'Có lỗi xảy ra khi chấp nhận lời mời';
-            message.error(msg);
+            toast.error(msg);
         }
     };
 
@@ -76,11 +76,11 @@ export default function InvitationPage() {
 
         try {
             await dispatch(respondToInvitations({ token, action: 'reject' })).unwrap();
-            message.info('Bạn đã từ chối lời mời.');
+            toast.info('Bạn đã từ chối lời mời.');
             navigate('/home');
         } catch (error: unknown) {
             const msg = typeof error === 'string' ? error : 'Có lỗi xảy ra khi từ chối lời mời';
-            message.error(msg);
+            toast.error(msg);
         }
     };
 

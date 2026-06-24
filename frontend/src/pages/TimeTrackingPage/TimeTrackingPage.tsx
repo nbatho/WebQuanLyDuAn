@@ -6,7 +6,8 @@ import {
     Play, Square, Clock, Calendar, Search,
     Timer, Trash2, ChevronRight
 } from 'lucide-react';
-import { Avatar, message } from 'antd';
+import { Avatar } from 'antd';
+import { toast } from 'sonner';
 import './time-tracking.css';
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import {
@@ -116,16 +117,16 @@ export default function TimeTrackingPage() {
     // ── Handlers ──
     const handleStartTimer = useCallback(async (taskId: number, taskName: string) => {
         if (runningTimer) {
-            message.warning('Hãy dừng timer đang chạy trước!');
+            toast.warning('Hãy dừng timer đang chạy trước!');
             return;
         }
         try {
             await dispatch(fetchStartTimer({ taskId })).unwrap();
             dispatch(fetchMyTimeLogs());
             dispatch(fetchRunningTimer());
-            message.success(`⏱ Bắt đầu: ${taskName}`);
+            toast.success(`⏱ Bắt đầu: ${taskName}`);
         } catch (err: unknown) {
-            message.error(typeof err === 'string' ? err : 'Không thể bắt đầu timer');
+            toast.error(typeof err === 'string' ? err : 'Không thể bắt đầu timer');
         }
     }, [dispatch, runningTimer]);
 
@@ -134,9 +135,9 @@ export default function TimeTrackingPage() {
         try {
             await dispatch(fetchStopTimer(runningTimer.time_log_id)).unwrap();
             dispatch(fetchMyTimeLogs());
-            message.success('⏹ Timer đã dừng & lưu!');
+            toast.success('⏹ Timer đã dừng & lưu!');
         } catch (err: unknown) {
-            message.error(typeof err === 'string' ? err : 'Không thể dừng timer');
+            toast.error(typeof err === 'string' ? err : 'Không thể dừng timer');
         }
     }, [dispatch, runningTimer]);
 
@@ -144,9 +145,9 @@ export default function TimeTrackingPage() {
         try {
             await dispatch(fetchDeleteTimeLog(id)).unwrap();
             dispatch(fetchMyTimeLogs());
-            message.success('Đã xóa');
+            toast.success('Đã xóa');
         } catch (err: unknown) {
-            message.error(typeof err === 'string' ? err : 'Không thể xóa');
+            toast.error(typeof err === 'string' ? err : 'Không thể xóa');
         }
     }, [dispatch]);
 

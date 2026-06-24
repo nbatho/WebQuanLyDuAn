@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Hash, Plus, Send, MessageSquare, X, FileText, Cloud, Paperclip } from 'lucide-react';
-import { message, Spin } from 'antd';
+import { Spin } from 'antd';
+import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../../hooks';
 import * as msgApi from '../../api/messages';
@@ -99,7 +100,7 @@ export default function InboxPage() {
             setInput('');
             setAttachedFile(null);
             loadConvos(); // refresh sidebar last_message
-        } catch { message.error(t('errors.genericError')); }
+        } catch { toast.error(t('errors.genericError')); }
     };
 
     // Local file upload handler
@@ -115,7 +116,7 @@ export default function InboxPage() {
             });
         } catch (error) {
             console.error('Lỗi upload:', error);
-            message.error('Không thể tải file lên');
+            toast.error('Không thể tải file lên');
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = '';
@@ -135,7 +136,7 @@ export default function InboxPage() {
             setShowNewDM(false);
             await loadConvos();
             setActiveId(conversation_id);
-        } catch { message.error(t('errors.genericError')); }
+        } catch { toast.error(t('errors.genericError')); }
     };
 
     // Create channel
@@ -147,8 +148,8 @@ export default function InboxPage() {
             setChannelName('');
             setSelectedMembers([]);
             await loadConvos();
-            message.success(t('buttons.submit'));
-        } catch { message.error(t('errors.genericError')); }
+            toast.success(t('buttons.submit'));
+        } catch { toast.error(t('errors.genericError')); }
     };
 
     // Helpers
