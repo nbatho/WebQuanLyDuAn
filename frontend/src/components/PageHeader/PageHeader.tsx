@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
     ChevronDown, Star, FolderClosed, Bot, Share2,
-    LayoutDashboard, LayoutList, Trello,
+    LayoutList, Trello,
 } from 'lucide-react';
 
 

@@ -1,4 +1,4 @@
-import type { Task, NewTaskData } from "../tasks";
+import type { NewTaskData } from "../tasks";
 export interface ContextMenuProps {
     x: number;
     y: number;
