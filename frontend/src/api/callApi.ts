@@ -4,8 +4,18 @@ import axios, {
     type AxiosResponse,
 } from 'axios';
 import { toast } from 'sonner';
-import { getAccessToken, removeAccessToken } from '../utils/localStorage';
+import { getAccessToken, removeAccessToken, setAccessToken } from '../utils/localStorage';
 import { ApiError, type ApiErrorPayload } from '../utils/errorUtils';
+
+type RetryableAxiosRequestConfig = InternalAxiosRequestConfig & {
+    _retry?: boolean;
+};
+
+type RefreshTokenResponse = {
+    user?: {
+        access_token?: string;
+    };
+};
 
 const STATUS_TOAST_MAP: Record<number, string> = {
     401: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
@@ -17,6 +27,34 @@ const STATUS_TOAST_MAP: Record<number, string> = {
     502: 'Dịch vụ tạm thời không khả dụng. Vui lòng thử lại.',
     503: 'Máy chủ đang bảo trì. Vui lòng thử lại sau.',
 };
+
+let refreshAccessTokenPromise: Promise<string> | null = null;
+
+function getLoginRedirectUrl(): string {
+    const currentParams = new URLSearchParams(window.location.search);
+    const inviteToken =
+        currentParams.get('inviteToken') ||
+        (window.location.pathname === '/join-workspace'
+            ? currentParams.get('token')
+            : null);
+
+    return inviteToken
+        ? `/login?inviteToken=${encodeURIComponent(inviteToken)}`
+        : '/login';
+}
+
+function redirectToLogin(): void {
+    window.location.href = getLoginRedirectUrl();
+}
+
+function isRefreshRequest(config?: RetryableAxiosRequestConfig): boolean {
+    return config?.url?.includes('/auth/refresh') ?? false;
+}
+
+function isTokenAuthError(status: number, payload: ApiErrorPayload): boolean {
+    const message = payload.message.toLowerCase();
+    return status === 401 || (status === 403 && message.includes('token'));
+}
 
 function createAxiosInstance(baseURL: string): AxiosInstance {
     const instance = axios.create({
@@ -57,6 +95,7 @@ function createAxiosInstance(baseURL: string): AxiosInstance {
             }
 
             const { status, data } = error.response;
+            const originalRequest = error.config as RetryableAxiosRequestConfig | undefined;
 
             const payload: ApiErrorPayload = {
                 status: status >= 500 ? 'error' : 'fail',
@@ -70,18 +109,51 @@ function createAxiosInstance(baseURL: string): AxiosInstance {
             };
             const apiError = new ApiError(payload, status);
 
+            if (
+                originalRequest &&
+                !originalRequest._retry &&
+                !isRefreshRequest(originalRequest) &&
+                isTokenAuthError(status, payload)
+            ) {
+                originalRequest._retry = true;
+
+                try {
+                    if (!refreshAccessTokenPromise) {
+                        refreshAccessTokenPromise = instance
+                            .post<RefreshTokenResponse>('/auth/refresh')
+                            .then((response) => {
+                                const refreshResponse = response as RefreshTokenResponse;
+                                const accessToken = refreshResponse.user?.access_token;
+                                if (!accessToken) {
+                                    throw new Error('Missing access token from refresh response');
+                                }
+
+                                setAccessToken(accessToken);
+                                return accessToken;
+                            })
+                            .finally(() => {
+                                refreshAccessTokenPromise = null;
+                            });
+                    }
+
+                    const newAccessToken = await refreshAccessTokenPromise;
+                    if (originalRequest.headers) {
+                        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                    }
+
+                    return instance(originalRequest);
+                } catch {
+                    removeAccessToken();
+                    toast.error(STATUS_TOAST_MAP[401], { id: 'unauthorized' });
+                    redirectToLogin();
+                    return Promise.reject(apiError);
+                }
+            }
+
             if (status === 401) {
                 removeAccessToken();
                 toast.error(STATUS_TOAST_MAP[401], { id: 'unauthorized' });
-                const currentParams = new URLSearchParams(window.location.search);
-                const inviteToken =
-                    currentParams.get('inviteToken') ||
-                    (window.location.pathname === '/join-workspace'
-                        ? currentParams.get('token')
-                        : null);
-                window.location.href = inviteToken
-                    ? `/login?inviteToken=${encodeURIComponent(inviteToken)}`
-                    : '/login';
+                redirectToLogin();
             } else {
                 const toastMessage = STATUS_TOAST_MAP[status] ?? payload.message;
                 toast.error(toastMessage, { id: `err-${status}` });

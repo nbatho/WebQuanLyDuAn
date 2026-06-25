@@ -15,7 +15,7 @@ export const protectedRoute = async (req, res, next) => {
             decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
         } catch (err) {
             console.error('Loi xac thuc token:', err.message);
-            return res.status(403).json({ message: 'Access Token khong hop le' });
+            return res.status(401).json({ message: 'Access Token khong hop le' });
         }
         // tìm user 
         const user = await findUserById(decoded.user_id);
