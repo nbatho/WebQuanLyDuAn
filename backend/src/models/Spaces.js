@@ -130,7 +130,36 @@ export const deleteSpace = async (space_id, user_id) => {
 
 export const findSpaceMembers = async (space_id) => {
   try {
-    const query = `SELECT u.user_id, u.username, u.email FROM users u JOIN space_members sm ON u.user_id = sm.user_id WHERE sm.space_id = $1 AND sm.deleted_at IS NULL AND u.deleted_at IS NULL`;
+    const query = `
+      SELECT
+        u.user_id,
+        u.username,
+        COALESCE(NULLIF(u.name, ''), u.username, u.email) AS name,
+        u.email,
+        u.avatar_url,
+        COALESCE(space_role.role_name, workspace_role.role_name) AS role_name
+      FROM spaces s
+      JOIN workspace_members wm
+        ON wm.workspace_id = s.workspace_id
+       AND wm.deleted_at IS NULL
+      JOIN users u
+        ON u.user_id = wm.user_id
+       AND u.deleted_at IS NULL
+      LEFT JOIN space_members sm
+        ON sm.space_id = s.space_id
+       AND sm.user_id = u.user_id
+       AND sm.deleted_at IS NULL
+      LEFT JOIN roles space_role
+        ON space_role.role_id = sm.role_id
+      LEFT JOIN roles workspace_role
+        ON workspace_role.role_id = wm.role_id
+      WHERE s.space_id = $1
+        AND s.deleted_at IS NULL
+        AND (
+          s.is_private = FALSE
+          OR sm.user_id IS NOT NULL
+        )
+      ORDER BY LOWER(COALESCE(NULLIF(u.name, ''), u.username, u.email)), u.user_id`;
     const values = [space_id];
     const result = await con.query(query, values);
     return result.rows;

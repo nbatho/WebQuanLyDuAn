@@ -53,6 +53,12 @@ function elapsedSince(startedAt: string): number {
     return Math.max(0, Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000));
 }
 
+function getEntryDurationSecs(entry: { duration_secs: number | null; started_at: string; stopped_at: string | null }): number {
+    if (entry.duration_secs && entry.duration_secs > 0) return entry.duration_secs;
+    if (!entry.stopped_at) return 0;
+    return Math.max(0, Math.floor((new Date(entry.stopped_at).getTime() - new Date(entry.started_at).getTime()) / 1000));
+}
+
 // ── component ────────────────────────────────────────────────────
 
 export default function TimeTrackingPage() {
@@ -166,8 +172,8 @@ export default function TimeTrackingPage() {
 
     // ── Stats ──
     const todayEntries = grouped['Hôm nay'] || [];
-    const todaySecs = todayEntries.reduce((sum, e) => sum + (e.duration_secs || 0), 0);
-    const weekSecs = completedEntries.reduce((sum, e) => sum + (e.duration_secs || 0), 0);
+    const todaySecs = todayEntries.reduce((sum, e) => sum + getEntryDurationSecs(e), 0);
+    const weekSecs = completedEntries.reduce((sum, e) => sum + getEntryDurationSecs(e), 0);
     const todayHrs = (todaySecs / 3600).toFixed(1);
     const weekHrs = (weekSecs / 3600).toFixed(1);
 
@@ -390,7 +396,7 @@ export default function TimeTrackingPage() {
                         )}
 
                         {Object.entries(grouped).map(([date, dateEntries]) => {
-                            const daySecs = dateEntries.reduce((sum, e) => sum + (e.duration_secs || 0), 0);
+                            const daySecs = dateEntries.reduce((sum, e) => sum + getEntryDurationSecs(e), 0);
                             const dayHrs = (daySecs / 3600).toFixed(1);
 
                             return (
@@ -404,7 +410,7 @@ export default function TimeTrackingPage() {
                                     <div className="flex flex-col">
                                         {dateEntries.map(entry => {
                                             const taskName = entry.task_name || `Task #${entry.task_id}`;
-                                            const dur = entry.duration_secs || 0;
+                                            const dur = getEntryDurationSecs(entry);
                                             const note = entry.note || '';
                                             const userName = entry.user_name || entry.username || '';
                                             const initials = userName
