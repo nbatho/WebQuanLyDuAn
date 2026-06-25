@@ -1,7 +1,7 @@
 import { X, ChevronRight, Minimize2, Maximize2, MoreHorizontal } from 'lucide-react';
 import { Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
-import StatusPicker from '../Pickers/StatusPicker';
+import { StatusPicker } from '@/components/Pickers';
 import type { Task } from '@/types/tasks';
 
 interface TaskDetailHeaderProps {

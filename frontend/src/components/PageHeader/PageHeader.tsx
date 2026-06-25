@@ -24,11 +24,6 @@ export interface PageHeaderProps {
 
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const FOLDER_TABS: PageTab[] = [
-    { icon: <LayoutDashboard size={14} />, label: 'overview', active: true },
-];
-
-// eslint-disable-next-line react-refresh/only-export-components
 export const LIST_TABS: PageTab[] = [
     { icon: <LayoutList size={14} />, label: 'list', active: true },
     { icon: <Trello size={14} />, label: 'board' },

@@ -88,12 +88,6 @@ export interface TaskViewContextType {
 
 export type TabType = 'assigned' | 'mentions' | 'created';
 
-export interface TaskGroup {
-    label: string;
-    icon?: string;
-    tasks: Task[];
-}
-
 export interface InlineCreateTaskProps {
     isActive: boolean;
     text: string;

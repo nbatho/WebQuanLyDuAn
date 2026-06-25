@@ -21,7 +21,7 @@ export default function SpaceViewPage() {
 
     return (
         <div className="flex h-full flex-col overflow-hidden bg-[var(--color-surface-container-lowest)]" style={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}>
-            <SpaceHeader currentSpace={currentSpace} activeView={'overview'} onViewChange={() => { }} />
+            <SpaceHeader currentSpace={currentSpace} />
 
             <main className="flex flex-1 flex-col overflow-hidden">
                 <OverviewView spaceId={spaceId} currentSpaceTree={currentSpaceTree} />

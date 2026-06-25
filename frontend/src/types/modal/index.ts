@@ -37,10 +37,3 @@ export interface CreateTaskModalProps {
     defaultListId?: number;
 }
 
-export interface TaskDetailModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    task: Task | null;
-    /** Flat list of tasks in the current space (or My Tasks list) for resolving `parent_task_id` children. */
-    allTasks?: Task[];
-}
